@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Language" content="en">
+<meta name="viewport" content="initial-scale=1.0">
+<head>
+
+</head>
+<body>
+
+    
+    <script>
+        
+        const audios = [
+            new Audio('assets/sounds/success/goodresult-82807.mp3'),
+            new Audio('assets/sounds/background/Carefree(chosic.com).mp3'),
+        ];
+        
+        audios[0].volume = .5;
+    
+        function play(i) {
+            audios[i].play();
+        }
+    
+    </script>
+    
+    <a href="#" onclick="play(0); return false">Click 0</a>
+    <a href="#" onclick="play(1); return false">Click 1</a>
+
+</body>
+</html>
