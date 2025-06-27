@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="Content-Language" content="en">
+<meta name="viewport" content="initial-scale=1.0">
+<head>
+
+    <style>
+    
+        body {
+            font-family: mono, sans-serif;
+            background: #fec;
+        }
+        
+        .container {
+            max-width: 60rem;
+            min-height: 40rem;
+            margin: 0 auto;
+            position: relative;
+            border-left: 1px solid #cb9;
+            border-right: 1px solid #cb9;
+            padding: 0 1rem;
+        }
+        
+        .fireworks-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+    
+        .score {
+            background: #309;
+            border-radius: 1rem;
+            position: absolute;
+            right: 1rem;
+            font-size: 2rem;
+            padding: 0 1rem;
+        }
+        
+        .score .icon {
+            display: inline-block;
+            line-height: 2rem;
+            font-size: 1.3rem;
+            position: relative;
+            bottom: 0.2rem;
+        }
+        
+        .score .value {
+            display: inline-block;
+            min-width: 5rem;
+            color: #fff;
+            font-weight: bold;
+            text-align: right;
+        }
+        
+        .prompt {
+            padding-top: 5rem;
+        }
+        
+        .prompt .img {
+            display: inline-block;
+            line-height: 8rem;
+            background: #ccc;
+            height: 12rem;
+            width: 12rem;
+        }
+        
+        .prompt .infield {
+            display: inline-block;
+            line-height: 8rem;
+            background: #fffae4;
+            font-size: 6rem;
+            padding: 0 1rem;
+            min-width: 30rem;
+        }
+    
+    </style>
+
+    <script src="assets/fireworks/fireworks.js"></script>
+    <script src="assets/jquery/jquery-3.7.1.min.js"></script>
+</head>
+<body>
+    <div class="container">
+
+        <div class="score"><span class="icon">🪙</span> <span class="value">0</span></div>
+        <div class="prompt">
+            <span class="img"></span>
+            <span class="infield">apple</span>
+        </div>
+
+    </div>
+
+    <div class="fireworks-container"></div>
+    
+    <script>
+        
+        // Initialize
+
+        const fireworks = {
+            obj: new Fireworks(document.querySelector('.fireworks-container'), {
+                sound: {
+                    enabled: true,
+                    files: [
+                        'assets/fireworks/explosion0.mp3',
+                        'assets/fireworks/explosion1.mp3',
+                        'assets/fireworks/explosion2.mp3'
+                    ],
+                    volume: {
+                        min: 1,
+                        max: 2
+                    }
+                },
+                lineWidth: { explosion: { min: 2, max: 6}, trace: { min: 2, max: 6}},
+                // intensity: 20, // default: 30
+                delay: { min: 5, max: 10 },
+            }),
+            playing: false,
+            slow_timeout: false,
+            stop_timeout: false,
+        };
+        setTimeout(function(){ $('.fireworks-container').hide(); }, 200);
+        
+        function show_fireworks() {
+            console.log('fireworks: show');
+            $('.fireworks-container').show();
+            fireworks.obj.setOptions({ delay: { min: 5, max: 10 }});
+            if(fireworks.slow_timeout !== false) { 
+                console.log('fireworks: clear slow');
+                clearTimeout(fireworks.slow_timeout); 
+            }
+            if(fireworks.stop_timeout !== false) { 
+                console.log('fireworks: clear stop');
+                clearTimeout(fireworks.stop_timeout); 
+            }
+            if(!fireworks.playing) {
+                console.log('fireworks: start()');
+                fireworks.playing = true;
+                fireworks.obj.start();
+            }
+            // fireworks.pause()
+            // fireworks.clear()
+
+            fireworks.slow_timeout = setTimeout( function() {
+                // Gracefully stop the fireworks
+                fireworks.obj.setOptions({ delay: { min: 1000, max: 1000 }});
+                fireworks.slow_timeout = false;
+            }, 2*1000);
+            
+            fireworks.stop_timeout = setTimeout( function(){
+                console.log('fireworks: stop()');
+                fireworks.obj.stop();
+                $('.fireworks-container').hide();
+                fireworks.stop_timeout = false;
+                fireworks.playing = false;
+            }, 3.5*1000);
+        }
+
+        
+        
+        $('.score').on('click', show_fireworks);
+        
+    </script>
+
+</body>
+</html>
