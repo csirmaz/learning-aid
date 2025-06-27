@@ -4,6 +4,7 @@
 <meta http-equiv="Content-Language" content="en">
 <meta name="viewport" content="initial-scale=1.0">
 <head>
+    <title>Bee</title>
 
     <style>
     
@@ -14,7 +15,7 @@
         
         .container {
             max-width: 60rem;
-            min-height: 40rem;
+            min-height: 30rem;
             margin: 0 auto;
             position: relative;
             border-left: 1px solid #cb9;
@@ -61,8 +62,9 @@
         
         .prompt .img {
             display: inline-block;
-            line-height: 8rem;
-            background: #ccc;
+            font-size: 8rem;
+            text-align: center;
+            background: #ddf;
             height: 12rem;
             width: 12rem;
         }
@@ -73,9 +75,41 @@
             background: #fffae4;
             font-size: 6rem;
             padding: 0 1rem;
-            min-width: 30rem;
+            min-width: 35rem;
+            letter-spacing: .3rem;
         }
-    
+        
+        .prompt .infield .help,
+        .prompt .infield .inp {
+            display: inline-block;
+        }
+
+        .prompt .infield .help { color: #999; }
+        .prompt .infield .inp { color: #000; }
+        body .prompt .infield .success { color: #090; }
+        
+        .startbutton {
+            margin: 2rem 0;
+            border-radius: 1rem;
+            background: #a0c;
+            color: #fff;
+            font-size: 2rem;
+            padding: .5rem;
+            position: absolute;
+            cursor: pointer;
+        }
+
+        @keyframes pulse { 
+            25% { transform: scale(1.4); } 
+            50% { transform: scale(1); } 
+            75% { transform: scale(1.2); } 
+            100% { transform: scale(1); } 
+        }
+
+        .pulse {
+            animation:pulse 1.5s ease-in-out 1;
+        }
+
     </style>
 
     <script src="assets/fireworks/fireworks.js"></script>
@@ -87,17 +121,164 @@
         <div class="score"><span class="icon">🪙</span> <span class="value">0</span></div>
         <div class="prompt">
             <span class="img"></span>
-            <span class="infield">apple</span>
+            <span class="infield"><span class="help"></span><span class="inp"></span></span>
         </div>
+        
+        <div class="startbutton">Click here to start</div>
 
     </div>
+    <p>
+    Player: <span class="d_player"></span>
+    | Word sets: <span class="d_wordsets"></span>
+    </p>
+    <p>Press F1 or F2 to show the target word briefly</p>
 
     <div class="fireworks-container"></div>
     
     <script>
-        
-        // Initialize
+    
+        // Words, split into sets
+        // Format: ['<emoji>', '<word to spell>']
+        // Use e.g. https://getemoji.com/
 
+        // The page will attempt to play assets/sounds/words/<word to spell>.mp3
+        // Use e.g. https://ttsmp3.com/ to generate them
+        
+        const word_sets = [
+            [
+                ['😀', 'happy'],
+                ['👃🏻', 'nose'],
+                ['👂', 'ear'],
+                ['💍', 'ring'],
+                ['👞', 'shoe'],
+                ['🧥', 'coat'],
+                ['🌈', 'rainbow'],
+                ['🥚', 'egg'],
+                ['🧊', 'ice'],
+                ['🍿', 'popcorn'],
+                ['🚜', 'tractor'],
+                ['🧺', 'basket'],
+                ['🔑', 'key'],
+                ['📏', 'ruler'],
+                ['❤️', 'heart'],
+                ['▶️', 'play'],
+                ['🔔', 'bell'],
+                ['😁', 'grin'],
+                ['👜', 'bag'],
+                ['🧣', 'scarf'],
+                ['🐠', 'fish'],
+                ['🌜', 'moon'],
+                ['🥛', 'milk'],
+                ['🥁', 'drum'],
+                ['⛺️', 'tent'],
+                ['📦', 'box'],
+                ['🖊', 'pen'],
+                ['📌', 'pin'],
+                ['🌞', 'sun'],
+                ['🖐', 'hand'],
+                ['🫂', 'love'],
+                ['🏊', 'swim'],
+                ['🏃🏻‍♂️‍➡️', 'run'],
+                ['🐄', 'cow'],
+                ['🐖', 'pig'],
+                ['🪺', 'nest'],
+                ['🐈‍', 'cat'],
+                ['🐑', 'sheep'],
+                ['🌳', 'tree'],
+                ['🪨', 'rock'],
+                ['❄️', 'snow'],
+                ['⛄️', 'snowman'],
+                ['🍋', 'lemon'],
+                ['🍕', 'pizza'],
+                ['🍝', 'pasta'],
+                ['🎹', 'piano'],
+                ['🏦', 'bank'],
+                ['💳', 'card'],
+                ['🧱', 'wall'],
+                ['🛏', 'bed'],
+                ['🧸', 'teddy'],
+                ['🚪', 'door'],
+            ],
+            [
+                ['🍄', 'mushroom'],
+                ['🐬', 'dolphin'],
+                ['🕷', 'spider'],
+                ['🎾', 'tennis'],
+                ['🎺', 'trumpet'],
+                ['🚁', 'helicopter'],
+                ['🖼', 'picture'],
+                ['👄', 'mouth'],
+                ['💎', 'diamond'],
+                ['🦈', 'shark'],
+                ['🐍', 'snake'],
+                ['🦴', 'bone'],
+                ['🦜', 'parrot'],
+                ['☔️', 'rain'],
+                ['🍪', 'cookie'],
+                ['⛳️', 'golf'],
+                ['🚂', 'train'],
+                ['🔒', 'lock'],
+                ['🍌', 'banana'],
+                ['🍬', 'candy'],
+                ['🥄', 'spoon'],
+                ['🪽', 'wing'],
+                ['🥝', 'kiwi'],
+                ['😢', 'cry'],
+                ['👶', 'baby'],
+                ['👑', 'crown'],
+                ['🧦', 'socks'],
+                ['🦶', 'foot'],
+                ['🐤', 'chick'],
+                ['🦘', 'kangaroo'],
+                ['🦒', 'giraffe'],
+                ['🌹', 'rose'],
+                ['🐇', 'rabbit'],
+                ['🔥', 'fire'],
+                ['✈️', 'plane'],
+                ['🏠', 'house'],
+                ['📱', 'phone'],
+                ['🪧', 'sign'],
+            ]
+        ];
+        
+        
+
+        const audio = {
+            success: [
+                {'file': 'assets/sounds/success/goodresult-82807.mp3', 'volume': .2, 'object': false},
+                {'file': 'assets/sounds/success/success-340660.mp3', 'volume': .4, 'object': false},
+                {'file': 'assets/sounds/success/sample_confirm_success02_kofi_by_miraclei-360154.mp3', 'volume': .8, 'object': false},
+                {'file': 'assets/sounds/success/yipee-45360.mp3', 'volume': .4, 'object': false},
+                {'file': 'assets/sounds/success/purchase-succesful-ingame-230550.mp3', 'volume': .4, 'object': false},
+                {'file': 'assets/sounds/success/success-fanfare-trumpets-6185.mp3', 'volume': .4, 'object': false},
+            ]
+        };
+
+        let words = [];
+
+        // Application data
+        const bee = {
+            word_ix: false,
+            can_type: false,
+            typed: '',
+            can_use_help: true,
+            help_timeout: false,
+            score_anim_timeout: false,
+            player: 'Default',  // name of the player - scores are saved to browser under this name
+            $image: $('.prompt .img'),
+            $input: $('.prompt .infield .inp'),
+            $help: $('.prompt .infield .help'),
+            storage: {'players': {}},  // storage data that's saved into local storage
+            word_audio: false,
+        };
+        
+        // Try to load data
+        if(localStorage.spellbee) {
+            bee.storage = JSON.parse(localStorage.spellbee);
+        }
+
+        
+        // Data and objects for the fireworks animation
         const fireworks = {
             obj: new Fireworks(document.querySelector('.fireworks-container'), {
                 sound: {
@@ -121,8 +302,15 @@
             stop_timeout: false,
         };
         setTimeout(function(){ $('.fireworks-container').hide(); }, 200);
+
         
-        function show_fireworks() {
+        function save_storage() {
+            localStorage.spellbee = JSON.stringify(bee.storage);
+        }
+        
+
+        // Show fireworks for a few seconds
+        function show_fireworks(callback) {
             console.log('fireworks: show');
             $('.fireworks-container').show();
             fireworks.obj.setOptions({ delay: { min: 5, max: 10 }});
@@ -154,12 +342,197 @@
                 $('.fireworks-container').hide();
                 fireworks.stop_timeout = false;
                 fireworks.playing = false;
+                if(callback) { callback(); }
             }, 3.5*1000);
         }
 
         
+        // Display target word briefly
+        function show_help() {
+            bee.can_type = false;
+            bee.$input.hide();
+            bee.$help.show();
+            play_word(words[bee.word_ix][1]);
+            bee.$help.fadeOut({duration: 1500, complete: function() {
+                bee.$input.show();
+                bee.can_type = true;
+            }});
+        }
+
+
+        function to_underscores(prefix, s) {
+            o = prefix;
+            for(let i=0; i<s.length-prefix.length; i++) { o += '_'; }
+            return o;
+        }
         
-        $('.score').on('click', show_fireworks);
+        
+        function update_input_field() {
+            bee.$input.html(to_underscores(bee.typed, words[bee.word_ix][1]));
+        }
+        
+        
+        // Add one to the score & animate
+        function add_score() {
+            bee.storage.players[bee.player].score++;
+            save_storage();
+            $('.score .value').html(bee.storage.players[bee.player].score);
+            $('.score').addClass('pulse');
+            if(bee.score_anim_timeout !== false) { clearTimeout(bee.score_anim_timeout); }
+            bee.score_anim_timeout = setTimeout(function() {
+                $('.score').removeClass('pulse');
+                bee.score_anim_timeout = false;
+            }, 1500);
+            return bee.storage.players[bee.player].score;
+        }
+        
+        
+        // Call this to zero the score of the current player
+        function clear_score() {
+            bee.storage.players[bee.player].score = -1;
+            add_score();
+        }
+        
+        
+        function play_success_sound() {
+            const i = Math.floor(Math.random() * audio.success.length);
+            const d = audio.success[i];
+            if(d['object'] === false) { 
+                console.log("Audio: setting up success", i);
+                d['object'] = new Audio(d['file']); 
+                d['object'].volume = d['volume']; 
+            }
+            console.log("Audio: playing success", i);
+            d['object'].play();
+        }
+        
+        
+        function play_word(s) {
+            s = s.replaceAll(/[^a-z]/g, '');
+            file = 'assets/sounds/words/'+s+'.mp3';
+            if(bee.word_audio === false) {
+                bee.word_audio = new Audio(audio.success[0].file);
+                bee.word_audio.volume = 1;
+            }
+            try {
+                bee.word_audio.src = file;
+                bee.word_audio.play();
+            } catch(e) {
+                console.log("Error during play_word", e);
+            }
+        }
+
+        
+        function process_keypress(event) {
+            event.preventDefault = true;
+            if(!bee.can_type) { return; }
+            
+            if(event.keyCode >= 65 && event.keyCode <= 90) { // a-z
+                if(bee.typed.length < words[bee.word_ix][1].length) {
+                    bee.typed += event.key;
+                    update_input_field();
+                    
+                    if(bee.typed == words[bee.word_ix][1]) { // Success!
+                        bee.can_type = false;
+                        play_success_sound();
+                        bee.$input.addClass('success');
+                        if(add_score() % 4 == 0) {
+                            show_fireworks(function() {
+                                setTimeout(new_question, 1100);
+                            });
+                        } else {
+                            setTimeout(new_question, 2700);
+                        }
+                    }
+                }
+                return;
+            }
+            
+            if(event.keyCode == 8) { // backspace
+                if(bee.typed.length > 0) {
+                    bee.typed = bee.typed.substring(0, bee.typed.length-1);
+                    update_input_field();
+                }
+                return;
+            }
+                       
+            if(event.keyCode == 112 || event.keyCode == 113) { // F1, F2
+                if(!bee.can_use_help) { return; }
+                console.log("Disabling help");
+                bee.can_use_help = false;
+                if(bee.help_timeout === false) {
+                    console.log("Scheduling enabling help");
+                    bee.help_timeout = setTimeout(function(){ 
+                        console.log("Enabling help");
+                        bee.can_use_help = true;
+                        bee.help_timeout = false;
+                    }, 5*1000);
+                }
+                show_help();
+            }            
+        }
+
+        
+        // Initialize a question
+        function start_question(word_ix) {
+            bee.word_ix = word_ix;
+            bee.can_type = true;
+            bee.can_use_help = true;
+            if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); bee.help_timeout = false; }
+            
+            
+            // Show picture
+            bee.$image.html(words[word_ix][0]);
+            
+            // Add help & input
+            bee.$help.html(words[word_ix][1]);
+            bee.typed = '';
+            update_input_field();
+            bee.$input.removeClass('success');
+            show_help();
+        }
+        
+        
+        function new_question() {
+            let word_ix;
+            while(true) {
+                word_ix = Math.floor(Math.random() * words.length);
+                if(bee.word_ix === false || word_ix != bee.word_ix) { break; } // ensure we choose a new word
+            }
+            start_question(word_ix);
+        }
+        
+        
+        function main() {
+            document.addEventListener('keydown', process_keypress); // Or use 'keypress' event
+            
+            bee.player = prompt("Who is the player? We'll save the score in the browser under this name");
+
+            // Initialize
+            if(!bee.storage.players[bee.player]) { 
+                let wordsets = prompt("What range of word sets should we use? 0 to "+(word_sets.length-1));
+                bee.storage.players[bee.player] = {'score': 0, 'wordsets': wordsets};
+                save_storage();
+            }
+            
+            $('.score .value').html(bee.storage.players[bee.player].score);
+            $('.d_player').html(bee.player);
+            
+            // Set up word list
+            for(let i=0; i<=bee.storage.players[bee.player].wordsets; i++) {
+                words = words.concat(word_sets[i]);
+            }
+            $('.d_wordsets').html("0 to " + bee.storage.players[bee.player].wordsets + " (" + words.length + " words)");
+            
+            new_question();
+        }
+        
+        // Audio can only be played after a user event on the page, so we require a click
+        $('.startbutton').on('click', function() {
+            $('.startbutton').hide();
+            main();
+            return false;
+        });
         
     </script>
 
