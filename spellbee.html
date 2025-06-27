@@ -529,6 +529,7 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
             // Initialize
             if(!bee.storage.players[bee.player]) { 
                 let wordsets = prompt("What range of word sets should we use?\nType \"0\" for simpler words, or \"1\" for more complex\n(magic 'e', digraphs, irregular sound values)") - 0;
+                if(isNaN(wordsets)) { wordsets = 0; }
                 bee.storage.players[bee.player] = {'score': 0, 'wordsets': wordsets};
                 save_storage();
             }
