@@ -46,6 +46,7 @@
             font-size: 1.3rem;
             position: relative;
             bottom: 0.2rem;
+            color: #fe0;
         }
         
         .score .value {
@@ -64,7 +65,8 @@
             display: inline-block;
             font-size: 8rem;
             text-align: center;
-            background: #ddf;
+            background: #fff;
+            border-radius: 1rem;
             height: 12rem;
             width: 12rem;
         }
@@ -98,6 +100,10 @@
             position: absolute;
             cursor: pointer;
         }
+        
+        .smallprint { font-size: 70%; }
+        .smallprint .handle { cursor: pointer; }
+        .smallprint .expand { display: none; }
 
         @keyframes pulse { 
             25% { transform: scale(1.4); } 
@@ -132,6 +138,18 @@
     | Word sets: <span class="d_wordsets"></span>
     </p>
     <p>Press F1 or F2 to show the target word briefly</p>
+    
+    <p class="smallprint"><span class="handle">Licences</span>
+    <span class="expand">|
+    Fireworks module from https://github.com/crashmax-dev/fireworks-js/tree/v1 (MIT)
+    | Sound Effect by <a href="https://pixabay.com/users/u_2gxydaiwcd-46893983/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=340660">u_2gxydaiwcd</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=340660">Pixabay</a>
+Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=6185">freesound_community</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=6185">Pixabay</a>
+Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=82807">freesound_community</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=82807">Pixabay</a>
+Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=45360">freesound_community</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=45360">Pixabay</a>
+Sound Effect by <a href="https://pixabay.com/users/miraclei-45186201/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360154">MiraclEI</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360154">Pixabay</a>
+Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=230550">Ribhav Agrawal</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=230550">Pixabay</a>
+| Words TTS by https://ttsmp3.com/ (No restrictions on use)
+    </span></p>
 
     <div class="fireworks-container"></div>
     
@@ -532,6 +550,10 @@
             $('.startbutton').hide();
             main();
             return false;
+        });
+        
+        $('.smallprint .handle').on('click', function() {
+            $('.smallprint .expand').toggle();
         });
         
     </script>
