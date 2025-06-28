@@ -387,12 +387,13 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
         
         
         function esc_html(s) {
+            s = String(s);
             return s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
         }
         
         
         function update_input_field() {
-            bee.$input.html(to_underscores(bee.typed, words[bee.word_ix][1]));
+            bee.$input.html(esc_html(to_underscores(bee.typed, words[bee.word_ix][1])));
         }
         
         
@@ -400,7 +401,7 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
         function add_score() {
             bee.storage.players[bee.player].score++;
             save_storage();
-            $('.score .value').html(bee.storage.players[bee.player].score);
+            $('.score .value').html(esc_html(bee.storage.players[bee.player].score));
             $('.score').addClass('pulse');
             if(bee.score_anim_timeout !== false) { clearTimeout(bee.score_anim_timeout); }
             bee.score_anim_timeout = setTimeout(function() {
@@ -506,10 +507,10 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
             
             
             // Show picture
-            bee.$image.html(words[word_ix][0]);
+            bee.$image.html(esc_html(words[word_ix][0]));
             
             // Add help & input
-            bee.$help.html(words[word_ix][1]);
+            bee.$help.html(esc_html(words[word_ix][1]));
             bee.typed = '';
             update_input_field();
             bee.$input.removeClass('success');
@@ -530,14 +531,14 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
         function main() {
             document.addEventListener('keydown', process_keypress); // Or use 'keypress' event
 
-            $('.score .value').html(bee.storage.players[bee.player].score);
-            $('.d_player').html(bee.player);
+            $('.score .value').html(esc_html(bee.storage.players[bee.player].score));
+            $('.d_player').html(esc_html(bee.player));
             
             // Set up word list
             for(let i=0; i<=bee.storage.players[bee.player].wordsets; i++) {
                 words = words.concat(word_sets[i]);
             }
-            $('.d_wordsets').html("0 to " + bee.storage.players[bee.player].wordsets + " (" + words.length + " words)");
+            $('.d_wordsets').html("0 to " + esc_html(bee.storage.players[bee.player].wordsets) + " (" + words.length + " words)");
             
             new_question();
         }
