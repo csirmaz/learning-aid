@@ -136,7 +136,7 @@
     Player: <span class="d_player"></span>
     | Word sets: <span class="d_wordsets"></span>
     </p>
-    <p>Press F1, F2 or ESC to show the target word briefly</p>
+    <p>Hint: Press F1, F2, ESC or the button under ESC (some may trigger other functions)</p>
     
     <p class="smallprint"><span class="handle">Licences</span>
     <span class="expand">|
@@ -497,7 +497,7 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
                 return;
             }
                        
-            if(event.keyCode == 112 || event.keyCode == 113 || event.keyCode == 27) { // F1, F2, ESC
+            if(event.keyCode == 112 || event.keyCode == 113 || event.keyCode == 27 || event.keyCode == 192) { // F1, F2, ESC, pipe
                 if(!bee.can_use_help) { return; }
                 console.log("Disabling help");
                 bee.can_use_help = false;
@@ -510,7 +510,9 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
                     }, 5*1000);
                 }
                 show_help();
-            }            
+            }
+            
+            // console.log("key", event);
         }
 
         
