@@ -15,7 +15,7 @@
         
         .container {
             max-width: 60rem;
-            min-height: 30rem;
+            min-height: 27rem;
             margin: 0 auto;
             position: relative;
             border-left: 1px solid #cb9;
@@ -137,7 +137,7 @@
     Player: <span class="d_player"></span>
     | Word sets: <span class="d_wordsets"></span>
     </p>
-    <p>Press F1 or F2 to show the target word briefly</p>
+    <p>Press F1, F2 or ESC to show the target word briefly</p>
     
     <p class="smallprint"><span class="handle">Licences</span>
     <span class="expand">|
@@ -474,7 +474,7 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
                 return;
             }
                        
-            if(event.keyCode == 112 || event.keyCode == 113) { // F1, F2
+            if(event.keyCode == 112 || event.keyCode == 113 || event.keyCode == 27) { // F1, F2, ESC
                 if(!bee.can_use_help) { return; }
                 console.log("Disabling help");
                 bee.can_use_help = false;
