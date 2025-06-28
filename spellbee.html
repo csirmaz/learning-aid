@@ -147,6 +147,12 @@ Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/
 Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=45360">freesound_community</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=45360">Pixabay</a>
 Sound Effect by <a href="https://pixabay.com/users/miraclei-45186201/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360154">MiraclEI</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360154">Pixabay</a>
 Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=230550">Ribhav Agrawal</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=230550">Pixabay</a>
+Sound Effect by <a href="https://pixabay.com/users/peekaboolabcreative-22100005/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=357606">Nussaraporn Haleebut</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=357606">Pixabay</a>
+Sound Effect by <a href="https://pixabay.com/users/universfield-28281460/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=326133">Universfield</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=326133">Pixabay</a>
+Sound Effect by <a href="https://pixabay.com/users/liecio-3298866/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=190035">LIECIO</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=190035">Pixabay</a>
+Sound Effect by <a href="https://pixabay.com/users/koiroylers-44305058/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=356013">Koi Roylers</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=356013">Pixabay</a>
+Sound Effect by <a href="https://pixabay.com/users/koiroylers-44305058/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=351945">Koi Roylers</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=351945">Pixabay</a>
+Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360357">Phurisarah H</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360357">Pixabay</a>
 | Words TTS by https://ttsmp3.com/ (No restrictions on use)
     </span> | <a href="https://github.com/csirmaz/learning-aid">Codebase</a>
     | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
@@ -298,12 +304,18 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
 
         const audio = {
             success: [
-                {'file': 'assets/sounds/success/goodresult-82807.mp3', 'volume': .2, 'object': false},
+                {'file': 'assets/sounds/success/goodresult-82807.mp3', 'volume': .3, 'object': false},
                 {'file': 'assets/sounds/success/success-340660.mp3', 'volume': .4, 'object': false},
                 {'file': 'assets/sounds/success/sample_confirm_success02_kofi_by_miraclei-360154.mp3', 'volume': .8, 'object': false},
-                {'file': 'assets/sounds/success/yipee-45360.mp3', 'volume': .4, 'object': false},
+                {'file': 'assets/sounds/success/yipee-45360.mp3', 'volume': .8, 'object': false},
                 {'file': 'assets/sounds/success/purchase-succesful-ingame-230550.mp3', 'volume': .4, 'object': false},
-                {'file': 'assets/sounds/success/success-fanfare-trumpets-6185.mp3', 'volume': .4, 'object': false},
+                {'file': 'assets/sounds/success/success-fanfare-trumpets-6185.mp3', 'volume': .5, 'object': false},
+                {'file': 'assets/sounds/success/11l-victory_sound_with_t-1749487402950-357606.mp3', 'volume': .3, 'object': false},
+                {'file': 'assets/sounds/success/level-up-05-326133.mp3', 'volume': .6, 'object': false},
+                {'file': 'assets/sounds/success/bonus-points-190035.mp3', 'volume': .6, 'object': false},
+                {'file': 'assets/sounds/success/correct-356013.mp3', 'volume': .4, 'object': false},
+                {'file': 'assets/sounds/success/get-coin-351945.mp3', 'volume': .4, 'object': false},
+                {'file': 'assets/sounds/success/11l-triumphant_orchestra-1749487505211-360357.mp3', 'volume': .4, 'object': false},
             ]
         };
 
@@ -457,11 +469,11 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
             const i = Math.floor(Math.random() * audio.success.length);
             const d = audio.success[i];
             if(d['object'] === false) { 
-                console.log("Audio: setting up success", i);
+                console.log("Audio: setting up success", d['file']);
                 d['object'] = new Audio(d['file']); 
                 d['object'].volume = d['volume']; 
             }
-            console.log("Audio: playing success", i);
+            console.log("Audio: playing success", d['file']);
             d['object'].play();
         }
         
@@ -615,7 +627,6 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
         // Audio can only be played after a user event on the page, so we require a click
         menu = "<p>Choose player</p>";
         for (const [key, value] of Object.entries(bee.storage.players)) {
-            console.log(bee.storage.players);
             menu += '<div class="startbutton" data-player="'+esc_html(key)+'">'+esc_html(key)+'</div>';
         }
         menu += '<div class="startbutton" data-playernew="1">New user<br><span style="font-size:60%">All player data is stored in the browser only</span></div>';
