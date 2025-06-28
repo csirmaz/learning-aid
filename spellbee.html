@@ -91,13 +91,12 @@
         body .prompt .infield .success { color: #090; }
         
         .startbutton {
-            margin: 2rem 0;
+            margin: 2rem 5rem;
             border-radius: 1rem;
             background: #a0c;
             color: #fff;
-            font-size: 2rem;
-            padding: .5rem;
-            position: absolute;
+            font-size: 1.5rem;
+            padding: .2rem 1rem;
             cursor: pointer;
         }
         
@@ -130,7 +129,7 @@
             <span class="infield"><span class="help"></span><span class="inp"></span></span>
         </div>
         
-        <div class="startbutton">Click here to start</div>
+        <div class="startmenu"></div>
 
     </div>
     <p>
@@ -149,7 +148,9 @@ Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/
 Sound Effect by <a href="https://pixabay.com/users/miraclei-45186201/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360154">MiraclEI</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360154">Pixabay</a>
 Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=230550">Ribhav Agrawal</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=230550">Pixabay</a>
 | Words TTS by https://ttsmp3.com/ (No restrictions on use)
-    </span> | <a href="https://github.com/csirmaz/learning-aid">Codebase</a></p>
+    </span> | <a href="https://github.com/csirmaz/learning-aid">Codebase</a>
+    | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
+    </p>
 
     <div class="fireworks-container"></div>
     
@@ -385,6 +386,11 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
         }
         
         
+        function esc_html(s) {
+            return s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+        }
+        
+        
         function update_input_field() {
             bee.$input.html(to_underscores(bee.typed, words[bee.word_ix][1]));
         }
@@ -523,17 +529,7 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
         
         function main() {
             document.addEventListener('keydown', process_keypress); // Or use 'keypress' event
-            
-            bee.player = prompt("Who is the player? We'll save the score in the browser under this name");
 
-            // Initialize
-            if(!bee.storage.players[bee.player]) { 
-                let wordsets = prompt("What range of word sets should we use?\nType \"0\" for simpler words, or \"1\" for more complex\n(magic 'e', digraphs, irregular sound values)") - 0;
-                if(isNaN(wordsets)) { wordsets = 0; }
-                bee.storage.players[bee.player] = {'score': 0, 'wordsets': wordsets};
-                save_storage();
-            }
-            
             $('.score .value').html(bee.storage.players[bee.player].score);
             $('.d_player').html(bee.player);
             
@@ -546,12 +542,43 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
             new_question();
         }
         
+        // Start menu - render
         // Audio can only be played after a user event on the page, so we require a click
-        $('.startbutton').on('click', function() {
-            $('.startbutton').hide();
-            main();
-            return false;
-        });
+        menu = "<p>Choose player</p>";
+        for (const [key, value] of Object.entries(bee.storage.players)) {
+            console.log(bee.storage.players);
+            menu += '<div class="startbutton" data-player="'+esc_html(key)+'">'+esc_html(key)+'</div>';
+        }
+        menu += '<div class="startbutton" data-playernew="1">New user<br><span style="font-size:60%">All player data is stored in the browser only</span></div>';
+        $('.prompt').hide();
+        $('.startmenu').html(menu);
+        
+        // Start menu - logic
+        setTimeout(function() {  // allow time for rendering
+            $('.startbutton').on('click', function() {
+                $('.startmenu').hide();
+                $('.prompt').show();
+                
+                if($(this).data('playernew')) {
+                    bee.player = prompt("What is the name of the player?");
+
+                    // Initialize
+                    if(!bee.storage.players[bee.player]) { 
+                        let wordsets = prompt("What range of word sets should we use?\nType \"0\" for simpler words, or \"1\" for more complex\n(magic 'e', digraphs, irregular sound values)") - 0;
+                        if(isNaN(wordsets)) { wordsets = 0; }
+                        bee.storage.players[bee.player] = {'score': 0, 'wordsets': wordsets};
+                        save_storage();
+                    } else {
+                        alert("That player already exists. Loading player data");
+                    }
+                } else {
+                    bee.player = $(this).data('player');
+                }
+                
+                main();
+                return false;
+            });
+        }, 200);
         
         $('.smallprint .handle').on('click', function() {
             $('.smallprint .expand').toggle();
