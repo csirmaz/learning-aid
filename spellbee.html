@@ -11,6 +11,7 @@
         body {
             font-family: monospace, sans-serif;
             background: #fec;
+            overflow: hidden;
         }
         
         .container {
@@ -414,11 +415,23 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
         
         // Display target word briefly
         function show_help() {
+            console.log("Disabling help");
+            bee.can_use_help = false;
+            if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); }
+            console.log("Scheduling enabling help");
+            bee.help_timeout = setTimeout(function(){ 
+                console.log("Enabling help");
+                bee.can_use_help = true;
+                bee.help_timeout = false;
+            }, 5500);
+
             bee.can_type = false;
             bee.$input.hide();
             bee.$help.show();
             play_word(words[bee.word_ix][1]);
-            bee.$help.fadeOut({duration: 1500, complete: function() {
+            const help_duration = 1000 + words[bee.word_ix][1].length * 300;
+            console.log("Help duration", help_duration);
+            bee.$help.fadeOut({duration: help_duration, complete: function() {
                 bee.$input.show();
                 bee.can_type = true;
             }});
@@ -529,16 +542,6 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                        
             if(event.keyCode == 112 || event.keyCode == 113 || event.keyCode == 27 || event.keyCode == 192) { // F1, F2, ESC, pipe
                 if(!bee.can_use_help) { return; }
-                console.log("Disabling help");
-                bee.can_use_help = false;
-                if(bee.help_timeout === false) {
-                    console.log("Scheduling enabling help");
-                    bee.help_timeout = setTimeout(function(){ 
-                        console.log("Enabling help");
-                        bee.can_use_help = true;
-                        bee.help_timeout = false;
-                    }, 5*1000);
-                }
                 show_help();
             }
             
