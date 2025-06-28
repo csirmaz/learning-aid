@@ -150,6 +150,7 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
 | Words TTS by https://ttsmp3.com/ (No restrictions on use)
     </span> | <a href="https://github.com/csirmaz/learning-aid">Codebase</a>
     | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
+    | <a href="#" onclick="modify_wordlist(); return false">Update word sets</a>
     </p>
 
     <div class="fireworks-container"></div>
@@ -164,30 +165,12 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
         // Use e.g. https://ttsmp3.com/ to generate them
         
         const word_sets = [
-            [
-                ['😀', 'happy'],
-                ['👃🏻', 'nose'],
-                ['👂', 'ear'],
+            [ // Word set 0
                 ['💍', 'ring'],
-                ['👞', 'shoe'],
-                ['🧥', 'coat'],
-                ['🌈', 'rainbow'],
                 ['🥚', 'egg'],
-                ['🧊', 'ice'],
-                ['🍿', 'popcorn'],
-                ['🚜', 'tractor'],
-                ['🧺', 'basket'],
-                ['🔑', 'key'],
-                ['📏', 'ruler'],
-                ['❤️', 'heart'],
                 ['▶️', 'play'],
                 ['🔔', 'bell'],
-                ['😁', 'grin'],
                 ['👜', 'bag'],
-                ['🧣', 'scarf'],
-                ['🐠', 'fish'],
-                ['🌜', 'moon'],
-                ['🥛', 'milk'],
                 ['🥁', 'drum'],
                 ['⛺️', 'tent'],
                 ['📦', 'box'],
@@ -195,8 +178,7 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
                 ['📌', 'pin'],
                 ['🌞', 'sun'],
                 ['🖐', 'hand'],
-                ['🫂', 'love'],
-                ['🏊', 'swim'],
+                ['😁', 'grin'],
                 ['🏃🏻‍♂️‍➡️', 'run'],
                 ['🐄', 'cow'],
                 ['🐖', 'pig'],
@@ -206,24 +188,55 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
                 ['🌳', 'tree'],
                 ['🪨', 'rock'],
                 ['❄️', 'snow'],
-                ['⛄️', 'snowman'],
                 ['🍋', 'lemon'],
+                ['🔒', 'lock'],
+                ['⛳️', 'golf'],
+                ['🏦', 'bank'],
+                ['💳', 'card'],
+                ['🛏', 'bed'],
+                ['🧸', 'teddy'],
+                ['🪽', 'wing'],
+                ['🌜', 'moon'],
+                ['🥛', 'milk'],
+                ['😀', 'happy'],
+                ['🎾', 'tennis'],
+            ],
+            [ // Word set 1
+                ['👃🏻', 'nose'],
+                ['👂', 'ear'],
+                ['👞', 'shoe'],
+                ['🧥', 'coat'],
+                ['🌈', 'rainbow'],
+                ['🧊', 'ice'],
+                ['🍿', 'popcorn'],
+                ['🚜', 'tractor'],
+                ['🧺', 'basket'],
+                ['🔑', 'key'],
+                ['📏', 'ruler'],
+                ['❤️', 'heart'],
+                ['🧣', 'scarf'],
+                ['🐠', 'fish'],
+                ['🫂', 'love'],
+                ['🏊', 'swim'],
+                ['⛄️', 'snowman'],
                 ['🍕', 'pizza'],
                 ['🍝', 'pasta'],
                 ['🎹', 'piano'],
-                ['🏦', 'bank'],
-                ['💳', 'card'],
                 ['🧱', 'wall'],
-                ['🛏', 'bed'],
-                ['🧸', 'teddy'],
                 ['🚪', 'door'],
-            ],
-            [
+                ['🥝', 'kiwi'],
                 ['🍄', 'mushroom'],
+                ['🐤', 'chick'],
+                ['🍬', 'candy'],
+                ['🥄', 'spoon'],
+                ['🌹', 'rose'],
+                ['🐇', 'rabbit'],
+                ['🚂', 'train'],
+                ['🎺', 'trumpet'],
+            ],
+            [ // Word set 2
                 ['🐬', 'dolphin'],
                 ['🕷', 'spider'],
-                ['🎾', 'tennis'],
-                ['🎺', 'trumpet'],
                 ['🚁', 'helicopter'],
                 ['🖼', 'picture'],
                 ['👄', 'mouth'],
@@ -234,29 +247,32 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
                 ['🦜', 'parrot'],
                 ['☔️', 'rain'],
                 ['🍪', 'cookie'],
-                ['⛳️', 'golf'],
-                ['🚂', 'train'],
-                ['🔒', 'lock'],
                 ['🍌', 'banana'],
-                ['🍬', 'candy'],
-                ['🥄', 'spoon'],
-                ['🪽', 'wing'],
-                ['🥝', 'kiwi'],
                 ['😢', 'cry'],
                 ['👶', 'baby'],
                 ['👑', 'crown'],
                 ['🧦', 'socks'],
                 ['🦶', 'foot'],
-                ['🐤', 'chick'],
                 ['🦘', 'kangaroo'],
                 ['🦒', 'giraffe'],
-                ['🌹', 'rose'],
-                ['🐇', 'rabbit'],
                 ['🔥', 'fire'],
                 ['✈️', 'plane'],
                 ['🏠', 'house'],
                 ['📱', 'phone'],
-                ['🪧', 'sign'],
+                ['🪧', 'sign'],                
+                ['🤖', 'robot'],
+                ['🏜️', 'desert'],
+            ],
+            [ // Word set 3
+                ['🎶', 'hymn'],
+                ['🏋️', 'gym'],
+                ['🇪🇬', 'Egypt'],
+                ['🔣', 'symbol'],
+                ['🕵️', 'mystery'],
+                ['🏜️', 'pyramid'],
+                ['🎤', 'lyric'],
+                ['👻', 'myth'],
+                
             ]
         ];
         
@@ -283,7 +299,7 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
             can_use_help: true,
             help_timeout: false,
             score_anim_timeout: false,
-            player: 'Default',  // name of the player - scores are saved to browser under this name
+            player: false,  // name of the player - scores are saved to browser under this name
             $image: $('.prompt .img'),
             $input: $('.prompt .infield .inp'),
             $help: $('.prompt .infield .help'),
@@ -433,7 +449,7 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
         
         
         function play_word(s) {
-            s = s.replaceAll(/[^a-z]/g, '');
+            s = s.replaceAll(/[^A-Za-z]/g, '');
             file = 'assets/sounds/words/'+s+'.mp3';
             if(bee.word_audio === false) {
                 bee.word_audio = new Audio(audio.success[0].file);
@@ -528,20 +544,52 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
         }
         
         
+        // Choose a range of word sets to show words from
+        function choose_wordsets() {
+            const num_wordsets = word_sets.length - 1;
+            let min_wordset = prompt("What range of word sets should we use?\nType a number from 0 to "+num_wordsets+" (simple to difficult) for the bottom end of the range") - 0;
+            if(isNaN(min_wordset)) { min_wordset = 0; }
+            let max_wordset = prompt("Type a number from "+min_wordset+" to "+num_wordsets+" (simple to difficult) for the top end of the range") - 0;
+            if(isNaN(max_wordset)) { max_wordset = 0; }
+            return [min_wordset, max_wordset];
+        }
+        
+        
+        function init_wordlist() {
+            words = [];
+            min_wordset = bee.storage.players[bee.player].min_wordset;
+            if(min_wordset === undefined) { min_wordset = 0; }
+            max_wordset = bee.storage.players[bee.player].wordsets;
+            for(let i=min_wordset; i<=max_wordset; i++) {
+                words = words.concat(word_sets[i]);
+            }
+            $('.d_wordsets').html(
+                esc_html(min_wordset) + " to " + 
+                esc_html(max_wordset) + " (" + words.length + " words)"
+            );
+        }
+        
+        
+        function modify_wordlist() {
+            if(bee.player === false) { alert("Choose a player first"); return; }
+            const wordsets = choose_wordsets();
+            bee.storage.players[bee.player].min_wordset = wordsets[0];
+            bee.storage.players[bee.player].wordsets = wordsets[1];
+            save_storage();
+            init_wordlist();
+            new_question();
+        }
+        
+        
         function main() {
             document.addEventListener('keydown', process_keypress); // Or use 'keypress' event
 
             $('.score .value').html(esc_html(bee.storage.players[bee.player].score));
             $('.d_player').html(esc_html(bee.player));
-            
-            // Set up word list
-            for(let i=0; i<=bee.storage.players[bee.player].wordsets; i++) {
-                words = words.concat(word_sets[i]);
-            }
-            $('.d_wordsets').html("0 to " + esc_html(bee.storage.players[bee.player].wordsets) + " (" + words.length + " words)");
-            
+            init_wordlist();
             new_question();
         }
+        
         
         // Start menu - render
         // Audio can only be played after a user event on the page, so we require a click
@@ -564,10 +612,9 @@ Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_s
                     bee.player = prompt("What is the name of the player?");
 
                     // Initialize
-                    if(!bee.storage.players[bee.player]) { 
-                        let wordsets = prompt("What range of word sets should we use?\nType \"0\" for simpler words, or \"1\" for more complex\n(magic 'e', digraphs, irregular sound values)") - 0;
-                        if(isNaN(wordsets)) { wordsets = 0; }
-                        bee.storage.players[bee.player] = {'score': 0, 'wordsets': wordsets};
+                    if(!bee.storage.players[bee.player]) {
+                        const wordsets = choose_wordsets();
+                        bee.storage.players[bee.player] = {'score': 0, 'min_wordset': wordsets[0], 'wordsets': wordsets[1]};
                         save_storage();
                     } else {
                         alert("That player already exists. Loading player data");
