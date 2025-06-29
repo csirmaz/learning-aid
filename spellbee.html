@@ -1,9 +1,9 @@
 <!DOCTYPE html>
 <html lang="en" xmlns="http://www.w3.org/1999/xhtml">
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta http-equiv="Content-Language" content="en">
-<meta name="viewport" content="initial-scale=1.0">
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Language" content="en">
+    <meta name="viewport" content="initial-scale=1.0">
     <title>SpellBee</title>
 
     <style>
@@ -63,6 +63,7 @@
         }
         
         .prompt .img {
+            font-family: Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Android Emoji,EmojiSymbols,EmojiOne Mozilla,Twemoji Mozilla,Segoe UI Symbol,Noto Color Emoji,EmojiOne Color,emoji,var(--font-noto-emojipedia-fallback);
             display: inline-block;
             font-size: 8rem;
             text-align: center;
@@ -174,7 +175,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
         
         const word_sets = [
             [ // Word set 0
-                ['🖊', 'pen'],      
+                ['🖊️', 'pen'],      
                 ['📌', 'pin'],      
                 ['🥚', 'egg'],      
                 ['👜', 'bag'],
@@ -184,9 +185,9 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 ['🪺', 'nest'],
                 ['🐈‍', 'cat'],
                 ['🥛', 'milk'],
-                ['🛏', 'bed'],
+                ['🛌', 'bed'],
                 ['⛺️', 'tent'],
-                ['🖐', 'hand'],
+                ['🖐️', 'hand'],
                 ['😁', 'grin'],
                 ['🐠', 'fish'],
                 ['🌜', 'moon'],
@@ -244,6 +245,31 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 ['🐇', 'rabbit'],
                 ['🚂', 'train'],
                 ['🎺', 'trumpet'],
+                ['🦊', 'fox'],
+                ['🐴', 'horse'],
+                ['🐶', 'dog'],
+                ['🦆', 'duck'],
+                ['🌽', 'corn'],
+                ['🐭', 'mouse'],
+                ['🐵', 'monkey'],
+                ['💧', 'water'],
+                ['🚗', 'car'],
+                ['⬜️', 'white'],
+                ['⬛️', 'black'],
+                ['🟥', 'red'],
+                ['🟩', 'green'],
+                ['🏫', 'school'],
+                ['🏨', 'hotel'],
+                ['🌃', 'night'],
+                ['🏞️', 'river'],
+                ['🌅', 'morning'],
+                ['🏡', 'home'],
+                ['🔥', 'hot'],
+                ['🗻', 'cold'],
+                ['🌋', 'lava'],
+                ['🪰', 'fly'],
+                ['🍱', 'food'],
+                ['🛑', 'stop'],
             ],
             [ // Word set 3
                 ['🖼', 'picture'],
@@ -281,6 +307,13 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 ['🦻🏽', 'hear'],
             ],
             [ // Word set 4
+                ['🪞', 'mirror'],
+                ['☁️', 'cloud'],
+                ['🧗', 'climb'],
+                ['🛝', 'slide'],
+
+                ['🏥', 'hospital'],
+                ['🍉', 'watermelon'],
                 ['🕷', 'spider'],
                 ['🐬', 'dolphin'],
                 ['💎', 'diamond'],
@@ -571,7 +604,10 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
             
             
             // Show picture
-            bee.$image.html(esc_html(words[word_ix][0]));
+            // Ensure emoji code ends in picture modifier
+            let emoji = words[word_ix][0];
+            if(emoji[emoji.lenght-1] != "\ufe0f") { emoji += "\ufe0f"; }
+            bee.$image.html(esc_html(emoji));
             
             // Add help & input
             bee.$help.html(esc_html(words[word_ix][1]));
