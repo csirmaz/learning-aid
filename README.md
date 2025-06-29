@@ -4,7 +4,7 @@ Reusable web-based tools to help KS1 and KS2 children with skills (maths, spelli
 
 ## Pages
 
-- Spelling: https://csirmaz.github.io/learning-aid/spellbee.html
+- Spelling: https://csirmaz.github.io/learning-aid/spellbee.html (for a device with physical keyboard)
 
 ## Tools
 
