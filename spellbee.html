@@ -158,6 +158,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
     </span> | <a href="https://github.com/csirmaz/learning-aid">Codebase</a>
     | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
     | <a href="#" onclick="modify_wordlist(); return false">Update word sets</a>
+    | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
     </p>
 
     <div class="fireworks-container"></div>
@@ -173,42 +174,48 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
         
         const word_sets = [
             [ // Word set 0
-                ['💍', 'ring'],
-                ['🥚', 'egg'],
-                ['▶️', 'play'],
-                ['🔔', 'bell'],
+                ['🖊', 'pen'],      
+                ['📌', 'pin'],      
+                ['🥚', 'egg'],      
                 ['👜', 'bag'],
                 ['🥁', 'drum'],
-                ['⛺️', 'tent'],
-                ['📦', 'box'],
-                ['🖊', 'pen'],
-                ['📌', 'pin'],
-                ['🌞', 'sun'],
-                ['🖐', 'hand'],
-                ['😁', 'grin'],
                 ['🏃🏻‍♂️‍➡️', 'run'],
-                ['🐄', 'cow'],
                 ['🐖', 'pig'],
                 ['🪺', 'nest'],
                 ['🐈‍', 'cat'],
+                ['🥛', 'milk'],
+                ['🛏', 'bed'],
+                ['⛺️', 'tent'],
+                ['🖐', 'hand'],
+                ['😁', 'grin'],
+                ['🐠', 'fish'],
+                ['🌜', 'moon'],
+                ['🚪', 'door'],
+                ['🥄', 'spoon'],
+                ['🙅🏼‍♀️', 'not'],
+            ],
+            [ // Word set 1
+                ['▶️', 'play'],
+                ['📦', 'box'],
+                ['🌞', 'sun'],
+                ['❄️', 'snow'],
+                ['🪨', 'rock'],
+                ['🔒', 'lock'],
+                ['💍', 'ring'],
+                ['🔔', 'bell'],
+                ['🐄', 'cow'],
                 ['🐑', 'sheep'],
                 ['🌳', 'tree'],
-                ['🪨', 'rock'],
-                ['❄️', 'snow'],
                 ['🍋', 'lemon'],
-                ['🔒', 'lock'],
                 ['⛳️', 'golf'],
                 ['🏦', 'bank'],
                 ['💳', 'card'],
-                ['🛏', 'bed'],
                 ['🧸', 'teddy'],
                 ['🪽', 'wing'],
-                ['🌜', 'moon'],
-                ['🥛', 'milk'],
                 ['😀', 'happy'],
                 ['🎾', 'tennis'],
             ],
-            [ // Word set 1
+            [ // Word set 2
                 ['👃🏻', 'nose'],
                 ['👂', 'ear'],
                 ['👞', 'shoe'],
@@ -222,7 +229,6 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 ['📏', 'ruler'],
                 ['❤️', 'heart'],
                 ['🧣', 'scarf'],
-                ['🐠', 'fish'],
                 ['🫂', 'love'],
                 ['🏊', 'swim'],
                 ['⛄️', 'snowman'],
@@ -230,24 +236,18 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 ['🍝', 'pasta'],
                 ['🎹', 'piano'],
                 ['🧱', 'wall'],
-                ['🚪', 'door'],
                 ['🥝', 'kiwi'],
                 ['🍄', 'mushroom'],
                 ['🐤', 'chick'],
                 ['🍬', 'candy'],
-                ['🥄', 'spoon'],
                 ['🌹', 'rose'],
                 ['🐇', 'rabbit'],
                 ['🚂', 'train'],
                 ['🎺', 'trumpet'],
             ],
-            [ // Word set 2
-                ['🐬', 'dolphin'],
-                ['🕷', 'spider'],
-                ['🚁', 'helicopter'],
+            [ // Word set 3
                 ['🖼', 'picture'],
                 ['👄', 'mouth'],
-                ['💎', 'diamond'],
                 ['🦈', 'shark'],
                 ['🐍', 'snake'],
                 ['🦴', 'bone'],
@@ -260,8 +260,6 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 ['👑', 'crown'],
                 ['🧦', 'socks'],
                 ['🦶', 'foot'],
-                ['🦘', 'kangaroo'],
-                ['🦒', 'giraffe'],
                 ['🔥', 'fire'],
                 ['✈️', 'plane'],
                 ['🏠', 'house'],
@@ -269,10 +267,25 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 ['🪧', 'sign'],                
                 ['🤖', 'robot'],
                 ['🏜️', 'desert'],
-            ],
-            [ // Word set 3
-                ['🎶', 'hymn'],
+                ['👩‍🦰', 'woman'],
+                ['👭', 'women'],
+                ['🥩', 'meat'],
+                ['📨', 'mail'],
+                ['👨‍🦱', 'male'],
                 ['🏋️', 'gym'],
+                ['🦶🏽', 'heel'],
+                ['👨🏾‍⚕️', 'heal'],
+                ['🪢', 'knot'],
+                ['🛣', 'road'],
+                ['⛏', 'break'],
+                ['🦻🏽', 'hear'],
+            ],
+            [ // Word set 4
+                ['🕷', 'spider'],
+                ['🐬', 'dolphin'],
+                ['💎', 'diamond'],
+                ['🚁', 'helicopter'],
+                ['🎶', 'hymn'],
                 ['🇪🇬', 'Egypt'],
                 ['🔣', 'symbol'],
                 ['🕵️', 'mystery'],
@@ -282,22 +295,10 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 ['🚈', 'arrive'],
                 ['🧚‍♂️', 'appear'],
                 ['👯‍♀️', 'group'],
-                ['🛣', 'road'],
                 ['⚙️', 'steel'],
-                ['👩‍🦰', 'woman'],
-                ['👭', 'women'],
-                ['🥩', 'meat'],
-                ['⛏', 'break'],
                 ['🗺️', 'here'],
-                ['🦻🏽', 'hear'],
-                ['🦶🏽', 'heel'],
-                ['👨🏾‍⚕️', 'heal'],
-                ['🪢', 'knot'],
-                ['🙅🏼‍♀️', 'not'],
-                ['📨', 'mail'],
-                ['👨‍🦱', 'male'],
-                
-                
+                ['🦘', 'kangaroo'],
+                ['🦒', 'giraffe'],
             ]
         ];
         
@@ -324,6 +325,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
 
         // Application data
         const bee = {
+            load_time: Date.now(),
             word_ix: false,
             can_type: false,
             typed: '',
@@ -429,7 +431,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
             bee.$input.hide();
             bee.$help.show();
             play_word(words[bee.word_ix][1]);
-            const help_duration = 1000 + words[bee.word_ix][1].length * 300;
+            const help_duration = 1200 + words[bee.word_ix][1].length * 400;
             console.log("Help duration", help_duration);
             bee.$help.fadeOut({duration: help_duration, complete: function() {
                 bee.$input.show();
@@ -473,7 +475,18 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
         
         // Call this to zero the score of the current player
         function clear_score() {
+            if(bee.player === false) { alert("Choose a player first"); return; }
             bee.storage.players[bee.player].score = -1;
+            add_score();
+        }
+        
+        
+        // Interactively reduce the score
+        function reduce_score() {
+            if(bee.player === false) { alert("Choose a player first"); return; }
+            const diff = prompt("Reduce score by") - 0;
+            if(isNaN(diff)) { return; }
+            bee.storage.players[bee.player].score -= diff + 1;
             add_score();
         }
         
@@ -570,6 +583,12 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
         
         
         function new_question() {
+            // Refresh the page periodically
+            if(Date.now - bee.load_time > 12*60*60*1000) {
+                window.location.reload(true);
+                return;
+            }
+            
             let word_ix;
             while(true) {
                 word_ix = Math.floor(Math.random() * words.length);
