@@ -4,13 +4,13 @@
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
-    <title>SpellBee</title>
+    <title>Count</title>
 
     <style>
     
         body {
             font-family: monospace, sans-serif;
-            background: #fec;
+            background: #eee;
             overflow: hidden;
         }
         
@@ -33,7 +33,7 @@
         }
     
         .score {
-            background: #309;
+            background: #390;
             border-radius: 1rem;
             position: absolute;
             right: 1rem;
@@ -59,38 +59,23 @@
         }
         
         .prompt {
-            padding-top: 5rem;
+            padding-top: 3rem;
         }
         
-        .prompt .img {
-            font-family: Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Android Emoji,EmojiSymbols,EmojiOne Mozilla,Twemoji Mozilla,Segoe UI Symbol,Noto Color Emoji,EmojiOne Color,emoji,var(--font-noto-emojipedia-fallback);
-            display: inline-block;
-            font-size: 8rem;
-            text-align: center;
-            background: #fff;
-            border-radius: 1rem;
-            height: 12rem;
-            width: 12rem;
-        }
-        
-        .prompt .infield {
-            display: inline-block;
-            line-height: 8rem;
-            background: #fffae4;
-            font-size: 6rem;
-            padding: 0 1rem;
-            min-width: 35rem;
-            letter-spacing: .3rem;
-        }
-        
-        .prompt .infield .help,
-        .prompt .infield .inp {
-            display: inline-block;
-        }
+        .prompticonsuccess { display: none; }
+        body .prompt.success .prompticonsuccess { display: inline; }
+        body .prompt.success .prompticon { display: none; }
 
-        .prompt .infield .help { color: #999; }
+        .prompt .infield {
+            background: #fffae4;
+            font-size: 3rem;
+            padding: 0 .6rem;
+            letter-spacing: .1rem;
+            height: 8.5rem;
+        }
+        
         .prompt .infield .inp { color: #000; }
-        body .prompt .infield .success { color: #090; }
+        body .prompt.success .infield .inp { color: #090; }
         
         .startbutton {
             margin: 2rem 5rem;
@@ -117,6 +102,44 @@
             animation:pulse 1.5s ease-in-out 1;
         }
 
+        .keypad td {
+            border-top: .5rem solid #d5d;
+            border-left: .5rem solid #d5d;
+            border-right: .5rem solid #707;
+            border-bottom: .5rem solid #707;
+            background: #a3a;
+            color: #fff;
+            font-size: 3rem;
+            width: 20%;
+            text-align: center;
+            margin: 0;
+        }
+        .keypad td.pressed {
+            border-top: .5rem solid #707;
+            border-left: .5rem solid #707;
+            border-right: .5rem solid #d5d;
+            border-bottom: .5rem solid #d5d;
+            background: #929;
+            color: #ddd;
+        }
+        
+        .hintwrap {
+            height: 4rem;
+            margin: 1rem 0;
+            overflow: hidden;
+        }
+        table.hint { 
+            border-collapse: collapse; 
+        }
+        table.hint td {
+            border: 2px solid #000;
+            padding: .1rem .4rem;
+            font-size: 1rem;
+        }
+        table.hint td.hint-h {
+            background: #0f0;
+        }
+
     </style>
 
     <script src="assets/fireworks/fireworks.js"></script>
@@ -127,18 +150,51 @@
 
         <div class="score"><span class="icon">🪙</span> <span class="value">0</span></div>
         <div class="prompt">
-            <span class="img"></span>
-            <span class="infield"><span class="help"></span><span class="inp"></span></span>
+            <div class="infield">
+                <div class="problem"></div>
+                <div><span class="prompticon"></span><span class="prompticonsuccess"></span> <span class="inp"></span></div>
+            </div>
+            <div class="hintwrap">
+                <div class="hintloader"><img src="assets/images/loader.gif"></div>
+                <table class="hint"></table>
+            </div>
         </div>
-        
+
+        <table class="keypad">
+        <tr>
+            <td data-i="D7">7</td>
+            <td data-i="D8">8</td>
+            <td data-i="D9">9</td>
+            <td data-i="del">🔙</td>
+        </tr>
+        <tr>
+            <td data-i="D4">4</td>
+            <td data-i="D5">5</td>
+            <td data-i="D6">6</td>
+            <td data-i=""></td>
+        </tr>
+        <tr>
+            <td data-i="D1">1</td>
+            <td data-i="D2">2</td>
+            <td data-i="D3">3</td>
+            <td data-i="help">❓</td>
+        </tr>
+        <tr>
+            <td data-i="D-">-</td>
+            <td data-i="D0">0</td>
+            <td data-i="half">½</td>
+            <td data-i="ent">🆗</td>
+        </tr>
+        </table>
+
         <div class="startmenu"></div>
 
     </div>
-    <p>
+    <p class="smallprint">
     Player: <span class="d_player"></span>
-    | Word sets: <span class="d_wordsets"></span>
+    | Problem range: <span class="d_wordsets"></span>
     </p>
-    <p>Hint: Press F1, F2, ESC or the button under ESC (some may trigger other functions)</p>
+    <p class="smallprint">Hint: Press F1, F2, ESC or the button under ESC (some may trigger other functions)</p>
     
     <p class="smallprint">Use this page with a physical keyboard | <span class="handle">Licences</span>
     <span class="expand">|
@@ -155,10 +211,12 @@ Sound Effect by <a href="https://pixabay.com/users/liecio-3298866/?utm_source=li
 Sound Effect by <a href="https://pixabay.com/users/koiroylers-44305058/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=356013">Koi Roylers</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=356013">Pixabay</a>
 Sound Effect by <a href="https://pixabay.com/users/koiroylers-44305058/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=351945">Koi Roylers</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=351945">Pixabay</a>
 Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360357">Phurisarah H</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360357">Pixabay</a>
-| Words TTS by https://ttsmp3.com/ (No restrictions on use)
-    </span> | <a href="https://github.com/csirmaz/learning-aid">Codebase</a>
+Sound Effect by <a href="https://pixabay.com/users/matthewvakaliuk73627-48347364/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=290204">Matthew Vakalyuk</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=290204">Pixabay</a>
+    </span> 
+    | Icons by <a href="https://icons8.com">Icons8</a>
+    | <a href="https://github.com/csirmaz/learning-aid">Codebase</a>
     | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
-    | <a href="#" onclick="modify_wordlist(); return false">Update word sets</a>
+    | <a href="#" onclick="modify_problemset(); return false">Update problem range</a>
     | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
     </p>
 
@@ -166,178 +224,68 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
     
     <script>
     
-        // Words, split into sets
-        // Format: ['<emoji>', '<word to spell>']
-        // Use e.g. https://getemoji.com/
-
-        // The page will attempt to play assets/sounds/words/<word to spell>.mp3
-        // Use e.g. https://ttsmp3.com/ to generate them
+        const max_problemset = 1;
+        const MAX_INPUT = 6;
+        const PL = '▢'; // placeholder
+        const HALF = '½';
         
-        const word_sets = [
-            [ // Word set 0
-                ['🖊️', 'pen'],      
-                ['📌', 'pin'],      
-                ['🥚', 'egg'],      
-                ['👜', 'bag'],
-                ['🥁', 'drum'],
-                ['🏃🏻‍♂️‍➡️', 'run'],
-                ['🐖', 'pig'],
-                ['🪺', 'nest'],
-                ['🐈‍', 'cat'],
-                ['🥛', 'milk'],
-                ['🛌', 'bed'],
-                ['⛺️', 'tent'],
-                ['🖐️', 'hand'],
-                ['😁', 'grin'],
-                ['🐠', 'fish'],
-                ['🌜', 'moon'],
-                ['🚪', 'door'],
-                ['🥄', 'spoon'],
-                ['🙅🏼‍♀️', 'not'],
-            ],
-            [ // Word set 1
-                ['▶️', 'play'],
-                ['📦', 'box'],
-                ['🌞', 'sun'],
-                ['❄️', 'snow'],
-                ['🪨', 'rock'],
-                ['🔒', 'lock'],
-                ['💍', 'ring'],
-                ['🔔', 'bell'],
-                ['🐄', 'cow'],
-                ['🐑', 'sheep'],
-                ['🌳', 'tree'],
-                ['🍋', 'lemon'],
-                ['⛳️', 'golf'],
-                ['🏦', 'bank'],
-                ['💳', 'card'],
-                ['🧸', 'teddy'],
-                ['🪽', 'wing'],
-                ['😀', 'happy'],
-                ['🎾', 'tennis'],
-            ],
-            [ // Word set 2
-                ['👃🏻', 'nose'],
-                ['👂', 'ear'],
-                ['👞', 'shoe'],
-                ['🧥', 'coat'],
-                ['🌈', 'rainbow'],
-                ['🧊', 'ice'],
-                ['🍿', 'popcorn'],
-                ['🚜', 'tractor'],
-                ['🧺', 'basket'],
-                ['🔑', 'key'],
-                ['📏', 'ruler'],
-                ['❤️', 'heart'],
-                ['🧣', 'scarf'],
-                ['🫂', 'love'],
-                ['🏊', 'swim'],
-                ['⛄️', 'snowman'],
-                ['🍕', 'pizza'],
-                ['🍝', 'pasta'],
-                ['🎹', 'piano'],
-                ['🧱', 'wall'],
-                ['🥝', 'kiwi'],
-                ['🍄', 'mushroom'],
-                ['🐤', 'chick'],
-                ['🍬', 'candy'],
-                ['🌹', 'rose'],
-                ['🐇', 'rabbit'],
-                ['🚂', 'train'],
-                ['🎺', 'trumpet'],
-                ['🦊', 'fox'],
-                ['🐴', 'horse'],
-                ['🐶', 'dog'],
-                ['🦆', 'duck'],
-                ['🌽', 'corn'],
-                ['🐭', 'mouse'],
-                ['🐵', 'monkey'],
-                ['💧', 'water'],
-                ['🚗', 'car'],
-                ['⬜️', 'white'],
-                ['⬛️', 'black'],
-                ['🟥', 'red'],
-                ['🟩', 'green'],
-                ['🏫', 'school'],
-                ['🏨', 'hotel'],
-                ['🌃', 'night'],
-                ['🏞️', 'river'],
-                ['🌅', 'morning'],
-                ['🏡', 'home'],
-                ['🔥', 'hot'],
-                ['🗻', 'cold'],
-                ['🌋', 'lava'],
-                ['🪰', 'fly'],
-                ['🍱', 'food'],
-                ['🛑', 'stop'],
-            ],
-            [ // Word set 3
-                ['🖼', 'picture'],
-                ['👄', 'mouth'],
-                ['🦈', 'shark'],
-                ['🐍', 'snake'],
-                ['🦴', 'bone'],
-                ['🦜', 'parrot'],
-                ['☔️', 'rain'],
-                ['🍪', 'cookie'],
-                ['🍌', 'banana'],
-                ['😢', 'cry'],
-                ['👶', 'baby'],
-                ['👑', 'crown'],
-                ['🧦', 'socks'],
-                ['🦶', 'foot'],
-                ['🔥', 'fire'],
-                ['✈️', 'plane'],
-                ['🏠', 'house'],
-                ['📱', 'phone'],
-                ['🪧', 'sign'],                
-                ['🤖', 'robot'],
-                ['🏜️', 'desert'],
-                ['👩‍🦰', 'woman'],
-                ['👭', 'women'],
-                ['🥩', 'meat'],
-                ['📨', 'mail'],
-                ['👨‍🦱', 'male'],
-                ['🏋️', 'gym'],
-                ['🦶🏽', 'heel'],
-                ['👨🏾‍⚕️', 'heal'],
-                ['🪢', 'knot'],
-                ['🛣', 'road'],
-                ['⛏', 'break'],
-                ['🦻🏽', 'hear'],
-            ],
-            [ // Word set 4
-                ['🪞', 'mirror'],
-                ['☁️', 'cloud'],
-                ['🧗', 'climb'],
-                ['🛝', 'slide'],
+        function RND(min, max) { return min + Math.floor(Math.random() * (max + 1 - min)); } // inclusive
+        
+        // Problem generators, returning {problem:HTML, solution:STR, hint:OBJ}
+        const PRBL = {
+            add_to_five: function() {
+                const v = RND(0, 5);
+                return {problem: v+'+'+PL+'=5', solution:(5-v), hint:{range:[1,5,1,v]}};
+            },
+            add_to_ten: function() {
+                const v = RND(0, 10);
+                return {problem: v+'+'+PL+'=10', solution:(10-v), hint:{range:[1,10,1,v]}};
+            },
+            add_small: function() {
+                const a = RND(0, 10);
+                const b = RND(0, 10);
+                return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[1,20,1,a]}};
+            },
+            sub_five: function() {
+                const v = RND(0, 5);
+                return {problem: '5-'+v+'=', solution:(5-v), hint:{range:[1,5,1,v]}};
+            },
+            sub_ten: function() {
+                const v = RND(0, 10);
+                return {problem: '10-'+v+'=', solution:(10-v), hint:{range:[1,10,1,v]}};
+            },
+            sub_five_minus: function() {
+                const v = RND(0, 8);
+                return {problem: '5-'+v+'=', solution:(5-v), hint:{range:[-5,5,1,0]}};
+            },
+            sub_ten_minus: function() {
+                const v = RND(0, 13);
+                return {problem: '10-'+v+'=', solution:(10-v), hint:{range:[-3,10,1,0]}};
+            },
 
-                ['🏥', 'hospital'],
-                ['🍉', 'watermelon'],
-                ['🕷', 'spider'],
-                ['🐬', 'dolphin'],
-                ['💎', 'diamond'],
-                ['🚁', 'helicopter'],
-                ['🎶', 'hymn'],
-                ['🇪🇬', 'Egypt'],
-                ['🔣', 'symbol'],
-                ['🕵️', 'mystery'],
-                ['🏜️', 'pyramid'],
-                ['🎤', 'lyric'],
-                ['👻', 'myth'],
-                ['🚈', 'arrive'],
-                ['🧚‍♂️', 'appear'],
-                ['👯‍♀️', 'group'],
-                ['⚙️', 'steel'],
-                ['🗺️', 'here'],
-                ['🦘', 'kangaroo'],
-                ['🦒', 'giraffe'],
+        };
+
+        // Lists problems and their relative frequencies
+        const PROBLEMSETS = {
+            0: [
+                [PRBL.add_to_five, 10],
+                [PRBL.add_to_ten, 10],
+                [PRBL.add_small, 30],
+                [PRBL.sub_five, 10],
+                [PRBL.sub_ten, 10],
+            ],
+            1: [
+                [PRBL.add_to_five, 10],
+                [PRBL.add_to_five, 10],
+                [PRBL.add_to_ten, 10],
+                [PRBL.add_small, 10],
+                [PRBL.sub_five_minus, 10],
+                [PRBL.sub_ten_minus, 10],
             ]
-        ];
-        
-        
+        };
 
         const audio = {
+            click: {'file':'assets/sounds/click.mp3', 'volume':1, 'object':false},
             success: [
                 {'file': 'assets/sounds/success/goodresult-82807.mp3', 'volume': .3, 'object': false},
                 {'file': 'assets/sounds/success/success-340660.mp3', 'volume': .4, 'object': false},
@@ -354,29 +302,33 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
             ]
         };
 
-        let words = [];
-
         // Application data
         const bee = {
             load_time: Date.now(),
-            word_ix: false,
+            problemset: false, // index (int)
+            problem: false, // output of a problem generator, {problem:HTML, solution:STR, hint:OBJ}
             can_type: false,
             typed: '',
             can_use_help: true,
             help_timeout: false,
             score_anim_timeout: false,
             player: false,  // name of the player - scores are saved to browser under this name
-            $image: $('.prompt .img'),
             $input: $('.prompt .infield .inp'),
-            $help: $('.prompt .infield .help'),
             storage: {'players': {}},  // storage data that's saved into local storage
-            word_audio: false,
         };
         
         // Try to load data
-        if(localStorage.spellbee) {
-            bee.storage = JSON.parse(localStorage.spellbee);
+        if(localStorage.count) {
+            bee.storage = JSON.parse(localStorage.count);
         }
+        
+        // Fix emojis
+        $('.prompticon').html('👉'+"\ufe0f");
+        $('.prompticonsuccess').html('✅'+"\ufe0f");
+        $('.keypad [data-i="ent"]').html('🆗'+"\ufe0f");
+        $('.keypad [data-i="help"]').html('❓'+"\ufe0f");
+        
+        $('.hintloader').hide();
 
         
         // Data and objects for the fireworks animation
@@ -394,7 +346,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                         max: 2
                     }
                 },
-                lineWidth: { explosion: { min: 2, max: 6}, trace: { min: 2, max: 6}},
+                lineWidth: { explosion: { min: 4, max: 6}, trace: { min: 4, max: 6}},
                 // intensity: 20, // default: 30
                 delay: { min: 5, max: 10 },
             }),
@@ -406,7 +358,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
 
         
         function save_storage() {
-            localStorage.spellbee = JSON.stringify(bee.storage);
+            localStorage.count = JSON.stringify(bee.storage);
         }
         
 
@@ -446,37 +398,37 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 if(callback) { callback(); }
             }, 3.5*1000);
         }
-
         
-        // Display target word briefly
-        function show_help() {
-            console.log("Disabling help");
-            bee.can_use_help = false;
-            if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); }
-            console.log("Scheduling enabling help");
-            bee.help_timeout = setTimeout(function(){ 
-                console.log("Enabling help");
-                bee.can_use_help = true;
-                bee.help_timeout = false;
-            }, 5500);
-
-            bee.can_type = false;
-            bee.$input.hide();
-            bee.$help.show();
-            play_word(words[bee.word_ix][1]);
-            const help_duration = 1200 + words[bee.word_ix][1].length * 400;
-            console.log("Help duration", help_duration);
-            bee.$help.fadeOut({duration: help_duration, complete: function() {
-                bee.$input.show();
-                bee.can_type = true;
-            }});
+        
+        
+        function clear_hint() {
+            $('.hint').html('');
         }
 
-
-        function to_underscores(prefix, s) {
-            o = prefix;
-            for(let i=0; i<s.length-prefix.length; i++) { o += '_'; }
-            return o;
+        
+        function show_help() {
+            // hint syntax: {range: [range-min, range-max, highlight-min, highlight-max]}
+            bee.can_type = false;
+            $('.hintloader').show();
+            $('.hint').hide();
+            setTimeout(function() {
+                o = '<tr>';
+                const data = bee.problem.hint;
+                if(data.range) {
+                    for(let i=data.range[0]; i<=data.range[1]; i++) {
+                        const h = (i >= data.range[2] && i <= data.range[3]);
+                        o += '<td class="'+(h?'hint-h':'')+'">'+i+'</td>';
+                        if((i % 10) == 0 && i != 0) { o += '</tr><tr>'; }
+                    }
+                }
+                o += '</tr>';
+                $('.hint').html(o);
+                setTimeout(function() {
+                    $('.hintloader').hide();
+                    $('.hint').show();
+                }, 100); // allow rendering
+                bee.can_type = true;
+            }, 3000); // hint wait time
         }
         
         
@@ -487,7 +439,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
         
         
         function update_input_field() {
-            bee.$input.html(esc_html(to_underscores(bee.typed, words[bee.word_ix][1])));
+            bee.$input.html(esc_html(bee.typed));
         }
         
         
@@ -524,6 +476,16 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
         }
         
         
+        function play_click() {
+            const d = audio.click;
+            if(d['object'] === false) { 
+                console.log("Audio: setting up", d['file']);
+                d['object'] = new Audio(d['file']); 
+                d['object'].volume = d['volume']; 
+            }            
+            d['object'].play();
+        }
+        
         function play_success_sound() {
             const i = Math.floor(Math.random() * audio.success.length);
             const d = audio.success[i];
@@ -537,84 +499,104 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
         }
         
         
-        function play_word(s) {
-            s = s.replaceAll(/[^A-Za-z]/g, '');
-            file = 'assets/sounds/words/'+s+'.mp3';
-            if(bee.word_audio === false) {
-                bee.word_audio = new Audio(audio.success[0].file);
-                bee.word_audio.volume = 1;
-            }
-            try {
-                bee.word_audio.src = file;
-                bee.word_audio.play();
-            } catch(e) {
-                console.log("Error during play_word", e);
+        function process_keypad(e) {
+            e.preventDefault = true;
+            if(!bee.can_type) { return; }
+            play_click();
+            const $this = $(this);
+            let v = $this.data('i');
+            
+            $this.addClass('pressed');
+            setTimeout(function(){ $this.removeClass('pressed'); }, 200);
+            
+            if(v != '') {
+                if(v.substring(0, 1) == 'D') { v = v.substring(1); }
+                type_action(v);
             }
         }
-
         
-        function process_keypress(event) {
-            event.preventDefault = true;
-            if(!bee.can_type) { return; }
+        
+        function type_action(c) {
+            if(c == 'help') { show_help(); }
             
-            if(event.keyCode >= 65 && event.keyCode <= 90) { // a-z
-                if(bee.typed.length < words[bee.word_ix][1].length) {
-                    bee.typed += event.key;
-                    update_input_field();
-                    
-                    if(bee.typed == words[bee.word_ix][1]) { // Success!
-                        bee.can_type = false;
-                        play_success_sound();
-                        bee.$input.addClass('success');
-                        if(add_score() % 4 == 0) {
-                            show_fireworks(function() {
-                                setTimeout(new_question, 1100);
-                            });
-                        } else {
-                            setTimeout(new_question, 2700);
-                        }
-                    }
-                }
-                return;
-            }
-            
-            if(event.keyCode == 8) { // backspace
+            if(c == 'del') {
                 if(bee.typed.length > 0) {
                     bee.typed = bee.typed.substring(0, bee.typed.length-1);
                     update_input_field();
                 }
-                return;
-            }
-                       
-            if(event.keyCode == 112 || event.keyCode == 113 || event.keyCode == 27 || event.keyCode == 192) { // F1, F2, ESC, pipe
-                if(!bee.can_use_help) { return; }
-                show_help();
             }
             
-            // console.log("key", event);
+            if(c == 'ent') {
+                // Convert half at end
+                let value = bee.typed;
+                if(value.substring(value.length-1) == HALF) {
+                    value = value.substring(0, value.length-1) + '.5';
+                }
+                
+                if(value == String(bee.problem.solution)) { // Success!
+                    bee.can_type = false;
+                    play_success_sound();
+                    $('.prompt').addClass('success');
+                    if(add_score() % 4 == 0) {
+                        show_fireworks(function() {
+                            setTimeout(new_question, 1100);
+                        });
+                    } else {
+                        setTimeout(new_question, 2700);
+                    }
+                }
+            }
+            
+            if(c == 'half') {
+                if(bee.typed.length < MAX_INPUT) {
+                    bee.typed += HALF;
+                    update_input_field();
+                }
+            }
+            
+            if(String(c).search(/^[\-0-9]$/) !== -1) {
+                if(bee.typed.length < MAX_INPUT) {
+                    bee.typed += c;
+                    update_input_field();
+                }
+            }
+            
+        }
+        
+                
+        function process_keypress(event) {
+            event.preventDefault = true;
+            if(!bee.can_type) { return; }
+            
+            if((event.keyCode >= 48 && event.keyCode <= 57) || event.keyCode == 173) { // 0-9 and -
+                type_action(event.key);
+                return;
+            }
+            
+            if(event.keyCode == 8) { type_action('del'); return; }
+            
+            if(event.keyCode == 13) { type_action('ent'); return; }
+                       
+            if(event.keyCode == 112 || event.keyCode == 113 || event.keyCode == 27 || event.keyCode == 192) { // F1, F2, ESC, pipe
+                type_action('help');
+                return;
+            }
+            
+            console.log("key", event);
         }
 
         
         // Initialize a question
-        function start_question(word_ix) {
-            bee.word_ix = word_ix;
+        function start_question() {
             bee.can_type = true;
-            bee.can_use_help = true;
-            if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); bee.help_timeout = false; }
             
-            
-            // Show picture
-            // Ensure emoji code ends in picture modifier
-            let emoji = words[word_ix][0];
-            if(emoji[emoji.lenght-1] != "\ufe0f") { emoji += "\ufe0f"; }
-            bee.$image.html(esc_html(emoji));
+            $('.problem').html(bee.problem.problem);
             
             // Add help & input
-            bee.$help.html(esc_html(words[word_ix][1]));
             bee.typed = '';
             update_input_field();
-            bee.$input.removeClass('success');
-            show_help();
+            $('.prompt').removeClass('success');
+            clear_hint();
         }
         
         
@@ -624,59 +606,57 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 window.location.reload(true);
                 return;
             }
-            
-            let word_ix;
-            while(true) {
-                word_ix = Math.floor(Math.random() * words.length);
-                if(bee.word_ix === false || word_ix != bee.word_ix) { break; } // ensure we choose a new word
+
+            // Choose a problem generator
+            const pset = PROBLEMSETS[bee.problemset];
+            let freq_sum = 0;
+            for(let i=0; i<pset.length; i++) { freq_sum += pset[i][1]; }
+            const freq = Math.random() * freq_sum;
+            freq_sum = 0;
+            let i=0;
+            for(i=0; i<pset.length; i++) {
+                freq_sum += pset[i][1];
+                if(freq <= freq_sum) { break; }
             }
-            start_question(word_ix);
+            // Get a problem
+            bee.problem = pset[i][0]();
+            start_question();
         }
         
         
         // Choose a range of word sets to show words from
-        function choose_wordsets() {
-            const num_wordsets = word_sets.length - 1;
-            let min_wordset = prompt("What range of word sets should we use?\nType a number from 0 to "+num_wordsets+" (simple to difficult) for the bottom end of the range") - 0;
-            if(isNaN(min_wordset)) { min_wordset = 0; }
-            let max_wordset = prompt("Type a number from "+min_wordset+" to "+num_wordsets+" (simple to difficult) for the top end of the range") - 0;
-            if(isNaN(max_wordset)) { max_wordset = 0; }
-            return [min_wordset, max_wordset];
+        function choose_problemset() {
+            let p = prompt("What set of problems should we use?\nType a number from 0 to "+max_problemset+" (simple to difficult)") - 0;
+            if(isNaN(p)) { p = 0; }
+            return p;
         }
         
         
-        function init_wordlist() {
-            words = [];
-            min_wordset = bee.storage.players[bee.player].min_wordset;
-            if(min_wordset === undefined) { min_wordset = 0; }
-            max_wordset = bee.storage.players[bee.player].wordsets;
-            for(let i=min_wordset; i<=max_wordset; i++) {
-                words = words.concat(word_sets[i]);
-            }
-            $('.d_wordsets').html(
-                esc_html(min_wordset) + " to " + 
-                esc_html(max_wordset) + " (" + words.length + " words)"
-            );
+        function init_problemset() {
+            let p = bee.storage.players[bee.player].problemset;
+            if(p === undefined) { p = 0; }
+            $('.d_wordsets').html(esc_html(p));
+            bee.problemset = p;
         }
         
         
-        function modify_wordlist() {
+        function modify_problemset() {
             if(bee.player === false) { alert("Choose a player first"); return; }
-            const wordsets = choose_wordsets();
-            bee.storage.players[bee.player].min_wordset = wordsets[0];
-            bee.storage.players[bee.player].wordsets = wordsets[1];
+            const p = choose_problemset();
+            bee.storage.players[bee.player].problemset = p;
             save_storage();
-            init_wordlist();
+            init_problemset();
             new_question();
         }
         
         
         function main() {
             document.addEventListener('keydown', process_keypress); // Or use 'keypress' event
+            $('.keypad td').on('click', process_keypad);
 
             $('.score .value').html(esc_html(bee.storage.players[bee.player].score));
             $('.d_player').html(esc_html(bee.player));
-            init_wordlist();
+            init_problemset();
             new_question();
         }
         
@@ -689,6 +669,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
         }
         menu += '<div class="startbutton" data-playernew="1">New user<br><span style="font-size:60%">All player data is stored in the browser only</span></div>';
         $('.prompt').hide();
+        $('.keypad').hide();
         $('.startmenu').html(menu);
         
         // Start menu - logic
@@ -701,8 +682,8 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
 
                     // Initialize
                     if(!bee.storage.players[bee.player]) {
-                        const wordsets = choose_wordsets();
-                        bee.storage.players[bee.player] = {'score': 0, 'min_wordset': wordsets[0], 'wordsets': wordsets[1]};
+                        const p = choose_problemset();
+                        bee.storage.players[bee.player] = {'score': 0, 'problemset': p};
                         save_storage();
                     } else {
                         alert("That player already exists. Loading player data");
@@ -713,6 +694,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 
                 $('.startmenu').hide();
                 $('.prompt').show();
+                $('.keypad').show();
                 main();
                 return false;
             });
@@ -726,3 +708,4 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
 
 </body>
 </html>
+
