@@ -133,8 +133,8 @@
         }
         table.hint td {
             border: 2px solid #000;
-            padding: .1rem .4rem;
-            font-size: 1rem;
+            padding: .1rem .1rem;
+            font-size: .9rem;
         }
         table.hint td.hint-h {
             background: #0f0;
@@ -212,6 +212,7 @@ Sound Effect by <a href="https://pixabay.com/users/koiroylers-44305058/?utm_sour
 Sound Effect by <a href="https://pixabay.com/users/koiroylers-44305058/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=351945">Koi Roylers</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=351945">Pixabay</a>
 Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360357">Phurisarah H</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360357">Pixabay</a>
 Sound Effect by <a href="https://pixabay.com/users/matthewvakaliuk73627-48347364/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=290204">Matthew Vakalyuk</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=290204">Pixabay</a>
+Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=37702">freesound_community</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=37702">Pixabay</a>
     </span> 
     | Icons by <a href="https://icons8.com">Icons8</a>
     | <a href="https://github.com/csirmaz/learning-aid">Codebase</a>
@@ -262,7 +263,32 @@ Sound Effect by <a href="https://pixabay.com/users/matthewvakaliuk73627-48347364
                 const v = RND(0, 13);
                 return {problem: '10-'+v+'=', solution:(10-v), hint:{range:[-3,10,1,0]}};
             },
-
+            add_big_no_carry: function() {
+                const a1 = RND(0, 9);
+                const a2 = RND(0, 9);
+                const b1 = RND(0, 2);
+                const b2 = RND(0, 9-a2);
+                const a = a1*10+a2;
+                const b = b1*10+b2;
+                return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[a1*10+1,a1*10+20,a1*10+1,a]}};
+            },
+            add_big_small: function() {
+                const a1 = RND(0, 9);
+                const a2 = RND(0, 9);
+                const b2 = RND(0, 9);
+                const a = a1*10+a2;
+                const b = b2;
+                return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[a1*10+1,a1*10+20,a1*10+1,a]}};
+            },
+            multiply: function() {
+                const a = RND(0, 12);
+                const b = RND(0, 12);
+                return {problem: a+'x'+b+'=', solution:(a*b), hint:{range:[0,a*12,-1,-1,a]}}; 
+            },
+            halving: function() {
+                const a = RND(0, 12);
+                return {problem: a+'/2=', solution:(a/2), hint:{range:[1,a,-1,-1]}};
+            }
         };
 
         // Lists problems and their relative frequencies
@@ -281,11 +307,16 @@ Sound Effect by <a href="https://pixabay.com/users/matthewvakaliuk73627-48347364
                 [PRBL.add_small, 10],
                 [PRBL.sub_five_minus, 10],
                 [PRBL.sub_ten_minus, 10],
+                [PRBL.add_big_no_carry, 20],
+                [PRBL.add_big_small, 20],
+                [PRBL.multiply, 30],
+                [PRBL.halving, 10],
             ]
         };
 
         const audio = {
             click: {'file':'assets/sounds/click.mp3', 'volume':1, 'object':false},
+            notavail: {'file':'assets/sounds/wronganswer-37702.mp3', 'volume':1, 'object':false},
             success: [
                 {'file': 'assets/sounds/success/goodresult-82807.mp3', 'volume': .3, 'object': false},
                 {'file': 'assets/sounds/success/success-340660.mp3', 'volume': .4, 'object': false},
@@ -408,14 +439,22 @@ Sound Effect by <a href="https://pixabay.com/users/matthewvakaliuk73627-48347364
         
         function show_help() {
             // hint syntax: {range: [range-min, range-max, highlight-min, highlight-max]}
+            // hint syntax: {range: [range-min, range-max, highlight-min, highlight-max, step]}
+            const data = bee.problem.hint;
+            if(data === false) {
+                playme('notavail');
+                return;
+            }
+            
             bee.can_type = false;
             $('.hintloader').show();
             $('.hint').hide();
             setTimeout(function() {
                 o = '<tr>';
-                const data = bee.problem.hint;
                 if(data.range) {
-                    for(let i=data.range[0]; i<=data.range[1]; i++) {
+                    let step = 1;
+                    if(data.range.length >= 5) { step = data.range[4]; }
+                    for(let i=data.range[0]; i<=data.range[1]; i+=step) {
                         const h = (i >= data.range[2] && i <= data.range[3]);
                         o += '<td class="'+(h?'hint-h':'')+'">'+i+'</td>';
                         if((i % 10) == 0 && i != 0) { o += '</tr><tr>'; }
@@ -476,8 +515,8 @@ Sound Effect by <a href="https://pixabay.com/users/matthewvakaliuk73627-48347364
         }
         
         
-        function play_click() {
-            const d = audio.click;
+        function playme(f) {
+            const d = audio[f];
             if(d['object'] === false) { 
                 console.log("Audio: setting up", d['file']);
                 d['object'] = new Audio(d['file']); 
@@ -502,7 +541,7 @@ Sound Effect by <a href="https://pixabay.com/users/matthewvakaliuk73627-48347364
         function process_keypad(e) {
             e.preventDefault = true;
             if(!bee.can_type) { return; }
-            play_click();
+            playme('click');
             const $this = $(this);
             let v = $this.data('i');
             
