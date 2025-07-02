@@ -193,9 +193,7 @@
     <p class="smallprint">
     Player: <span class="d_player"></span>
     | Problem range: <span class="d_wordsets"></span>
-    </p>
-    <p class="smallprint">Hint: Press F1, F2, ESC or the button under ESC (some may trigger other functions)</p>
-    
+    </p>    
     <p class="smallprint">Use this page with a physical keyboard | <span class="handle">Licences</span>
     <span class="expand">|
     Fireworks module from https://github.com/crashmax-dev/fireworks-js/tree/v1 (MIT)
@@ -220,6 +218,7 @@ Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/
     | <a href="#" onclick="modify_problemset(); return false">Update problem range</a>
     | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
     </p>
+    <p class="smallprint">Hint: Press F1, F2, ESC or the button under ESC (some may trigger other functions)</p>
 
     <div class="fireworks-container"></div>
     
@@ -283,7 +282,7 @@ Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/
             multiply: function() {
                 const a = RND(0, 12);
                 const b = RND(0, 12);
-                return {problem: a+'x'+b+'=', solution:(a*b), hint:{range:[0,a*12,-1,-1,a]}}; 
+                return {problem: a+'x'+b+'=', solution:(a*b), hint:{range:[0,a*12,a*10,a*10,a]}}; 
             },
             halving: function() {
                 const a = RND(0, 12);
@@ -457,7 +456,7 @@ Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/
                     for(let i=data.range[0]; i<=data.range[1]; i+=step) {
                         const h = (i >= data.range[2] && i <= data.range[3]);
                         o += '<td class="'+(h?'hint-h':'')+'">'+i+'</td>';
-                        if((i % 10) == 0 && i != 0) { o += '</tr><tr>'; }
+                        if((i % 10) == 0 && i != 0 && step == 1) { o += '</tr><tr>'; }
                     }
                 }
                 o += '</tr>';
@@ -571,8 +570,9 @@ Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/
                 if(value.substring(value.length-1) == HALF) {
                     value = value.substring(0, value.length-1) + '.5';
                 }
+                console.log("Value", value, "Target", bee.problem.solution);
                 
-                if(value == String(bee.problem.solution)) { // Success!
+                if((value - 0) == bee.problem.solution) { // Success!
                     bee.can_type = false;
                     play_success_sound();
                     $('.prompt').addClass('success');
@@ -606,22 +606,17 @@ Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/
         function process_keypress(event) {
             event.preventDefault = true;
             if(!bee.can_type) { return; }
-            
             if((event.keyCode >= 48 && event.keyCode <= 57) || event.keyCode == 173) { // 0-9 and -
                 type_action(event.key);
                 return;
             }
-            
             if(event.keyCode == 8) { type_action('del'); return; }
-            
             if(event.keyCode == 13) { type_action('ent'); return; }
-                       
             if(event.keyCode == 112 || event.keyCode == 113 || event.keyCode == 27 || event.keyCode == 192) { // F1, F2, ESC, pipe
                 type_action('help');
                 return;
             }
-            
-            console.log("key", event);
+            // console.log("key", event);
         }
 
         
