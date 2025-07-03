@@ -262,6 +262,11 @@ Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/
                 const v = RND(0, 13);
                 return {problem: '10-'+v+'=', solution:(10-v), hint:{range:[-3,10,1,0]}};
             },
+            sub_small: function() {
+                const a = RND(0, 10);
+                const b = RND(a, 10);
+                return {problem: b+'-'+a+'=', solution:(b-a), hint:{range:[1,b,-1,-1]}};
+            },
             add_big_no_carry: function() {
                 const a1 = RND(0, 9);
                 const a2 = RND(0, 9);
@@ -298,6 +303,7 @@ Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/
                 [PRBL.add_small, 30],
                 [PRBL.sub_five, 10],
                 [PRBL.sub_ten, 10],
+                [PRBL.sub_small, 10],                
             ],
             1: [
                 [PRBL.add_to_five, 10],
@@ -306,10 +312,11 @@ Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/
                 [PRBL.add_small, 10],
                 [PRBL.sub_five_minus, 10],
                 [PRBL.sub_ten_minus, 10],
+                [PRBL.sub_small, 10],                
                 [PRBL.add_big_no_carry, 20],
                 [PRBL.add_big_small, 20],
-                [PRBL.multiply, 30],
-                [PRBL.halving, 10],
+                [PRBL.multiply, 35],
+                [PRBL.halving, 20],
             ]
         };
 
