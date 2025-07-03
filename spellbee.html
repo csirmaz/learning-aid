@@ -194,6 +194,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 ['🚪', 'door'],
                 ['🥄', 'spoon'],
                 ['🙅🏼‍♀️', 'not'],
+                ['🪆', 'toy'],
             ],
             [ // Word set 1
                 ['▶️', 'play'],
@@ -338,6 +339,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
         
 
         const audio = {
+            notavail: {'file':'assets/sounds/wronganswer-37702.mp3', 'volume':1, 'object':false},
             success: [
                 {'file': 'assets/sounds/success/goodresult-82807.mp3', 'volume': .3, 'object': false},
                 {'file': 'assets/sounds/success/success-340660.mp3', 'volume': .4, 'object': false},
@@ -537,6 +539,17 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
         }
         
         
+        function playme(f) {
+            const d = audio[f];
+            if(d['object'] === false) { 
+                console.log("Audio: setting up", d['file']);
+                d['object'] = new Audio(d['file']); 
+                d['object'].volume = d['volume']; 
+            }            
+            d['object'].play();
+        }
+
+        
         function play_word(s) {
             s = s.replaceAll(/[^A-Za-z]/g, '');
             file = 'assets/sounds/words/'+s+'.mp3';
@@ -555,9 +568,9 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
         
         function process_keypress(event) {
             event.preventDefault = true;
-            if(!bee.can_type) { return; }
             
             if(event.keyCode >= 65 && event.keyCode <= 90) { // a-z
+                if(!bee.can_type) { playme('notavail'); return; }
                 if(bee.typed.length < words[bee.word_ix][1].length) {
                     bee.typed += event.key;
                     update_input_field();
@@ -579,6 +592,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
             }
             
             if(event.keyCode == 8) { // backspace
+                if(!bee.can_type) { playme('notavail'); return; }
                 if(bee.typed.length > 0) {
                     bee.typed = bee.typed.substring(0, bee.typed.length-1);
                     update_input_field();
@@ -587,6 +601,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
             }
                        
             if(event.keyCode == 112 || event.keyCode == 113 || event.keyCode == 27 || event.keyCode == 192) { // F1, F2, ESC, pipe
+                if(!bee.can_type) { return; }
                 if(!bee.can_use_help) { return; }
                 show_help();
             }

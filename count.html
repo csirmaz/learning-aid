@@ -460,10 +460,14 @@ Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/
                 if(data.range) {
                     let step = 1;
                     if(data.range.length >= 5) { step = data.range[4]; }
-                    for(let i=data.range[0]; i<=data.range[1]; i+=step) {
-                        const h = (i >= data.range[2] && i <= data.range[3]);
-                        o += '<td class="'+(h?'hint-h':'')+'">'+i+'</td>';
-                        if((i % 10) == 0 && i != 0 && step == 1) { o += '</tr><tr>'; }
+                    if(step > 0) {
+                        for(let i=data.range[0]; i<=data.range[1]; i+=step) {
+                            const h = (i >= data.range[2] && i <= data.range[3]);
+                            o += '<td class="'+(h?'hint-h':'')+'">'+i+'</td>';
+                            if((i % 10) == 0 && i != 0 && step == 1) { o += '</tr><tr>'; }
+                        }
+                    } else {
+                        playme('notavail');
                     }
                 }
                 o += '</tr>';
@@ -574,6 +578,7 @@ Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/
             if(c == 'ent') {
                 // Convert half at end
                 let value = bee.typed;
+                if(value.length == 0) { return; }
                 if(value.substring(value.length-1) == HALF) {
                     value = value.substring(0, value.length-1) + '.5';
                 }
@@ -613,7 +618,7 @@ Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/
         function process_keypress(event) {
             event.preventDefault = true;
             if(!bee.can_type) { return; }
-            if((event.keyCode >= 48 && event.keyCode <= 57) || event.keyCode == 173) { // 0-9 and -
+            if((event.keyCode >= 48 && event.keyCode <= 57) || event.key == '-') { // 0-9 and -
                 type_action(event.key);
                 return;
             }
