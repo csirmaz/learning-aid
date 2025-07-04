@@ -261,8 +261,14 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                 return {problem: '10-'+v+'=', solution:(10-v), hint:{range:[-3,10,1,0]}};
             },
             sub_small: function() {
+                let a = RND(0, 10);
+                let b = RND(0, 10);
+                if(a > b) { const tmp = a; a = b; b = tmp; }
+                return {problem: b+'-'+a+'=', solution:(b-a), hint:{range:[1,b,-1,-1]}};
+            },
+            sub_mid: function() {
                 const a = RND(0, 10);
-                const b = RND(a, 10);
+                const b = RND(0, 10) + 10;
                 return {problem: b+'-'+a+'=', solution:(b-a), hint:{range:[1,b,-1,-1]}};
             },
             add_big_no_carry: function() {
@@ -304,16 +310,16 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                 [PRBL.sub_small, 10],                
             ],
             1: [
-                [PRBL.add_to_five, 10],
-                [PRBL.add_to_five, 10],
-                [PRBL.add_to_ten, 10],
+                [PRBL.add_to_five, 5],
+                [PRBL.add_to_ten, 5],
                 [PRBL.add_small, 10],
-                [PRBL.sub_five_minus, 10],
-                [PRBL.sub_ten_minus, 10],
+                [PRBL.sub_five_minus, 5],
+                [PRBL.sub_ten_minus, 5],
                 [PRBL.sub_small, 10],                
-                [PRBL.add_big_no_carry, 20],
-                [PRBL.add_big_small, 20],
-                [PRBL.multiply, 35],
+                [PRBL.sub_mid, 20],
+                [PRBL.add_big_no_carry, 30],
+                [PRBL.add_big_small, 30],
+                [PRBL.multiply, 40],
                 [PRBL.halving, 20],
             ]
         };
@@ -469,7 +475,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                     if(step > 0) {
                         for(let i=data.range[0]; i<=data.range[1]; i+=step) {
                             const h = (i >= data.range[2] && i <= data.range[3]);
-                            o += '<td class="'+(h?'hint-h':'')+'">'+i+'</td>';
+                            o += '<td class="'+(h?'hint-h':'')+'">'+(i<10&&i>=0?'&nbsp;':'')+i+'</td>';
                             if((i % 10) == 0 && i != 0 && step == 1) { o += '</tr><tr>'; }
                         }
                     } else {
