@@ -59,7 +59,7 @@
         }
         
         .prompt {
-            padding-top: 5rem;
+            padding-top: 3rem;
         }
         
         .prompt .img {
@@ -74,10 +74,12 @@
         }
         
         .prompt .infield {
-            display: inline-block;
+            display: block;
             line-height: 8rem;
+            border-radius: 1rem;
             background: #fffae4;
-            font-size: 6rem;
+            font-size: 5rem;
+            margin: 1rem 0;
             padding: 0 1rem;
             min-width: 35rem;
             letter-spacing: .3rem;
@@ -90,7 +92,9 @@
 
         .prompt .infield .help { color: #999; }
         .prompt .infield .inp { color: #000; }
+        .prompt .infield .inp .spacehelp { color: #ccc; }
         body .prompt .infield .success { color: #090; }
+        .prompt .infield .helpwait { display: none; }
         
         .startbutton {
             margin: 2rem 5rem;
@@ -128,7 +132,7 @@
         <div class="score"><span class="icon">🪙</span> <span class="value">0</span></div>
         <div class="prompt">
             <span class="img"></span>
-            <span class="infield"><span class="help"></span><span class="inp"></span></span>
+            <span class="infield"><span class="help"></span><img class="helpwait" src="assets/images/loader.gif"><span class="inp"></span></span>
         </div>
         
         <div class="startmenu"></div>
@@ -156,7 +160,9 @@ Sound Effect by <a href="https://pixabay.com/users/koiroylers-44305058/?utm_sour
 Sound Effect by <a href="https://pixabay.com/users/koiroylers-44305058/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=351945">Koi Roylers</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=351945">Pixabay</a>
 Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360357">Phurisarah H</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360357">Pixabay</a>
 | Words TTS by https://ttsmp3.com/ (No restrictions on use)
-    </span> | <a href="https://github.com/csirmaz/learning-aid">Codebase</a>
+    </span> 
+    | Icons by <a href="https://icons8.com">Icons8</a>
+    | <a href="https://github.com/csirmaz/learning-aid">Codebase</a>
     | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
     | <a href="#" onclick="modify_wordlist(); return false">Update word sets</a>
     | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
@@ -195,6 +201,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 ['🥄', 'spoon'],
                 ['🙅🏼‍♀️', 'not'],
                 ['🪆', 'toy'],
+                ['🧑', 'boy'],
             ],
             [ // Word set 1
                 ['▶️', 'play'],
@@ -216,6 +223,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 ['🪽', 'wing'],
                 ['😀', 'happy'],
                 ['🎾', 'tennis'],
+                ['👁', 'eye'],
             ],
             [ // Word set 2
                 ['👃🏻', 'nose'],
@@ -306,13 +314,16 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 ['🛣', 'road'],
                 ['⛏', 'break'],
                 ['🦻🏽', 'hear'],
+                ['🎃', 'scary'],
+                ['🎃', 'pumpkin'],
             ],
             [ // Word set 4
                 ['🪞', 'mirror'],
                 ['☁️', 'cloud'],
                 ['🧗', 'climb'],
                 ['🛝', 'slide'],
-
+                ['🧑‍🏫', 'teacher'],
+                ['👕', 'shirt'],
                 ['🏥', 'hospital'],
                 ['🍉', 'watermelon'],
                 ['🕷', 'spider'],
@@ -333,6 +344,18 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                 ['🗺️', 'here'],
                 ['🦘', 'kangaroo'],
                 ['🦒', 'giraffe'],
+                ['👩‍✈️', 'pilot'],
+                ['🌊', 'wave'],
+                
+                ['☔️', 'It is raining'],
+                ['😽', 'Cat gives kiss'],
+                ['😾', 'angry cat'],
+                ['🚶‍♀️‍➡️', 'She is walking'],
+                ['🏃‍♂️‍➡️', 'He is running'],
+                ['👨🏻‍🍼', 'feeding the baby'],
+                ['🛀🏾', 'having a bath'],
+                ['🍟', 'I want chips'],
+                ['🚻', 'Where is the toilet'],
             ]
         ];
         
@@ -371,6 +394,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
             $image: $('.prompt .img'),
             $input: $('.prompt .infield .inp'),
             $help: $('.prompt .infield .help'),
+            $helpwait: $('.prompt .infield .helpwait'),
             storage: {'players': {}},  // storage data that's saved into local storage
             word_audio: false,
         };
@@ -451,33 +475,44 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
 
         
         // Display target word briefly
-        function show_help() {
+        function show_help(is_initial) {
             console.log("Disabling help");
             bee.can_use_help = false;
             if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); }
-            console.log("Scheduling enabling help");
-            bee.help_timeout = setTimeout(function(){ 
-                console.log("Enabling help");
-                bee.can_use_help = true;
-                bee.help_timeout = false;
-            }, 5500);
 
             bee.can_type = false;
             bee.$input.hide();
-            bee.$help.show();
-            play_word(words[bee.word_ix][1]);
-            const help_duration = 1200 + words[bee.word_ix][1].length * 400;
-            console.log("Help duration", help_duration);
-            bee.$help.fadeOut({duration: help_duration, complete: function() {
-                bee.$input.show();
-                bee.can_type = true;
-            }});
+            
+            if(!is_initial) { bee.$helpwait.show(); }
+
+            setTimeout(function() {
+                bee.$helpwait.hide();
+                bee.$help.show();
+                setTimeout(function() {
+                    play_word(words[bee.word_ix][1]);
+                    const help_duration = 1200 + words[bee.word_ix][1].length * 400; // plus the initial wait below
+                    console.log("Help duration", help_duration);
+                    bee.$help.fadeOut({duration: help_duration, complete: function() {
+                        bee.$input.show();
+                        bee.can_type = true;
+                        
+                        console.log("Scheduling enabling help");
+                        bee.help_timeout = setTimeout(function(){ 
+                            console.log("Enabling help");
+                            bee.can_use_help = true;
+                            bee.help_timeout = false;
+                        }, 4000); // minus the duration of the help!
+                    }});
+                }, 600); // initial wait while showing the word (before TTS)
+            }, is_initial ? 0 : 2500);
         }
 
 
         function to_underscores(prefix, s) {
             o = prefix;
-            for(let i=0; i<s.length-prefix.length; i++) { o += '_'; }
+            for(let i=prefix.length; i<s.length; i++) {
+                if(s[i] == ' ') { o += '<span class="spacehelp">_</span><wbr>'; } else { o += '_'; }
+            }
             return o;
         }
         
@@ -489,7 +524,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
         
         
         function update_input_field() {
-            bee.$input.html(esc_html(to_underscores(bee.typed, words[bee.word_ix][1])));
+            bee.$input.html(to_underscores(bee.typed, words[bee.word_ix][1]));
         }
         
         
@@ -551,7 +586,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
 
         
         function play_word(s) {
-            s = s.replaceAll(/[^A-Za-z]/g, '');
+            s = s.toLowerCase().replaceAll(/ /g, '_').replaceAll(/[^a-z_]/g, '');
             file = 'assets/sounds/words/'+s+'.mp3';
             if(bee.word_audio === false) {
                 bee.word_audio = new Audio(audio.success[0].file);
@@ -569,13 +604,13 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
         function process_keypress(event) {
             event.preventDefault = true;
             
-            if(event.keyCode >= 65 && event.keyCode <= 90) { // a-z
+            if((event.keyCode >= 65 && event.keyCode <= 90) || event.keyCode == 32) { // a-z, space
                 if(!bee.can_type) { playme('notavail'); return; }
                 if(bee.typed.length < words[bee.word_ix][1].length) {
                     bee.typed += event.key;
                     update_input_field();
                     
-                    if(bee.typed == words[bee.word_ix][1]) { // Success!
+                    if(bee.typed.toLowerCase() == words[bee.word_ix][1].toLowerCase()) { // Success!
                         bee.can_type = false;
                         play_success_sound();
                         bee.$input.addClass('success');
@@ -602,8 +637,8 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
                        
             if(event.keyCode == 112 || event.keyCode == 113 || event.keyCode == 27 || event.keyCode == 192) { // F1, F2, ESC, pipe
                 if(!bee.can_type) { return; }
-                if(!bee.can_use_help) { return; }
-                show_help();
+                if(!bee.can_use_help) { playme('notavail'); return; }
+                show_help(false);
             }
             
             // console.log("key", event);
@@ -629,7 +664,7 @@ Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_sou
             bee.typed = '';
             update_input_field();
             bee.$input.removeClass('success');
-            show_help();
+            show_help(true);
         }
         
         
