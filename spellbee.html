@@ -126,7 +126,7 @@
         .cursor {
             animation: blink-animation 2s steps(2, start) infinite;
             display: inline-block;
-            border: 2px solid #d00;
+            border: 2px solid #f77;
             width: .2rem;
             height: 5rem;
             margin-left: -1px;
@@ -137,6 +137,7 @@
 
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
+    <script src="assets/local/beelocal.js"></script>
 </head>
 <body>
     <div class="container">
@@ -417,6 +418,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
             help_timeout: false,
             score_anim_timeout: false,
             player: false,  // name of the player - scores are saved to browser under this name
+            help_asked: 0,
             $image: $('.prompt .img'),
             $input: $('.prompt .infield .inp'),
             $help: $('.prompt .infield .help'),
@@ -509,7 +511,10 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
             bee.can_type = false;
             bee.$input.hide();
             
-            if(!is_initial) { bee.$helpwait.show(); }
+            if(!is_initial) { 
+                bee.$helpwait.show(); 
+                bee.help_asked++;
+            }
 
             setTimeout(function() {
                 bee.$helpwait.hide();
@@ -647,6 +652,10 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                         } else {
                             setTimeout(new_question, 2700);
                         }
+                        
+                        if(typeof(bee_local) !== 'undefined' && bee_local.success_hook) {
+                            bee_local.success_hook(bee.word_ix, words[bee.word_ix][1], bee.player, bee.help_asked);
+                        }
                     }
                 }
                 return;
@@ -688,6 +697,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
             // Add help & input
             bee.$help.html(esc_html(words[word_ix][1]));
             bee.typed = '';
+            bee.help_asked = 0;
             update_input_field();
             bee.$input.removeClass('success');
             show_help(true);
@@ -696,7 +706,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
         
         function new_question() {
             // Refresh the page periodically
-            if(Date.now - bee.load_time > 12*60*60*1000) {
+            if(Date.now - bee.load_time > 4*60*60*1000) {
                 window.location.reload(true);
                 return;
             }
