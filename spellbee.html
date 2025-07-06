@@ -120,6 +120,18 @@
         .pulse {
             animation:pulse 1.5s ease-in-out 1;
         }
+        
+        @keyframes blink-animation { to { visibility: hidden; } }
+        
+        .cursor {
+            animation: blink-animation 2s steps(2, start) infinite;
+            display: inline-block;
+            border: 2px solid #d00;
+            width: .2rem;
+            height: 5rem;
+            margin-left: -1px;
+            border-right: 0 solid transparent;
+        }
 
     </style>
 
@@ -181,6 +193,10 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
         
         const word_sets = [
             [ // Word set 0
+            ],
+            [ // Word set 1
+            ],
+            [ // Word set 2
                 ['🖊️', 'pen'],      
                 ['📌', 'pin'],      
                 ['🥚', 'egg'],      
@@ -203,7 +219,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                 ['🪆', 'toy'],
                 ['🧑', 'boy'],
             ],
-            [ // Word set 1
+            [ // Word set 3
                 ['▶️', 'play'],
                 ['📦', 'box'],
                 ['🌞', 'sun'],
@@ -225,7 +241,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                 ['🎾', 'tennis'],
                 ['👁', 'eye'],
             ],
-            [ // Word set 2
+            [ // Word set 4
                 ['👃🏻', 'nose'],
                 ['👂', 'ear'],
                 ['👞', 'shoe'],
@@ -280,7 +296,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                 ['🍱', 'food'],
                 ['🛑', 'stop'],
             ],
-            [ // Word set 3
+            [ // Word set 5
                 ['🖼', 'picture'],
                 ['👄', 'mouth'],
                 ['🦈', 'shark'],
@@ -317,7 +333,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                 ['🎃', 'scary'],
                 ['🎃', 'pumpkin'],
             ],
-            [ // Word set 4
+            [ // Word set 6
                 ['🪞', 'mirror'],
                 ['☁️', 'cloud'],
                 ['🧗', 'climb'],
@@ -356,7 +372,9 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                 ['🛀🏾', 'having a bath'],
                 ['🍟', 'I want chips'],
                 ['🚻', 'Where is the toilet'],
-            ]
+            ],
+            [ // Word set 7
+            ],
         ];
         
         
@@ -517,7 +535,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
 
 
         function to_underscores(prefix, s) {
-            o = prefix;
+            o = esc_html(prefix) + '<span class="cursor"></span>';
             for(let i=prefix.length; i<s.length; i++) {
                 if(s[i] == ' ') { o += '<span class="spacehelp">_</span><wbr>'; } else { o += '_'; }
             }
