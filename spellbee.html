@@ -418,7 +418,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
             help_timeout: false,
             score_anim_timeout: false,
             player: false,  // name of the player - scores are saved to browser under this name
-            help_asked: 0,
+            help_asked: 0,  // how many times help was asked for for the current word
             $image: $('.prompt .img'),
             $input: $('.prompt .infield .inp'),
             $help: $('.prompt .infield .help'),
@@ -574,6 +574,31 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
         }
         
         
+        // Mark a word as known, and how many times it was already asked
+        // A word is known if it could be typed without help
+        function add_known_word(word) {
+            if(!bee.storage.players[bee.player].known_words) {
+                bee.storage.players[bee.player].known_words = {};
+            }
+            if(bee.storage.players[bee.player].known_words[word] === undefined) {
+                bee.storage.players[bee.player].known_words[word] = 1;
+            } else {
+                bee.storage.players[bee.player].known_words[word]++;
+            }
+            save_storage();
+        }
+        
+        
+        function is_known_word(word) {
+            if(bee.storage.players[bee.player].known_words) {
+                const c = bee.storage.players[bee.player].word;
+                if(c === undefined) { return 0; }
+                return c;
+            }
+            return 0;
+        }
+        
+        
         // Call this to zero the score of the current player
         function clear_score() {
             if(bee.player === false) { alert("Choose a player first"); return; }
@@ -653,6 +678,10 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                             setTimeout(new_question, 2700);
                         }
                         
+                        if(bee.help_asked == 0) {
+                            add_known_word(words[bee.word_ix][1]);
+                        }
+                        
                         if(typeof(bee_local) !== 'undefined' && bee_local.success_hook) {
                             bee_local.success_hook(bee.word_ix, words[bee.word_ix][1], bee.player, bee.help_asked);
                         }
@@ -714,7 +743,14 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
             let word_ix;
             while(true) {
                 word_ix = Math.floor(Math.random() * words.length);
-                if(bee.word_ix === false || word_ix != bee.word_ix) { break; } // ensure we choose a new word
+                // ensure we choose a new word
+                if(bee.word_ix !== false && word_ix == bee.word_ix) { continue; }
+                // Avoid already known words (typed without help)
+                const known_count = is_known_word(words[word_ix]);
+                if(known_count == 1 && Math.random() < .4) { continue; }
+                if(known_count == 2 && Math.random() < .6) { continue; }
+                if(known_count > 2 && Math.random() < .9) { continue; }
+                break;
             }
             start_question(word_ix);
         }
