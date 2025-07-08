@@ -70,6 +70,7 @@
             background: #fff;
             border-radius: 1rem;
             height: 12rem;
+            line-height: 12rem;
             width: 12rem;
         }
         
@@ -132,6 +133,8 @@
             margin-left: -1px;
             border-right: 0 solid transparent;
         }
+        
+        .infield .help .cursor { visibility: hidden; }
 
     </style>
 
@@ -560,19 +563,17 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
         }
 
 
+        // Escape special characters
         function esc_html(s) {
             s = String(s);
             return s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
         }
         
         
-        // Render the typing and underscores
-        function update_input_field() {
+        // Render a typed input into HTML. prefix=what is typed, s=full string
+        function typed_to_html(prefix, s) {
             const line_length = 17; // word wrap after this many characters
-            
-            const prefix = bee.typed;
-            const s = words[bee.word_ix][1];
-            
+
             // The aim is to leave the underscores in place, so we word
             // wrap according to the target string
             const wrap_at = {};
@@ -611,7 +612,13 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                 if(s[i] == ' ') { o += '<span class="spacehelp">_</span>'; } else { o += '_'; }
                 if(wrap_at[i]) { o += '<br>'; }
             }
-            bee.$input.html(o);
+            return o;
+        }
+        
+        
+        // Render the typing and underscores
+        function update_input_field() {
+            bee.$input.html(typed_to_html(bee.typed, words[bee.word_ix][1]));
         }
         
         
@@ -630,7 +637,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
         }
         
         
-        // Mark a word as known, and how many times it was already asked
+        // Mark a word as known, and count how many times it was successfully entered
         // A word is known if it could be typed without help
         function add_known_word(word) {
             if(!bee.storage.players[bee.player].known_words) {
@@ -697,6 +704,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
         }
 
         
+        // Play the mp3 assigned to a word
         function play_word(s) {
             s = s.toLowerCase().replaceAll(/ /g, '_').replaceAll(/[^a-z_]/g, '');
             file = 'assets/sounds/words/'+s+'.mp3';
@@ -772,7 +780,6 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
             bee.can_use_help = true;
             if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); bee.help_timeout = false; }
             
-            
             // Show picture
             // Ensure emoji code ends in picture modifier
             let emoji = words[word_ix][0];
@@ -780,7 +787,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
             bee.$image.html(esc_html(emoji));
             
             // Add help & input
-            bee.$help.html(esc_html(words[word_ix][1]));
+            bee.$help.html(typed_to_html(words[word_ix][1], words[word_ix][1]));
             bee.typed = '';
             bee.help_asked = 0;
             update_input_field();
