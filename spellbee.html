@@ -580,24 +580,26 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
             for(let i=0; i<s.length; i++) {
                 cur_line++;
                 if(cur_line >= line_length) {
-                    wrap_at[i] = true;
+                    wrap_at[i] = 'forced';
                     cur_line = 0;
                     continue;
                 }
                 if(s[i] == ' ') {
                     let is_full = true;
-                    for(let j=1; j<line_length-cur_line; j++) { // lookahead
+                    for(let j=1; j<=line_length-cur_line; j++) { // lookahead
+                        // console.log("ij", i, j, cur_line);
                         if(i+j >= s.length || s[i+j] == ' ') { 
                             is_full = false; 
                             break; 
                         }
                     }
                     if(is_full) {
-                        wrap_at[i] = true;
+                        wrap_at[i] = 'at space';
                         cur_line = 0;
                     }
                 }
             }
+            // console.log(wrap_at);
             
             let o = '';
             for(let i=0; i<prefix.length; i++) {
