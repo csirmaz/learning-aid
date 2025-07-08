@@ -75,7 +75,7 @@
         
         .prompt .infield {
             display: block;
-            line-height: 8rem;
+            line-height: 6rem;
             border-radius: 1rem;
             background: #fffae4;
             font-size: 5rem;
@@ -128,7 +128,7 @@
             display: inline-block;
             border: 2px solid #f77;
             width: .2rem;
-            height: 5rem;
+            height: 4rem;
             margin-left: -1px;
             border-right: 0 solid transparent;
         }
@@ -533,7 +533,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
             bee.$input.hide();
             
             if(!is_initial) { 
-                bee.$helpwait.show(); 
+                bee.$helpwait.show(); // show a loading animation
                 bee.help_asked++;
             }
 
@@ -542,7 +542,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                 bee.$help.show();
                 setTimeout(function() {
                     play_word(words[bee.word_ix][1]);
-                    const help_duration = 1200 + words[bee.word_ix][1].length * 400; // plus the initial wait below
+                    const help_duration = 1200 + words[bee.word_ix][1].length * 400; // help duration (this plus the initial wait below)
                     console.log("Help duration", help_duration);
                     bee.$help.fadeOut({duration: help_duration, complete: function() {
                         bee.$input.show();
@@ -553,30 +553,63 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                             console.log("Enabling help");
                             bee.can_use_help = true;
                             bee.help_timeout = false;
-                        }, 4000); // minus the duration of the help!
+                        }, 4000); // time to enable help again - minus the duration of the help!
                     }});
                 }, 600); // initial wait while showing the word (before TTS)
-            }, is_initial ? 0 : 2500);
+            }, is_initial ? 0 : 2500); // duration of the loading animation
         }
 
 
-        function to_underscores(prefix, s) {
-            o = esc_html(prefix) + '<span class="cursor"></span>';
-            for(let i=prefix.length; i<s.length; i++) {
-                if(s[i] == ' ') { o += '<span class="spacehelp">_</span><wbr>'; } else { o += '_'; }
-            }
-            return o;
-        }
-        
-        
         function esc_html(s) {
             s = String(s);
             return s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
         }
         
         
+        // Render the typing and underscores
         function update_input_field() {
-            bee.$input.html(to_underscores(bee.typed, words[bee.word_ix][1]));
+            const line_length = 17; // word wrap after this many characters
+            
+            const prefix = bee.typed;
+            const s = words[bee.word_ix][1];
+            
+            // The aim is to leave the underscores in place, so we word
+            // wrap according to the target string
+            const wrap_at = {};
+            let cur_line = 0;
+            for(let i=0; i<s.length; i++) {
+                cur_line++;
+                if(cur_line >= line_length) {
+                    wrap_at[i] = true;
+                    cur_line = 0;
+                    continue;
+                }
+                if(s[i] == ' ') {
+                    let is_full = true;
+                    for(let j=1; j<line_length-cur_line; j++) { // lookahead
+                        if(i+j >= s.length || s[i+j] == ' ') { 
+                            is_full = false; 
+                            break; 
+                        }
+                    }
+                    if(is_full) {
+                        wrap_at[i] = true;
+                        cur_line = 0;
+                    }
+                }
+            }
+            
+            let o = '';
+            for(let i=0; i<prefix.length; i++) {
+                o += (prefix[i] == ' ' ? '&nbsp;' : esc_html(prefix[i]));
+                if(wrap_at[i]) { o += '<br>'; }
+            }
+            o += '<span class="cursor"></span>';
+            for(let i=prefix.length; i<s.length; i++) {
+                if(s[i] == ' ') { o += '<span class="spacehelp">_</span>'; } else { o += '_'; }
+                if(wrap_at[i]) { o += '<br>'; }
+            }
+            bee.$input.html(o);
         }
         
         
