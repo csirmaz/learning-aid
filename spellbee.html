@@ -63,7 +63,7 @@
         }
         
         .prompt .img {
-            font-family: Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Android Emoji,EmojiSymbols,EmojiOne Mozilla,Twemoji Mozilla,Segoe UI Symbol,Noto Color Emoji,EmojiOne Color,emoji,var(--font-noto-emojipedia-fallback);
+            font-family: Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Android Emoji,EmojiSymbols,EmojiOne Mozilla,Twemoji Mozilla,Segoe UI Symbol,Noto Color Emoji,EmojiOne Color,emoji;
             display: inline-block;
             font-size: 8rem;
             text-align: center;
@@ -189,13 +189,14 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
         // Format: ['<emoji>', '<word to spell>']
         // Use e.g. https://getemoji.com/
 
-        // The page will attempt to play assets/sounds/words/<word to spell>.mp3
+        // The page will attempt to play assets/sounds/words/<word to spell>.mp3 (lowercased and spaces replaced by underscores)
         // Use e.g. https://ttsmp3.com/ to generate them
         
         const word_sets = [
             [ // Word set 0
                 ['📦', 'box'],
                 ['🍱', 'food'],
+                ['🏊', 'swim'],
             ],
             [ // Word set 1
                 ['🏋️', 'gym'],
@@ -261,7 +262,6 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                 ['❤️', 'heart'],
                 ['🧣', 'scarf'],
                 ['🫂', 'love'],
-                ['🏊', 'swim'],
                 ['⛄️', 'snowman'],
                 ['🍕', 'pizza'],
                 ['🍝', 'pasta'],
@@ -344,29 +344,14 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                 ['🏥', 'hospital'],
                 ['🍉', 'watermelon'],
                 ['🕷', 'spider'],
-                ['🐬', 'dolphin'],
-                ['💎', 'diamond'],
-                ['🚁', 'helicopter'],
-                ['🎶', 'hymn'],
-                ['🇪🇬', 'Egypt'],
-                ['🔣', 'symbol'],
-                ['🕵️', 'mystery'],
-                ['🏜️', 'pyramid'],
-                ['🎤', 'lyric'],
-                ['👻', 'myth'],
-                ['🛬', 'arrive'],
-                ['🧚‍♂️', 'appear'],
-                ['👯‍♀️', 'group'],
                 ['⚙️', 'steel'],
                 ['🗺️', 'here'],
                 ['🦘', 'kangaroo'],
-                ['🦒', 'giraffe'],
                 ['👩‍✈️', 'pilot'],
                 ['🌊', 'wave'],
                 ['🏭', 'factory'],
                 ['🪥', 'toothbrush'],
                 ['🏷', 'nametag'],
-                
                 ['☔️', 'It is raining'],
                 ['😽', 'Cat gives kiss'],
                 ['😾', 'angry cat'],
@@ -377,8 +362,28 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                 ['🍟', 'I want chips'],
                 ['🚻', 'Where is the toilet'],
                 ['🏖', 'We are going on a holiday'],
+                ['🗺', 'Where are we'],
+                ['🤫', 'Keep it a secret'],
+                ['🪜', 'ladder'],
+                ['🛞', 'wheel'],
+                ['📎', 'paper clip'],
+                ['🚓', 'police car'],                
             ],
             [ // Word set 7
+                ['🦒', 'giraffe'],
+                ['🚁', 'helicopter'],
+                ['🛬', 'arrive'],
+                ['🧚‍♂️', 'appear'],
+                ['👯‍♀️', 'group'],
+                ['🎶', 'hymn'],
+                ['🇪🇬', 'Egypt'],
+                ['🔣', 'symbol'],
+                ['🕵️', 'mystery'],
+                ['🏜️', 'pyramid'],
+                ['🐬', 'dolphin'],
+                ['💎', 'diamond'],
+                ['🎤', 'lyric'],
+                ['👻', 'myth'],
                 ['🤔', 'forgetting'],
                 ['☑️', 'preferred'],
                 ['⛔️', 'forbidden'],
@@ -386,6 +391,9 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                 ['😎', 'expert'],
                 ['🏤', 'post office'],
                 ['📉', 'going down'],
+                ['🪤', 'Careful It is a trap'],
+                ['💇🏾‍♂️', 'Adam needs a haircut'],
+                ['🛣', 'motorway'],
             ],
         ];
         
@@ -443,6 +451,8 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
             bee.storage = JSON.parse(localStorage.spellbee);
         }
 
+        // Fix emojis
+        $('.score .icon').html('🪙'+"\ufe0f");
         
         // Data and objects for the fireworks animation
         const fireworks = {
@@ -758,9 +768,9 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                 if(bee.word_ix !== false && word_ix == bee.word_ix) { continue; }
                 // Avoid already known words (typed without help)
                 const known_count = is_known_word(words[word_ix]);
-                if(known_count == 1 && Math.random() < .4) { continue; }
                 if(known_count == 2 && Math.random() < .6) { continue; }
                 if(known_count > 2 && Math.random() < .9) { continue; }
+                if(known_count > 5 && Math.random() < .95) { continue; }
                 break;
             }
             start_question(word_ix);

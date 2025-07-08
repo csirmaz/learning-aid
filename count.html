@@ -148,7 +148,7 @@
 <body>
     <div class="container">
 
-        <div class="score"><span class="icon">🪙</span> <span class="value">0</span></div>
+        <div class="score"><span class="icon"></span> <span class="value">0</span></div>
         <div class="prompt">
             <div class="infield">
                 <div class="problem"></div>
@@ -372,6 +372,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
         }
         
         // Fix emojis
+        $('.score .icon').html('🪙'+"\ufe0f");
         $('.prompticon').html('👉'+"\ufe0f");
         $('.prompticonsuccess').html('✅'+"\ufe0f");
         $('.keypad [data-i="ent"]').html('🆗'+"\ufe0f");
