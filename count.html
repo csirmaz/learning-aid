@@ -57,9 +57,30 @@
             font-weight: bold;
             text-align: right;
         }
+        .score.goal_reached .value { 
+            color: #fe0;
+            text-shadow: 0 0 .2rem #fe0;
+        }
         
+        .score .bar {
+            margin: 0 .2rem .4rem .2rem;
+            height: .4rem;
+            border-radius: .4rem;
+            background: #5c3;
+            position: relative;
+        }
+        .score.goal_reached .bar { background: #a70; }
+        
+        .score .bar .barfill {
+            display: block;
+            height: .4rem;
+            border-radius: .4rem;
+            width: 0%;
+            background: #fe0;
+        }
+
         .prompt {
-            padding-top: 3rem;
+            padding-top: 4rem;
         }
         
         .prompticonsuccess { display: none; }
@@ -100,6 +121,15 @@
 
         .pulse {
             animation:pulse 1.5s ease-in-out 1;
+        }
+
+        @keyframes goldpulse {
+            50% { background: #a70; transform: scale(1.8); }
+            100% { background: #390; transform: scale(1); }
+        }
+        
+        .goldpulse {
+            animation: goldpulse 1.5s ease-in-out 1;
         }
 
         .keypad td {
@@ -148,7 +178,7 @@
 <body>
     <div class="container">
 
-        <div class="score"><span class="icon"></span> <span class="value">0</span></div>
+        <div class="score"><span class="icon"></span> <span class="value">0</span><div class="bar"><span class="barfill"></span></div></div>
         <div class="prompt">
             <div class="infield">
                 <div class="problem"></div>
@@ -364,6 +394,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
             player: false,  // name of the player - scores are saved to browser under this name
             $input: $('.prompt .infield .inp'),
             storage: {'players': {}},  // storage data that's saved into local storage
+            score_goal: 30,  // controls the bar under the score
         };
         
         // Try to load data
@@ -505,17 +536,30 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
         }
         
         
-        // Add one to the score & animate
+        // update UI & animate
+        function update_score_ui(do_animate) {
+            const score = bee.storage.players[bee.player].score;
+            save_storage();
+            $('.score .value').html(esc_html(score));
+            if(do_animate !== false) {
+                $('.score').addClass((score % bee.score_goal == 0) ? 'goldpulse' : 'pulse');
+                if(bee.score_anim_timeout !== false) { clearTimeout(bee.score_anim_timeout); }
+                bee.score_anim_timeout = setTimeout(function() {
+                    $('.score').removeClass('pulse').removeClass('goldpulse');
+                    bee.score_anim_timeout = false;
+                }, 1500);
+            }
+            
+            // bar
+            $('.score .bar .barfill').css('width', ((score % bee.score_goal) / bee.score_goal * 100.)+'%');
+            $('.score').toggleClass('goal_reached', score >= bee.score_goal);
+        }
+        
+        
+        // Add one to the score & update UI & animate
         function add_score() {
             bee.storage.players[bee.player].score++;
-            save_storage();
-            $('.score .value').html(esc_html(bee.storage.players[bee.player].score));
-            $('.score').addClass('pulse');
-            if(bee.score_anim_timeout !== false) { clearTimeout(bee.score_anim_timeout); }
-            bee.score_anim_timeout = setTimeout(function() {
-                $('.score').removeClass('pulse');
-                bee.score_anim_timeout = false;
-            }, 1500);
+            update_score_ui();
             return bee.storage.players[bee.player].score;
         }
         
@@ -523,8 +567,8 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
         // Call this to zero the score of the current player
         function clear_score() {
             if(bee.player === false) { alert("Choose a player first"); return; }
-            bee.storage.players[bee.player].score = -1;
-            add_score();
+            bee.storage.players[bee.player].score = 0;
+            update_score_ui();
         }
         
         
@@ -533,8 +577,8 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
             if(bee.player === false) { alert("Choose a player first"); return; }
             const diff = prompt("Reduce score by") - 0;
             if(isNaN(diff)) { return; }
-            bee.storage.players[bee.player].score -= diff + 1;
-            add_score();
+            bee.storage.players[bee.player].score -= diff;
+            update_score_ui();
         }
         
         
@@ -548,6 +592,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
             d['object'].play();
         }
         
+
         function play_success_sound() {
             const i = Math.floor(Math.random() * audio.success.length);
             const d = audio.success[i];
@@ -601,7 +646,8 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
                     bee.can_type = false;
                     play_success_sound();
                     $('.prompt').addClass('success');
-                    if(add_score() % 4 == 0) {
+                    const score = add_score();
+                    if(score % 4 == 0 || score % bee.score_goal == 0) {
                         show_fireworks(function() {
                             setTimeout(new_question, 1100);
                         });
@@ -713,7 +759,7 @@ Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?u
             document.addEventListener('keydown', process_keypress); // Or use 'keypress' event
             $('.keypad td').on('click', process_keypad);
 
-            $('.score .value').html(esc_html(bee.storage.players[bee.player].score));
+            update_score_ui(false);
             $('.d_player').html(esc_html(bee.player));
             init_problemset();
             new_question();
