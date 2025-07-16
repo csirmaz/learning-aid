@@ -1,4 +1,9 @@
 
+        // Fix emojis
+        $('.score .icon').html('🪙'+"\ufe0f");
+        $('.gifts .open').html('🎁'+"\ufe0f");
+        $('.giftannounce span').html('🎁'+"\ufe0f");
+
 
         const audio = {
             click: {'file':'assets/sounds/click.mp3', 'volume':1, 'object':false},
@@ -26,8 +31,28 @@
                 {'file': 'assets/sounds/success/11l-game_complete_notifi-1749489486836-360350.mp3', 'volume': .4, 'object': false},
             ]
         };
-
         
+        
+        const giftelements = [
+            'assets/images/gifts/ai-generated-8658573_640.png',
+            'assets/images/gifts/animal-6987017_640.jpg',
+            'assets/images/gifts/avocado-3651037_640.png',
+            'assets/images/gifts/banana-2850841_640.png',
+            'assets/images/gifts/cat-4475583_640.png',
+            'assets/images/gifts/cat-5773481_640.jpg',
+            'assets/images/gifts/cat-5781057_640.jpg',
+            'assets/images/gifts/cat-7928232_640.png',
+            'assets/images/gifts/cat-8266486_640.jpg',
+            'assets/images/gifts/cat-8863536_640.png',
+            'assets/images/gifts/chicken-159496_640.png',
+            'assets/images/gifts/dog-3431913_640.jpg',
+            'assets/images/gifts/ghost-8250317_640.png',
+            'assets/images/gifts/lion-5487377_640.png',
+            'assets/images/gifts/robot-8449206_640.jpg',
+            'assets/images/gifts/sheep-35599_640.png',
+        ];
+
+
         // Data and objects for the fireworks animation
         const fireworks = {
             obj: new Fireworks(document.querySelector('.fireworks-container'), {
@@ -52,12 +77,6 @@
             stop_timeout: false,
         };
         setTimeout(function(){ $('.fireworks-container').hide(); }, 200);
-
-        
-        function save_storage() {
-            localStorage.count = JSON.stringify(bee.storage);
-        }
-
 
         // Show fireworks for a few seconds
         function show_fireworks(callback) {
@@ -153,6 +172,75 @@
             console.log("Audio: playing success", d['file']);
             d['object'].play();
         }
+
+
+        // Call this to zero the score of the current player
+        function clear_score() {
+            if(bee.player === false) { alert("Choose a player first"); return; }
+            bee.storage.players[bee.player].score = 0;
+            update_score_ui();
+        }
+        
+        
+        // Interactively reduce the score
+        function reduce_score() {
+            if(bee.player === false) { alert("Choose a player first"); return; }
+            const diff = prompt("Reduce score by") - 0;
+            if(isNaN(diff)) { return; }
+            bee.storage.players[bee.player].score -= diff;
+            update_score_ui();
+        }
+        
+        
+        // Give the player a gift
+        function give_gift(callback) {
+            // choose gift
+            if(bee.storage.players[bee.player].gifts === undefined) {
+                bee.storage.players[bee.player].gifts = [];
+            }
+            const giftarray = bee.storage.players[bee.player].gifts;
+            
+            const max_gifts = giftelements.length;
+            if(giftarray.length >= max_gifts) { 
+                console.log("No more gifts to give");
+                return;
+            }
+            
+            let gix;
+            let trials = 0;
+            while(true) {
+                gix = Math.floor(Math.random() * giftelements.length);
+                if(giftarray.includes(gix)) { 
+                    trials++;
+                    if(trials > max_gifts * 10) {
+                        console.log("Could not find gift to give");
+                        return;
+                    }
+                    continue; 
+                }
+                break;
+            }
+            
+            giftarray.push(gix);
+            save_storage();
+            
+            $('.giftannounce img').hide().attr('src', giftelements[gix]);
+            $('.giftannounce span').show();
+            $('.giftannounce').fadeIn(1500);
+            setTimeout(function() {
+                $('.giftannounce span').hide();
+                $('.giftannounce img').show();
+                show_fireworks();
+                setTimeout(function() {
+                    $('.giftannounce').fadeOut(1500);
+                    $('.gifts').addClass('goldpulse');
+                    setTimeout(function() {
+                        $('.gifts').removeClass('goldpulse');
+                        if(callback) { callback(); }
+                    }, 1500);
+                }, 4000); // showing gift
+            }, 4000); // showing gift box
+        }
         
 
         const licences = `
@@ -187,7 +275,44 @@ Image by <a href="https://pixabay.com/users/edurs34-8516248/?utm_source=link-att
 Image by <a href="https://pixabay.com/users/clker-free-vector-images-3736/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=35599">Clker-Free-Vector-Images</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=35599">Pixabay</a>
 Image by <a href="https://pixabay.com/users/neas_artwork-2743866/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=5487377">Linnéa</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=5487377">Pixabay</a>
 `;
-        
+
+
         $('.smallprint .handle').on('click', function() {
             $('.smallprint .expand').html(licences).toggle();
+        });
+
+        
+        // Display gift list
+        $('.gifts').on('click', function() {
+            if(bee.giftlist == -1) {
+                bee.giftlist = 0;
+                $('.game').hide();
+                $('.scorewrap').show();
+                $('.score').hide();
+                $('.giftlist').show();
+                $('.gifts .open').hide();
+                $('.gifts .close').show();
+                
+                const giftarray = bee.storage.players[bee.player].gifts;
+                if(giftarray === undefined || giftarray.length == 0) { return; }
+                $('.giftlist .list img').attr('src', giftelements[giftarray[bee.giftlist]]);
+                
+            } else {
+                bee.giftlist = -1;
+                $('.giftlist').hide();
+                $('.game').show();
+                $('.score').show();
+                $('.gifts .close').hide();
+                $('.gifts .open').show();
+            }
+        });
+        
+        // Go to next gift in list
+        $('.giftlist .list .next, .giftlist .list img').on('click', function() {
+            if(bee.giftlist == -1) { return; }
+            const giftarray = bee.storage.players[bee.player].gifts;
+            if(giftarray === undefined || giftarray.length == 0) { return; }
+            bee.giftlist++;
+            if(bee.giftlist >= giftarray.length) { bee.giftlist = 0; }
+            $('.giftlist .list img').attr('src', giftelements[giftarray[bee.giftlist]]);
         });

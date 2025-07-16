@@ -1,0 +1,174 @@
+
+        body {
+            font-family: monospace, sans-serif;
+            background: #fec;
+            overflow: hidden;
+        }
+
+        .container {
+            max-width: 60rem;
+            min-height: 27rem;
+            margin: 0 auto;
+            position: relative;
+            border-left: 1px solid #cb9;
+            border-right: 1px solid #cb9;
+            padding: 0 1rem;
+        }
+        
+        .fireworks-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+        }
+        
+        .scorewrap {
+            position: absolute;
+            right: 1rem;
+        }
+    
+        .score, .gifts {
+            display: inline-block;
+            height: 4rem;
+            background: #309;
+            border-radius: 1rem;
+            font-size: 2rem;
+            padding: 0 1rem;
+        }
+        
+        .gifts { 
+            margin-left: .2rem;
+            cursor: pointer;
+        }
+        
+        .gifts span {
+            display: inline-block;
+            font-size: 2rem;
+            line-height: 2rem;
+            vertical-align: middle;
+        }
+        
+        .gifts .close {
+            display: none;
+            color: #fff;
+            padding: 0 1rem;
+        }
+        
+        .score .icon {
+            display: inline-block;
+            line-height: 2rem;
+            font-size: 1.3rem;
+            position: relative;
+            bottom: 0.2rem;
+            color: #fe0;
+        }
+
+        .score .value {
+            display: inline-block;
+            min-width: 5rem;
+            color: #fff;
+            font-weight: bold;
+            text-align: right;
+        }
+        .score.goal_reached .value { 
+            color: #fe0;
+            text-shadow: 0 0 .2rem #fe0;
+        }
+        
+        .score .bar {
+            margin: 0 .2rem .4rem .2rem;
+            height: .4rem;
+            border-radius: .4rem;
+            background: #73f;
+            position: relative;
+        }
+        .score.goal_reached .bar { background: #a70; }
+        
+        .score .bar .barfill {
+            display: block;
+            height: .4rem;
+            border-radius: .4rem;
+            width: 0%;
+            background: #fe0;
+        }
+        
+        .prompt {
+            padding-top: 4rem;
+        }
+
+        .startbutton {
+            margin: 2rem 5rem;
+            border-radius: 1rem;
+            background: #a0c;
+            color: #fff;
+            font-size: 1.5rem;
+            padding: .2rem 1rem;
+            cursor: pointer;
+        }
+        
+        .smallprint { font-size: 70%; }
+        .smallprint .handle { cursor: pointer; }
+        .smallprint .expand { display: none; }
+
+        @keyframes pulse { 
+            25% { transform: scale(1.4); } 
+            50% { transform: scale(1); } 
+            75% { transform: scale(1.2); } 
+            100% { transform: scale(1); } 
+        }
+
+        .pulse {
+            animation:pulse 1.5s ease-in-out 1;
+        }
+        
+        @keyframes goldpulse {
+            50% { background: #a70; transform: scale(1.8); }
+            100% { background: #309; transform: scale(1); }
+        }
+        
+        .goldpulse {
+            animation: goldpulse 1.5s ease-in-out 1;
+        }
+
+        .giftlist {
+            display: none;
+        }
+        
+        .giftlist .title {
+            font-size: 1.5rem;
+        }
+        
+        .giftlist .list {
+            width: 100%;
+            margin: 3rem 0;
+            text-align: center;
+        }
+        
+        .giftlist .list .next {
+            border: 2px solid #555;
+            border-radius: 1rem;
+            cursor: pointer;
+            padding: 1rem;
+            vertical-align: bottom;
+            display: block;
+            position: absolute;
+            right: 1rem;
+            top: 15rem;
+        }
+
+        .giftlist .list img {
+            height: 20rem;
+        }
+        
+        .giftannounce {
+            display: none;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            text-align: center;
+        }
+
+        .giftannounce span { font-size: 20rem; }
+        .giftannounce img { height: 20rem; margin-top: 5rem }

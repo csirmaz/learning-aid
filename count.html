@@ -5,83 +5,13 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>Count</title>
+    <link rel="stylesheet" type="text/css" href="assets/common.css">
 
     <style>
     
-        body {
-            font-family: monospace, sans-serif;
-            background: #eee;
-            overflow: hidden;
-        }
-        
-        .container {
-            max-width: 60rem;
-            min-height: 27rem;
-            margin: 0 auto;
-            position: relative;
-            border-left: 1px solid #cb9;
-            border-right: 1px solid #cb9;
-            padding: 0 1rem;
-        }
-        
-        .fireworks-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-        }
-    
-        .score {
-            background: #390;
-            border-radius: 1rem;
-            position: absolute;
-            right: 1rem;
-            font-size: 2rem;
-            padding: 0 1rem;
-        }
-        
-        .score .icon {
-            display: inline-block;
-            line-height: 2rem;
-            font-size: 1.3rem;
-            position: relative;
-            bottom: 0.2rem;
-            color: #fe0;
-        }
-        
-        .score .value {
-            display: inline-block;
-            min-width: 5rem;
-            color: #fff;
-            font-weight: bold;
-            text-align: right;
-        }
-        .score.goal_reached .value { 
-            color: #fe0;
-            text-shadow: 0 0 .2rem #fe0;
-        }
-        
-        .score .bar {
-            margin: 0 .2rem .4rem .2rem;
-            height: .4rem;
-            border-radius: .4rem;
-            background: #5c3;
-            position: relative;
-        }
-        .score.goal_reached .bar { background: #a70; }
-        
-        .score .bar .barfill {
-            display: block;
-            height: .4rem;
-            border-radius: .4rem;
-            width: 0%;
-            background: #fe0;
-        }
-
-        .prompt {
-            padding-top: 4rem;
-        }
+        body { background: #eee; }
+        .score, .gifts { background: #390; }
+        .score .bar { background: #5c3; }
         
         .prompticonsuccess { display: none; }
         body .prompt.success .prompticonsuccess { display: inline; }
@@ -98,39 +28,6 @@
         .prompt .infield .inp { color: #000; }
         body .prompt.success .infield .inp { color: #090; }
         
-        .startbutton {
-            margin: 2rem 5rem;
-            border-radius: 1rem;
-            background: #a0c;
-            color: #fff;
-            font-size: 1.5rem;
-            padding: .2rem 1rem;
-            cursor: pointer;
-        }
-        
-        .smallprint { font-size: 70%; }
-        .smallprint .handle { cursor: pointer; }
-        .smallprint .expand { display: none; }
-
-        @keyframes pulse { 
-            25% { transform: scale(1.4); } 
-            50% { transform: scale(1); } 
-            75% { transform: scale(1.2); } 
-            100% { transform: scale(1); } 
-        }
-
-        .pulse {
-            animation:pulse 1.5s ease-in-out 1;
-        }
-
-        @keyframes goldpulse {
-            50% { background: #a70; transform: scale(1.8); }
-            100% { background: #390; transform: scale(1); }
-        }
-        
-        .goldpulse {
-            animation: goldpulse 1.5s ease-in-out 1;
-        }
 
         .keypad td {
             border-top: .5rem solid #d5d;
@@ -178,8 +75,13 @@
 <body>
     <div class="container">
 
-        <div class="score"><span class="icon"></span> <span class="value">0</span><div class="bar"><span class="barfill"></span></div></div>
-        <div class="prompt">
+        <div class="game scorewrap">
+            <div class="score">
+                <span class="icon">🪙</span> <span class="value">0</span>
+                <div class="bar"><span class="barfill"></span></div>
+            </div><div class="gifts"><span class="open">🎁</span><span class="close">X</span></div>
+        </div>
+        <div class="game prompt">
             <div class="infield">
                 <div class="problem"></div>
                 <div><span class="prompticon"></span><span class="prompticonsuccess"></span> <span class="inp"></span></div>
@@ -190,7 +92,7 @@
             </div>
         </div>
 
-        <table class="keypad">
+        <table class="game keypad">
         <tr>
             <td data-i="D7">7</td>
             <td data-i="D8">8</td>
@@ -218,6 +120,19 @@
         </table>
 
         <div class="startmenu"></div>
+        
+        <div class="giftlist">
+            <span class="title">Gifts collected</span>
+            <div class="list">
+                <img src="assets/images/nogift.png">
+                <span class="next">Next</span>
+            </div>
+        </div>
+
+        <div class="giftannounce">
+            <span></span>
+            <img src="assets/images/nogift.png">
+        </div>
 
     </div>
     <p class="smallprint">
@@ -376,6 +291,7 @@
             player: false,  // name of the player - scores are saved to browser under this name
             $input: $('.prompt .infield .inp'),
             storage: {'players': {}},  // storage data that's saved into local storage
+            giftlist: -1,
             score_goal: 30,  // controls the bar under the score
         };
         
@@ -383,9 +299,13 @@
         if(localStorage.count) {
             bee.storage = JSON.parse(localStorage.count);
         }
-        
+
+        function save_storage() {
+            console.log("Saving storage");
+            localStorage.count = JSON.stringify(bee.storage);
+        }
+
         // Fix emojis
-        $('.score .icon').html('🪙'+"\ufe0f");
         $('.prompticon').html('👉'+"\ufe0f");
         $('.prompticonsuccess').html('✅'+"\ufe0f");
         $('.keypad [data-i="ent"]').html('🆗'+"\ufe0f");
@@ -448,24 +368,6 @@
             bee.$input.html(esc_html(bee.typed));
         }
         
-        
-        // Call this to zero the score of the current player
-        function clear_score() {
-            if(bee.player === false) { alert("Choose a player first"); return; }
-            bee.storage.players[bee.player].score = 0;
-            update_score_ui();
-        }
-        
-        
-        // Interactively reduce the score
-        function reduce_score() {
-            if(bee.player === false) { alert("Choose a player first"); return; }
-            const diff = prompt("Reduce score by") - 0;
-            if(isNaN(diff)) { return; }
-            bee.storage.players[bee.player].score -= diff;
-            update_score_ui();
-        }
-        
 
         function process_keypad(e) {
             e.preventDefault = true;
@@ -508,7 +410,7 @@
                     play_success_sound();
                     $('.prompt').addClass('success');
                     const score = add_score();
-                    if(score % 4 == 0 || score % bee.score_goal == 0) {
+                    if(score % 5 == 0 || score % bee.score_goal == 0) {
                         show_fireworks(function() {
                             setTimeout(new_question, 1100);
                         });
@@ -634,8 +536,7 @@
             menu += '<div class="startbutton" data-player="'+esc_html(key)+'">'+esc_html(key)+'</div>';
         }
         menu += '<div class="startbutton" data-playernew="1">New user<br><span style="font-size:60%">All player data is stored in the browser only</span></div>';
-        $('.prompt').hide();
-        $('.keypad').hide();
+        $('.game').hide();
         $('.startmenu').html(menu);
         
         // Start menu - logic
@@ -659,8 +560,7 @@
                 }
                 
                 $('.startmenu').hide();
-                $('.prompt').show();
-                $('.keypad').show();
+                $('.game').show();
                 main();
                 return false;
             });
