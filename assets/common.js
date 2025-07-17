@@ -204,6 +204,8 @@
         
         
         // Decide whether to give player a gift. One gift per twice the score goal
+        // Give the gift when the "lifetime score" (unaffected by reductions) reaches
+        // next_gift_at, which is set to a random position in every 2nd goal stretch
         function decide_gift() {
             const ls = bee.storage.players[bee.player].lifetime_score;
             if(ls === undefined) { return; }
