@@ -229,6 +229,7 @@
                     bee.storage.players[bee.player].next_gift_at = n;
                 }
             }
+            save_storage();
             return give_gift;
         }
         
