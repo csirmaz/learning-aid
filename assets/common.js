@@ -33,7 +33,7 @@
         };
         
         
-        const giftelements = [
+        const giftelements = [ // Order matters - what gifts a player has is recorded using the index
             'assets/images/gifts/ai-generated-8658573_640.png',
             'assets/images/gifts/animal-6987017_640.jpg',
             'assets/images/gifts/avocado-3651037_640.png',
@@ -234,24 +234,45 @@
         }
         
         
+        // Number: normal gift, L+number: local gift
+        function gift_label_to_img(l) {
+            if(String(l)[0] == 'L') {
+                l = l.substring(1, l.length) - 0;
+                if(typeof(bee_local) !== 'undefined' && bee_local.local_gifts) {
+                    return bee_local.local_gifts[l];
+                }
+                return 'assets/images/unknown_gift.png';
+            }
+            return giftelements[l];
+        }
+        
+        
         // Give the player a gift
         function give_gift(callback) {
-            // choose gift
+            // Gifts the player already has
             if(bee.storage.players[bee.player].gifts === undefined) {
                 bee.storage.players[bee.player].gifts = [];
             }
             const giftarray = bee.storage.players[bee.player].gifts;
             
-            const max_gifts = giftelements.length;
+            // Load list of available gifts
+            let local_gifts = [];
+            if(typeof(bee_local) !== 'undefined' && bee_local.local_gifts) {
+                local_gifts = bee_local.local_gifts;
+            }
+            
+            const max_gifts = giftelements.length + local_gifts.length;
             if(giftarray.length >= max_gifts) { 
                 console.log("No more gifts to give");
                 return;
             }
             
+            // Choose gift we can give. Number: normal gift, L+number: local gift
             let gix;
             let trials = 0;
             while(true) {
-                gix = Math.floor(Math.random() * giftelements.length);
+                let i = Math.floor(Math.random() * max_gifts);
+                gix = (i < giftelements.length ? i : 'L' + (i - giftelements.length));
                 if(giftarray.includes(gix)) { 
                     trials++;
                     if(trials > max_gifts * 10) {
@@ -262,11 +283,11 @@
                 }
                 break;
             }
-            
+            console.log("Gift chosen", gix, gift_label_to_img(gix));
             giftarray.push(gix);
             save_storage();
             
-            $('.giftannounce img').hide().attr('src', giftelements[gix]);
+            $('.giftannounce img').hide().attr('src', gift_label_to_img(gix));
             $('.giftannounce span').show();
             $('.giftannounce').fadeIn(1500);
             setTimeout(function() {
@@ -337,7 +358,7 @@ Image by <a href="https://pixabay.com/users/neas_artwork-2743866/?utm_source=lin
                 
                 const giftarray = bee.storage.players[bee.player].gifts;
                 if(giftarray !== undefined && giftarray.length != 0) {
-                    $('.giftlist .list img').attr('src', giftelements[giftarray[bee.giftlist]]);
+                    $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
                 }
             } else {
                 bee.giftlist = -1;
@@ -356,6 +377,6 @@ Image by <a href="https://pixabay.com/users/neas_artwork-2743866/?utm_source=lin
             if(giftarray === undefined || giftarray.length == 0) { return false; }
             bee.giftlist++;
             if(bee.giftlist >= giftarray.length) { bee.giftlist = 0; }
-            $('.giftlist .list img').attr('src', giftelements[giftarray[bee.giftlist]]);
+            $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
             return false;
         });

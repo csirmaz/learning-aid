@@ -173,4 +173,7 @@
         }
 
         .giftannounce span { font-size: 20rem; }
-        .giftannounce img { height: 20rem; margin-top: 5rem }
+        .giftannounce img { 
+            height: 20rem;
+            margin-top: 5rem;
+        }
