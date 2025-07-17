@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?005">
 
     <style>
     
@@ -138,14 +138,14 @@
     <p class="smallprint">
     Player: <span class="d_player"></span>
     | Problem range: <span class="d_wordsets"></span>
-    </p>    
-    <p class="smallprint">Use this page with a physical keyboard | <span class="handle">Licences</span>
+    | <span class="handle">Licences</span>
     <span class="expand"></span> 
     | Icons by <a href="https://icons8.com">Icons8</a>
     | <a href="https://github.com/csirmaz/learning-aid">Codebase</a>
     | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
     | <a href="#" onclick="modify_problemset(); return false">Update problem range</a>
     | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
+    | <a href="#" onclick="get_gift_at(); return false">Gift?</a>
     </p>
     <p class="smallprint">Hint: Press F1, F2, ESC or the button under ESC (some may trigger other functions)</p>
 
@@ -292,7 +292,7 @@
             $input: $('.prompt .infield .inp'),
             storage: {'players': {}},  // storage data that's saved into local storage
             giftlist: -1,
-            score_goal: 30,  // controls the bar under the score
+            score_goal: 30,  // controls the bar under the score and gifts
         };
         
         // Try to load data
@@ -407,15 +407,19 @@
                 
                 if((value - 0) == bee.problem.solution) { // Success!
                     bee.can_type = false;
-                    play_success_sound();
                     $('.prompt').addClass('success');
+                    play_success_sound();
                     const score = add_score();
-                    if(score % 5 == 0 || score % bee.score_goal == 0) {
-                        show_fireworks(function() {
-                            setTimeout(new_question, 1100);
-                        });
+                    if(decide_gift()) {
+                        give_gift(new_question);
                     } else {
-                        setTimeout(new_question, 2700);
+                        if(score % 5 == 0 || score % bee.score_goal == 0) {
+                            show_fireworks(function() {
+                                setTimeout(new_question, 1100);
+                            });
+                        } else {
+                            setTimeout(new_question, 2700);
+                        }
                     }
                 }
             }

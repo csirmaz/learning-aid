@@ -144,7 +144,12 @@
         
         // Add one to the score & update UI & animate
         function add_score() {
+            if(bee.storage.players[bee.player].lifetime_score === undefined) {
+                bee.storage.players[bee.player].lifetime_score = bee.storage.players[bee.player].score;
+            }
+            
             bee.storage.players[bee.player].score++;
+            bee.storage.players[bee.player].lifetime_score++;
             update_score_ui();
             return bee.storage.players[bee.player].score;
         }
@@ -189,6 +194,40 @@
             if(isNaN(diff)) { return; }
             bee.storage.players[bee.player].score -= diff;
             update_score_ui();
+        }
+        
+        
+        function get_gift_at() {
+            if(bee.player === false) { alert("Choose a player first"); return; }
+            alert(bee.storage.players[bee.player].lifetime_score + " / " + bee.storage.players[bee.player].next_gift_at);
+        }
+        
+        
+        // Decide whether to give player a gift. One gift per twice the score goal
+        function decide_gift() {
+            const ls = bee.storage.players[bee.player].lifetime_score;
+            if(ls === undefined) { return; }
+            
+            let give_gift = false;
+            if(bee.storage.players[bee.player].next_gift_at === undefined) {
+                const completed_goals = Math.floor(ls / bee.score_goal);
+                const completed_two_goals = Math.floor(completed_goals / 2) * 2;
+                const offset = Math.floor((Math.random() + 1) * bee.score_goal) + 1;
+                const n = completed_two_goals * bee.score_goal + offset;
+                console.log("Next gift init", completed_goals, completed_two_goals, offset, n);
+                bee.storage.players[bee.player].next_gift_at = n;
+            } else {
+                if(ls >= bee.storage.players[bee.player].next_gift_at) {
+                    give_gift = true;
+                    const completed_goals = Math.floor(ls / bee.score_goal);
+                    const completed_two_goals = Math.floor(completed_goals / 2) * 2;
+                    const offset = Math.floor((Math.random() + 1) * bee.score_goal) + 1;
+                    const n = (completed_two_goals+2) * bee.score_goal + offset;
+                    console.log("Next gift update", completed_goals, completed_two_goals, offset, n);
+                    bee.storage.players[bee.player].next_gift_at = n;
+                }
+            }
+            return give_gift;
         }
         
         
@@ -290,8 +329,7 @@ Image by <a href="https://pixabay.com/users/neas_artwork-2743866/?utm_source=lin
                 $('.scorewrap').show();
                 $('.score').hide();
                 $('.giftlist').show();
-                $('.gifts .open').hide();
-                $('.gifts .close').show();
+                $('.gifts').addClass('opened');
                 
                 const giftarray = bee.storage.players[bee.player].gifts;
                 if(giftarray === undefined || giftarray.length == 0) { return; }
@@ -302,8 +340,7 @@ Image by <a href="https://pixabay.com/users/neas_artwork-2743866/?utm_source=lin
                 $('.giftlist').hide();
                 $('.game').show();
                 $('.score').show();
-                $('.gifts .close').hide();
-                $('.gifts .open').show();
+                $('.gifts').removeClass('opened');
             }
         });
         

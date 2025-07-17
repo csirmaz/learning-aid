@@ -107,6 +107,7 @@
     | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
     | <a href="#" onclick="modify_wordlist(); return false">Update word sets</a>
     | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
+    | <a href="#" onclick="get_gift_at(); return false">Gift?</a>
     </p>
 
     <div class="fireworks-container"></div>
@@ -345,7 +346,7 @@
             storage: {'players': {}},  // storage data that's saved into local storage
             giftlist: -1,
             word_audio: false,
-            score_goal: 20,  // controls the bar under the score
+            score_goal: 20,  // controls the bar under the score and gifts
         };
         
         // Try to load data
@@ -505,15 +506,19 @@
                     
                     if(bee.typed.toLowerCase() == words[bee.word_ix][1].toLowerCase()) { // Success!
                         bee.can_type = false;
-                        play_success_sound();
                         bee.$input.addClass('success');
+                        play_success_sound();
                         const score = add_score();
-                        if(score % 5 == 0 || score % bee.score_goal == 0) {
-                            show_fireworks(function() {
-                                setTimeout(new_question, 1100);
-                            });
+                        if(decide_gift()) {
+                            give_gift(new_question);
                         } else {
-                            setTimeout(new_question, 2700);
+                            if(score % 5 == 0 || score % bee.score_goal == 0) {
+                                show_fireworks(function() {
+                                    setTimeout(new_question, 1100);
+                                });
+                            } else {
+                                setTimeout(new_question, 2700);
+                            }
                         }
                         
                         if(bee.help_asked == 0) {
