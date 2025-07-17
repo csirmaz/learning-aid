@@ -321,6 +321,7 @@ Image by <a href="https://pixabay.com/users/neas_artwork-2743866/?utm_source=lin
 
         $('.smallprint .handle').on('click', function() {
             $('.smallprint .expand').html(licences).toggle();
+            return false;
         });
 
         
@@ -335,9 +336,9 @@ Image by <a href="https://pixabay.com/users/neas_artwork-2743866/?utm_source=lin
                 $('.gifts').addClass('opened');
                 
                 const giftarray = bee.storage.players[bee.player].gifts;
-                if(giftarray === undefined || giftarray.length == 0) { return; }
-                $('.giftlist .list img').attr('src', giftelements[giftarray[bee.giftlist]]);
-                
+                if(giftarray !== undefined && giftarray.length != 0) {
+                    $('.giftlist .list img').attr('src', giftelements[giftarray[bee.giftlist]]);
+                }
             } else {
                 bee.giftlist = -1;
                 $('.giftlist').hide();
@@ -345,14 +346,16 @@ Image by <a href="https://pixabay.com/users/neas_artwork-2743866/?utm_source=lin
                 $('.score').show();
                 $('.gifts').removeClass('opened');
             }
+            return false;
         });
         
         // Go to next gift in list
         $('.giftlist .list .next, .giftlist .list img').on('click', function() {
-            if(bee.giftlist == -1) { return; }
+            if(bee.giftlist == -1) { return false; }
             const giftarray = bee.storage.players[bee.player].gifts;
-            if(giftarray === undefined || giftarray.length == 0) { return; }
+            if(giftarray === undefined || giftarray.length == 0) { return false; }
             bee.giftlist++;
             if(bee.giftlist >= giftarray.length) { bee.giftlist = 0; }
             $('.giftlist .list img').attr('src', giftelements[giftarray[bee.giftlist]]);
+            return false;
         });
