@@ -246,7 +246,7 @@
             },
             halving: function() {
                 const a = RND(0, 12);
-                return {problem: a+'/2=', solution:(a/2), hint:{range:[1,a,-1,-1]}};
+                return {problem: a+'÷2=', solution:(a/2), hint:{range:[1,a,-1,-1]}};
             }
         };
 
@@ -257,7 +257,8 @@
                 [PRBL.add_to_ten, 10],
                 [PRBL.add_small, 10],
                 [PRBL.add_mid, 20],
-                [PRBL.sub_five, 10],
+                // [PRBL.sub_five, 10],
+                [PRBL.sub_five_minus, 10],
                 [PRBL.sub_ten, 10],
                 [PRBL.sub_small, 10],
                 [PRBL.add_hundreds, 10],
@@ -274,7 +275,7 @@
                 [PRBL.add_big_carry, 15],
                 [PRBL.add_big_small, 30],
                 [PRBL.add_hundreds, 5],
-                [PRBL.multiply, 40],
+                [PRBL.multiply, 50],
                 [PRBL.halving, 20],
             ]
         };
