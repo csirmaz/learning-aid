@@ -77,6 +77,7 @@
             stop_timeout: false,
         };
         setTimeout(function(){ $('.fireworks-container').hide(); }, 200);
+        
 
         // Show fireworks for a few seconds
         function show_fireworks(callback) {
@@ -113,6 +114,22 @@
                 fireworks.playing = false;
                 if(callback) { callback(); }
             }, 3.5*1000);
+        }
+        
+        
+        const bee_confetti = new JSConfetti();
+        
+        
+        // Show a reward animation
+        function show_animation(callback) {
+            const r = Math.random();
+            if(r < .3) {
+                bee_confetti.addConfetti().then(callback);
+            } else { if(r < .6) {
+                bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"]}).then(callback);
+            } else {
+                show_fireworks(callback);
+            }}
         }
 
 
@@ -293,7 +310,7 @@
             setTimeout(function() {
                 $('.giftannounce span').hide();
                 $('.giftannounce img').show();
-                show_fireworks();
+                show_animation();
                 setTimeout(function() {
                     $('.giftannounce').fadeOut(1500);
                     $('.gifts').addClass('goldpulse');
@@ -313,9 +330,7 @@
                 give_gift(new_question);
             } else {
                 if(score % 5 == 0 || score % bee.score_goal == 0) {
-                    show_fireworks(function() {
-                        setTimeout(new_question, 1100);
-                    });
+                    show_animation(function() { setTimeout(new_question, 1100); });
                 } else {
                     setTimeout(new_question, 2700);
                 }
