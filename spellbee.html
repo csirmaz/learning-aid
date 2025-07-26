@@ -510,6 +510,7 @@
                     
                     if(bee.typed.toLowerCase() == words[bee.word_ix][1].toLowerCase()) { // Success!
                         bee.can_type = false;
+                        store_question(undefined);
                         bee.$input.addClass('success');
                         success_common();
                         
@@ -574,18 +575,21 @@
                 return;
             }
             
-            let word_ix;
-            while(true) {
-                word_ix = Math.floor(Math.random() * words.length);
-                // ensure we choose a new word
-                if(bee.word_ix !== false && word_ix == bee.word_ix) { continue; }
-                // Avoid already known words (typed without help)
-                const known_count = is_known_word(words[word_ix]);
-                if(known_count == 2 && Math.random() < .6) { continue; }
-                if(known_count > 2 && Math.random() < .9) { continue; }
-                if(known_count > 5 && Math.random() < .95) { continue; }
-                break;
+            let word_ix = get_question_from_store();
+            if(word_ix === undefined) {
+                while(true) {
+                    word_ix = Math.floor(Math.random() * words.length);
+                    // ensure we choose a new word
+                    if(bee.word_ix !== false && word_ix == bee.word_ix) { continue; }
+                    // Avoid already known words (typed without help)
+                    const known_count = is_known_word(words[word_ix]);
+                    if(known_count == 2 && Math.random() < .6) { continue; }
+                    if(known_count > 2 && Math.random() < .9) { continue; }
+                    if(known_count > 5 && Math.random() < .95) { continue; }
+                    break;
+                }
             }
+            store_question(word_ix);
             start_question(word_ix);
         }
         
@@ -613,6 +617,20 @@
                 esc_html(min_wordset) + " to " + 
                 esc_html(max_wordset) + " (" + words.length + " words)"
             );
+        }
+        
+        
+        // Prevent getting a new question when the page is refreshed
+        function store_question(word_ix) {
+            bee.storage.players[bee.player].current_question = word_ix;
+            save_storage();
+        }
+        
+        function get_question_from_store() {
+            const w = bee.storage.players[bee.player].current_question;
+            if(w === undefined) { return undefined; }
+            if(w >= words.length) { return undefined; }
+            return w;
         }
         
         
