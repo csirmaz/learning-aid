@@ -329,8 +329,13 @@
             if(decide_gift()) {
                 give_gift(new_question);
             } else {
-                if(score % 5 == 0 || score % bee.score_goal == 0) {
-                    show_animation(function() { setTimeout(new_question, 1100); });
+                if(score % 4 == 0 || score % bee.score_goal == 0) {
+                    if(typeof(bee_local) === 'undefined' 
+                        || (!bee_local.local_reward) 
+                        || bee_local.local_reward(new_question)
+                    ) {
+                        show_animation(function() { setTimeout(new_question, 1100); });
+                    }
                 } else {
                     setTimeout(new_question, 2700);
                 }
