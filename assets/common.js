@@ -52,6 +52,14 @@
             'assets/images/gifts/sheep-35599_640.png',
         ];
 
+        
+        // Videos played at times as a reward
+        let videos = [
+        ];
+        if(bee_local !== undefined && bee_local.local_videos) {
+            videos = videos.concat(bee_local.local_videos);
+        }
+        
 
         // Data and objects for the fireworks animation
         const fireworks = {
@@ -130,6 +138,28 @@
             } else {
                 show_fireworks(callback);
             }}
+        }
+        
+        
+        // Play a video as a reward. Return if an alternative reward should be shown.
+        function play_video(callback) {
+            if(videos.length == 0) { return true; } // show default reward
+            const video = videos[Math.floor(Math.random() * videos.length)];
+            const $v = $('<video src="'+video+'" playsinline style="display:block;border:1rem solid #fff;width:90%;" autoplay></video>');
+            const $inwrap = $('<div style="max-width:60rem;margin:5rem auto;"></div>');
+            const $wrap = $('<div style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:2;background:rgba(0,0,0,.5);"></div>').append($inwrap);
+            $inwrap.append($v);
+            $v.on('ended', function() {
+                setTimeout(function() {
+                    $v.remove();
+                    setTimeout(function() {
+                        $wrap.remove();
+                        if(callback) { callback(); }
+                    }, 1100);
+                }, 700);
+            });
+            $('body').append($wrap);
+            return false; // do now show default reward animation
         }
 
 
@@ -330,10 +360,7 @@
                 give_gift(new_question);
             } else {
                 if(score % 4 == 0 || score % bee.score_goal == 0) {
-                    if(typeof(bee_local) === 'undefined' 
-                        || (!bee_local.local_reward) 
-                        || bee_local.local_reward(new_question)
-                    ) {
+                    if(Math.random() > .4 || play_video(new_question)) {
                         show_animation(function() { setTimeout(new_question, 1100); });
                     }
                 } else {
