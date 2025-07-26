@@ -410,19 +410,7 @@
                 if((value - 0) == bee.problem.solution) { // Success!
                     bee.can_type = false;
                     $('.prompt').addClass('success');
-                    play_success_sound();
-                    const score = add_score();
-                    if(decide_gift()) {
-                        give_gift(new_question);
-                    } else {
-                        if(score % 5 == 0 || score % bee.score_goal == 0) {
-                            show_fireworks(function() {
-                                setTimeout(new_question, 1100);
-                            });
-                        } else {
-                            setTimeout(new_question, 2700);
-                        }
-                    }
+                    success_common();
                 }
             }
             

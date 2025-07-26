@@ -510,19 +510,7 @@
                     if(bee.typed.toLowerCase() == words[bee.word_ix][1].toLowerCase()) { // Success!
                         bee.can_type = false;
                         bee.$input.addClass('success');
-                        play_success_sound();
-                        const score = add_score();
-                        if(decide_gift()) {
-                            give_gift(new_question);
-                        } else {
-                            if(score % 5 == 0 || score % bee.score_goal == 0) {
-                                show_fireworks(function() {
-                                    setTimeout(new_question, 1100);
-                                });
-                            } else {
-                                setTimeout(new_question, 2700);
-                            }
-                        }
+                        success_common();
                         
                         if(bee.help_asked == 0) {
                             add_known_word(words[bee.word_ix][1]);

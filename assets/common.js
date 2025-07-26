@@ -305,10 +305,27 @@
             }, 4000); // showing gift box
         }
         
+        
+        function success_common() {
+            play_success_sound();
+            const score = add_score();
+            if(decide_gift()) {
+                give_gift(new_question);
+            } else {
+                if(score % 5 == 0 || score % bee.score_goal == 0) {
+                    show_fireworks(function() {
+                        setTimeout(new_question, 1100);
+                    });
+                } else {
+                    setTimeout(new_question, 2700);
+                }
+            }
+        }
+        
 
         const licences = `
-|
-Fireworks module from https://github.com/crashmax-dev/fireworks-js/tree/v1 (MIT)
+| Fireworks module from https://github.com/crashmax-dev/fireworks-js/tree/v1 (MIT)
+| Confetti module from https://github.com/loonywizard/js-confetti (MIT)
 | Sound Effect by <a href="https://pixabay.com/users/u_2gxydaiwcd-46893983/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=340660">u_2gxydaiwcd</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=340660">Pixabay</a>
 Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=6185">freesound_community</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=6185">Pixabay</a>
 Sound Effect by <a href="https://pixabay.com/users/miraclei-45186201/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360154">MiraclEI</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360154">Pixabay</a>
