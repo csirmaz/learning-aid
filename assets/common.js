@@ -8,6 +8,10 @@
         const audio = {
             click: {'file':'assets/sounds/click.mp3', 'volume':1, 'object':false},
             notavail: {'file':'assets/sounds/wronganswer-37702.mp3', 'volume':1, 'object':false},
+            level_complete: [
+                {file: 'assets/sounds/success/congrats1.mp3', volume: 1, object: false},
+                {file: 'assets/sounds/success/congrats2.mp3', volume: 1, object: false}
+            ],
             success: [
                 {file: 'assets/sounds/success/good1.mp3', volume: 1, object: false},
                 {file: 'assets/sounds/success/good2.mp3', volume: 1, object: false},
@@ -138,13 +142,11 @@
         // Show a reward animation
         function show_animation(callback) {
             const r = Math.random();
-            if(r < .3) {
+            if(r < .5) {
                 bee_confetti.addConfetti().then(callback);
-            } else { if(r < .6) {
-                bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"]}).then(callback);
             } else {
                 show_fireworks(callback);
-            }}
+            }
         }
         
         
@@ -209,6 +211,7 @@
         }
 
 
+        // Play a unique sound identified by a key
         function playme(f) {
             const d = audio[f];
             if(d['object'] === false) { 
@@ -218,11 +221,12 @@
             }            
             d['object'].play();
         }
-
-
-        function play_success_sound() {
-            const i = Math.floor(Math.random() * audio.success.length);
-            const d = audio.success[i];
+        
+        
+        // Play a random sound from a list
+        function play_rnd_sound(f) {
+            const i = Math.floor(Math.random() * audio[f].length);
+            const d = audio[f][i];
             if(d['object'] === false) { 
                 console.log("Audio: setting up success", d['file']);
                 d['object'] = new Audio(d['file']); 
@@ -231,6 +235,9 @@
             console.log("Audio: playing success", d['file']);
             d['object'].play();
         }
+
+
+        function play_success_sound() { play_rnd_sound('success'); }
 
 
         // Call this to zero the score of the current player
@@ -361,17 +368,24 @@
         
         
         function success_common() {
-            play_success_sound();
             const score = add_score();
             if(decide_gift()) {
                 give_gift(new_question);
             } else {
-                if(score % 4 == 0 || score % bee.score_goal == 0) {
-                    if(Math.random() > .4 || play_video(new_question)) {
-                        show_animation(function() { setTimeout(new_question, 1100); });
-                    }
+                if(score % bee.score_goal == 0) {
+                    play_rnd_sound('level_complete');
+                    bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 300}).then(
+                        function() { setTimeout(new_question, 1100); }
+                    );
                 } else {
-                    setTimeout(new_question, 2700);
+                    play_success_sound();
+                    if(score % 4 == 0) {
+                        if(Math.random() > .4 || play_video(new_question)) {
+                            show_animation(function() { setTimeout(new_question, 1100); });
+                        }
+                    } else {
+                        setTimeout(new_question, 2700);
+                    }
                 }
             }
         }
