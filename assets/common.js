@@ -153,21 +153,23 @@
         // Play a video as a reward. Return if an alternative reward should be shown.
         function play_video(callback) {
             if(videos.length == 0) { return true; } // show default reward
-            const video = videos[Math.floor(Math.random() * videos.length)];
-            const $v = $('<video src="'+video+'" playsinline style="display:block;border:1rem solid #fff;width:90%;" autoplay></video>');
-            const $inwrap = $('<div style="max-width:60rem;margin:5rem auto;"></div>');
-            const $wrap = $('<div style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:2;background:rgba(0,0,0,.5);"></div>').append($inwrap);
-            $inwrap.append($v);
-            $v.on('ended', function() {
-                setTimeout(function() {
-                    $v.remove();
+            setTimeout(function() {
+                const video = videos[Math.floor(Math.random() * videos.length)];
+                const $v = $('<video src="'+video+'" playsinline style="display:block;border:1rem solid #fff;width:90%;" autoplay></video>');
+                const $inwrap = $('<div style="max-width:60rem;margin:5rem auto;"></div>');
+                const $wrap = $('<div style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:2;background:rgba(0,0,0,.5);"></div>').append($inwrap);
+                $inwrap.append($v);
+                $v.on('ended', function() {
                     setTimeout(function() {
-                        $wrap.remove();
-                        if(callback) { callback(); }
-                    }, 1100);
-                }, 700);
-            });
-            $('body').append($wrap);
+                        $v.remove();
+                        setTimeout(function() {
+                            $wrap.remove();
+                            if(callback) { callback(); }
+                        }, 1100);
+                    }, 700);
+                });
+                $('body').append($wrap);
+            }, 1000);
             return false; // do now show default reward animation
         }
 
@@ -369,25 +371,56 @@
         
         function success_common() {
             const score = add_score();
-            if(decide_gift()) {
-                give_gift(new_question);
-            } else {
-                if(score % bee.score_goal == 0) {
-                    play_rnd_sound('level_complete');
-                    bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 300}).then(
-                        function() { setTimeout(new_question, 1100); }
-                    );
-                } else {
-                    play_success_sound();
-                    if(score % 4 == 0) {
-                        if(Math.random() > .4 || play_video(new_question)) {
-                            show_animation(function() { setTimeout(new_question, 1100); });
-                        }
-                    } else {
-                        setTimeout(new_question, 2700);
-                    }
-                }
+            
+            // level complete logic
+            if(score % bee.score_goal == 0) {
+                play_rnd_sound('level_complete');
+                bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 300}).then(
+                    function() { setTimeout(new_question, 1100); }
+                    // no need to call the gift logic; gift will be given on next step
+                );
+                return;
             }
+            
+            // check if gift is due
+            if(decide_gift()) {
+                play_success_sound();
+                give_gift(new_question);
+                return;
+            }
+            
+            // default logic to go to next question
+            const celebrate_period = (bee.score_goal < 30 ? 4 : 5);
+            if(score % celebrate_period > 0) {
+                play_success_sound();
+                setTimeout(new_question, 2700);
+                return;
+            }
+            
+            // periodic celebration
+            
+            // score:    0  4  8 12 16 20 24 28 32 36 40     (4)
+            // period_ix 0  1  2  3  4  5  6  7  8  9 10
+            //                 B     b  L     B     b  L      B=bigger b=bigger at rnd  L=level complete
+            
+            // score     0  5 10 15 20 25 30 35 40 45 50 55 60  (5)
+            // period_ix 0  1  2  3  4  5  6  7  8  9 10 11 12
+            //                 B     B     L     B     B     L
+            
+            
+            const period_ix = Math.floor(score / celebrate_period);
+            const periods_in_level = Math.floor(bee.score_goal / celebrate_period);
+            const period_ix_lev = (period_ix % periods_in_level);
+            // Bigger celebration with video
+            let bigger = false;
+            if(period_ix_lev == 2) { bigger = true; }
+            if(celebrate_period == 5 && period_ix_lev == 4) { bigger = true; }
+            if(celebrate_period == 4 && period_ix_lev == 4 && Math.random() <= .5) { bigger = true; }
+            play_success_sound();
+            if((!bigger) || play_video(new_question)) {
+                show_animation(function() { setTimeout(new_question, 1100); });
+            }
+            return;
         }
         
 
