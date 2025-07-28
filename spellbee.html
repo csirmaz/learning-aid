@@ -38,7 +38,7 @@
             display: inline-block;
         }
 
-        .prompt .infield .help { color: #999; }
+        .prompt .infield .help { color: #05b; }
         .prompt .infield .inp { color: #000; }
         .prompt .infield .inp .spacehelp { color: #ccc; }
         body .prompt .infield .success { color: #090; }
@@ -57,6 +57,12 @@
         }
         
         .infield .help .cursor { visibility: hidden; }
+        
+        .keyhelp {
+            margin-top: 4rem;
+            font-size: 1.5rem;
+            opacity: .7;
+        }
 
     </style>
 
@@ -79,6 +85,8 @@
             <span class="infield"><span class="help"></span><img class="helpwait" src="assets/images/loader.gif"><span class="inp"></span></span>
         </div>
         
+        <div class="game keyhelp">1️⃣=❓ &nbsp; 2️⃣=💬</div>
+        
         <div class="startmenu"></div>
 
         <div class="giftlist">
@@ -95,11 +103,11 @@
         </div>
 
     </div>
-    <p>
+    <p class="smallprint">
     Player: <span class="d_player"></span>
     | Word sets: <span class="d_wordsets"></span>
     </p>
-    <p>Hint: Press F1, F2, ESC or the button under ESC (some may trigger other functions)</p>
+    <p class="smallprint">Hint: Press 1, F1, F2, ESC or the button under ESC (some may trigger other functions)</p>
     
     <p class="smallprint">Use this page with a physical keyboard | <span class="handle">Licences</span>
     <span class="expand"></span> 
@@ -126,26 +134,31 @@
             [ // Word set 0
                 ['📦', 'box'],
                 ['🍱', 'food'],
+                ['🔥', 'hot'],
+                ['🟥', 'red'],
                 ['🏊', 'swim'],
             ],
             [ // Word set 1
+                ['🛌', 'bed'],
+                ['🐄', 'cow'],
+                ['🥁', 'drum'],
                 ['🏋️', 'gym'],
-                ['🐍', 'snake'],
                 ['🥝', 'kiwi'],
+                ['🪺', 'nest'],
+                ['🍝', 'pasta'],
+                ['📌', 'pin'],      
+                ['🦈', 'shark'],
+                ['🐍', 'snake'],
+                ['⛺️', 'tent'],
             ],
             [ // Word set 2
                 ['🖊️', 'pen'],      
-                ['📌', 'pin'],      
                 ['🥚', 'egg'],      
                 ['👜', 'bag'],
-                ['🥁', 'drum'],
                 ['🏃🏻‍♂️‍➡️', 'run'],
                 ['🐖', 'pig'],
-                ['🪺', 'nest'],
                 ['🐈‍', 'cat'],
                 ['🥛', 'milk'],
-                ['🛌', 'bed'],
-                ['⛺️', 'tent'],
                 ['🖐️', 'hand'],
                 ['😁', 'grin'],
                 ['🐠', 'fish'],
@@ -155,16 +168,19 @@
                 ['🙅🏼‍♀️', 'not'],
                 ['🪆', 'toy'],
                 ['🧑', 'boy'],
+                ['👍🏿', 'thumb'],
             ],
             [ // Word set 3
+                ['🖍', 'crayon'],
+                ['👁', 'eye'],
                 ['▶️', 'play'],
+                ['🛡', 'shield'],
                 ['🌞', 'sun'],
                 ['❄️', 'snow'],
                 ['🪨', 'rock'],
                 ['🔒', 'lock'],
                 ['💍', 'ring'],
                 ['🔔', 'bell'],
-                ['🐄', 'cow'],
                 ['🐑', 'sheep'],
                 ['🌳', 'tree'],
                 ['🍋', 'lemon'],
@@ -175,7 +191,6 @@
                 ['🪽', 'wing'],
                 ['😀', 'happy'],
                 ['🎾', 'tennis'],
-                ['👁', 'eye'],
             ],
             [ // Word set 4
                 ['👃🏻', 'nose'],
@@ -194,7 +209,6 @@
                 ['🫂', 'love'],
                 ['⛄️', 'snowman'],
                 ['🍕', 'pizza'],
-                ['🍝', 'pasta'],
                 ['🎹', 'piano'],
                 ['🧱', 'wall'],
                 ['🍄', 'mushroom'],
@@ -215,7 +229,6 @@
                 ['🚗', 'car'],
                 ['⬜️', 'white'],
                 ['⬛️', 'black'],
-                ['🟥', 'red'],
                 ['🟩', 'green'],
                 ['🏫', 'school'],
                 ['🏨', 'hotel'],
@@ -223,7 +236,6 @@
                 ['🏞️', 'river'],
                 ['🌅', 'morning'],
                 ['🏡', 'home'],
-                ['🔥', 'hot'],
                 ['🥶', 'cold'],
                 ['🌋', 'lava'],
                 ['🪰', 'fly'],
@@ -232,7 +244,6 @@
             [ // Word set 5
                 ['🖼', 'picture'],
                 ['👄', 'mouth'],
-                ['🦈', 'shark'],
                 ['🦴', 'bone'],
                 ['🦜', 'parrot'],
                 ['☔️', 'rain'],
@@ -263,6 +274,10 @@
                 ['🦻🏽', 'hear'],
                 ['🎃', 'scary'],
                 ['🎃', 'pumpkin'],
+                ['📦', 'thing'],
+                ['🔩', 'screw'],
+                ['📰', 'news'],
+                ['🌍', 'world'],
             ],
             [ // Word set 6
                 ['🪞', 'mirror'],
@@ -301,6 +316,9 @@
                 ['👦', 'brother'],
             ],
             [ // Word set 7
+                ['🪙', 'coin'],
+                ['🪶', 'feather'],
+                ['📦', 'package'],
                 ['🦒', 'giraffe'],
                 ['🚁', 'helicopter'],
                 ['🛬', 'arrive'],
@@ -401,7 +419,7 @@
                         }, 4000); // time to enable help again - minus the duration of the help!
                     }});
                 }, 600); // initial wait while showing the word (before TTS)
-            }, is_initial ? 0 : 2500); // duration of the loading animation
+            }, is_initial ? 0 : 1800); // duration of the loading animation
         }
         
         
@@ -523,22 +541,29 @@
                         }
                     }
                 }
-                return;
+                return false;
             }
             
             if(event.keyCode == 8) { // backspace
-                if(!bee.can_type) { playme('notavail'); return; }
+                if(!bee.can_type) { playme('notavail'); return false; }
                 if(bee.typed.length > 0) {
                     bee.typed = bee.typed.substring(0, bee.typed.length-1);
                     update_input_field();
                 }
-                return;
+                return false;
             }
                        
-            if(event.keyCode == 112 || event.keyCode == 113 || event.keyCode == 27 || event.keyCode == 192) { // F1, F2, ESC, pipe
-                if(!bee.can_type) { return; }
-                if(!bee.can_use_help) { playme('notavail'); return; }
+            if(event.keyCode == 112 || event.keyCode == 113 || event.keyCode == 27 || event.keyCode == 192 || event.keyCode == 49) { // F1, F2, ESC, pipe, 1
+                if(!bee.can_type) { return false; }
+                if(!bee.can_use_help) { playme('notavail'); return false; }
                 show_help(false);
+                return false;
+            }
+            
+            if(event.keyCode == 50) {
+                if(!bee.can_type) { playme('notavail'); return false; }
+                play_word(words[bee.word_ix][1]);
+                return false;
             }
             
             // console.log("key", event);
