@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?29">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?32">
 
     <style>
     
@@ -69,7 +69,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?29"></script>
+    <script src="assets/local/beelocal.js?32"></script>
 </head>
 <body>
     <div class="container">
@@ -85,7 +85,7 @@
             <span class="infield"><span class="help"></span><img class="helpwait" src="assets/images/loader.gif"><span class="inp"></span></span>
         </div>
         
-        <div class="game keyhelp">1️⃣=❓ &nbsp; 2️⃣=💬</div>
+        <div class="game keyhelp">1️⃣=❓ &nbsp; 2️⃣=💬 &nbsp; 3️⃣=🎵</div>
         
         <div class="startmenu"></div>
 
@@ -383,7 +383,7 @@
 
 
     </script>
-    <script src="assets/common.js?29"></script>
+    <script src="assets/common.js?32"></script>
     <script>
         
         // Display target word briefly
@@ -566,6 +566,11 @@
                 return false;
             }
             
+            if(event.keyCode == 51) {
+                toggle_play_music(0);
+                return false;
+            }
+
             // console.log("key", event);
         }
 

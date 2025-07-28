@@ -40,6 +40,9 @@
                 {file: 'assets/sounds/success/11l-victory-1749704552668-358772.mp3', 'volume': .4, 'object': false},
                 {file: 'assets/sounds/success/11l-victory_sound_with_t-1749487409696-357609.mp3', 'volume': .4, 'object': false},
                 {file: 'assets/sounds/success/11l-game_complete_notifi-1749489486836-360350.mp3', 'volume': .4, 'object': false},
+            ],
+            music: [
+                {file: 'assets/music/satisfying-lofi-for-focus-study-amp-working-242103.mp3', volume: .1, object: false}
             ]
         };
         
@@ -213,33 +216,49 @@
         }
 
 
-        // Play a unique sound identified by a key
+        // Play a unique sound identified by the key `f`
         function playme(f) {
             const d = audio[f];
-            if(d['object'] === false) { 
+            if(d.object === false) { 
                 console.log("Audio: setting up", d['file']);
-                d['object'] = new Audio(d['file']); 
-                d['object'].volume = d['volume']; 
+                d.object = new Audio(d['file']); 
+                d.object.volume = d['volume']; 
             }            
-            d['object'].play();
+            d.object.play();
         }
         
         
-        // Play a random sound from a list
+        // Play a random sound from a list given by `f`
         function play_rnd_sound(f) {
             const i = Math.floor(Math.random() * audio[f].length);
             const d = audio[f][i];
-            if(d['object'] === false) { 
+            if(d.object === false) { 
                 console.log("Audio: setting up success", d['file']);
-                d['object'] = new Audio(d['file']); 
-                d['object'].volume = d['volume']; 
+                d.object = new Audio(d['file']); 
+                d.object.volume = d['volume']; 
             }
             console.log("Audio: playing success", d['file']);
-            d['object'].play();
+            d.object.play();
         }
 
 
         function play_success_sound() { play_rnd_sound('success'); }
+        
+        
+        // Play the `ix`th music
+        function toggle_play_music(ix) {
+            const d = audio.music[ix];
+            if(d.object === false) { 
+                console.log("Audio: setting up success", d['file']);
+                d.object = new Audio(d['file']); 
+                d.object.volume = d['volume'];
+                d.object.loop = true;
+                d.object.play();
+                return;
+            }
+            if(d.object.paused) { d.object.play(); return; }
+            d.object.pause();
+        }
 
 
         // Call this to zero the score of the current player
@@ -427,7 +446,8 @@
         const licences = `
 | Fireworks module from https://github.com/crashmax-dev/fireworks-js/tree/v1 (MIT)
 | Confetti module from https://github.com/loonywizard/js-confetti (MIT)
-| Sound Effect by <a href="https://pixabay.com/users/u_2gxydaiwcd-46893983/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=340660">u_2gxydaiwcd</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=340660">Pixabay</a>
+| 
+Sound Effect by <a href="https://pixabay.com/users/u_2gxydaiwcd-46893983/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=340660">u_2gxydaiwcd</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=340660">Pixabay</a>
 Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=6185">freesound_community</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=6185">Pixabay</a>
 Sound Effect by <a href="https://pixabay.com/users/miraclei-45186201/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360154">MiraclEI</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360154">Pixabay</a>
 Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=230550">Ribhav Agrawal</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=230550">Pixabay</a>
@@ -455,6 +475,8 @@ Image by <a href="https://pixabay.com/users/no-longer-here-19203/?utm_source=lin
 Image by <a href="https://pixabay.com/users/edurs34-8516248/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=7928232">Eduardo • Subscribe to my YT Channel❤️</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=7928232">Pixabay</a>
 Image by <a href="https://pixabay.com/users/clker-free-vector-images-3736/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=35599">Clker-Free-Vector-Images</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=35599">Pixabay</a>
 Image by <a href="https://pixabay.com/users/neas_artwork-2743866/?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=5487377">Linnéa</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=image&utm_content=5487377">Pixabay</a>
+|
+Music by <a href="https://pixabay.com/users/fassounds-3433550/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=242103">FASSounds</a> from <a href="https://pixabay.com/music//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=242103">Pixabay</a>
 `;
 
 
