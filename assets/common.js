@@ -67,7 +67,7 @@
         // Videos played at times as a reward
         let videos = [
         ];
-        if(bee_local !== undefined && bee_local.local_videos) {
+        if(typeof(bee_local) !== 'undefined' && bee_local.local_videos) {
             videos = videos.concat(bee_local.local_videos);
         }
         
@@ -155,9 +155,9 @@
             if(videos.length == 0) { return true; } // show default reward
             setTimeout(function() {
                 const video = videos[Math.floor(Math.random() * videos.length)];
-                const $v = $('<video src="'+video+'" playsinline style="display:block;border:1rem solid #fff;width:90%;" autoplay></video>');
-                const $inwrap = $('<div style="max-width:60rem;margin:5rem auto;"></div>');
-                const $wrap = $('<div style="position:absolute;top:0;left:0;right:0;bottom:0;z-index:2;background:rgba(0,0,0,.5);"></div>').append($inwrap);
+                const $v = $('<video src="'+video+'" playsinline class="video_v" autoplay></video>');
+                const $inwrap = $('<div class="video_w1"></div>');
+                const $wrap = $('<div class="video_w2"></div>').append($inwrap);
                 $inwrap.append($v);
                 $v.on('ended', function() {
                     setTimeout(function() {
@@ -415,7 +415,7 @@
             let bigger = false;
             if(period_ix_lev == 2) { bigger = true; }
             if(celebrate_period == 5 && period_ix_lev == 4) { bigger = true; }
-            if(celebrate_period == 4 && period_ix_lev == 4 && Math.random() <= .5) { bigger = true; }
+            if(celebrate_period == 4 && period_ix_lev == 4 && Math.random() <= .7) { bigger = true; }
             play_success_sound();
             if((!bigger) || play_video(new_question)) {
                 show_animation(function() { setTimeout(new_question, 1100); });

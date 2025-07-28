@@ -178,3 +178,25 @@
             height: 20rem;
             margin-top: 5rem;
         }
+
+        .video_v {
+            display: block;
+            border: 1rem solid #fff;
+            border-color: #ff5 #fa0 #5af #3c7;
+            width: 90%;
+        }
+        
+        .video_w1 {
+            max-width: 60rem;
+            margin: 5rem auto;
+        }
+        
+        .video_w2 {
+            position:absolute;
+            top:0;
+            left:0;
+            right:0;
+            bottom:0;
+            z-index:2;
+            background:rgba(0,0,0,.5);
+        }
