@@ -3,6 +3,7 @@
             font-family: monospace, sans-serif;
             background: #fec;
             overflow: hidden;
+            user-select: none;
         }
 
         .container {
