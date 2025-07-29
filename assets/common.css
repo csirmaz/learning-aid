@@ -147,17 +147,24 @@
             text-align: center;
         }
         
-        .giftlist .list .next {
+        .giftlist .list .next,
+        .giftlist .list .exchange {
             border: 2px solid #555;
             border-radius: 1rem;
             cursor: pointer;
-            padding: 1rem;
+            font-size: 1.5rem;
+            padding: .7rem;
             vertical-align: bottom;
             display: block;
             position: absolute;
             right: 1rem;
             top: 15rem;
             background:rgba(255,255,255,.3);
+        }
+        
+        .giftlist .list .exchange {
+            top: 20rem;
+            font-size: .8rem;
         }
 
         .giftlist .list img {

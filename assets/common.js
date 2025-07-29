@@ -292,7 +292,7 @@
             const ls = bee.storage.players[bee.player].lifetime_score;
             if(ls === undefined) { return; }
             
-            let give_gift = false;
+            let do_give_gift = false;
             if(bee.storage.players[bee.player].next_gift_at === undefined) {
                 const completed_goals = Math.floor(ls / bee.score_goal);
                 const completed_two_goals = Math.floor(completed_goals / 2) * 2;
@@ -302,7 +302,7 @@
                 bee.storage.players[bee.player].next_gift_at = n;
             } else {
                 if(ls >= bee.storage.players[bee.player].next_gift_at) {
-                    give_gift = true;
+                    do_give_gift = true;
                     const completed_goals = Math.floor(ls / bee.score_goal);
                     const completed_two_goals = Math.floor(completed_goals / 2) * 2;
                     const offset = Math.floor((Math.random() + 1) * bee.score_goal) + 1;
@@ -312,7 +312,7 @@
                 }
             }
             save_storage();
-            return give_gift;
+            return do_give_gift;
         }
         
         
@@ -330,7 +330,7 @@
         
         
         // Give the player a gift
-        function give_gift(callback) {
+        function give_gift(callback, return_gift_only) {
             // Gifts the player already has
             if(bee.storage.players[bee.player].gifts === undefined) {
                 bee.storage.players[bee.player].gifts = [];
@@ -366,6 +366,7 @@
                 break;
             }
             console.log("Gift chosen", gix, gift_label_to_img(gix));
+            if(return_gift_only) { return gix; }
             giftarray.push(gix);
             save_storage();
             
@@ -404,7 +405,7 @@
             // check if gift is due
             if(decide_gift()) {
                 play_success_sound();
-                give_gift(new_question);
+                give_gift(new_question, false);
                 return;
             }
             
@@ -488,7 +489,7 @@ Music by <a href="https://pixabay.com/users/fassounds-3433550/?utm_source=link-a
         
         // Display gift list
         $('.gifts').on('click', function() {
-            if(bee.giftlist == -1) {
+            if(bee.giftlist == -1) { // gift list index
                 bee.giftlist = 0;
                 $('.game').hide();
                 $('.scorewrap').show();
@@ -518,5 +519,30 @@ Music by <a href="https://pixabay.com/users/fassounds-3433550/?utm_source=link-a
             bee.giftlist++;
             if(bee.giftlist >= giftarray.length) { bee.giftlist = 0; }
             $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
+            return false;
+        });
+        
+        // Exchange gift
+        $('.giftlist .list .exchange').on('click', function() {
+            console.log("Exchanging gift");
+            if(bee.giftlist == -1) { return false; }
+            const giftarray = bee.storage.players[bee.player].gifts;
+            if(giftarray === undefined || giftarray.length == 0) { return false; }
+            
+            const diff = 2;
+            
+            if(!confirm("This will cost "+diff+" coins. Are you sure?")) { return false; }
+            
+            if(bee.storage.players[bee.player].score < diff) { playme('notavail'); return false; }
+            bee.storage.players[bee.player].score -= diff;
+            update_score_ui();
+
+            const gix = give_gift(undefined, true);
+            giftarray[bee.giftlist] = gix;
+            save_storage();
+            $('.giftlist .list img').fadeOut({duration: 2000, complete: function() {
+                $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist])).fadeIn();
+            }});
+            
             return false;
         });
