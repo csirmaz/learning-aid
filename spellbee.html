@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?32">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?33">
 
     <style>
     
@@ -58,6 +58,8 @@
         
         .infield .help .cursor { visibility: hidden; }
         
+        .wrongchar { text-decoration: underline dotted #05b .3rem; }
+        
         .keyhelp {
             margin-top: 4rem;
             font-size: 1.5rem;
@@ -69,7 +71,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?32"></script>
+    <script src="assets/local/beelocal.js?33"></script>
 </head>
 <body>
     <div class="container">
@@ -85,7 +87,7 @@
             <span class="infield"><span class="help"></span><img class="helpwait" src="assets/images/loader.gif"><span class="inp"></span></span>
         </div>
         
-        <div class="game keyhelp">1️⃣=❓ &nbsp; 2️⃣=💬 &nbsp; 3️⃣=🎵</div>
+        <div class="game keyhelp">1️⃣=❓ &nbsp; 2️⃣=💬</div>
         
         <div class="startmenu"></div>
 
@@ -368,6 +370,7 @@
             storage: {'players': {}},  // storage data that's saved into local storage
             giftlist: -1,
             word_audio: false,
+            word_audio_timeout: false,
             score_goal: 20,  // controls the bar under the score and gifts
         };
         
@@ -383,7 +386,7 @@
 
 
     </script>
-    <script src="assets/common.js?32"></script>
+    <script src="assets/common.js?33"></script>
     <script>
         
         // Display target word briefly
@@ -457,7 +460,10 @@
             
             let o = '';
             for(let i=0; i<prefix.length; i++) {
+                const wrongchar = (prefix[i].toLowerCase() != s[i].toLowerCase());
+                if(wrongchar) { o += '<span class="wrongchar">'; }
                 o += (prefix[i] == ' ' ? '&nbsp;' : esc_html(prefix[i]));
+                if(wrongchar) { o += '</span>'; }
                 if(wrap_at[i]) { o += '<br>'; }
             }
             o += '<span class="cursor"></span>';
@@ -502,6 +508,12 @@
 
         // Play the mp3 assigned to a word
         function play_word(s) {
+            if(bee.word_audio_timeout !== false) {
+                // prevent playing word too frequently
+                return;
+            }
+            bee.word_audio_timeout = setTimeout(function() { bee.word_audio_timeout = false; }, 3000);
+            
             s = s.toLowerCase().replaceAll(/ /g, '_').replaceAll(/[^a-z_]/g, '');
             file = 'assets/sounds/words/'+s+'.mp3';
             if(bee.word_audio === false) {
@@ -566,10 +578,10 @@
                 return false;
             }
             
-            if(event.keyCode == 51) {
+            /* if(event.keyCode == 51) {
                 toggle_play_music(0);
                 return false;
-            }
+            } */
 
             // console.log("key", event);
         }

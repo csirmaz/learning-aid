@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?32">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?33">
 
     <style>
     
@@ -72,7 +72,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?32"></script>
+    <script src="assets/local/beelocal.js?33"></script>
 </head>
 <body>
     <div class="container">
@@ -105,7 +105,7 @@
             <td data-i="D4">4</td>
             <td data-i="D5">5</td>
             <td data-i="D6">6</td>
-            <td data-i="music">🎵</td>
+            <td data-i=""></td>
         </tr>
         <tr>
             <td data-i="D1">1</td>
@@ -317,7 +317,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?32"></script>
+    <script src="assets/common.js?33"></script>
     <script>
 
         
@@ -425,11 +425,6 @@
                     bee.typed += HALF;
                     update_input_field();
                 }
-                return false;
-            }
-            
-            if(c == 'music') {
-                toggle_play_music(0);
                 return false;
             }
             
