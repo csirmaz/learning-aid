@@ -154,14 +154,16 @@
         
         
         // Play a video as a reward. Return if an alternative reward should be shown.
-        function play_video(callback) {
-            if(videos.length == 0) { return true; } // show default reward
+        function play_video(callback, video_ix) {
+            if(videos.length == 0) { return true; } // true: show default reward
+            const $wrap = $('<div class="video_w2"></div>');
+            $('body').append($wrap);
             setTimeout(function() {
-                const video = videos[Math.floor(Math.random() * videos.length)];
+                if(video_ix === undefined) { video_ix = Math.floor(Math.random() * videos.length); }
+                console.log("Playing video", video_ix);
+                const video = videos[video_ix];
                 const $v = $('<video src="'+video+'" playsinline class="video_v" autoplay></video>');
                 const $inwrap = $('<div class="video_w1"></div>');
-                const $wrap = $('<div class="video_w2"></div>').append($inwrap);
-                $inwrap.append($v);
                 $v.on('ended', function() {
                     setTimeout(function() {
                         $v.remove();
@@ -171,9 +173,10 @@
                         }, 1100);
                     }, 700);
                 });
-                $('body').append($wrap);
+                $inwrap.append($v);
+                $wrap.append($inwrap);
             }, 1000);
-            return false; // do now show default reward animation
+            return false; // false: do now show default reward animation
         }
 
 

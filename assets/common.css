@@ -206,7 +206,8 @@
             display: block;
             border: 1rem solid #fff;
             border-color: #ff5 #fa0 #5af #3c7;
-            width: 90%;
+            max-width: 90%;
+            max-height: 35rem;
         }
         
         .video_w1 {
