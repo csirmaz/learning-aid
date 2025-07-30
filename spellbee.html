@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?54">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?58">
 
     <style>
     
@@ -71,7 +71,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?54"></script>
+    <script src="assets/local/beelocal.js?58"></script>
 </head>
 <body>
     <div class="container">
@@ -386,7 +386,7 @@
 
 
     </script>
-    <script src="assets/common.js?54"></script>
+    <script src="assets/common.js?58"></script>
     <script>
         
         // Display target word briefly
@@ -496,12 +496,18 @@
         }
         
         
+        // Return the count of successful entries of a word
         function is_known_word(word) {
             if(bee.storage.players[bee.player].known_words) {
-                const c = bee.storage.players[bee.player].word;
-                if(c === undefined) { return 0; }
+                const c = bee.storage.players[bee.player].known_words[word];
+                if(c === undefined) { 
+                    console.log("Known words/read:", word, "unknown word");
+                    return 0;
+                }
+                console.log("Known words/read:", word, "returning", c);
                 return c;
             }
+            console.log("Known words/read:", word, "no storage");
             return 0;
         }
         
@@ -617,20 +623,28 @@
                 return;
             }
             
+            try{ document.activeElement.blur(); }catch(e){}
+            
             let word_ix = get_question_from_store();
+            let log = '';
             if(word_ix === undefined) {
                 while(true) {
                     word_ix = Math.floor(Math.random() * words.length);
+                    log += " w:"+word_ix;
                     // ensure we choose a new word
-                    if(bee.word_ix !== false && word_ix == bee.word_ix) { continue; }
+                    if(bee.word_ix !== false && word_ix == bee.word_ix) { log += ' norep'; continue; }
                     // Avoid already known words (typed without help)
-                    const known_count = is_known_word(words[word_ix]);
-                    if(known_count == 2 && Math.random() < .6) { continue; }
-                    if(known_count > 2 && Math.random() < .9) { continue; }
-                    if(known_count > 5 && Math.random() < .95) { continue; }
+                    const known_count = is_known_word(words[word_ix][1]);
+                    log += " k:"+known_count;
+                    if(known_count == 2 && Math.random() < .5) { log += ' no2'; continue; }
+                    if(known_count > 2 && Math.random() < .8) { log += ' no2+'; continue; }
+                    if(known_count > 5 && Math.random() < .95) { log += ' no5+'; continue; }
                     break;
                 }
+            } else {
+                log += ' from store';
             }
+            console.log("Selecting new word:", log);
             store_question(word_ix);
             start_question(word_ix);
         }
