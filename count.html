@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?39">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?48">
 
     <style>
     
@@ -72,7 +72,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?39"></script>
+    <script src="assets/local/beelocal.js?48"></script>
 </head>
 <body>
     <div class="container">
@@ -81,7 +81,7 @@
             <div class="score">
                 <span class="icon">🪙</span> <span class="value">0</span>
                 <div class="bar"><span class="barfill"></span></div>
-            </div><div class="gifts"><span class="open">🎁</span><span class="close">X</span></div>
+            </div><div class="gifts"><span class="open">🎁</span><span class="close">X</span><span class="needed">-</span></div>
         </div>
         <div class="game prompt">
             <div class="infield">
@@ -128,7 +128,7 @@
             <div class="list">
                 <img src="assets/images/nogift.png">
                 <span class="next">Next</span>
-                <span class="exchange">Exchange 🪙🪙</span>
+                <span class="exchange">Exchange<br>🪙🪙</span>
             </div>
         </div>
 
@@ -148,7 +148,6 @@
     | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
     | <a href="#" onclick="modify_problemset(); return false">Update problem range</a>
     | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
-    | <a href="#" onclick="get_gift_at(); return false">Gift?</a>
     </p>
     <p class="smallprint">Hint: Press F1, F2, ESC or the button under ESC (some may trigger other functions)</p>
 
@@ -318,7 +317,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?39"></script>
+    <script src="assets/common.js?48"></script>
     <script>
 
         

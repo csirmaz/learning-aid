@@ -200,6 +200,13 @@
             // bar
             $('.score .bar .barfill').css('width', ((score % bee.score_goal) / bee.score_goal * 100.)+'%');
             $('.score').toggleClass('goal_reached', score >= bee.score_goal);
+            
+            // remaining to gift
+            if(bee.storage.players[bee.player].lifetime_score !== undefined
+                && bee.storage.players[bee.player].next_gift_at !== undefined) {
+                $('.gifts .needed').html(esc_html(bee.storage.players[bee.player].next_gift_at - bee.storage.players[bee.player].lifetime_score));
+            }
+            
         }
         
         
@@ -278,13 +285,7 @@
             update_score_ui();
         }
         
-        
-        function get_gift_at() {
-            if(bee.player === false) { alert("Choose a player first"); return; }
-            alert(bee.storage.players[bee.player].lifetime_score + " / " + bee.storage.players[bee.player].next_gift_at);
-        }
-        
-        
+
         // Decide whether to give player a gift. One gift per twice the score goal
         // Give the gift when the "lifetime score" (unaffected by reductions) reaches
         // next_gift_at, which is set to a random position in every 2nd goal stretch
@@ -405,7 +406,10 @@
             // check if gift is due
             if(decide_gift()) {
                 play_success_sound();
-                give_gift(new_question, false);
+                give_gift(function() {
+                    update_score_ui(false);
+                    new_question();
+                }, false);
                 return;
             }
             
