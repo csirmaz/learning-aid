@@ -612,7 +612,7 @@
         
         function new_question() {
             // Refresh the page periodically
-            if(Date.now - bee.load_time > 4*60*60*1000) {
+            if(Date.now() - bee.load_time > 4*60*60*1000) {
                 window.location.reload(true);
                 return;
             }
