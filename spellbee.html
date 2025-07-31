@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?58">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?70">
 
     <style>
     
@@ -71,7 +71,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?58"></script>
+    <script src="assets/local/beelocal.js?70"></script>
 </head>
 <body>
     <div class="container">
@@ -107,6 +107,7 @@
 
     </div>
     <p class="smallprint">
+    v<span class="d_version"></span>
     Player: <span class="d_player"></span>
     | Word sets: <span class="d_wordsets"></span>
     </p>
@@ -379,14 +380,14 @@
             bee.storage = JSON.parse(localStorage.spellbee);
         }
 
-        function save_storage() {
-            console.log("Saving storage");
+        function save_storage(msg) {
+            console.log("Saving storage", msg);
             localStorage.spellbee = JSON.stringify(bee.storage);
         }
 
 
     </script>
-    <script src="assets/common.js?58"></script>
+    <script src="assets/common.js?70"></script>
     <script>
         
         // Display target word briefly
@@ -492,7 +493,7 @@
             } else {
                 bee.storage.players[bee.player].known_words[word]++;
             }
-            save_storage();
+            save_storage('add_known_word');
         }
         
         
@@ -679,7 +680,7 @@
         // Prevent getting a new question when the page is refreshed
         function store_question(word_ix) {
             bee.storage.players[bee.player].current_question = word_ix;
-            save_storage();
+            save_storage('store_question');
         }
         
         function get_question_from_store() {
@@ -695,7 +696,7 @@
             const wordsets = choose_wordsets();
             bee.storage.players[bee.player].min_wordset = wordsets[0];
             bee.storage.players[bee.player].wordsets = wordsets[1];
-            save_storage();
+            save_storage('modify_wordlist');
             init_wordlist();
             new_question();
         }
@@ -733,7 +734,7 @@
                     if(!bee.storage.players[bee.player]) {
                         const wordsets = choose_wordsets();
                         bee.storage.players[bee.player] = {'score': 0, 'min_wordset': wordsets[0], 'wordsets': wordsets[1]};
-                        save_storage();
+                        save_storage('init');
                     } else {
                         alert("That player already exists. Loading player data");
                     }

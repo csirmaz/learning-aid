@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?58">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?70">
 
     <style>
     
@@ -72,7 +72,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?58"></script>
+    <script src="assets/local/beelocal.js?70"></script>
 </head>
 <body>
     <div class="container">
@@ -139,6 +139,7 @@
 
     </div>
     <p class="smallprint">
+    v<span class="d_version"></span>
     Player: <span class="d_player"></span>
     | Problem range: <span class="d_wordsets"></span>
     | <span class="handle">Licences</span>
@@ -303,8 +304,8 @@
             bee.storage = JSON.parse(localStorage.count);
         }
 
-        function save_storage() {
-            console.log("Saving storage");
+        function save_storage(msg) {
+            console.log("Saving storage", msg);
             localStorage.count = JSON.stringify(bee.storage);
         }
 
@@ -317,7 +318,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?58"></script>
+    <script src="assets/common.js?70"></script>
     <script>
 
         
