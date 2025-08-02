@@ -127,7 +127,8 @@
     <script>
     
         // Words, split into sets
-        // Format: ['<emoji>', '<word to spell>']
+        // Format: ['{emoji}', '{word to spell}'], or
+        //         ['{emoji}', '{phrase with > before every character to type}']   (e.g. ['*', 'Look! A >s>t>a>r!'])
         // Use e.g. https://getemoji.com/
 
         // The page will attempt to play assets/sounds/words/<word to spell>.mp3 (lowercased and spaces replaced by underscores)
@@ -343,10 +344,12 @@
                 ['😎', 'expert'],
                 ['🏤', 'post office'],
                 ['📉', 'going down'],
-                ['🪤', 'Careful It is a trap'],
-                ['💇🏾‍♂️', 'Adam needs a haircut'],
+                ['🪤', 'Careful! It is a >t>r>a>p!'],
+                ['🪤', '>C>a>r>e>f>u>l! It is a trap!'],
+                ['💇🏾‍♂️', 'Adam needs a >h>a>i>r>c>u>t.'],
                 ['🛣', 'motorway'],
-                ['🎂', 'It is my birthday'],
+                ['🎂', 'It is my >b>i>r>t>h>d>a>y!'],
+                ['🎂', '>I>t> >i>s> >m>y birthday!'],
                 ['🗓️', 'year'],
             ],
         ];
@@ -359,6 +362,7 @@
             word_ix: false,
             can_type: false,
             typed: '',
+            processed_word: false,
             can_use_help: true,
             help_timeout: false,
             score_anim_timeout: false,
@@ -374,7 +378,7 @@
             word_audio_timeout: false,
             score_goal: 20,  // controls the bar under the score and gifts
         };
-        
+
         // Try to load data
         if(localStorage.spellbee) {
             bee.storage = JSON.parse(localStorage.spellbee);
@@ -389,48 +393,52 @@
     </script>
     <script src="assets/common.js?70"></script>
     <script>
+    
+        /* EXPLANATION OF TYPED, TO_TYPE, etc.
         
-        // Display target word briefly
-        function show_help(is_initial) {
-            console.log("Disabling help");
-            bee.can_use_help = false;
-            if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); }
-
-            bee.can_type = false;
-            bee.$input.hide();
+            word = ['o', 'pear']
+            bee.processed_word = {to_type: 'pear', to_display: 'pear', mask: false}
+        
+            word = ['o', 'I eat >a>p>p>l>e.']
+            bee.processed_word = {to_type: 'apple', to_display: 'I eat apple.', mask: '******_____*'}
             
-            if(!is_initial) { 
-                bee.$helpwait.show(); // show a loading animation
-                bee.help_asked++;
-            }
+            bee.typed = 'ap'
+            Display: "I eat ap___."
+        */
 
-            setTimeout(function() {
-                bee.$helpwait.hide();
-                bee.$help.show();
-                setTimeout(function() {
-                    play_word(words[bee.word_ix][1]);
-                    const help_duration = 1200 + words[bee.word_ix][1].length * 400; // help duration (this plus the initial wait below)
-                    console.log("Help duration", help_duration);
-                    bee.$help.fadeOut({duration: help_duration, complete: function() {
-                        bee.$input.show();
-                        bee.can_type = true;
-                        
-                        console.log("Scheduling enabling help");
-                        bee.help_timeout = setTimeout(function(){ 
-                            console.log("Enabling help");
-                            bee.can_use_help = true;
-                            bee.help_timeout = false;
-                        }, 4000); // time to enable help again - minus the duration of the help!
-                    }});
-                }, 600); // initial wait while showing the word (before TTS)
-            }, is_initial ? 0 : 1800); // duration of the loading animation
+        // Extract the to_type string from a word entry
+        function get_processed_word(word_ix) {
+            if(words[word_ix][1].indexOf('>') == -1) { 
+                return {'to_type': words[word_ix][1], 'to_display': words[word_ix][1], 'mask': false}; 
+            }
+            let to_type_str = '';
+            let to_disp_str = '';
+            let mask_str = '';
+            const full = words[word_ix][1];
+            let ttype = false;
+            for(let i=0; i<full.length; i++) {
+                if(full[i] == '>') { ttype = true; continue; }
+                if(ttype) { 
+                    to_type_str += full[i]; 
+                    to_disp_str += full[i];
+                    mask_str += '_';
+                    ttype = false; 
+                    continue; 
+                } else {
+                    to_disp_str += full[i];
+                    mask_str += '*';
+                }
+            }
+            return {'to_type': to_type_str, 'to_display': to_disp_str, 'mask': mask_str};
         }
-        
+
         
         // Render a typed input into HTML. prefix=what is typed, s=full string
-        function typed_to_html(prefix, s) {
+        function render_to_html(for_help) {
             const line_length = 17; // word wrap after this many characters
-
+    
+            const s = bee.processed_word.to_display;
+            
             // The aim is to leave the underscores in place, so we word
             // wrap according to the target string
             const wrap_at = {};
@@ -460,17 +468,39 @@
             // console.log(wrap_at);
             
             let o = '';
-            for(let i=0; i<prefix.length; i++) {
-                const wrongchar = (prefix[i].toLowerCase() != s[i].toLowerCase());
-                if(wrongchar) { o += '<span class="wrongchar">'; }
-                o += (prefix[i] == ' ' ? '&nbsp;' : esc_html(prefix[i]));
-                if(wrongchar) { o += '</span>'; }
-                if(wrap_at[i]) { o += '<br>'; }
-            }
-            o += '<span class="cursor"></span>';
-            for(let i=prefix.length; i<s.length; i++) {
-                if(s[i] == ' ') { o += '<span class="spacehelp">_</span>'; } else { o += '_'; }
-                if(wrap_at[i]) { o += '<br>'; }
+            let typed_ix = 0;
+            for(let i=0; i<s.length; i++) {
+                const totype = (bee.processed_word.mask === false || bee.processed_word.mask[i] == '_'); // whether the character is to be typed
+                
+                if(for_help) { // We are rendering the help string
+                
+                    // possibly we can use totype to highlight what needs to be typed
+                    o += (s[i] == ' ' ? '&nbsp;' : esc_html(s[i]));
+                    if(wrap_at[i]) { o += '<br>'; }
+                    
+                } else { // We are rendering what the user entered, plus surrounding phrase
+                
+                    if(totype) { // We are in the area that should be typed
+                        if(typed_ix < bee.typed.length) { // The user typed this much
+                            const userchar = bee.typed[typed_ix];
+                            const wrongchar = (s[i].toLowerCase() != userchar.toLowerCase());
+                            if(wrongchar) { o += '<span class="wrongchar">'; }
+                            o += (userchar == ' ' ? '&nbsp;' : esc_html(userchar));
+                            if(wrongchar) { o += '</span>'; }
+                            if(wrap_at[i]) { o += '<br>'; }
+                            if(typed_ix == bee.typed.length - 1) { o += '<span class="cursor"></span>'; } // add cursor after last char typed
+                        } else { // The user is still to type this
+                            if(typed_ix == 0) { o += '<span class="cursor"></span>'; } // add cursor at beginning if no char typed
+                            o += (s[i] == ' ' ? '<span class="spacehelp">_</span>' : '_');
+                            if(wrap_at[i]) { o += '<br>'; }
+                        }
+                        typed_ix++;
+                    } else { // This does not need to be typed
+                        o += (s[i] == ' ' ? '&nbsp;' : esc_html(s[i]));
+                        if(wrap_at[i]) { o += '<br>'; }
+                    }
+                
+                }
             }
             return o;
         }
@@ -478,10 +508,49 @@
         
         // Render the typing and underscores
         function update_input_field() {
-            bee.$input.html(typed_to_html(bee.typed, words[bee.word_ix][1]));
+            bee.$input.html(render_to_html(false));
         }
 
+
+        // Display target word briefly
+        function show_help(is_initial) {
+            console.log("Disabling help");
+            bee.can_use_help = false;
+            if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); }
+
+            bee.can_type = false;
+            bee.$input.hide();
+            
+            if(!is_initial) { 
+                bee.$helpwait.show(); // show a loading animation
+                bee.help_asked++;
+            }
+            
+            const help_duration_loading = 1800; // duration of the loading animation
+            const help_duration_1 = 800 + bee.processed_word.to_display.length * 200; // full color
+            const help_duration_2 = 1500; // fading
+            const help_duration_enable = 4000; // time to enable help again
+
+            setTimeout(function() {
+                bee.$helpwait.hide();
+                bee.$help.show();
+                play_word(bee.processed_word.to_display);
+                setTimeout(function() {
+                    bee.$help.fadeOut({duration: help_duration_2, complete: function() {
+                        bee.$input.show();
+                        bee.can_type = true;
+                        console.log("Scheduling enabling help");
+                        bee.help_timeout = setTimeout(function(){ 
+                            console.log("Enabling help");
+                            bee.can_use_help = true;
+                            bee.help_timeout = false;
+                        }, help_duration_enable);
+                    }});
+                }, help_duration_1); // initial wait while showing the word
+            }, is_initial ? 0 : help_duration_loading);
+        }
         
+                
         // Mark a word as known, and count how many times it was successfully entered
         // A word is known if it could be typed without help
         function add_known_word(word) {
@@ -541,11 +610,11 @@
             
             if((event.keyCode >= 65 && event.keyCode <= 90) || event.keyCode == 32) { // a-z, space
                 if(!bee.can_type) { playme('notavail'); return; }
-                if(bee.typed.length < words[bee.word_ix][1].length) {
+                if(bee.typed.length < bee.processed_word.to_type.length) {
                     bee.typed += event.key;
                     update_input_field();
                     
-                    if(bee.typed.toLowerCase() == words[bee.word_ix][1].toLowerCase()) { // Success!
+                    if(bee.typed.toLowerCase() == bee.processed_word.to_type.toLowerCase()) { // Success!
                         bee.can_type = false;
                         store_question(undefined);
                         bee.$input.addClass('success');
@@ -581,7 +650,7 @@
             
             if(event.keyCode == 50) {
                 if(!bee.can_type) { playme('notavail'); return false; }
-                play_word(words[bee.word_ix][1]);
+                play_word(bee.processed_word.to_display);
                 return false;
             }
             
@@ -608,8 +677,9 @@
             bee.$image.html(esc_html(emoji));
             
             // Add help & input
-            bee.$help.html(typed_to_html(words[word_ix][1], words[word_ix][1]));
             bee.typed = '';
+            bee.processed_word = get_processed_word(word_ix);
+            bee.$help.html(render_to_html(true));
             bee.help_asked = 0;
             update_input_field();
             bee.$input.removeClass('success');
