@@ -9,6 +9,10 @@ Feel free to edit the code (vanilla JavaScript) to fit your needs or use the com
 - Spelling: https://csirmaz.github.io/learning-aid/spellbee.html (for a device with a physical keyboard)
 - Arithmetic: https://csirmaz.github.io/learning-aid/count.html (compatible with touchscreens & mobiles)
 
+![screenshot](https://raw.github.com/csirmaz/learning-aid/master/assets/spell-sample.jpg)
+
+![screenshot](https://raw.github.com/csirmaz/learning-aid/master/assets/count-sample.jpg)
+
 ## Common features
 
 - Simple technologies (CSS, JS, jQuery)
