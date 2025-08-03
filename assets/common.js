@@ -223,6 +223,7 @@
         }
         
         
+        // The lifetime score tracks coins awarded since the user was created; used by the gift system
         function init_lifetime_score() {
             if(bee.player === false) { return; }
             if(bee.storage.players[bee.player].lifetime_score === undefined) {
