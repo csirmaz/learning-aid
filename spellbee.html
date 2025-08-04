@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?72">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?73">
 
     <style>
     
@@ -71,7 +71,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?72"></script>
+    <script src="assets/local/beelocal.js?73"></script>
 </head>
 <body>
     <div class="container">
@@ -138,31 +138,38 @@
         const word_sets = [
             [ // Word set 0
                 ['📦', 'box'],
+                ['🐈‍', 'cat'],
                 ['🍱', 'food'],
                 ['🔥', 'hot'],
+                ['🖊️', 'pen'],      
                 ['🟥', 'red'],
+                ['🌹', '>r>e>d rose'],
                 ['🏊', 'swim'],
+                ['🌳', 'tree'],
             ],
             [ // Word set 1
                 ['🛌', 'bed'],
                 ['🐄', 'cow'],
                 ['🥁', 'drum'],
                 ['🏋️', 'gym'],
+                //['🏨', 'hotel'],
+                ['🏨', 'Sleep in a >h>o>t>e>l'],
                 ['🥝', 'kiwi'],
                 ['🪺', 'nest'],
                 ['🍝', 'pasta'],
-                ['📌', 'pin'],      
+                ['📌', 'pin'],
+                ['💍', 'ring'],
                 ['🦈', 'shark'],
                 ['🐍', 'snake'],
+                // ['🎾', 'tennis'],
+                ['🎾', 'play >t>e>n>n>i>s'],
                 ['⛺️', 'tent'],
             ],
             [ // Word set 2
-                ['🖊️', 'pen'],      
                 ['🥚', 'egg'],      
                 ['👜', 'bag'],
                 ['🏃🏻‍♂️‍➡️', 'run'],
                 ['🐖', 'pig'],
-                ['🐈‍', 'cat'],
                 //['🥛', 'milk'],
                 ['🥛', 'I drink >m>i>l>k'],
                 ['🖐️', 'hand'],
@@ -187,12 +194,10 @@
                 ['❄️', 'snow'],
                 ['🪨', 'rock'],
                 ['🔒', 'lock'],
-                ['💍', 'ring'],
                 // ['🔔', 'bell'],
                 ['🔔', 'ring the >b>e>l>l'],
                 ['🔔', '>r>i>n>g the bell'],
                 ['🐑', 'sheep'],
-                ['🌳', 'tree'],
                 ['🍋', 'lemon'],
                 //['⛳️', 'golf'],
                 ['⛳️', '>p>l>a>y golf'],
@@ -204,8 +209,6 @@
                 ['🪽', 'wing'],
                 // ['😀', 'happy'],
                 ['😀', 'I am >h>a>p>p>y'],
-                // ['🎾', 'tennis'],
-                ['🎾', 'play >t>e>n>n>i>s'],
             ],
             [ // Word set 4
                 ['👃🏻', 'nose'],
@@ -239,7 +242,6 @@
                 //['🍬', 'candy'],
                 ['🍬', 'sweet >c>a>n>d>y'],
                 // ['🌹', 'rose'],
-                ['🌹', '>r>e>d rose'],
                 ['🌹', 'red >r>o>s>e'],
                 ['🐇', 'rabbit'],
                 ['🚂', 'train'],
@@ -261,8 +263,6 @@
                 ['⬛️', 'black'],
                 ['🟩', 'green'],
                 ['🏫', 'school'],
-                //['🏨', 'hotel'],
-                ['🏨', 'Sleep in a >h>o>t>e>l'],
                 //['🌃', 'night'],
                 ['🌃', 'Good >n>i>g>h>t!'],
                 ['🏞️', 'river'],
@@ -287,7 +287,7 @@
                 ['😢', 'cry'],
                 ['👶', 'baby'],
                 //['👑', 'crown'],
-                ['👑', 'The king\'s crown'],
+                ['👑', 'The king\'s >c>r>o>w>n'],
                 ['🧦', 'socks'],
                 //['🦶', 'foot'],
                 ['🦶', 'smelly >f>o>o>t'],
@@ -363,7 +363,7 @@
                 ['👨🏻‍🍼', 'feeding the baby'],
                 // ['🛀🏾', 'having a bath'],
                 ['🛀🏾', 'I am >h>a>v>i>n>g a bath.'],
-                ['🛀🏾', 'I am having a >b>a>t>h'],
+                ['🛀🏾', 'I am having a >b>a>t>h.'],
                 ['🍟', 'I want >c>h>i>p>s!'],
                 ['🍟', '>I> >w>a>n>t chips!'],
                 ['🚻', '>W>h>e>r>e is the toilet?'],
@@ -481,7 +481,7 @@
 
 
     </script>
-    <script src="assets/common.js?72"></script>
+    <script src="assets/common.js?73"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
@@ -715,7 +715,7 @@
                         }
                         
                         if(typeof(bee_local) !== 'undefined' && bee_local.success_hook) {
-                            bee_local.success_hook(bee.word_ix, words[bee.word_ix][1], bee.player, bee.help_asked);
+                            bee_local.success_hook(bee.word_ix, words[bee.word_ix][1], bee.player, bee.help_asked, -1);
                         }
                     }
                 }
