@@ -454,13 +454,13 @@
             
             // periodic celebration
             
-            // score:    0  4  8 12 16 20 24 28 32 36 40     (4)
-            // period_ix 0  1  2  3  4  5  6  7  8  9 10
-            //                 B     b  L     B     b  L      B=bigger b=bigger at rnd  L=level complete
+            // score:    0  4  8 12 16 20 24 28 32 36 40 ...     (celebrate_period=4, e.g. score_goal=20)
+            // period_ix 0  1  2  3  4  5  6  7  8  9 10 ...
+            //                 B     b  L     B     b  L ...      B=bigger b=bigger at rnd  L=level complete
             
-            // score     0  5 10 15 20 25 30 35 40 45 50 55 60  (5)
-            // period_ix 0  1  2  3  4  5  6  7  8  9 10 11 12
-            //                 B     B     L     B     B     L
+            // score     0  5 10 15 20 25 30 35 40 45 50 55 60 ...  (celebrate_period=5, e.g. score_goal=30)
+            // period_ix 0  1  2  3  4  5  6  7  8  9 10 11 12 ...
+            //                 B     B     L     B     B     L ...
             
             
             const period_ix = Math.floor(score / celebrate_period);
