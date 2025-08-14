@@ -6,8 +6,8 @@ Feel free to edit the code (vanilla JavaScript) to fit your needs or use the com
 
 ## Pages
 
-- Spelling: https://csirmaz.github.io/learning-aid/spellbee.html (for a device with a physical keyboard)
-- Arithmetic: https://csirmaz.github.io/learning-aid/count.html (compatible with touchscreens & mobiles)
+- Spelling: https://csirmaz.codeberg.page/learning-aid/@main/spellbee.html (for a device with a physical keyboard)
+- Arithmetic: https://csirmaz.codeberg.page/learning-aid/@main/count.html (compatible with touchscreens & mobiles)
 
 ![screenshot](https://www.postminart.com/cdn/spell-sample.jpg)
 
