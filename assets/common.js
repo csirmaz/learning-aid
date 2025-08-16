@@ -1,5 +1,5 @@
 
-        const bee_app_version = 73;
+        const bee_app_version = 81;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -417,12 +417,12 @@
         }
         
         
-        function success_common() {
+        function success_common(fast_to_next_question) {
             const score = add_score();
-            const new_next_gift_at = decide_gift(); // precede update_score_ui to update remaining-to-gift display
+            const new_next_gift_at = decide_gift(); // precede update_score_ui() to update remaining-to-gift display
             update_score_ui();
 
-            // level complete logic
+            // level complete logic (see "L" below)
             if(score % bee.score_goal == 0) {
                 play_rnd_sound('level_complete');
                 bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 300}).then(
@@ -432,7 +432,7 @@
                 return;
             }
             
-            // check if gift is due
+            // check if gift is due (not represented in the chart)
             if(new_next_gift_at !== false) {
                 bee.storage.players[bee.player].next_gift_at = new_next_gift_at;
                 save_storage('success_common>gift');
@@ -444,25 +444,38 @@
                 return;
             }
             
-            // default logic to go to next question
+            // default logic to go to next question (no periodic celebration - see "x" below)
             const celebrate_period = (bee.score_goal < 30 ? 4 : 5);
             if(score % celebrate_period > 0) {
-                play_success_sound();
-                setTimeout(new_question, 2700);
+                if(fast_to_next_question) {
+                    setTimeout(new_question, 700);
+                }
+                else {
+                    play_success_sound();
+                    setTimeout(new_question, 2700);
+                }
                 return;
             }
             
-            // periodic celebration
+            /*
+             *   celebrate_period=4, for example when score_goal=20
+             *                              1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2
+             *   score: 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8
+             *            x x x p x x x p x x x p x x x p x x x L x x x p x x x p
+             *   period_ix:     1       2       3       4       5       6       7
+             *   bigger:                B               b       L               B     (B=always bigger, b=bigger at random)
+             * 
+             * 
+             *   celebrate_period=5, for examle when score_goal=30
+             *                              1 1 1 1 1 1 1 1 1 1 2 2 2 2 2 2 2 2 2 2 3 3 3 3 3 3 3 3 3 3 3
+             *   score: 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0
+             *            x x x x p x x x x p x x x x p x x x x p x x x x p x x x x L x x x x p x x x x p
+             *   period_ix:       1         2         3         4         5         6         7         8
+             *   bigger:                    B                   B                   L                   B
+             */
             
-            // score:    0  4  8 12 16 20 24 28 32 36 40 ...     (celebrate_period=4, e.g. score_goal=20)
-            // period_ix 0  1  2  3  4  5  6  7  8  9 10 ...
-            //                 B     b  L     B     b  L ...      B=bigger b=bigger at rnd  L=level complete
-            
-            // score     0  5 10 15 20 25 30 35 40 45 50 55 60 ...  (celebrate_period=5, e.g. score_goal=30)
-            // period_ix 0  1  2  3  4  5  6  7  8  9 10 11 12 ...
-            //                 B     B     L     B     B     L ...
-            
-            
+            // periodic celebration (see "p", "B", "b")
+                        
             const period_ix = Math.floor(score / celebrate_period);
             const periods_in_level = Math.floor(bee.score_goal / celebrate_period);
             const period_ix_lev = (period_ix % periods_in_level);
@@ -472,11 +485,89 @@
             if(celebrate_period == 5 && period_ix_lev == 4) { bigger = true; }
             if(celebrate_period == 4 && period_ix_lev == 4 && Math.random() <= .7) { bigger = true; }
             play_success_sound();
-            if((!bigger) || play_video(new_question)) {
+            if((!bigger) || play_video(new_question)) { // if `bigger`, bigger periodic celebration, see "B"
+                // smaller periodic celebration, including when video is not available - see "p"
                 show_animation(function() { setTimeout(new_question, 1100); });
             }
             return;
         }
+        
+        
+        // text-to-speech support
+        const bee_tts = {
+            status: 'init', // 'init' | 'ready' | 'fail'
+            voice: false,  // selected voice
+            voice_points: -1,  // scoring to select voice
+            synth: window.speechSynthesis,
+            init_trials: 6
+        };
+        
+        bee_tts.initialize = function() {
+            if(!bee_tts.synth) {
+                console.log("TTS failed (not available)");
+                bee_tts.status = 'fail';
+                return;
+            }
+            bee_tts.init_trials--;
+            if(bee_tts.init_trials <= 0) {
+                console.log("TTS init failed (after tries)");
+                bee_tts.status = 'fail';
+                return;
+            }
+            console.log("TTS init, trial=", bee_tts.init_trials);
+            try {
+                const voices = bee_tts.synth.getVoices();
+                if(!voices.length) {
+                    setTimeout(bee_tts.initialize, 1000);
+                    return;
+                }
+                for (const voice of voices) {
+                    let p = 0;
+                    if(voice.lang.startsWith('en')) { p += 100; }
+                    if(voice.lang.toLowerCase().endsWith('gb')) { p += 2; }
+                    if(voice.name.indexOf('female') != -1) { p += 1; }
+                    if(voice.localService) { p += 5; }
+                    if(p > bee_tts.voice_points) { bee_tts.voice_points = p; bee_tts.voice = voice; }
+                }
+                if(bee_tts.voice_points < 100) {
+                    console.log("TTS init failed (no English voice)");
+                    bee_tts.status = 'fail';
+                    return;
+                }
+                console.log("TTS ready - selected voice", bee_tts.voice);
+                bee_tts.status = 'ready';
+                return;
+            } catch(e) {
+                console.log("TTS init: error", e);
+                bee_tts.status = 'fail';
+                return;                
+            }
+        };
+        
+        // Speak an utterance. Returns true if utterance is being spoken; then callback() will be called on end.
+        bee_tts.speak = function(s, callback) {
+            if(bee_tts.status != 'ready') {
+                console.log("TTS speak: not ready");
+                return false;
+            }
+            try {
+                const utterThis = new SpeechSynthesisUtterance(s);
+                utterThis.voice = bee_tts.voice;
+                //utterThis.pitch = pitch.value;
+                //utterThis.rate = rate.value;
+                if(callback) {
+                    utterThis.addEventListener('end', callback);
+                    utterThis.addEventListener('error', callback);
+                }
+                bee_tts.synth.speak(utterThis);
+                return true;
+            } catch(e) {
+                console.log("TTS speach error", e);
+                return false;
+            }
+        };
+        
+        setTimeout(bee_tts.initialize, 500);
         
 
         const licences = `

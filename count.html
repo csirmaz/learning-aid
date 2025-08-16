@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?73">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?81">
 
     <style>
     
@@ -80,7 +80,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?73"></script>
+    <script src="assets/local/beelocal.js?81"></script>
 </head>
 <body>
     <div class="container">
@@ -154,6 +154,7 @@
     <span class="expand"></span> 
     | Icons by <a href="https://icons8.com">Icons8</a>
     | <a href="https://github.com/csirmaz/learning-aid">Codebase</a>
+    | <a href="#" onclick="bee_tts.speak('This is what text to speach sounds like: '+Math.floor(Math.random()*100), function(){ alert(bee_tts.voice.name+' '+bee_tts.voice.lang+' '+bee_tts.voice.localService); }); return false">TTS</a>
     | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
     | <a href="#" onclick="modify_problemset(); return false">Update problem range</a>
     | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
@@ -180,16 +181,27 @@
         const PRBL = {
             add_to_five: function() {  // e.g. 2+?=[5]
                 const v = RND(0, 5);
-                return {problem: v+'+?=5', placeholder: true, solution:(5-v), hint:{range:[1,5,1,v]}};
+                return {problem: v+'+?=5', placeholder: true, solution:(5-v), hint: {
+                    speak_prompt: v+' plus what is five?',
+                    speak_solution: 'Yes, '+v+' plus '+(5-v)+' is five.',
+                    range: [1,5,1,v]
+                }};
             },
             add_to_ten: function() {  // e.g. 7+?=[10]
                 const v = RND(0, 10);
-                return {problem: v+'+?=10', placeholder: true, solution:(10-v), hint:{range:[1,10,1,v]}};
+                return {problem: v+'+?=10', placeholder: true, solution:(10-v), hint:{
+                    speak_prompt: v+' plus what is ten?',
+                    speak_solution: 'Yes, '+v+' plus '+(10-v)+' is ten.',
+                    range:[1,10,1,v]
+                }};
             },
             add_small: function() {  // e.g. 3+8=
                 const a = RND(0, 10);
                 const b = RND(0, 10);
-                return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[1,20,1,a]}};
+                return {problem: a+'+'+b+'=', solution:(a+b), hint:{
+                    speak_solution: 'Yes, '+a+' plus '+b+' is '+(a+b)+'.',
+                    range:[1,20,1,a]
+                }};
             },
             add_mid: function() {  // e.g. 13+8=
                 const a = RND(0, 10) + 10;
@@ -199,7 +211,11 @@
             add_hundreds: function () {  // e.g. 500+700=
                 const a = RND(1, 10) * 100;
                 const b = RND(1, 10) * 100;
-                return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[100,20*100,100,a,100]}};
+                return {problem: a+'+'+b+'=', solution:(a+b), hint:{
+                    speak_prompt: 'What is '+a+' plus '+b+'?',
+                    speak_solution: 'Yes, '+a+' plus '+b+' is '+(a+b)+'.',
+                    range:[100,20*100,100,a,100]
+                }};
             },
             sub_five: function() {  // e.g. [5]-3=
                 const v = RND(0, 5);
@@ -262,23 +278,43 @@
             multiply: function() { // e.g. 3x6=
                 const a = RND(0, 12);
                 const b = RND(0, 12);
-                return {problem: a+'*'+b+'=', solution:(a*b), hint:{range:[0,a*12,a*10,a*10,a]}}; 
+                return {problem: a+'*'+b+'=', solution:(a*b), hint:{
+                    speak_prompt: 'What is '+a+' times '+b+'?',
+                    speak_solution: 'Yes, '+a+' times '+b+' is '+(a*b),
+                    range:[0,a*12,a*10,a*10,a]
+                }}; 
             },
             halving: function() { // e.g. 10/2=
                 const a = RND(0, 12);
-                return {problem: a+'/2=', solution:(a/2), hint:{range:[1,a,-1,-1]}};
+                return {problem: a+'/2=', solution:(a/2), hint:{
+                    speak_prompt: 'What is half of '+a+'?',
+                    speak_solution: 'Yes, '+a+' divided by two is '+(a/2)+'.',
+                    range:[1,a,-1,-1]
+                }};
             },
             halving_whole_ph: function() {  // e.g. ?x[2]=8
                 const a = RND(1, 6)*2;
-                return {problem: '?*2='+a, placeholder: true, solution:(a/2), hint:{range:[1,a,-1,-1]}};
+                return {problem: '?*2='+a, placeholder: true, solution:(a/2), hint:{
+                    speak_prompt: 'What taken twice is '+a+'?',
+                    speak_solution: 'Yes, '+(a/2)+' times two is '+a,
+                    range:[1,a,-1,-1]
+                }};
             },
             third_whole_ph: function() {  // e.g. ?x[3]=9
                 const a = RND(1, 4)*3;
-                return {problem: '?*3='+a, placeholder: true, solution:(a/3), hint:{range:[1,a,-1,-1]}};
+                return {problem: '?*3='+a, placeholder: true, solution:(a/3), hint:{
+                    speak_prompt: 'What taken three times is '+a+'?',
+                    speak_solution: 'Yes, '+(a/3)+' times three is '+a,
+                    range:[1,a,-1,-1]
+                }};
             },
             fifth_whole_ph: function() {  // e.g. ?x[5]=25
                 const a = RND(1, 5)*5;
-                return {problem: '?*5='+a, placeholder: true, solution:(a/5), hint:{range:[1,a,-1,-1]}};
+                return {problem: '?*5='+a, placeholder: true, solution:(a/5), hint:{
+                    speak_prompt: 'What taken five times is '+a+'?',
+                    speak_solution: 'Yes, '+(a/5)+' times five is '+a,
+                    range:[1,a,-1,-1]
+                }};
             },
         };
 
@@ -295,7 +331,7 @@
                 [PRBL.add_hundreds, 10],
                 [PRBL.halving, 10],
                 [PRBL.halving_whole_ph, 10],
-                [PRBL.third_whole_ph, 5],
+                // [PRBL.third_whole_ph, 5],
             ],
             1: [
                 [PRBL.add_to_five, 1],
@@ -353,7 +389,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?73"></script>
+    <script src="assets/common.js?81"></script>
     <script>
 
         
@@ -398,6 +434,9 @@
                     $('.hintloader').hide();
                     $('.hint').show();
                 }, 100); // allow rendering
+                
+                if(data.speak_prompt) { bee_tts.speak(data.speak_prompt); }
+                
                 bee.can_type = true;
             }, 3000); // hint wait time
         }
@@ -451,7 +490,14 @@
                 if((value - 0) == bee.problem.solution) { // Success!
                     bee.can_type = false;
                     $('.prompt').addClass('success');
-                    success_common();
+                    if(!(bee.problem.hint 
+                        && bee.problem.hint.speak_solution
+                        && bee_tts.speak(bee.problem.hint.speak_solution, function() {
+                            success_common(true); // true = move fast to next question
+                        })
+                    )) {
+                        success_common();
+                    }
                 }
                 return false;
             }
@@ -523,6 +569,7 @@
             bee.can_type = true;
             
             $('.problem').html(format_problem(bee.problem.problem));
+            if(bee.problem.hint && bee.problem.hint.speak_prompt) { bee_tts.speak(bee.problem.hint.speak_prompt); }
             
             // Add help & input
             bee.typed = '';
