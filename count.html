@@ -34,6 +34,8 @@
             font-style: italic;
         }
         
+        .op { display: inline-block; padding: 0 .4rem; }        
+        .cmpop { display: inline-block; padding: 0 .8rem; }
 
         .keypad td {
             border-top: .5rem solid #d5d;
@@ -92,7 +94,7 @@
         <div class="game prompt">
             <div class="infield">
                 <div class="problem"></div>
-                <div><span class="prompticon"></span><span class="prompticonsuccess"></span> <span class="prompt-ph"><span class="ph">a</span>=</span><span class="inp"></span></div>
+                <div><span class="prompticon"></span><span class="prompticonsuccess"></span> <span class="prompt-ph"><span class="ph">a</span><span class="cmpop">=</span></span><span class="inp"></span></div>
             </div>
             <div class="hintwrap">
                 <div class="hintloader"><img src="assets/images/loader.gif"></div>
@@ -164,13 +166,12 @@
     
         const max_problemset = 1;
         const MAX_INPUT = 6;
-        const PL = '<span class="ph">a</span>'; // placeholder
         const HALF = '½';
         
         function RND(min, max) { return min + Math.floor(Math.random() * (max + 1 - min)); } // inclusive
         
         /* Problem generators, returning {
-                problem:STR,  // use '?' for the placeholder; '*' for multiplication, '/' for division
+                problem:STR,  // use '?' for the placeholder; '*' for multiplication, '/' for division. See format_problem()
                 solution:STR, 
                 hint:OBJ,
                 [placeholder:true]  // add if the question has a variable/placeholder
@@ -179,11 +180,11 @@
         const PRBL = {
             add_to_five: function() {  // e.g. 2+?=[5]
                 const v = RND(0, 5);
-                return {problem: v+'+'+PL+'=5', placeholder: true, solution:(5-v), hint:{range:[1,5,1,v]}};
+                return {problem: v+'+?=5', placeholder: true, solution:(5-v), hint:{range:[1,5,1,v]}};
             },
             add_to_ten: function() {  // e.g. 7+?=[10]
                 const v = RND(0, 10);
-                return {problem: v+'+'+PL+'=10', placeholder: true, solution:(10-v), hint:{range:[1,10,1,v]}};
+                return {problem: v+'+?=10', placeholder: true, solution:(10-v), hint:{range:[1,10,1,v]}};
             },
             add_small: function() {  // e.g. 3+8=
                 const a = RND(0, 10);
@@ -261,23 +262,23 @@
             multiply: function() { // e.g. 3x6=
                 const a = RND(0, 12);
                 const b = RND(0, 12);
-                return {problem: a+'x'+b+'=', solution:(a*b), hint:{range:[0,a*12,a*10,a*10,a]}}; 
+                return {problem: a+'*'+b+'=', solution:(a*b), hint:{range:[0,a*12,a*10,a*10,a]}}; 
             },
             halving: function() { // e.g. 10/2=
                 const a = RND(0, 12);
-                return {problem: a+'÷2=', solution:(a/2), hint:{range:[1,a,-1,-1]}};
+                return {problem: a+'/2=', solution:(a/2), hint:{range:[1,a,-1,-1]}};
             },
             halving_whole_ph: function() {  // e.g. ?x[2]=8
                 const a = RND(1, 6)*2;
-                return {problem: PL+'x2='+a, placeholder: true, solution:(a/2), hint:{range:[1,a,-1,-1]}};
+                return {problem: '?*2='+a, placeholder: true, solution:(a/2), hint:{range:[1,a,-1,-1]}};
             },
             third_whole_ph: function() {  // e.g. ?x[3]=9
                 const a = RND(1, 4)*3;
-                return {problem: PL+'x3='+a, placeholder: true, solution:(a/3), hint:{range:[1,a,-1,-1]}};
+                return {problem: '?*3='+a, placeholder: true, solution:(a/3), hint:{range:[1,a,-1,-1]}};
             },
             fifth_whole_ph: function() {  // e.g. ?x[5]=25
                 const a = RND(1, 5)*5;
-                return {problem: PL+'x5='+a, placeholder: true, solution:(a/5), hint:{range:[1,a,-1,-1]}};
+                return {problem: '?*5='+a, placeholder: true, solution:(a/5), hint:{range:[1,a,-1,-1]}};
             },
         };
 
@@ -489,13 +490,39 @@
             }
             // console.log("key", event);
         }
+        
+        
+        // Format the problem string
+        function format_problem(p) {
+            const PL = '<span class="ph">a</span>'; // placeholder
+            const DIV = '÷';
+            const MULT = 'x';
+            p = p.replace('&', '`a&amp;`b');
+            p = p.replace('>', '`c&gt;`d');
+            p = p.replace('<', '`c&lt;`d');
+            p = p.replace('?', '`p');
+            p = p.replace('/', '`a'+DIV+'`b');
+            p = p.replace('*', '`a'+MULT+'`b');
+            p = p.replace('+', '`a+`b');
+            p = p.replace('-', '`a-`b');
+            p = p.replace('=', '`c=`d');
+            // placeholder
+            p = p.replace('`p', PL);
+            // operators
+            p = p.replace('`a', '<span class="op">');
+            p = p.replace('`b', '</span>');
+            // comparison operators
+            p = p.replace('`c', '<span class="cmpop">');
+            p = p.replace('`d', '</span>');
+            return p;
+        }
 
         
         // Initialize a question
         function start_question() {
             bee.can_type = true;
             
-            $('.problem').html(bee.problem.problem);
+            $('.problem').html(format_problem(bee.problem.problem));
             
             // Add help & input
             bee.typed = '';
