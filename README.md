@@ -16,7 +16,7 @@ Feel free to edit the code (vanilla JavaScript) to fit your needs or use the com
 ## Common features
 
 - Simple technologies (CSS, JS, jQuery)
-- Consists of static files, serve from any simple webserver or directly from GitHub
+- Consists of static files, serve from any simple webserver or directly from Codeberg
 - Scoring system
 - Multiple types of rewards
     - Positive sound & animation feedback after every solution
@@ -24,6 +24,7 @@ Feel free to edit the code (vanilla JavaScript) to fit your needs or use the com
     - Video clips shown as reward (supply your clips)
     - "Level complete" reward
     - Gifts (stickers) awarded about every two levels; list view and exchange stickers
+- Text-to-speech support, reads out math problems for reinforcement
 - Audio playback tools
 - Video overlay tools
 
