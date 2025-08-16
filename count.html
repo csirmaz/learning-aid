@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?81">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?83">
 
     <style>
     
@@ -80,7 +80,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?81"></script>
+    <script src="assets/local/beelocal.js?83"></script>
 </head>
 <body>
     <div class="container">
@@ -171,6 +171,19 @@
         
         function RND(min, max) { return min + Math.floor(Math.random() * (max + 1 - min)); } // inclusive
         
+        function speak_thousands(x) { // force speaking thousands
+            if(x >= 1000) {
+                x = '' + x;
+                return x.substring(0, x.length-3) + ',' + x.substring(x.length-3);
+            }
+            return x;
+        }
+        
+        function speak_half(x) {
+            if(Math.abs((x - Math.floor(x)) - .5) < .0001) { return Math.floor(x) + ' and a half'; }
+            return x;
+        }
+        
         /* Problem generators, returning {
                 problem:STR,  // use '?' for the placeholder; '*' for multiplication, '/' for division. See format_problem()
                 solution:STR, 
@@ -213,7 +226,7 @@
                 const b = RND(1, 10) * 100;
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{
                     speak_prompt: 'What is '+a+' plus '+b+'?',
-                    speak_solution: 'Yes, '+a+' plus '+b+' is '+(a+b)+'.',
+                    speak_solution: 'Yes, '+a+' plus '+b+' is '+speak_thousands(a+b)+'.',
                     range:[100,20*100,100,a,100]
                 }};
             },
@@ -275,20 +288,29 @@
                 const b = b2;
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[a1*10+1,a1*10+20,a1*10+1,a]}};
             },
-            multiply: function() { // e.g. 3x6=
+            small_multiply: function() { // e.g. 3x2=
+                const a = RND(1, 3);
+                const b = RND(0, 4);
+                return {problem: a+'*'+b+'=', solution:(a*b), hint:{
+                    speak_prompt: 'What is '+a+' times '+b+'?',
+                    speak_solution: 'Yes, '+a+' times '+b+' is '+(a*b),
+                    range:[0,b*5,b*10,b*10,b]
+                }}; 
+            },
+            multiply: function() { // e.g. 3x6= (twelve times table)
                 const a = RND(0, 12);
                 const b = RND(0, 12);
                 return {problem: a+'*'+b+'=', solution:(a*b), hint:{
                     speak_prompt: 'What is '+a+' times '+b+'?',
                     speak_solution: 'Yes, '+a+' times '+b+' is '+(a*b),
-                    range:[0,a*12,a*10,a*10,a]
+                    range:[0,b*12,b*10,b*10,b]
                 }}; 
             },
             halving: function() { // e.g. 10/2=
                 const a = RND(0, 12);
                 return {problem: a+'/2=', solution:(a/2), hint:{
                     speak_prompt: 'What is half of '+a+'?',
-                    speak_solution: 'Yes, '+a+' divided by two is '+(a/2)+'.',
+                    speak_solution: 'Yes, '+a+' divided by two is '+speak_half(a/2)+'.',
                     range:[1,a,-1,-1]
                 }};
             },
@@ -329,6 +351,7 @@
                 [PRBL.sub_ten_minus, 10],
                 [PRBL.sub_small, 20],
                 [PRBL.add_hundreds, 10],
+                [PRBL.small_multiply, 10],
                 [PRBL.halving, 10],
                 [PRBL.halving_whole_ph, 10],
                 // [PRBL.third_whole_ph, 5],
@@ -389,7 +412,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?81"></script>
+    <script src="assets/common.js?83"></script>
     <script>
 
         
