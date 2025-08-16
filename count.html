@@ -28,6 +28,12 @@
         .prompt .infield .inp { color: #000; }
         body .prompt.success .infield .inp { color: #090; }
         
+        .prompt .ph {
+            color: #00b;
+            font-family: Times New Roman, serif;
+            font-style: italic;
+        }
+        
 
         .keypad td {
             border-top: .5rem solid #d5d;
@@ -86,7 +92,7 @@
         <div class="game prompt">
             <div class="infield">
                 <div class="problem"></div>
-                <div><span class="prompticon"></span><span class="prompticonsuccess"></span> <span class="inp"></span></div>
+                <div><span class="prompticon"></span><span class="prompticonsuccess"></span> <span class="prompt-ph"><span class="ph">a</span>=</span><span class="inp"></span></div>
             </div>
             <div class="hintwrap">
                 <div class="hintloader"><img src="assets/images/loader.gif"></div>
@@ -158,64 +164,75 @@
     
         const max_problemset = 1;
         const MAX_INPUT = 6;
-        const PL = '▢'; // placeholder
+        const PL = '<span class="ph">a</span>'; // placeholder
         const HALF = '½';
         
         function RND(min, max) { return min + Math.floor(Math.random() * (max + 1 - min)); } // inclusive
         
-        // Problem generators, returning {problem:HTML, solution:STR, hint:OBJ}
+        /* Problem generators, returning {
+                problem:STR,  // use '?' for the placeholder; '*' for multiplication, '/' for division
+                solution:STR, 
+                hint:OBJ,
+                [placeholder:true]  // add if the question has a variable/placeholder
+            } 
+        */
         const PRBL = {
-            add_to_five: function() {
+            add_to_five: function() {  // e.g. 2+?=[5]
                 const v = RND(0, 5);
-                return {problem: v+'+'+PL+'=5', solution:(5-v), hint:{range:[1,5,1,v]}};
+                return {problem: v+'+'+PL+'=5', placeholder: true, solution:(5-v), hint:{range:[1,5,1,v]}};
             },
-            add_to_ten: function() {
+            add_to_ten: function() {  // e.g. 7+?=[10]
                 const v = RND(0, 10);
-                return {problem: v+'+'+PL+'=10', solution:(10-v), hint:{range:[1,10,1,v]}};
+                return {problem: v+'+'+PL+'=10', placeholder: true, solution:(10-v), hint:{range:[1,10,1,v]}};
             },
-            add_small: function() {
+            add_small: function() {  // e.g. 3+8=
                 const a = RND(0, 10);
                 const b = RND(0, 10);
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[1,20,1,a]}};
             },
-            add_mid: function() {
+            add_mid: function() {  // e.g. 13+8=
                 const a = RND(0, 10) + 10;
                 const b = RND(0, 10);
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[11,30,11,a]}};
             },
-            add_hundreds: function () {
+            add_hundreds: function () {  // e.g. 500+700=
                 const a = RND(1, 10) * 100;
                 const b = RND(1, 10) * 100;
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[100,20*100,100,a,100]}};
             },
-            sub_five: function() {
+            sub_five: function() {  // e.g. [5]-3=
                 const v = RND(0, 5);
                 return {problem: '5-'+v+'=', solution:(5-v), hint:{range:[1,5,1,v]}};
             },
-            sub_ten: function() {
+            sub_ten: function() {  // e.g. [10]-7=
                 const v = RND(0, 10);
                 return {problem: '10-'+v+'=', solution:(10-v), hint:{range:[1,10,1,v]}};
             },
-            sub_five_minus: function() {
+            sub_five_minus: function() {  // e.g. [5]-8=
                 const v = RND(0, 8);
                 return {problem: '5-'+v+'=', solution:(5-v), hint:{range:[-5,5,1,0]}};
             },
-            sub_ten_minus: function() {
+            sub_ten_minus: function() {  // e.g. [10]-13=
                 const v = RND(0, 13);
                 return {problem: '10-'+v+'=', solution:(10-v), hint:{range:[-3,10,1,0]}};
             },
-            sub_small: function() {
+            sub_small: function() {  // e.g. 7-4=  (always positive)
                 let a = RND(0, 10);
                 let b = RND(0, 10);
                 if(a > b) { const tmp = a; a = b; b = tmp; }
                 return {problem: b+'-'+a+'=', solution:(b-a), hint:{range:[1,b,-1,-1]}};
             },
-            sub_mid: function() {
+            sub_small_any: function() {  // e.g. 4-7=
+                let a = RND(0, 10);
+                let b = RND(0, 10);
+                return {problem: b+'-'+a+'=', solution:(b-a), hint:{range:[-10,10,0,b]}};
+            },
+            sub_mid: function() {  // e.g. 12-6=
                 const a = RND(0, 10);
                 const b = RND(0, 10) + 10;
                 return {problem: b+'-'+a+'=', solution:(b-a), hint:{range:[1,b,-1,-1]}};
             },
-            add_big_no_carry: function() {
+            add_big_no_carry: function() {  // e.g. 36+42= (no carry)
                 const a1 = RND(0, 9);
                 const a2 = RND(0, 9);
                 const b1 = RND(0, 9);
@@ -224,7 +241,7 @@
                 const b = b1*10+b2;
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[a1*10+1,a1*10+20,a1*10+1,a]}};
             },
-            add_big_carry: function() {
+            add_big_carry: function() { // e.g. 36+48= (always carry)
                 const a1 = RND(0, 9);
                 const a2 = RND(0, 9);
                 const b1 = RND(0, 9);
@@ -233,7 +250,7 @@
                 const b = b1*10+b2;
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[a1*10+1,a1*10+20,a1*10+1,a]}};
             },
-            add_big_small: function() {
+            add_big_small: function() { // e.g. 44+8=
                 const a1 = RND(0, 9);
                 const a2 = RND(0, 9);
                 const b2 = RND(0, 9);
@@ -241,45 +258,61 @@
                 const b = b2;
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[a1*10+1,a1*10+20,a1*10+1,a]}};
             },
-            multiply: function() {
+            multiply: function() { // e.g. 3x6=
                 const a = RND(0, 12);
                 const b = RND(0, 12);
                 return {problem: a+'x'+b+'=', solution:(a*b), hint:{range:[0,a*12,a*10,a*10,a]}}; 
             },
-            halving: function() {
+            halving: function() { // e.g. 10/2=
                 const a = RND(0, 12);
                 return {problem: a+'÷2=', solution:(a/2), hint:{range:[1,a,-1,-1]}};
-            }
+            },
+            halving_whole_ph: function() {  // e.g. ?x[2]=8
+                const a = RND(1, 6)*2;
+                return {problem: PL+'x2='+a, placeholder: true, solution:(a/2), hint:{range:[1,a,-1,-1]}};
+            },
+            third_whole_ph: function() {  // e.g. ?x[3]=9
+                const a = RND(1, 4)*3;
+                return {problem: PL+'x3='+a, placeholder: true, solution:(a/3), hint:{range:[1,a,-1,-1]}};
+            },
+            fifth_whole_ph: function() {  // e.g. ?x[5]=25
+                const a = RND(1, 5)*5;
+                return {problem: PL+'x5='+a, placeholder: true, solution:(a/5), hint:{range:[1,a,-1,-1]}};
+            },
         };
 
         // Lists problems and their relative frequencies
         const PROBLEMSETS = {
             0: [
                 [PRBL.add_to_five, 5],
-                [PRBL.add_to_ten, 10],
-                [PRBL.add_small, 10],
-                [PRBL.add_mid, 30],
-                // [PRBL.sub_five, 10],
+                [PRBL.add_to_ten, 5],
+                [PRBL.add_small, 5],
+                [PRBL.add_mid, 20],
                 [PRBL.sub_five_minus, 10],
-                [PRBL.sub_ten, 10],
+                [PRBL.sub_ten_minus, 10],
                 [PRBL.sub_small, 20],
                 [PRBL.add_hundreds, 10],
                 [PRBL.halving, 10],
+                [PRBL.halving_whole_ph, 10],
+                [PRBL.third_whole_ph, 5],
             ],
             1: [
                 [PRBL.add_to_five, 1],
                 [PRBL.add_to_ten, 5],
-                // [PRBL.add_small, 10],
                 [PRBL.sub_five_minus, 5],
                 [PRBL.sub_ten_minus, 5],
-                [PRBL.sub_small, 5],                
+                [PRBL.sub_small_any, 5],
                 [PRBL.sub_mid, 20],
-                [PRBL.add_big_no_carry, 30],
-                [PRBL.add_big_carry, 15],
-                [PRBL.add_big_small, 30],
-                [PRBL.add_hundreds, 5],
+                [PRBL.add_hundreds, 15],
+                [PRBL.add_big_no_carry, 10],
+                [PRBL.add_big_carry, 20],
+                [PRBL.add_big_small, 10],
+                [PRBL.add_hundreds, 10],
                 [PRBL.multiply, 50],
                 [PRBL.halving, 20],
+                [PRBL.halving_whole_ph, 10],
+                [PRBL.third_whole_ph, 10],
+                [PRBL.fifth_whole_ph, 10],
             ]
         };
 
@@ -468,6 +501,7 @@
             bee.typed = '';
             update_input_field();
             $('.prompt').removeClass('success');
+            $('.prompt-ph').toggle(bee.problem.placeholder ? true : false);
             clear_hint();
         }
         
