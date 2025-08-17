@@ -1,5 +1,5 @@
 
-        const bee_app_version = 86;
+        const bee_app_version = 96;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -144,7 +144,7 @@
         const bee_confetti = new JSConfetti();
         
         
-        // Show a reward animation
+        // Show a reward animation (fireworks or confetti)
         function show_animation(callback) {
             const r = Math.random();
             if(r < .5) {
@@ -188,6 +188,7 @@
         }
         
         
+        // Return bool
         function arrays_intersect(a1, a2) {
             for(let i=0; i<a1.length; i++) {
                 if(a2.includes(a1[i])) { return true; }
@@ -196,7 +197,7 @@
         }
 
 
-        // update UI & animate
+        // update UI & animate to update score
         function update_score_ui(do_animate) {
             const score = bee.storage.players[bee.player].score;
             $('.score .value').html(esc_html(score));
@@ -242,7 +243,7 @@
         }
 
 
-        // Play a unique sound identified by the key `f`
+        // Play a specific sound identified by the key `f`
         function playme(f) {
             const d = audio[f];
             if(d.object === false) { 
@@ -259,11 +260,11 @@
             const i = Math.floor(Math.random() * audio[f].length);
             const d = audio[f][i];
             if(d.object === false) { 
-                console.log("Audio: setting up success", d['file']);
+                console.log("Audio: setting up", d['file']);
                 d.object = new Audio(d['file']); 
                 d.object.volume = d['volume']; 
             }
-            console.log("Audio: playing success", d['file']);
+            console.log("Audio: playing", d['file']);
             d.object.play();
         }
 
@@ -275,7 +276,7 @@
         function toggle_play_music(ix) {
             const d = audio.music[ix];
             if(d.object === false) { 
-                console.log("Audio: setting up success", d['file']);
+                console.log("Audio: setting up", d['file']);
                 d.object = new Audio(d['file']); 
                 d.object.volume = d['volume'];
                 d.object.loop = true;
@@ -417,6 +418,7 @@
         }
         
         
+        // Implements common operations when a task is solved
         function success_common(fast_to_next_question) {
             const score = add_score();
             const new_next_gift_at = decide_gift(); // precede update_score_ui() to update remaining-to-gift display

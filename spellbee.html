@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?86">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?96">
 
     <style>
     
@@ -71,7 +71,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?86"></script>
+    <script src="assets/local/beelocal.js?96"></script>
 </head>
 <body>
     <div class="container">
@@ -118,6 +118,7 @@
     | Icons by <a href="https://icons8.com">Icons8</a>
     | <a href="https://github.com/csirmaz/learning-aid">Codebase</a>
     | <a href="#" onclick="bee_tts.speak('This is what text to speach sounds like: '+Math.floor(Math.random()*100), function(){ alert(bee_tts.voice.name+' '+bee_tts.voice.lang+' '+bee_tts.voice.localService); }); return false">TTS</a>
+    <span class="localfunctions"></span>
     | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
     | <a href="#" onclick="modify_wordlist(); return false">Update word sets</a>
     | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
@@ -480,12 +481,16 @@
 
         function save_storage(msg) {
             console.log("Saving storage", msg);
-            localStorage.spellbee = JSON.stringify(bee.storage);
+            const s = JSON.stringify(bee.storage);
+            localStorage.spellbee = s;
+            if(typeof(bee_local) !== 'undefined' && bee_local.save_hook) {
+                bee_local.save_hook('spellbee', s);
+            }            
         }
 
 
     </script>
-    <script src="assets/common.js?86"></script>
+    <script src="assets/common.js?96"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
