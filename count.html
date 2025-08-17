@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?83">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?86">
 
     <style>
     
@@ -59,9 +59,9 @@
         }
         
         .hintwrap {
-            height: 4rem;
+            min-height: 4rem;
             margin: 1rem 0;
-            overflow: hidden;
+            overflow: auto;
         }
         table.hint { 
             border-collapse: collapse; 
@@ -74,13 +74,21 @@
         table.hint td.hint-h {
             background: #0f0;
         }
+        table.hint td.wide {
+            height: 2.5rem;
+            vertical-align: top;
+        }
+        table.hint td.wide div {
+            transform: rotate(80deg);
+            width: 1rem;
+        }
 
     </style>
 
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?83"></script>
+    <script src="assets/local/beelocal.js?86"></script>
 </head>
 <body>
     <div class="container">
@@ -180,7 +188,11 @@
         }
         
         function speak_half(x) {
-            if(Math.abs((x - Math.floor(x)) - .5) < .0001) { return Math.floor(x) + ' and a half'; }
+            const fx = Math.floor(x);
+            if(Math.abs((x - fx) - .5) < .0001) { 
+                if(fx == 0) { return 'half'; }
+                return fx + ' and a half'; 
+            }
             return x;
         }
         
@@ -226,7 +238,7 @@
                 const b = RND(1, 10) * 100;
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{
                     speak_prompt: 'What is '+a+' plus '+b+'?',
-                    speak_solution: 'Yes, '+a+' plus '+b+' is '+speak_thousands(a+b)+'.',
+                    speak_solution: 'Well done! '+a+' plus '+b+' is '+speak_thousands(a+b)+'.',
                     range:[100,20*100,100,a,100]
                 }};
             },
@@ -326,7 +338,7 @@
                 const a = RND(1, 4)*3;
                 return {problem: '?*3='+a, placeholder: true, solution:(a/3), hint:{
                     speak_prompt: 'What taken three times is '+a+'?',
-                    speak_solution: 'Yes, '+(a/3)+' times three is '+a,
+                    speak_solution: 'Good job! '+(a/3)+' times three is '+a,
                     range:[1,a,-1,-1]
                 }};
             },
@@ -334,7 +346,7 @@
                 const a = RND(1, 5)*5;
                 return {problem: '?*5='+a, placeholder: true, solution:(a/5), hint:{
                     speak_prompt: 'What taken five times is '+a+'?',
-                    speak_solution: 'Yes, '+(a/5)+' times five is '+a,
+                    speak_solution: 'Great! '+(a/5)+' times five is '+a,
                     range:[1,a,-1,-1]
                 }};
             },
@@ -396,6 +408,9 @@
         // Try to load data
         if(localStorage.count) {
             bee.storage = JSON.parse(localStorage.count);
+            if(typeof(bee_local) !== 'undefined' && bee_local.loaded_hook) {
+                bee_local.loaded_hook('count');
+            }
         }
 
         function save_storage(msg) {
@@ -412,7 +427,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?83"></script>
+    <script src="assets/common.js?86"></script>
     <script>
 
         
@@ -444,7 +459,7 @@
                         for(let i=data.range[0]; i<=data.range[1]; i+=step) {
                             if((ix % 10) == 0 && ix != 0) { o += '</tr><tr>'; }
                             const h = (i >= data.range[2] && i <= data.range[3]); // highlight
-                            o += '<td class="'+(h?'hint-h':'')+'">'+(i<10&&i>=0?'&nbsp;':'')+i+'</td>';
+                            o += '<td class="'+(h?' hint-h':'')+(i>=200?' wide':'')+'"><div>'+(i<10 && i>=0 ? '&nbsp;' : '')+i+'</div></td>';
                             ix++;
                         }
                     } else {
