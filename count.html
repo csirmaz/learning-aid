@@ -197,12 +197,16 @@
             return x;
         }
         
-        /* Problem generators, returning {
+        /* Problem generators, returning <problem> := {
                 problem:STR,  // use '?' for the placeholder; '*' for multiplication, '/' for division. See format_problem()
                 solution:STR, 
                 hint:OBJ,
                 [placeholder:true]  // add if the question has a variable/placeholder
-            } 
+            }
+            Alternatively, a problem generator can return a <list of problems> := {
+                type: 'problem_list',
+                problems: [<problem>, ...]
+            }
         */
         const PRBL = {
             add_to_five: function() {  // e.g. 2+?=[5]
@@ -302,7 +306,7 @@
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[a1*10+1,a1*10+20,a1*10+1,a]}};
             },
             small_multiply: function() { // e.g. 3x2=
-                const a = RND(1, 3);
+                const a = RND(1, 5);
                 const b = RND(0, 4);
                 return {problem: a+'*'+b+'=', solution:(a*b), hint:{
                     speak_prompt: 'What is '+a+' times '+b+'?',
@@ -310,14 +314,21 @@
                     range:[0,b*5,b*10,b*10,b]
                 }}; 
             },
-            multiply: function() { // e.g. 3x6= (twelve times table)
+            multiply: function() { // e.g. 3x6= (twelve times table) - return groups of 3
+                const get_prob = function(a, b) {
+                    return {problem: a+'*'+b+'=', solution:(a*b), hint:{
+                        speak_prompt: 'What is '+a+' times '+b+'?',
+                        speak_solution: 'Yes, '+a+' times '+b+' is '+(a*b),
+                        range:[0,b*12,b*10,b*10,b]
+                    }}; 
+                };
                 const a = RND(0, 12);
                 const b = RND(0, 12);
-                return {problem: a+'*'+b+'=', solution:(a*b), hint:{
-                    speak_prompt: 'What is '+a+' times '+b+'?',
-                    speak_solution: 'Yes, '+a+' times '+b+' is '+(a*b),
-                    range:[0,b*12,b*10,b*10,b]
-                }}; 
+                let problems = [];
+                for(let bb=b; bb<=12 && bb<=b+2; bb++) {
+                    problems.push(get_prob(a, bb));
+                }
+                return {type: 'problem_list', problems: problems};
             },
             halving: function() { // e.g. 10/2=
                 const a = RND(0, 12);
@@ -335,6 +346,22 @@
                     range:[1,a,-1,-1]
                 }};
             },
+            halving_whole_phi: function() {  // e.g. [2]x?=8
+                const a = RND(1, 6)*2;
+                return {problem: '2*?='+a, placeholder: true, solution:(a/2), hint:{
+                    speak_prompt: 'Two taken how many times is '+a+'?',
+                    speak_solution: 'Yes, two times '+(a/2)+' is '+a,
+                    range:[1,a,-1,-1]
+                }};
+            },
+            third_whole: function() {  // e.g. 9/[3]=
+                const a = RND(1, 4)*3;
+                return {problem: a+'/3=', placeholder: false, solution:(a/3), hint:{
+                    speak_prompt: 'What is '+a+' divided by three?',
+                    speak_solution: 'Good job! The third of '+a+' is '+(a/3),
+                    range:[1,a,-1,-1]
+                }};
+            },
             third_whole_ph: function() {  // e.g. ?x[3]=9
                 const a = RND(1, 4)*3;
                 return {problem: '?*3='+a, placeholder: true, solution:(a/3), hint:{
@@ -343,11 +370,35 @@
                     range:[1,a,-1,-1]
                 }};
             },
+            third_whole_phi: function() {  // e.g. [3]x?=9
+                const a = RND(1, 4)*3;
+                return {problem: '3*?='+a, placeholder: true, solution:(a/3), hint:{
+                    speak_prompt: 'Three taken how many times is '+a+'?',
+                    speak_solution: 'Good job! Three times '+(a/3)+' is '+a,
+                    range:[1,a,-1,-1]
+                }};
+            },
+            fifth_whole: function() {  // e.g. 9/[5]=
+                const a = RND(1, 5)*5;
+                return {problem: a+'/5=', placeholder: false, solution:(a/5), hint:{
+                    speak_prompt: 'What is '+a+' divided by five?',
+                    speak_solution: 'Good job! The fifth of '+a+' is '+(a/5),
+                    range:[1,a,-1,-1]
+                }};
+            },
             fifth_whole_ph: function() {  // e.g. ?x[5]=25
                 const a = RND(1, 5)*5;
                 return {problem: '?*5='+a, placeholder: true, solution:(a/5), hint:{
                     speak_prompt: 'What taken five times is '+a+'?',
                     speak_solution: 'Great! '+(a/5)+' times five is '+a,
+                    range:[1,a,-1,-1]
+                }};
+            },
+            fifth_whole_phi: function() {  // e.g. [5]x?=25
+                const a = RND(1, 5)*5;
+                return {problem: '5*?='+a, placeholder: true, solution:(a/5), hint:{
+                    speak_prompt: 'Five taken how many times is '+a+'?',
+                    speak_solution: 'Great! Five times '+(a/5)+' is '+a,
                     range:[1,a,-1,-1]
                 }};
             },
@@ -366,7 +417,8 @@
                 [PRBL.add_hundreds, 10],
                 [PRBL.small_multiply, 10],
                 [PRBL.halving, 10],
-                [PRBL.halving_whole_ph, 10],
+                [PRBL.halving_whole_ph, 5],
+                [PRBL.halving_whole_phi, 5],
                 // [PRBL.third_whole_ph, 5],
             ],
             1: [
@@ -381,11 +433,16 @@
                 [PRBL.add_big_carry, 20],
                 [PRBL.add_big_small, 10],
                 [PRBL.add_hundreds, 10],
-                [PRBL.multiply, 50],
-                [PRBL.halving, 20],
-                [PRBL.halving_whole_ph, 10],
-                [PRBL.third_whole_ph, 10],
-                [PRBL.fifth_whole_ph, 10],
+                [PRBL.multiply, 20],
+                [PRBL.halving, 8],
+                [PRBL.halving_whole_ph, 4],
+                [PRBL.halving_whole_phi, 4],
+                [PRBL.third_whole, 8],
+                [PRBL.third_whole_ph, 4],
+                [PRBL.third_whole_phi, 4],
+                [PRBL.fifth_whole, 8],
+                [PRBL.fifth_whole_ph, 4],
+                [PRBL.fifth_whole_phi, 4],
             ]
         };
 
@@ -394,6 +451,7 @@
             load_time: Date.now(),
             problemset: false, // index (int)
             problem: false, // output of a problem generator, {problem:HTML, solution:STR, hint:OBJ}
+            queued_problems: false,
             can_type: false,
             typed: '',
             can_use_help: true,
@@ -631,20 +689,35 @@
             }
 
             try{ document.activeElement.blur(); }catch(e){}
-
-            // Choose a problem generator
-            const pset = PROBLEMSETS[bee.problemset];
-            let freq_sum = 0;
-            for(let i=0; i<pset.length; i++) { freq_sum += pset[i][1]; }
-            const freq = Math.random() * freq_sum;
-            freq_sum = 0;
-            let i=0;
-            for(i=0; i<pset.length; i++) {
-                freq_sum += pset[i][1];
-                if(freq <= freq_sum) { break; }
+            
+            // Check for grouped / queued problems
+            if(bee.queued_problems && bee.queued_problems.length) {
+                console.log("Using queued problem");
+                bee.problem = bee.queued_problems.shift();
             }
-            // Get a problem
-            bee.problem = pset[i][0]();
+            else {
+                // Choose a problem generator
+                const pset = PROBLEMSETS[bee.problemset];
+                let freq_sum = 0;
+                for(let i=0; i<pset.length; i++) { freq_sum += pset[i][1]; }
+                const freq = Math.random() * freq_sum;
+                freq_sum = 0;
+                let i=0;
+                for(i=0; i<pset.length; i++) {
+                    freq_sum += pset[i][1];
+                    if(freq <= freq_sum) { break; }
+                }
+                
+                // Get a problem
+                const new_prob = pset[i][0]();
+                if(new_prob.type == 'problem_list') {
+                    bee.queued_problems = new_prob.problems;
+                    bee.problem = bee.queued_problems.shift();
+                }
+                else {                
+                    bee.problem = new_prob;
+                }
+            }
             start_question();
         }
         
