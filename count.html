@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?98">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?100">
 
     <style>
     
@@ -88,7 +88,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?98"></script>
+    <script src="assets/local/beelocal.js?100"></script>
 </head>
 <body>
     <div class="container">
@@ -490,7 +490,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?98"></script>
+    <script src="assets/common.js?100"></script>
     <script>
 
         
@@ -590,6 +590,7 @@
                 
                 if((value - 0) == bee.problem.solution) { // Success!
                     bee.can_type = false;
+                    store_question(bee.queued_problems); // This is shorter now as we used shift()
                     $('.prompt').addClass('success');
                     if(!(bee.problem.hint 
                         && bee.problem.hint.speak_solution
@@ -679,7 +680,19 @@
             $('.prompt-ph').toggle(bee.problem.placeholder ? true : false);
             clear_hint();
         }
+
         
+        // Prevent getting a new question when the page is refreshed
+        function store_question(problem_data) {
+            bee.storage.players[bee.player].current_question = problem_data;
+            save_storage('store_question');
+        }
+
+        function get_question_from_store() {
+            const w = bee.storage.players[bee.player].current_question;
+            return w;
+        }
+
         
         function new_question() {
             // Refresh the page periodically
@@ -689,13 +702,12 @@
             }
 
             try{ document.activeElement.blur(); }catch(e){}
-            
-            // Check for grouped / queued problems
-            if(bee.queued_problems && bee.queued_problems.length) {
-                console.log("Using queued problem");
-                bee.problem = bee.queued_problems.shift();
+
+            if(!(bee.queued_problems && bee.queued_problems.length)) {
+                bee.queued_problems = get_question_from_store();
             }
-            else {
+
+            if(!(bee.queued_problems && bee.queued_problems.length)) {
                 // Choose a problem generator
                 const pset = PROBLEMSETS[bee.problemset];
                 let freq_sum = 0;
@@ -712,12 +724,14 @@
                 const new_prob = pset[i][0]();
                 if(new_prob.type == 'problem_list') {
                     bee.queued_problems = new_prob.problems;
-                    bee.problem = bee.queued_problems.shift();
                 }
                 else {                
-                    bee.problem = new_prob;
+                    bee.queued_problems = [new_prob];
                 }
+                store_question(bee.queued_problems);
             }
+            
+            bee.problem = bee.queued_problems.shift();
             start_question();
         }
         
