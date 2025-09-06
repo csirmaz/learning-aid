@@ -3,9 +3,9 @@
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <meta http-equiv="Content-Language" content="en">
-    <meta name="viewport" content="initial-scale=1.0">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?100">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?101">
 
     <style>
     
@@ -88,7 +88,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?100"></script>
+    <script src="assets/local/beelocal.js?101"></script>
 </head>
 <body>
     <div class="container">
@@ -448,6 +448,7 @@
 
         // Application data
         const bee = {
+            app_name: 'count',
             load_time: Date.now(),
             problemset: false, // index (int)
             problem: false, // output of a problem generator, {problem:HTML, solution:STR, hint:OBJ}
@@ -477,7 +478,7 @@
             const s = JSON.stringify(bee.storage);
             localStorage.count = s;
             if(typeof(bee_local) !== 'undefined' && bee_local.save_hook) {
-                bee_local.save_hook('count', s);
+                bee_local.save_hook(s);
             }            
         }
 
@@ -490,7 +491,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?100"></script>
+    <script src="assets/common.js?101"></script>
     <script>
 
         

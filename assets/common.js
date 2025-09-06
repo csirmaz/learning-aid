@@ -1,5 +1,5 @@
 
-        const bee_app_version = 100;
+        const bee_app_version = 101;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -431,6 +431,7 @@
                     function() { setTimeout(new_question, 1100); }
                     // no need to call the gift logic; gift will be given on next step
                 );
+                if(typeof(bee_local) !== 'undefined' && bee_local.level_hook) { bee_local.level_hook(score); }
                 return;
             }
             
