@@ -116,7 +116,7 @@
     <p class="smallprint">Use this page with a physical keyboard | <span class="handle">Licences</span>
     <span class="expand"></span> 
     | Icons by <a href="https://icons8.com">Icons8</a>
-    | <a href="https://github.com/csirmaz/learning-aid">Codebase</a>
+    | <a href="https://codeberg.org/csirmaz/learning-aid">Codebase</a>
     | <a href="#" onclick="bee_tts.speak('This is what text to speach sounds like: '+Math.floor(Math.random()*100), function(){ alert(bee_tts.voice.name+' '+bee_tts.voice.lang+' '+bee_tts.voice.localService); }); return false">TTS</a>
     <span class="localfunctions"></span>
     | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
@@ -639,9 +639,9 @@
             }
             
             const help_duration_loading = 1800; // duration of the loading animation
-            const help_duration_1 = 800 + bee.processed_word.to_display.length * 200; // full color
+            const help_duration_1 = (is_initial ? 800 : 1200) + bee.processed_word.to_display.length * 200; // full color
             const help_duration_2 = 1500; // fading
-            const help_duration_enable = 4000; // time to enable help again
+            const help_duration_enable = 4400; // time to enable help again
 
             setTimeout(function() {
                 bee.$helpwait.hide();
