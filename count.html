@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?102">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?104">
 
     <style>
     
@@ -88,7 +88,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?102"></script>
+    <script src="assets/local/beelocal.js?104"></script>
 </head>
 <body>
     <div class="container">
@@ -319,11 +319,15 @@
                     return {problem: a+'*'+b+'=', solution:(a*b), hint:{
                         speak_prompt: 'What is '+a+' times '+b+'?',
                         speak_solution: 'Yes, '+a+' times '+b+' is '+(a*b),
-                        range:[0,b*12,b*10,b*10,b]
+                        // range:[0,b*12,b*10,b*10,b],
+                        help_txt:
+                            (b>0 ? a+'*'+(b-1)+'='+(a*(b-1))+'#' : '')
+                            + a+'*'+b+'=?#'
+                            + a+'*'+(b+1)+'='+(a*(b+1))
                     }}; 
                 };
-                const a = RND(0, 12);
-                const b = RND(0, 12);
+                const a = RND(2, 12);
+                const b = RND(2, 12);
                 let problems = [];
                 for(let bb=b; bb<=12 && bb<=b+2; bb++) {
                     problems.push(get_prob(a, bb));
@@ -409,17 +413,17 @@
             0: [
                 [PRBL.add_to_five, 5],
                 [PRBL.add_to_ten, 5],
-                [PRBL.add_small, 5],
                 [PRBL.add_mid, 20],
                 [PRBL.sub_five_minus, 10],
                 [PRBL.sub_ten_minus, 10],
                 [PRBL.sub_small, 20],
                 [PRBL.add_hundreds, 10],
+                [PRBL.add_big_no_carry, 10],
                 [PRBL.small_multiply, 10],
                 [PRBL.halving, 10],
                 [PRBL.halving_whole_ph, 5],
                 [PRBL.halving_whole_phi, 5],
-                // [PRBL.third_whole_ph, 5],
+                [PRBL.third_whole_ph, 5],
             ],
             1: [
                 [PRBL.add_to_five, 1],
@@ -443,6 +447,9 @@
                 [PRBL.fifth_whole, 8],
                 [PRBL.fifth_whole_ph, 4],
                 [PRBL.fifth_whole_phi, 4],
+            ],
+            2: [
+                [PRBL.multiply, 20],
             ]
         };
 
@@ -491,7 +498,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?102"></script>
+    <script src="assets/common.js?104"></script>
     <script>
 
         
@@ -529,6 +536,9 @@
                     } else {
                         playme('notavail');
                     }
+                }
+                if(data.help_txt) {
+                    o = '<td>'+format_problem(data.help_txt)+'</td>';
                 }
                 o += '</tr>';
                 $('.hint').html(o);
@@ -646,23 +656,24 @@
             const PL = '<span class="ph">a</span>'; // placeholder
             const DIV = '÷';
             const MULT = 'x';
-            p = p.replace('&', '`a&amp;`b');
-            p = p.replace('>', '`c&gt;`d');
-            p = p.replace('<', '`c&lt;`d');
-            p = p.replace('?', '`p');
-            p = p.replace('/', '`a'+DIV+'`b');
-            p = p.replace('*', '`a'+MULT+'`b');
-            p = p.replace('+', '`a+`b');
-            p = p.replace('-', '`a-`b');
-            p = p.replace('=', '`c=`d');
+            p = p.replaceAll('&', '`a&amp;`b');
+            p = p.replaceAll('>', '`c&gt;`d');
+            p = p.replaceAll('<', '`c&lt;`d');
+            p = p.replaceAll('?', '`p');
+            p = p.replaceAll('/', '`a'+DIV+'`b');
+            p = p.replaceAll('*', '`a'+MULT+'`b');
+            p = p.replaceAll('+', '`a+`b');
+            p = p.replaceAll('-', '`a-`b');
+            p = p.replaceAll('=', '`c=`d');
+            p = p.replaceAll('#', '<br>');
             // placeholder
-            p = p.replace('`p', PL);
+            p = p.replaceAll('`p', PL);
             // operators
-            p = p.replace('`a', '<span class="op">');
-            p = p.replace('`b', '</span>');
+            p = p.replaceAll('`a', '<span class="op">');
+            p = p.replaceAll('`b', '</span>');
             // comparison operators
-            p = p.replace('`c', '<span class="cmpop">');
-            p = p.replace('`d', '</span>');
+            p = p.replaceAll('`c', '<span class="cmpop">');
+            p = p.replaceAll('`d', '</span>');
             return p;
         }
 
