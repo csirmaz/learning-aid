@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?105">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?106">
 
     <style>
         body {
@@ -92,7 +92,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?105"></script>
+    <script src="assets/local/beelocal.js?106"></script>
 </head>
 <body>
     <div class="container">
@@ -502,7 +502,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?105"></script>
+    <script src="assets/common.js?106"></script>
     <script>
 
         
@@ -663,6 +663,27 @@
             p = p.replaceAll('&', '`a&amp;`b');
             p = p.replaceAll('>', '`c&gt;`d');
             p = p.replaceAll('<', '`c&lt;`d');
+            
+            p = p.replace(/^([0-9]+)\*([0-9]+)/, function(match,p1,p2) {
+                // #fffae4
+                let numcols = {
+                    '2':'`hf2c79f',
+                    '3':'`heeed8f',
+                    '4':'`h98ee8f',
+                    '5':'`h9b8fee',
+                    '6':'`hd38fee',
+                    '7':'`hee8f8f',
+                    '8':'`hee8fc1',
+                    '9':'`h939293',
+                    '10':'`hfdfdfd',
+                    '11':'`hffdbdb',
+                    '12':'`hfbac1b',
+                };
+                let c1 = numcols[p1] || '#fffae4';
+                let c2 = numcols[p2] || '#fffae4';
+                return '<span style`e"background: linear`ggradient(90deg,'+c1+' 0%, `hfffae4 50%, '+c2+' 100%);">'+match+'`f';
+            });
+            
             p = p.replaceAll('?', '`p');
             p = p.replaceAll('/', '`a'+DIV+'`b');
             p = p.replaceAll('*', '`a'+MULT+'`b');
@@ -678,6 +699,11 @@
             // comparison operators
             p = p.replaceAll('`c', '<span class="cmpop">');
             p = p.replaceAll('`d', '</span>');
+            // mult gradient
+            p = p.replaceAll('`e', '=');
+            p = p.replaceAll('`f', '</span>');
+            p = p.replaceAll('`g', '-');
+            p = p.replaceAll('`h', '#');
             return p;
         }
 
@@ -710,7 +736,7 @@
         }
         
         // Another cheat: switching to the calculator app
-        var wentaway = 0;
+        var wentaway = 0; // counts the switches away
         var wentaway_penalty = false;
         document.addEventListener('visibilitychange', function(){
             if(wentaway_penalty) { return; }
@@ -719,8 +745,10 @@
                 bee.can_type = false;
                 wentaway_penalty = true;
                 $('.hintloader').show();
+                $('.problem').hide();
                 setTimeout(function() {
                     $('.hintloader').hide();
+                    $('.problem').show();
                     bee.can_type = true;
                     wentaway_penalty = false;
                 }, 12*1000);
