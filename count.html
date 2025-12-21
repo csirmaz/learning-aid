@@ -5,10 +5,14 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?104">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?105">
 
     <style>
-    
+        body {
+            /* Disables pull-to-refresh but allows overscroll glow effects. */
+            overscroll-behavior-y: contain;
+        }
+
         body { background: #eee; }
         .score, .gifts { background: #390; }
         .score .bar { background: #5c3; }
@@ -88,7 +92,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?104"></script>
+    <script src="assets/local/beelocal.js?105"></script>
 </head>
 <body>
     <div class="container">
@@ -498,7 +502,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?104"></script>
+    <script src="assets/common.js?105"></script>
     <script>
 
         
@@ -694,7 +698,7 @@
         }
 
         
-        // Prevent getting a new question when the page is refreshed
+        // Prevent getting a new question when the page is refreshed (a cheat to get out of difficult questions)
         function store_question(problem_data) {
             bee.storage.players[bee.player].current_question = problem_data;
             save_storage('store_question');
@@ -704,6 +708,24 @@
             const w = bee.storage.players[bee.player].current_question;
             return w;
         }
+        
+        // Another cheat: switching to the calculator app
+        var wentaway = 0;
+        var wentaway_penalty = false;
+        document.addEventListener('visibilitychange', function(){
+            if(wentaway_penalty) { return; }
+            if(document.hidden) { wentaway++; return; }
+            if(wentaway) {
+                bee.can_type = false;
+                wentaway_penalty = true;
+                $('.hintloader').show();
+                setTimeout(function() {
+                    $('.hintloader').hide();
+                    bee.can_type = true;
+                    wentaway_penalty = false;
+                }, 12*1000);
+            }
+        });
 
         
         function new_question() {
@@ -715,6 +737,8 @@
 
             try{ document.activeElement.blur(); }catch(e){}
 
+            // First see if we stored any question in store
+            // Prevent getting a new question when the page is refreshed (a cheat to get out of difficult questions)
             if(!(bee.queued_problems && bee.queued_problems.length)) {
                 bee.queued_problems = get_question_from_store();
             }
