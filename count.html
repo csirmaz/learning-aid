@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?109">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?111">
 
     <style>
         body {
@@ -92,7 +92,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?109"></script>
+    <script src="assets/local/beelocal.js?111"></script>
 </head>
 <body>
     <div class="container">
@@ -337,11 +337,13 @@
                         (( (a==9 && b<10) || (b==9 && a<10))?'To multiply by nine, take one less than the other number. That is the first digit. For the second digit, take how many you need to nine.':
                         (( (a==11 && b<10) || (b==11 && a<10))?'The two digits will be the same':
                         ((a==12)?('Split the problem. Take ten times '+b+' and add two times '+b+'.'):
+                        ((b==12)?('Split the problem. Take ten times '+a+' and add two times '+a+'.'):
                         ((a==11)?('Split the problem. Take ten times '+b+' and add '+b+'.'):
+                        ((b==11)?('Split the problem. Take ten times '+a+' and add '+a+'.'):
                         ((a==5 && (b%2==0))?('Remember that '+b+' times five is '+(b/2)+' pairs of fives.'):
                         ((b==5 && (a%2==0))?('Remember that '+a+' times five is '+(a/2)+' pairs of fives.'):
-                        ((a==5)?('How much is '+b+' times five? Then add five.'):
-                        ((b==5)?('How much is '+a+' times five? Then add five.'):
+                        ((a==5)?('How much is '+(b-1)+' times five? Then add five.'):
+                        ((b==5)?('How much is '+(a-1)+' times five? Then add five.'):
                         (( (a==4 && b==3) || (a==3 && b==4))?'This is the special number that you can split into threes and fours, too.':
                         ((a==4)?('To get '+b+' times four, take '+b+' times two, twice.'):
                         ((b==4)?('To get '+a+' times four, take '+a+' times two, twice.'):
@@ -350,7 +352,7 @@
                         ((a==6)?('Take how much'+b+' times five is, and add '+b+'.'):
                         ((b==6)?('Take how much'+a+' times five is, and add '+a+'.'):
                         ('Remember that '+a+' times '+(b-1)+' is '+(a*(b-1))+'.')
-                        ))))))))))))))))))
+                        ))))))))))))))))))))
                     }}; 
                 };
                 const a = RND(2, 12);
@@ -525,7 +527,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?109"></script>
+    <script src="assets/common.js?111"></script>
     <script>
 
         
