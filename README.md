@@ -40,7 +40,8 @@ Feel free to edit the code (vanilla JavaScript) to fit your needs or use the com
 
 - Multiple problem generators
 - Relative frequencies of problem types set by difficulty level
-- Help system that generates a grid to help with counting
+- Help system that generates a grid, speech, etc. to help with counting
 - On-screen keypad
+- Use problem range >= 100 for times-tables
 
 

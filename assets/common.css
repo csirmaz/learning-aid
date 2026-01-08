@@ -9,7 +9,7 @@
         .container {
             max-width: 60rem;
             min-height: 27rem;
-            margin: 0 auto;
+            margin: 0 auto 1rem auto;
             position: relative;
             border-left: 1px solid #cb9;
             border-right: 1px solid #cb9;
@@ -28,6 +28,8 @@
             position: absolute;
             right: 1rem;
         }
+        
+        body.condense .scorewrap { zoom: 70%; }
     
         .score, .gifts {
             display: inline-block;
@@ -114,6 +116,7 @@
         .prompt {
             padding-top: 4rem;
         }
+        body.condense .prompt { padding-top: 3rem; }
 
         .startbutton {
             margin: 2rem 5rem;

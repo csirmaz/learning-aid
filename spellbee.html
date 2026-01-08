@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?111">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?117">
 
     <style>
     
@@ -71,7 +71,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?111"></script>
+    <script src="assets/local/beelocal.js?117"></script>
 </head>
 <body>
     <div class="container">
@@ -503,7 +503,7 @@
 
 
     </script>
-    <script src="assets/common.js?111"></script>
+    <script src="assets/common.js?117"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
@@ -879,6 +879,9 @@
             const wordsets = choose_wordsets();
             bee.storage.players[bee.player].min_wordset = wordsets[0];
             bee.storage.players[bee.player].wordsets = wordsets[1];
+            if(typeof(bee_local) !== 'undefined' && bee_local.problemset_hook) {
+                bee_local.problemset_hook(String(wordsets));
+            }
             save_storage('modify_wordlist');
             init_wordlist();
             new_question();
