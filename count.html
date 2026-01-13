@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?122">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?123">
 
     <style>
         body {
@@ -13,7 +13,8 @@
             overscroll-behavior-y: contain;
         }
 
-        body { background: #eee; }
+        body { background: #555; color:#f8f8cc; }
+        body a { color:#99f; }
         .score, .gifts { background: #390; }
         .score .bar { background: #5c3; }
         
@@ -22,7 +23,8 @@
         body .prompt.success .prompticon { display: none; }
 
         .prompt .infield {
-            background: #fffae4;
+            background: #77d;
+            border-radius: 0.5rem;
             font-size: 3rem;
             padding: 0 .6rem;
             letter-spacing: .1rem;
@@ -30,8 +32,8 @@
         }
         body.condense .prompt .infield { font-size: 2.1rem; }
         
-        .prompt .infield .inp { color: #000; }
-        body .prompt.success .infield .inp { color: #090; }
+        .prompt .infield .inp { color: #f8f8cc; }
+        body .prompt.success .infield .inp { color: #af6; }
         
         .prompt .ph {
             color: #00b;
@@ -42,27 +44,75 @@
         .op { display: inline-block; padding: 0 .4rem; }        
         .cmpop { display: inline-block; padding: 0 .8rem; }
 
+        .hintloader img { border: .2rem solid #fff; border-radius: .4rem; }
+        
         .keypad td {
-            border-top: .5rem solid #d5d;
-            border-left: .5rem solid #d5d;
-            border-right: .5rem solid #707;
-            border-bottom: .5rem solid #707;
-            background: #a3a;
-            color: #fff;
+            border-top: .2rem solid #fff;
+            border-left: .2rem solid #fff;
+            border-right: .2rem solid #ccc;
+            border-bottom: .2rem solid #ccc;
+            background: #f0f0f0;
+            color: #333;
             font-size: 3rem;
             width: 20%;
             text-align: center;
             margin: 0;
         }
         .keypad td.pressed {
-            border-top: .5rem solid #707;
-            border-left: .5rem solid #707;
-            border-right: .5rem solid #d5d;
-            border-bottom: .5rem solid #d5d;
-            background: #929;
-            color: #ddd;
+            border-top: .2rem solid #ccc;
+            border-left: .2rem solid #ccc;
+            border-right: .2rem solid #fff;
+            border-bottom: .2rem solid #fff;
+            background: #ddd;
+            color: #000;
         }
         body.condense .keypad td { font-size: 2.3rem; }
+        body.condense .keypad td.kpdel, body.condense .keypad td.kpent { font-size: 1rem; }
+        
+        .keypad .kpext {
+            border-top: .2rem solid #ccc;
+            border-left: .2rem solid #ccc;
+            border-right: .2rem solid #888;
+            border-bottom: .2rem solid #888;
+            background: #aaa;
+        }
+        .keypad .kpext.pressed {
+            border-top: .2rem solid #888;
+            border-left: .2rem solid #888;
+            border-right: .2rem solid #ccc;
+            border-bottom: .2rem solid #ccc;
+            background: #999;
+        }
+        .keypad .kpent {
+            font-size: 1.5rem;
+            border-top: .2rem solid #8f8;
+            border-left: .2rem solid #8f8;
+            border-right: .2rem solid #080;
+            border-bottom: .2rem solid #080;
+            background: #0c0;
+        }
+        .keypad .kpent.pressed {
+            border-top: .2rem solid #080;
+            border-left: .2rem solid #080;
+            border-right: .2rem solid #8f8;
+            border-bottom: .2rem solid #8f8;
+            background: #090;
+        }
+        .keypad .kpdel {
+            font-size: 1.5rem;
+            border-top: .2rem solid #f88;
+            border-left: .2rem solid #f88;
+            border-right: .2rem solid #800;
+            border-bottom: .2rem solid #800;
+            background: #c00;
+        }
+        .keypad .kpdel.pressed {
+            border-top: .2rem solid #800;
+            border-left: .2rem solid #800;
+            border-right: .2rem solid #f88;
+            border-bottom: .2rem solid #f88;
+            background: #900;
+        }
         
         .hintwrap {
             min-height: 4rem;
@@ -98,7 +148,8 @@
         }
         table.hint .sgroup {
             display: inline-block;
-            border: 1px solid #555;
+            border: 1px solid #000;
+            background: #fff;
             border-radius: .8rem;
             font-size: .8rem;
             padding: 0 .1rem;
@@ -115,7 +166,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?122"></script>
+    <script src="assets/local/beelocal.js?123"></script>
 </head>
 <body>
     <div class="container">
@@ -142,25 +193,25 @@
             <td data-i="D7">7</td>
             <td data-i="D8">8</td>
             <td data-i="D9">9</td>
-            <td data-i="del">🔙</td>
+            <td class="kpext" data-i="help">❓</td>
         </tr>
         <tr>
             <td data-i="D4">4</td>
             <td data-i="D5">5</td>
             <td data-i="D6">6</td>
-            <td data-i=""></td>
+            <td class="kpext" data-i="half">½</td>
         </tr>
         <tr>
             <td data-i="D1">1</td>
             <td data-i="D2">2</td>
             <td data-i="D3">3</td>
-            <td data-i="help">❓</td>
+            <td class="kpext" data-i="D-">-</td>
         </tr>
         <tr>
-            <td data-i="D-">-</td>
+            <td class="kpdel" data-i="del">Del</td>
             <td data-i="D0">0</td>
-            <td data-i="half">½</td>
-            <td data-i="ent">🆗</td>
+            <td class="kpent" data-i="ent">Enter</td>
+            <td class="kpext" data-i=""></td>
         </tr>
         </table>
 
@@ -376,10 +427,10 @@
                 for(let bb=2; bb<=12; bb++) { // 1..11
                     problems.push(get_prob(aa, bb));
                 }
-                for(let bb=0; bb<=12; bb++) { // 12..24
+                for(let bb=11; bb>=0; bb--) { // 12..23
                     problems.push(get_prob(aa, bb));
                 }
-                for(let bb=0; bb<6; bb++) { // 25..30
+                for(let bb=0; bb<7; bb++) { // 24..30
                     problems.push(get_prob(aa, RND(2,12)));
                 }
                 return {type: 'problem_list', problems: problems};
@@ -587,13 +638,13 @@
         // Fix emojis
         $('.prompticon').html('👉'+"\ufe0f");
         $('.prompticonsuccess').html('✅'+"\ufe0f");
-        $('.keypad [data-i="ent"]').html('🆗'+"\ufe0f");
+        // $('.keypad [data-i="ent"]').html('🆗'+"\ufe0f");
         $('.keypad [data-i="help"]').html('❓'+"\ufe0f");
         
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?122"></script>
+    <script src="assets/common.js?123"></script>
     <script>
 
         
@@ -785,25 +836,28 @@
             p = p.replaceAll('>', '`c&gt;`d');
             p = p.replaceAll('<', '`c&lt;`d');
             
-            p = p.replace(/^([0-9]+)\*([0-9]+)/, function(match,p1,p2) {
-                // #fffae4
-                let numcols = {
-                    '2':'`hf2c79f',
-                    '3':'`hefea8f',
-                    '4':'`h98ee8f',
-                    '5':'`h9b8fee',
-                    '6':'`hd38fee',
-                    '7':'`hee8f8f',
-                    '8':'`hee8fc1',
-                    '9':'`h939293',
-                    '10':'`hfdfdfd',
-                    '11':'`hffdbdb',
-                    '12':'`hfbac1b',
-                };
-                let c1 = numcols[p1] || '`hfffae4';
-                let c2 = numcols[p2] || '`hfffae4';
-                return '<span style`e"padding:0 .3rem;background: linear`ggradient(90deg,'+c1+' 0%, `hfffae4 50%, '+c2+' 100%);">'+match+'`f';
-            });
+            // Colorize multiplication
+            if(false) {
+                p = p.replace(/^([0-9]+)\*([0-9]+)/, function(match,p1,p2) {
+                    // #fffae4
+                    let numcols = {
+                        '2':'`hf2c79f',
+                        '3':'`hefea8f',
+                        '4':'`h98ee8f',
+                        '5':'`h9b8fee',
+                        '6':'`hd38fee',
+                        '7':'`hee8f8f',
+                        '8':'`hee8fc1',
+                        '9':'`h939293',
+                        '10':'`hfdfdfd',
+                        '11':'`hffdbdb',
+                        '12':'`hfbac1b',
+                    };
+                    let c1 = numcols[p1] || '`hfffae4';
+                    let c2 = numcols[p2] || '`hfffae4';
+                    return '<span style`e"padding:0 .3rem;background: linear`ggradient(90deg,'+c1+' 0%, `hfffae4 50%, '+c2+' 100%);">'+match+'`f';
+                });
+            }
             
             p = p.replaceAll('?', '`p');
             p = p.replaceAll('/', '`a'+DIV+'`b');
