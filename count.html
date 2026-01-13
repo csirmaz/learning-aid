@@ -346,7 +346,7 @@
                     return {problem: a+'*'+b+'=', solution:(a*b), hint:{
                         speak_prompt: ''+a+' times '+b+'',
                         speak_solution: 'Good! '+a+' times '+b+' is '+(a*b),
-                        groups: {in_group:b, groups:a, row_length:(b<4?5:(b==5?2:1))},
+                        groups: {in_group:a, groups:b, row_length:(a==5?2:1)},
                         help_speech:
                         ((a==10 || b==10)?'To multiply by ten, just write a zero after the other number.':
                         ((a==0 || b==0)?'You are multiplying by zero':
@@ -797,8 +797,8 @@
                     '11':'`hffdbdb',
                     '12':'`hfbac1b',
                 };
-                let c1 = numcols[p1] || '#fffae4';
-                let c2 = numcols[p2] || '#fffae4';
+                let c1 = numcols[p1] || '`hfffae4';
+                let c2 = numcols[p2] || '`hfffae4';
                 return '<span style`e"padding:0 .3rem;background: linear`ggradient(90deg,'+c1+' 0%, `hfffae4 50%, '+c2+' 100%);">'+match+'`f';
             });
             
@@ -825,6 +825,23 @@
             return p;
         }
 
+
+        // Delay answering as a penalty
+        var wentaway_penalty = false;
+        function penalty_delay() {
+            if(wentaway_penalty) { return; }
+            bee.can_type = false;
+            wentaway_penalty = true;
+            $('.hintloader').show();
+            $('.problem').hide();
+            setTimeout(function() {
+                $('.hintloader').hide();
+                $('.problem').show();
+                bee.can_type = true;
+                wentaway_penalty = false;
+            }, 12*1000);
+        }
+
         
         // Initialize a question
         function start_question() {
@@ -839,12 +856,17 @@
             $('.prompt').removeClass('success');
             $('.prompt-ph').toggle(bee.problem.placeholder ? true : false);
             clear_hint();
+
+            // Another cheat: switching to the calculator app and reload page
+            const cqt = bee.storage.players[bee.player].current_question_time;
+            if(cqt !== undefined && Date.now() - cqt < 3*60*1000) { penalty_delay(); }
         }
 
         
         // Prevent getting a new question when the page is refreshed (a cheat to get out of difficult questions)
         function store_question(problem_data) {
             bee.storage.players[bee.player].current_question = problem_data;
+            bee.storage.players[bee.player].current_question_time = Date.now(); // prevent cheat of switching to calculator app and reloading page
             save_storage('store_question');
         }
 
@@ -853,24 +875,12 @@
             return w;
         }
         
-        // Another cheat: switching to the calculator app
+        // Another cheat: switching to the calculator app and back
         var wentaway = 0; // counts the switches away
-        var wentaway_penalty = false;
-        document.addEventListener('visibilitychange', function(){
-            if(wentaway_penalty) { return; }
+        document.addEventListener('visibilitychange', function() {
+            if(bee.player === false) { return; }
             if(document.hidden) { wentaway++; return; }
-            if(wentaway) {
-                bee.can_type = false;
-                wentaway_penalty = true;
-                $('.hintloader').show();
-                $('.problem').hide();
-                setTimeout(function() {
-                    $('.hintloader').hide();
-                    $('.problem').show();
-                    bee.can_type = true;
-                    wentaway_penalty = false;
-                }, 12*1000);
-            }
+            if(wentaway) { penalty_delay(); }
         });
 
         
