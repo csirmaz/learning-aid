@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?118">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?122">
 
     <style>
         body {
@@ -115,7 +115,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?118"></script>
+    <script src="assets/local/beelocal.js?122"></script>
 </head>
 <body>
     <div class="container">
@@ -575,11 +575,11 @@
             }
         }
 
-        function save_storage(msg) {
-            console.log("Saving storage", msg);
+        function save_storage(msg, skip_hook) {
+            console.log("Saving storage", msg, skip_hook);
             const s = JSON.stringify(bee.storage);
             localStorage.count = s;
-            if(typeof(bee_local) !== 'undefined' && bee_local.save_hook) {
+            if((!skip_hook) && typeof(bee_local) !== 'undefined' && bee_local.save_hook) {
                 bee_local.save_hook(s);
             }            
         }
@@ -593,7 +593,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?118"></script>
+    <script src="assets/common.js?122"></script>
     <script>
 
         
@@ -733,6 +733,9 @@
                     )) {
                         success_common();
                     }
+                    // For anti-cheat system
+                    bee.storage.players[bee.player].current_question_time = undefined;
+                    save_storage('success_qtimer', true); // true = skip hook
                 }
                 return false;
             }
@@ -860,13 +863,14 @@
             // Another cheat: switching to the calculator app and reload page
             const cqt = bee.storage.players[bee.player].current_question_time;
             if(cqt !== undefined && Date.now() - cqt < 3*60*1000) { penalty_delay(); }
+            bee.storage.players[bee.player].current_question_time = Date.now();
+            save_storage('start_question_qtimer', true); // true = skip hook
         }
 
         
         // Prevent getting a new question when the page is refreshed (a cheat to get out of difficult questions)
         function store_question(problem_data) {
             bee.storage.players[bee.player].current_question = problem_data;
-            bee.storage.players[bee.player].current_question_time = Date.now(); // prevent cheat of switching to calculator app and reloading page
             save_storage('store_question');
         }
 
