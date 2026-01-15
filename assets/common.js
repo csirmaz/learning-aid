@@ -1,5 +1,5 @@
 
-        const bee_app_version = 123;
+        const bee_app_version = 125;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -8,7 +8,7 @@
 
 
         const audio = {
-            click: {'file':'assets/sounds/click.mp3', 'volume':1, 'object':false},
+            click: {'file':'assets/sounds/click.mp3', 'volume':.3, 'object':false},
             notavail: {'file':'assets/sounds/wronganswer-37702.mp3', 'volume':1, 'object':false},
             level_complete: [
                 {file: 'assets/sounds/success/congrats1.mp3', volume: 1, object: false},
@@ -565,7 +565,7 @@
                 bee_tts.synth.speak(utterThis);
                 return true;
             } catch(e) {
-                console.log("TTS speach error", e);
+                console.log("TTS speak error", e);
                 return false;
             }
         };
