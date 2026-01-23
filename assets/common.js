@@ -1,5 +1,5 @@
 
-        const bee_app_version = 125;
+        const bee_app_version = 128;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -426,12 +426,12 @@
 
             // level complete logic (see "L" below)
             if(score % bee.score_goal == 0) {
+                if(typeof(bee_local) !== 'undefined' && bee_local.level_hook) { bee_local.level_hook(score); }
                 play_rnd_sound('level_complete');
                 bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 300}).then(
-                    function() { setTimeout(new_question, 1100); }
+                    function() { setTimeout(play_video(new_question), 1500); }
                     // no need to call the gift logic; gift will be given on next step
                 );
-                if(typeof(bee_local) !== 'undefined' && bee_local.level_hook) { bee_local.level_hook(score); }
                 return;
             }
             
