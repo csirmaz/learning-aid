@@ -1,5 +1,5 @@
 
-        const bee_app_version = 130;
+        const bee_app_version = 132;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -430,11 +430,8 @@
                 play_rnd_sound('level_complete');
                 bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 300}).then(
                     function() { 
-                        console.log('-then');
                         setTimeout(function(){
-                            console.log('-to');
                             if(play_video(new_question)) { 
-                                console.log('-true');
                                 new_question();
                             }
                         }, 1500);
