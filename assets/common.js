@@ -1,5 +1,5 @@
 
-        const bee_app_version = 132;
+        const bee_app_version = 137;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -508,7 +508,15 @@
             voice: false,  // selected voice
             voice_points: -1,  // scoring to select voice
             synth: window.speechSynthesis,
-            init_trials: 6
+            init_trials: 6,
+            available_voices: []
+        };
+        
+        bee_tts.test = function() {
+            bee_tts.speak('This is what text to speach sounds like: '+Math.floor(Math.random()*100), function(){ 
+                alert(bee_tts.voice.name+' '+bee_tts.voice.lang+' '+bee_tts.voice.localService);
+                alert(bee_tts.available_voices.join("\n"));
+            });
         };
         
         bee_tts.initialize = function() {
@@ -532,9 +540,9 @@
                 }
                 for (const voice of voices) {
                     let p = 0;
-                    if(voice.lang.startsWith('en')) { p += 100; }
+                    if(voice.lang.startsWith('en')) { p += 100; bee_tts.available_voices.push("["+voice.name+"]"); }
                     if(voice.lang.toLowerCase().endsWith('gb')) { p += 2; }
-                    if(voice.name.indexOf('female') != -1) { p += 1; }
+                    if(voice.name.indexOf('female') == -1) { p += 1; }
                     if(voice.localService) { p += 5; }
                     if(p > bee_tts.voice_points) { bee_tts.voice_points = p; bee_tts.voice = voice; }
                 }
@@ -562,7 +570,7 @@
             try {
                 const utterThis = new SpeechSynthesisUtterance(s);
                 utterThis.voice = bee_tts.voice;
-                //utterThis.pitch = pitch.value;
+                // utterThis.pitch = 1.; // default
                 //utterThis.rate = rate.value;
                 if(callback) {
                     utterThis.addEventListener('end', callback);
