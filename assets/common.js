@@ -1,5 +1,5 @@
 
-        const bee_app_version = 128;
+        const bee_app_version = 130;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -429,7 +429,16 @@
                 if(typeof(bee_local) !== 'undefined' && bee_local.level_hook) { bee_local.level_hook(score); }
                 play_rnd_sound('level_complete');
                 bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 300}).then(
-                    function() { setTimeout(play_video(new_question), 1500); }
+                    function() { 
+                        console.log('-then');
+                        setTimeout(function(){
+                            console.log('-to');
+                            if(play_video(new_question)) { 
+                                console.log('-true');
+                                new_question();
+                            }
+                        }, 1500);
+                    }
                     // no need to call the gift logic; gift will be given on next step
                 );
                 return;

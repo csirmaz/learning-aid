@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?128">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?130">
 
     <style>
         body {
@@ -140,7 +140,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?128"></script>
+    <script src="assets/local/beelocal.js?130"></script>
 </head>
 <body>
     <div class="container">
@@ -620,7 +620,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?128"></script>
+    <script src="assets/common.js?130"></script>
     <script>
 
         
@@ -977,7 +977,7 @@
         
         // Choose a range of word sets to show words from
         function choose_problemset() {
-            let p = prompt("What set of problems should we use?\nType a number from 0 to "+max_problemset+" (simple to difficult)") - 0;
+            let p = prompt("What set of problems should we use?\nType a number from 0 to "+max_problemset+" (simple to difficult),\nor 101 for the 1-time table, 102 for the 2-time table etc.") - 0;
             if(isNaN(p)) { p = 0; }
             return p;
         }
