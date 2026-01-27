@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?137">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?138">
 
     <style>
         body {
@@ -140,7 +140,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?137"></script>
+    <script src="assets/local/beelocal.js?138"></script>
 </head>
 <body>
     <div class="container">
@@ -228,7 +228,7 @@
     <script>
     
         const max_problemset = 1;
-        const MAX_INPUT = 6;
+        const MAX_INPUT = 6;  // max length of input for solution
         const HALF = '½';
         
         function RND(min, max) { return min + Math.floor(Math.random() * (max + 1 - min)); } // inclusive
@@ -577,21 +577,22 @@
 
         // Application data
         const bee = {
-            app_name: 'count',
+            app_name: 'count',  // config
             load_time: Date.now(),
             problemset: false, // index (int)
-            problem: false, // output of a problem generator, {problem:HTML, solution:STR, hint:OBJ}
+            problem: false, // state: output of a problem generator, {problem:HTML, solution:STR, hint:OBJ}
             queued_problems: false,
             can_type: false,
             typed: '',
             can_use_help: true,
             help_timeout: false,
             score_anim_timeout: false,
-            player: false,  // name of the player - scores are saved to browser under this name
+            player: false,  // state: name of the player - scores are saved to browser under this name
             $input: $('.prompt .infield .inp'),
             storage: {'players': {}},  // storage data that's saved into local storage
             giftlist: -1,
-            score_goal: 30,  // controls the bar under the score and gifts
+            score_goal: 30,  // config: controls the bar under the score and gifts
+            button_clicks: false  // config: whether buttons make clicking sound
         };
         
         // Try to load data
@@ -620,7 +621,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?137"></script>
+    <script src="assets/common.js?138"></script>
     <script>
 
         
@@ -711,7 +712,7 @@
         function process_keypad(e) {
             e.preventDefault = true;
             if(!bee.can_type) { return; }
-            playme('click');
+            if(bee.button_clicks) { playme('click'); }
             const $this = $(this);
             let v = $this.data('i');
             

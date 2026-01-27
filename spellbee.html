@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?137">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?138">
 
     <style>
     
@@ -71,7 +71,7 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?137"></script>
+    <script src="assets/local/beelocal.js?138"></script>
 </head>
 <body>
     <div class="container">
@@ -462,7 +462,7 @@
 
         // Application data
         const bee = {
-            app_name: 'spellbee',
+            app_name: 'spellbee',  // config
             load_time: Date.now(),
             word_ix: false,
             can_type: false,
@@ -471,7 +471,7 @@
             can_use_help: true,
             help_timeout: false,
             score_anim_timeout: false,
-            player: false,  // name of the player - scores are saved to browser under this name
+            player: false,  // state: name of the player - scores are saved to browser under this name
             help_asked: 0,  // how many times help was asked for for the current word
             $image: $('.prompt .img'),
             $input: $('.prompt .infield .inp'),
@@ -481,7 +481,7 @@
             giftlist: -1,
             word_audio: false,
             word_audio_timeout: false,
-            score_goal: 20,  // controls the bar under the score and gifts
+            score_goal: 20,  // config: controls the bar under the score and gifts
         };
 
         // Try to load data
@@ -503,7 +503,7 @@
 
 
     </script>
-    <script src="assets/common.js?137"></script>
+    <script src="assets/common.js?138"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
