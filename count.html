@@ -399,15 +399,22 @@
                     }}; 
                 };
                 let problems = [];
-                for(let bb=2; bb<=12; bb++) { // 1..11
-                    problems.push(get_prob(aa, bb));
+                if(aa <= 12) {
+                    for(let bb=2; bb<=12; bb++) { // 1..11
+                        problems.push(get_prob(aa, bb));
+                    }
+                    for(let bb=11; bb>=0; bb--) { // 12..23
+                        problems.push(get_prob(aa, bb));
+                    }
+                    problems.push(get_prob(aa, 12)); // 24
+                    for(let bb=0; bb<6; bb++) { // 25..30
+                        problems.push(get_prob(aa, RND(2,12)));
+                    }
                 }
-                for(let bb=11; bb>=0; bb--) { // 12..23
-                    problems.push(get_prob(aa, bb));
-                }
-                problems.push(get_prob(aa, 12)); // 24
-                for(let bb=0; bb<6; bb++) { // 25..30
-                    problems.push(get_prob(aa, RND(2,12)));
+                if(aa == 13) { // two big numbers [7..12]=6  [2..12]=11   [7..12]*[7..12]=30%
+                    for(let bb=0; bb<30; bb++) {
+                        problems.push(get_prob(RND(7,12), RND(7,12)));
+                    }
                 }
                 return {type: 'problem_list', problems: problems};
             },
