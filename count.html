@@ -250,6 +250,36 @@
             return x;
         }
         
+        function speak_yes() {
+            return ['Yes! ', 'Good! ', 'Great! '][RND(0, 2)];
+        }
+        
+        function multiply_hint(a, b) {
+            return ((a==10 || b==10)?'To multiply by ten, just write a zero after the other number.':
+                ((a==0 || b==0)?'You are multiplying by zero':
+                ((a==1 || b==1)?'You are multiplying by one':
+                (( (a==9 && b<10) || (b==9 && a<10))?'To multiply by nine, take one less than the other number. That is the first digit. For the second digit, take how many you need to nine.':
+                (( (a==11 && b<10) || (b==11 && a<10))?'The two digits will be the same':
+                ((a==12)?('Split the problem. Take ten times '+b+' and add two times '+b+'.'):
+                ((b==12)?('Split the problem. Take ten times '+a+' and add two times '+a+'.'):
+                ((a==11)?('Split the problem. Take ten times '+b+' and add '+b+'.'):
+                ((b==11)?('Split the problem. Take ten times '+a+' and add '+a+'.'):
+                ((a==5 && (b%2==0))?('Remember that '+b+' times five is '+(b/2)+' pairs of fives.'):
+                ((b==5 && (a%2==0))?('Remember that '+a+' times five is '+(a/2)+' pairs of fives.'):
+                ((a==5)?('How much is '+(b-1)+' times five? Then add five.'):
+                ((b==5)?('How much is '+(a-1)+' times five? Then add five.'):
+                (( (a==4 && b==3) || (a==3 && b==4))?'This is the special number that you can split into threes and fours, too.':
+                ((a==4)?('To get '+b+' times four, take '+b+' times two, twice.'):
+                ((b==4)?('To get '+a+' times four, take '+a+' times two, twice.'):
+                ((a==3)?('Take '+b+' times two, and add '+b+'.'):
+                ((b==3)?('Take '+a+' times two, and add '+a+'.'):
+                ((a==6)?('Take how much'+b+' times five is, and add '+b+'.'):
+                ((b==6)?('Take how much'+a+' times five is, and add '+a+'.'):
+                ('Remember that '+a+' times '+(b-1)+' is '+(a*(b-1))+'.')
+                ))))))))))))))))))));
+
+        }
+        
         /* Problem generators, returning <problem> := {
                 problem:STR,  // use '?' for the placeholder; '*' for multiplication, '/' for division. See format_problem()
                 solution:STR, 
@@ -266,7 +296,7 @@
                 const v = RND(0, 5);
                 return {problem: v+'+?=5', placeholder: true, solution:(5-v), hint: {
                     speak_prompt: v+' plus what is five?',
-                    speak_solution: 'Yes, '+v+' plus '+(5-v)+' is five.',
+                    speak_solution: speak_yes()+v+' plus '+(5-v)+' is five.',
                     range: [1,5,1,v]
                 }};
             },
@@ -274,7 +304,7 @@
                 const v = RND(0, 10);
                 return {problem: v+'+?=10', placeholder: true, solution:(10-v), hint:{
                     speak_prompt: v+' plus what is ten?',
-                    speak_solution: 'Yes, '+v+' plus '+(10-v)+' is ten.',
+                    speak_solution: speak_yes()+v+' plus '+(10-v)+' is ten.',
                     range:[1,10,1,v]
                 }};
             },
@@ -282,7 +312,7 @@
                 const a = RND(0, 10);
                 const b = RND(0, 10);
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{
-                    speak_solution: 'Yes, '+a+' plus '+b+' is '+(a+b)+'.',
+                    speak_solution: speak_yes()+a+' plus '+b+' is '+(a+b)+'.',
                     range:[1,20,1,a]
                 }};
             },
@@ -296,7 +326,7 @@
                 const b = RND(1, 10) * 100;
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{
                     speak_prompt: 'What is '+a+' plus '+b+'?',
-                    speak_solution: 'Well done! '+a+' plus '+b+' is '+speak_thousands(a+b)+'.',
+                    speak_solution: speak_yes()+a+' plus '+b+' is '+speak_thousands(a+b)+'.',
                     range:[100,20*100,100,a,100]
                 }};
             },
@@ -363,43 +393,24 @@
                 const b = RND(0, 4);
                 return {problem: a+'*'+b+'=', solution:(a*b), hint:{
                     speak_prompt: 'What is '+a+' times '+b+'?',
-                    speak_solution: 'Yes, '+a+' times '+b+' is '+(a*b),
+                    speak_solution: speak_yes()+a+' times '+b+' is '+(a*b),
                     range:[0,b*5,b*10,b*10,b]
                 }}; 
             },
-            mult_tables: function(aa) {
+            mult_tables: function(aa) {  // aa=0..12 times tables, 13,14,15=big/mix/small part of 12-times tables
                 const get_prob = function(a, b) {
                     return {problem: a+'*'+b+'=', solution:(a*b), hint:{
                         speak_prompt: ''+a+' times '+b+'',
-                        speak_solution: 'Good! '+a+' times '+b+' is '+(a*b),
+                        speak_solution: speak_yes()+a+' times '+b+' is '+(a*b),
                         groups: {in_group:(b==5?b:a), groups:(b==5?a:b), row_length:(b==5||a==5?2:1)},
-                        help_speech:
-                        ((a==10 || b==10)?'To multiply by ten, just write a zero after the other number.':
-                        ((a==0 || b==0)?'You are multiplying by zero':
-                        ((a==1 || b==1)?'You are multiplying by one':
-                        (( (a==9 && b<10) || (b==9 && a<10))?'To multiply by nine, take one less than the other number. That is the first digit. For the second digit, take how many you need to nine.':
-                        (( (a==11 && b<10) || (b==11 && a<10))?'The two digits will be the same':
-                        ((a==12)?('Split the problem. Take ten times '+b+' and add two times '+b+'.'):
-                        ((b==12)?('Split the problem. Take ten times '+a+' and add two times '+a+'.'):
-                        ((a==11)?('Split the problem. Take ten times '+b+' and add '+b+'.'):
-                        ((b==11)?('Split the problem. Take ten times '+a+' and add '+a+'.'):
-                        ((a==5 && (b%2==0))?('Remember that '+b+' times five is '+(b/2)+' pairs of fives.'):
-                        ((b==5 && (a%2==0))?('Remember that '+a+' times five is '+(a/2)+' pairs of fives.'):
-                        ((a==5)?('How much is '+(b-1)+' times five? Then add five.'):
-                        ((b==5)?('How much is '+(a-1)+' times five? Then add five.'):
-                        (( (a==4 && b==3) || (a==3 && b==4))?'This is the special number that you can split into threes and fours, too.':
-                        ((a==4)?('To get '+b+' times four, take '+b+' times two, twice.'):
-                        ((b==4)?('To get '+a+' times four, take '+a+' times two, twice.'):
-                        ((a==3)?('Take '+b+' times two, and add '+b+'.'):
-                        ((b==3)?('Take '+a+' times two, and add '+a+'.'):
-                        ((a==6)?('Take how much'+b+' times five is, and add '+b+'.'):
-                        ((b==6)?('Take how much'+a+' times five is, and add '+a+'.'):
-                        ('Remember that '+a+' times '+(b-1)+' is '+(a*(b-1))+'.')
-                        ))))))))))))))))))))
+                        help_speech: multiply_hint(a, b)
                     }}; 
                 };
+                const get_prob_swap = function(a, b) {
+                    return (RND(0,1) ? get_prob(a, b) : get_prob(b, a));
+                };
                 let problems = [];
-                if(aa <= 12) {
+                if(aa <= 12) {  // times tables
                     for(let bb=2; bb<=12; bb++) { // 1..11
                         problems.push(get_prob(aa, bb));
                     }
@@ -413,48 +424,43 @@
                 }
                 /*
                     |0  1  2  3  4  5  6  7  8  9 10 11 12
-                    +-------------------------------------
-                   0|x  x  x  x  x  x  x  x  x  x  x  x  x      s: 25+3+3 = 26%
-                   1|x  x  x  x  x  x  x  x  x  x  x  x  x      m: 25+25+9 = 49%
-                   2|x  x  s  s  s  s  s  S  m  m  m  m  m
-                   3|x  x  s  s  s  s  s  S  m  m  m  m  m
-                   4|x  x  s  s  s  s  s  S  m  m  m  m  m
-                   5|x  x  s  s  s  s  s  M  m  m  m  m  m
-                   6|x  x  s  s  s  s  s  M  m  m  m  m  m
-                   7|x  x  S  S  S  M  M  M  M  M  B  B  B
-                   8|x  x  m  m  m  m  m  M  b  b  b  b  b
-                   9|x  x  m  m  m  m  m  M  b  b  b  b  b
-                  10|x  x  m  m  m  m  m  B  b  b  b  b  b
-                  11|x  x  m  m  m  m  m  B  b  b  b  b  b
-                  12|x  x  m  m  m  m  m  B  b  b  b  b  b
+                    +-------------------------------------      total: 66
+                   0|x  x  x  x  x  x  x  x  x  x  x  x  x      S+X=21 
+                   1|x  x  x  x  x  x  x  x  x  x  x  x  x      M=25
+                   2|x  x  S  S  S  S  S  S  M  M  M  M  M      B+X=21
+                   3|x  x  s  S  S  S  S  S  M  M  M  M  M
+                   4|x  x  s  s  S  S  S  S  M  M  M  M  M
+                   5|x  x  s  s  s  S  S  S  M  M  M  M  M
+                   6|x  x  s  s  s  s  S  S  M  M  M  M  M
+                   7|x  x  s  s  s  s  s  X  B  B  B  B  B
+                   8|x  x  m  m  m  m  m  b  B  B  B  B  B
+                   9|x  x  m  m  m  m  m  b  b  B  B  B  B
+                  10|x  x  m  m  m  m  m  b  b  b  B  B  B
+                  11|x  x  m  m  m  m  m  b  b  b  b  B  B
+                  12|x  x  m  m  m  m  m  b  b  b  b  b  B
                 
                 */
-                if(aa == 13) { // two big numbers (b,B)
+                if(aa == 13) { // two big numbers (b,B,X)
                     while(problems.length < 30) {
                         const x = RND(7, 12);
                         const y = RND(7, 12);
-                        if((x == 7 && y <= 9) || (y == 7 && x <= 9)) { continue; }
-                        problems.push(get_prob(x, y));
+                        if(x < y) { continue; }
+                        problems.push(get_prob_swap(x, y));
                     }
                 }
                 if(aa == 14) { // mix (m,M)
                     while(problems.length < 30) {
-                        const x = RND(2, 7);
-                        const y = RND(7, 12);
-                        if((y == 7 && x <= 4) || (x == 7 && y >= 10)) { continue; }
-                        if(RND(0,1)) {
-                            problems.push(get_prob(x, y));
-                        } else {
-                            problems.push(get_prob(y, x));
-                        }                    
+                        const x = RND(2, 6);
+                        const y = RND(8, 12);
+                        problems.push(get_prob_swap(x, y));
                     }
                 }
-                if(aa == 15) { // two small numbers (s,S)
+                if(aa == 15) { // two small numbers (s,S,X)
                     while(problems.length < 30) {
                         const x = RND(2, 7);
                         const y = RND(2, 7);
-                        if((x == 7 && y >= 5) || (y == 7 && x >= 5)) { continue; }
-                        problems.push(get_prob(x, y));
+                        if(x < y) { continue; }
+                        problems.push(get_prob_swap(x, y));
                     }
                 }
                 return {type: 'problem_list', problems: problems};
@@ -463,7 +469,7 @@
                 const get_prob = function(a, b) {
                     return {problem: a+'*'+b+'=', solution:(a*b), hint:{
                         speak_prompt: 'What is '+a+' times '+b+'?',
-                        speak_solution: 'Yes, '+a+' times '+b+' is '+(a*b),
+                        speak_solution: speak_yes()+a+' times '+b+' is '+(a*b),
                         // range:[0,b*12,b*10,b*10,b],
                         /*
                         help_txt:
@@ -471,29 +477,7 @@
                             + a+'*'+b+'=?#'
                             + a+'*'+(b+1)+'='+(a*(b+1))
                         */
-                        help_speech:
-                        ((a==10 || b==10)?'To multiply by ten, just write a zero after the other number.':
-                        ((a==0 || b==0)?'You are multiplying by zero':
-                        ((a==1 || b==1)?'You are multiplying by one':
-                        (( (a==9 && b<10) || (b==9 && a<10))?'To multiply by nine, take one less than the other number. That is the first digit. For the second digit, take how many you need to nine.':
-                        (( (a==11 && b<10) || (b==11 && a<10))?'The two digits will be the same':
-                        ((a==12)?('Split the problem. Take ten times '+b+' and add two times '+b+'.'):
-                        ((b==12)?('Split the problem. Take ten times '+a+' and add two times '+a+'.'):
-                        ((a==11)?('Split the problem. Take ten times '+b+' and add '+b+'.'):
-                        ((b==11)?('Split the problem. Take ten times '+a+' and add '+a+'.'):
-                        ((a==5 && (b%2==0))?('Remember that '+b+' times five is '+(b/2)+' pairs of fives.'):
-                        ((b==5 && (a%2==0))?('Remember that '+a+' times five is '+(a/2)+' pairs of fives.'):
-                        ((a==5)?('How much is '+(b-1)+' times five? Then add five.'):
-                        ((b==5)?('How much is '+(a-1)+' times five? Then add five.'):
-                        (( (a==4 && b==3) || (a==3 && b==4))?'This is the special number that you can split into threes and fours, too.':
-                        ((a==4)?('To get '+b+' times four, take '+b+' times two, twice.'):
-                        ((b==4)?('To get '+a+' times four, take '+a+' times two, twice.'):
-                        ((a==3)?('Take '+b+' times two, and add '+b+'.'):
-                        ((b==3)?('Take '+a+' times two, and add '+a+'.'):
-                        ((a==6)?('Take how much'+b+' times five is, and add '+b+'.'):
-                        ((b==6)?('Take how much'+a+' times five is, and add '+a+'.'):
-                        ('Remember that '+a+' times '+(b-1)+' is '+(a*(b-1))+'.')
-                        ))))))))))))))))))))
+                        help_speech: multiply_hint(a, b)
                     }}; 
                 };
                 const a = RND(2, 12);
@@ -508,7 +492,7 @@
                 const a = RND(0, 12);
                 return {problem: a+'/2=', solution:(a/2), hint:{
                     speak_prompt: 'What is half of '+a+'?',
-                    speak_solution: 'Yes, '+a+' divided by two is '+speak_half(a/2)+'.',
+                    speak_solution: speak_yes()+a+' divided by two is '+speak_half(a/2)+'.',
                     range:[1,a,-1,-1]
                 }};
             },
@@ -516,7 +500,7 @@
                 const a = RND(1, 6)*2;
                 return {problem: '?*2='+a, placeholder: true, solution:(a/2), hint:{
                     speak_prompt: 'What taken twice is '+a+'?',
-                    speak_solution: 'Yes, '+(a/2)+' times two is '+a,
+                    speak_solution: speak_yes()+(a/2)+' times two is '+a,
                     range:[1,a,-1,-1]
                 }};
             },
@@ -524,7 +508,7 @@
                 const a = RND(1, 6)*2;
                 return {problem: '2*?='+a, placeholder: true, solution:(a/2), hint:{
                     speak_prompt: 'Two taken how many times is '+a+'?',
-                    speak_solution: 'Yes, two times '+(a/2)+' is '+a,
+                    speak_solution: speak_yes()+'two times '+(a/2)+' is '+a,
                     range:[1,a,-1,-1]
                 }};
             },
@@ -532,7 +516,7 @@
                 const a = RND(1, 4)*3;
                 return {problem: a+'/3=', placeholder: false, solution:(a/3), hint:{
                     speak_prompt: 'What is '+a+' divided by three?',
-                    speak_solution: 'Good job! The third of '+a+' is '+(a/3),
+                    speak_solution: speak_yes()+'The third of '+a+' is '+(a/3),
                     range:[1,a,-1,-1]
                 }};
             },
@@ -540,7 +524,7 @@
                 const a = RND(1, 4)*3;
                 return {problem: '?*3='+a, placeholder: true, solution:(a/3), hint:{
                     speak_prompt: 'What taken three times is '+a+'?',
-                    speak_solution: 'Good job! '+(a/3)+' times three is '+a,
+                    speak_solution: speak_yes()+(a/3)+' times three is '+a,
                     range:[1,a,-1,-1]
                 }};
             },
@@ -548,7 +532,7 @@
                 const a = RND(1, 4)*3;
                 return {problem: '3*?='+a, placeholder: true, solution:(a/3), hint:{
                     speak_prompt: 'Three taken how many times is '+a+'?',
-                    speak_solution: 'Good job! Three times '+(a/3)+' is '+a,
+                    speak_solution: speak_yes()+'Three times '+(a/3)+' is '+a,
                     range:[1,a,-1,-1]
                 }};
             },
@@ -556,7 +540,7 @@
                 const a = RND(1, 5)*5;
                 return {problem: a+'/5=', placeholder: false, solution:(a/5), hint:{
                     speak_prompt: 'What is '+a+' divided by five?',
-                    speak_solution: 'Good job! The fifth of '+a+' is '+(a/5),
+                    speak_solution: speak_yes()+'The fifth of '+a+' is '+(a/5),
                     range:[1,a,-1,-1]
                 }};
             },
@@ -564,7 +548,7 @@
                 const a = RND(1, 5)*5;
                 return {problem: '?*5='+a, placeholder: true, solution:(a/5), hint:{
                     speak_prompt: 'What taken five times is '+a+'?',
-                    speak_solution: 'Great! '+(a/5)+' times five is '+a,
+                    speak_solution: speak_yes()+(a/5)+' times five is '+a,
                     range:[1,a,-1,-1]
                 }};
             },
@@ -572,7 +556,7 @@
                 const a = RND(1, 5)*5;
                 return {problem: '5*?='+a, placeholder: true, solution:(a/5), hint:{
                     speak_prompt: 'Five taken how many times is '+a+'?',
-                    speak_solution: 'Great! Five times '+(a/5)+' is '+a,
+                    speak_solution: speak_yes()+'Five times '+(a/5)+' is '+a,
                     range:[1,a,-1,-1]
                 }};
             },
@@ -1026,7 +1010,7 @@
         
         // Choose a range of word sets to show words from
         function choose_problemset() {
-            let p = prompt("What set of problems should we use?\nType a number from 0 to "+max_problemset+" (simple to difficult),\nor 101 for the 1-time table, 102 for the 2-time table etc.") - 0;
+            let p = prompt("What set of problems should we use?\nType a number from 0 to "+max_problemset+" (simple to difficult);\nor 101 for the 1-time table, 102 for the 2-time table etc.;\n or 113, 114, 115 for mixed 12-times tables (big, mixed, small)") - 0;
             if(isNaN(p)) { p = 0; }
             return p;
         }
