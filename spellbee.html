@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?138">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?146">
 
     <style>
     
@@ -71,14 +71,14 @@
     <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?138"></script>
+    <script src="assets/local/beelocal.js?146"></script>
 </head>
 <body>
     <div class="container">
 
         <div class="game scorewrap">
             <div class="score">
-                <span class="icon">🪙</span> <span class="value">0</span>
+                <span class="icon">🪙</span><span class="icontext"></span> <span class="value">0</span>
                 <div class="bar"><span class="barfill"></span></div>
             </div><div class="gifts"><span class="open">🎁</span><span class="close">X</span><span class="needed">-</span></div>
         </div>
@@ -113,15 +113,19 @@
     </p>
     <p class="smallprint">Hint: Press 1, F1, F2, ESC or the button under ESC (some may trigger other functions)</p>
     
-    <p class="smallprint">Use this page with a physical keyboard | <span class="handle">Licences</span>
-    <span class="expand"></span> 
-    | Icons by <a href="https://icons8.com">Icons8</a>
-    | <a href="https://codeberg.org/csirmaz/learning-aid">Codebase</a>
-    | <a href="#" onclick="bee_tts.test(); return false">TTS</a>
-    <span class="localfunctions"></span>
-    | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
-    | <a href="#" onclick="modify_wordlist(); return false">Update word sets</a>
-    | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
+    <p class="smallprint">
+        Use this page with a physical keyboard 
+        | <a href="#" class="handle">Tools &amp; Licences</a>
+        <span class="expand"></span> 
+        | Icons by <a href="https://icons8.com">I</a>cons8
+        | <a href="https://codeberg.org/csirmaz/learning-aid">Codebase</a>
+        <span class="expand_tools">
+            | <a href="#" onclick="bee_tts.test(); return false">TTS</a>
+            <span class="localfunctions"></span>
+            | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
+            | <a href="#" onclick="modify_wordlist(); return false">Update word sets</a>
+            | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
+        </span>
     </p>
 
     <div class="fireworks-container"></div>
@@ -503,7 +507,7 @@
 
 
     </script>
-    <script src="assets/common.js?138"></script>
+    <script src="assets/common.js?146"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.

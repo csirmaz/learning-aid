@@ -83,6 +83,20 @@
             bottom: 0.2rem;
             color: #fe0;
         }
+        
+        .score .icontext {
+            display: block;
+            width: 1.3rem;
+            text-align: center;
+            letter-spacing: -.1rem;
+            line-height: .7rem;
+            font-size: .7rem;
+            position: absolute;
+            top: 1rem;
+            left: 1.1rem;
+            color: #630;
+            text-shadow: 0 0 .2rem #fe0;
+        }
 
         .score .value {
             display: inline-block;
@@ -129,8 +143,8 @@
         }
         
         .smallprint { font-size: 70%; }
-        .smallprint .handle { cursor: pointer; }
         .smallprint .expand { display: none; }
+        .smallprint .expand_tools { display: none; }
 
         @keyframes pulse { 
             25% { transform: scale(1.4); } 

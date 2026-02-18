@@ -1,5 +1,5 @@
 
-        const bee_app_version = 138;
+        const bee_app_version = 146;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -201,6 +201,7 @@
         function update_score_ui(do_animate) {
             const score = bee.storage.players[bee.player].score;
             $('.score .value').html(esc_html(score));
+            $('.score .icontext').html(score < bee.score_goal ? '' : esc_html(Math.floor(score / bee.score_goal)));
             if(do_animate !== false) {
                 $('.score').addClass((score % bee.score_goal == 0) ? 'goldpulse' : 'pulse');
                 if(bee.score_anim_timeout !== false) { clearTimeout(bee.score_anim_timeout); }
@@ -624,8 +625,16 @@ Music by <a href="https://pixabay.com/users/fassounds-3433550/?utm_source=link-a
 `;
 
 
+        let smallprint_expanded = false;
         $('.smallprint .handle').on('click', function() {
+            if(!smallprint_expanded) {
+                if(prompt("Age verification: What is the capital of Finland?").toLowerCase() != 'helsinki') {
+                    return false;
+                }
+            }
             $('.smallprint .expand').html(licences).toggle();
+            $('.smallprint .expand_tools').toggle();
+            smallprint_expanded = !smallprint_expanded;
             return false;
         });
         
