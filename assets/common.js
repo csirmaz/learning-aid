@@ -1,5 +1,5 @@
 
-        const bee_app_version = 178;
+        const bee_app_version = 181;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -186,7 +186,7 @@
             } else {
                 bee.storage.players[bee.player].negative_score += v;
             }
-            const neg_max = 6;
+            const neg_max = 4;
             if(bee.storage.players[bee.player].negative_score > neg_max) {
                 bee.storage.players[bee.player].negative_score = neg_max;
             }

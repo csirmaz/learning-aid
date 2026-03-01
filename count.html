@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?178">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?181">
 
     <style>
         body {
@@ -144,7 +144,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?178"></script>
+    <script src="assets/local/beelocal.js?181"></script>
 </head>
 <body>
     <div class="container">
@@ -715,7 +715,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?178"></script>
+    <script src="assets/common.js?181"></script>
     <script>
 
         
@@ -960,12 +960,12 @@
 
 
         // Delay answering as a penalty
-        var wentaway_penalty = false;
+        var penalty_timeout_ongoing = false;
         function penalty_delay(wrong_answer, reason) {
-            console.log('penalty_delay reason=', reason, 'wrong_answer=', wrong_answer, 'ongoing=', wentaway_penalty);
-            if(wentaway_penalty) { return; }
+            console.log('penalty_delay reason=', reason, 'wrong_answer=', wrong_answer, 'ongoing=', penalty_timeout_ongoing);
+            if(penalty_timeout_ongoing) { return; }
             bee.can_type = false;
-            wentaway_penalty = true;
+            penalty_timeout_ongoing = true;
             if(!wrong_answer) { add_negative_score(.5); }
             $('.hintloader img').attr('src', wrong_answer ? 'assets/images/bricks.gif' : 'assets/images/loader.gif');
             $('.hintloader').show();
@@ -975,27 +975,32 @@
                 $('.hintloader img').attr('src', 'assets/images/loader.gif');
                 $('.problem').show();
                 bee.can_type = true;
-                wentaway_penalty = false;
+                penalty_timeout_ongoing = false;
             }, wrong_answer ? 6*1000 : 14*1000);
         }
 
         
         function manage_question_timeout(at_new_question) {
             console.log('#manage_question_timeout() at_new=', at_new_question);
+            const qtimeout = 15;
             bee.questiontimeout.$warn.css('visibility', 'hidden');
             if(bee.questiontimeout.warn_timeout) { clearTimeout(bee.questiontimeout.warn_timeout); }
             if(bee.questiontimeout.skip_timeout) { clearTimeout(bee.questiontimeout.skip_timeout); }
-            if(at_new_question && bee.problem.use_timeout && !wentaway_penalty) {
+            if(at_new_question && bee.problem.use_timeout && !penalty_timeout_ongoing) {
                 bee.questiontimeout.warn_timeout = setTimeout(function() {
-                    bee.questiontimeout.$warn.css('visibility', 'visible');
-                }, 5000);
+                    if(!penalty_timeout_ongoing) {
+                        bee.questiontimeout.$warn.css('visibility', 'visible');
+                    }
+                }, (qtimeout-1)*1000);
                 bee.questiontimeout.skip_timeout = setTimeout(function() {
                     // Skip to the next question
-                    console.log('timeout: skipping to next question');
-                    add_negative_score(1);
-                    end_question();
-                    setTimeout(function(){ new_question('manage_question_timeout()'); }, 200);
-                }, 6000);
+                    if(!penalty_timeout_ongoing) {
+                        console.log('timeout: skipping to next question');
+                        add_negative_score(1);
+                        end_question();
+                        setTimeout(function(){ new_question('manage_question_timeout()'); }, 200);
+                    }
+                }, qtimeout*1000);
             }
         }
         
@@ -1021,7 +1026,7 @@
             bee.storage.players[bee.player].current_question_time = Date.now();
             save_storage('set_question_qtime', true); // true = skip hook
             
-            // We call this after possibly calling penalty_delay so wentaway_penalty would already be set
+            // We call this after possibly calling penalty_delay so penalty_timeout_ongoing would already be set
             manage_question_timeout(true); // true = at new question
         }
 
