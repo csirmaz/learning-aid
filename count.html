@@ -311,6 +311,7 @@
                 const a = RND(0, 10);
                 const b = RND(0, 10);
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{
+                    speak_prompt: ''+a+' plus '+b+'',
                     speak_solution: speak_yes()+a+' plus '+b+' is '+(a+b)+'.',
                     range:[1,20,1,a]
                 }};
@@ -318,7 +319,11 @@
             add_mid: function() {  // e.g. 13+8=
                 const a = RND(0, 10) + 10;
                 const b = RND(0, 10);
-                return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[11,30,11,a]}};
+                return {problem: a+'+'+b+'=', solution:(a+b), hint:{
+                    speak_prompt: ''+a+' plus '+b+'',
+                    speak_solution: speak_yes()+a+' plus '+b+' is '+(a+b),
+                    range:[11,30,11,a]
+                }};
             },
             add_hundreds: function () {  // e.g. 500+700=
                 const a = RND(1, 10) * 100;
@@ -331,35 +336,63 @@
             },
             sub_five: function() {  // e.g. [5]-3=
                 const v = RND(0, 5);
-                return {problem: '5-'+v+'=', solution:(5-v), hint:{range:[1,5,1,v]}};
+                return {problem: '5-'+v+'=', solution:(5-v), hint:{
+                    speak_prompt: '5 minus '+v+'',
+                    speak_solution: speak_yes()+'5 minus '+v+' is '+(5-v),
+                    range:[1,5,1,v]
+                }};
             },
             sub_ten: function() {  // e.g. [10]-7=
                 const v = RND(0, 10);
-                return {problem: '10-'+v+'=', solution:(10-v), hint:{range:[1,10,1,v]}};
+                return {problem: '10-'+v+'=', solution:(10-v), hint:{
+                    speak_prompt: '10 minus '+v+'',
+                    speak_solution: speak_yes()+'10 minus '+v+' is '+(10-v),
+                    range:[1,10,1,v]
+                }};
             },
             sub_five_minus: function() {  // e.g. [5]-8=
                 const v = RND(0, 8);
-                return {problem: '5-'+v+'=', solution:(5-v), hint:{range:[-5,5,1,0]}};
+                return {problem: '5-'+v+'=', solution:(5-v), hint:{
+                    speak_prompt: '5 minus '+v+'',
+                    speak_solution: speak_yes()+'5 minus '+v+' is '+(5-v),
+                    range:[-5,5,1,0]
+                }};
             },
             sub_ten_minus: function() {  // e.g. [10]-13=
                 const v = RND(0, 13);
-                return {problem: '10-'+v+'=', solution:(10-v), hint:{range:[-3,10,1,0]}};
+                return {problem: '10-'+v+'=', solution:(10-v), hint:{
+                    speak_prompt: '10 minus '+v+'',
+                    speak_solution: speak_yes()+'10 minus '+v+' is '+(10-v),
+                    range:[-3,10,1,0]
+                }};
             },
             sub_small: function() {  // e.g. 7-4=  (always positive)
                 let a = RND(0, 10);
                 let b = RND(0, 10);
                 if(a > b) { const tmp = a; a = b; b = tmp; }
-                return {problem: b+'-'+a+'=', solution:(b-a), hint:{range:[1,b,-1,-1]}};
+                return {problem: b+'-'+a+'=', solution:(b-a), hint:{
+                    speak_prompt: ''+b+' minus '+a+'',
+                    speak_solution: speak_yes()+b+' minus '+a+' is '+(b-a),
+                    range:[1,b,-1,-1]
+                }};
             },
             sub_small_any: function() {  // e.g. 4-7=
                 let a = RND(0, 10);
                 let b = RND(0, 10);
-                return {problem: b+'-'+a+'=', solution:(b-a), hint:{range:[-10,10,0,b]}};
+                return {problem: b+'-'+a+'=', solution:(b-a), hint:{
+                    speak_prompt: ''+b+' minus '+a+'',
+                    speak_solution: speak_yes()+b+' minus '+a+' is '+(b-a),
+                    range:[-10,10,0,b]
+                }};
             },
             sub_mid: function() {  // e.g. 12-6=
                 const a = RND(0, 10);
                 const b = RND(0, 10) + 10;
-                return {problem: b+'-'+a+'=', solution:(b-a), hint:{range:[1,b,-1,-1]}};
+                return {problem: b+'-'+a+'=', solution:(b-a), hint:{
+                    speak_prompt: ''+b+' minus '+a+'',
+                    speak_solution: speak_yes()+b+' minus '+a+' is '+(b-a),
+                    range:[1,b,-1,-1]
+                }};
             },
             add_big_no_carry: function() {  // e.g. 36+42= (no carry)
                 const a1 = RND(0, 9);
