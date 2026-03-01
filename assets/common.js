@@ -1,10 +1,11 @@
 
-        const bee_app_version = 161;
+        const bee_app_version = 167;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
         $('.gifts .open').html('🎁'+"\ufe0f");
         $('.giftannounce span').html('🎁'+"\ufe0f");
+        $('.timeoutwarn').html('⏰'+"\ufe0f");
 
 
         const audio = {

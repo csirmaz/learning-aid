@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?161">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?167">
 
     <style>
         body {
@@ -139,13 +139,13 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?161"></script>
+    <script src="assets/local/beelocal.js?167"></script>
 </head>
 <body>
     <div class="container">
 
         <div class="game scorewrap">
-            <div class="score">
+            <div class="timeoutwarn">⏰</div><div class="score">
                 <span class="icon">🪙</span><span class="icontext"></span> <span class="value">0</span>
                 <div class="bar"><span class="barfill"></span></div>
             </div><div class="gifts"><span class="open">🎁</span><span class="close">X</span><span class="needed">-</span></div>
@@ -284,11 +284,21 @@
                 solution:STR, 
                 hint:OBJ,
                 [placeholder:true]  // add if the question has a variable/placeholder
+                [use_timeout:true]  // move on to the next question after a timeout
             }
             Alternatively, a problem generator can return a <list of problems> := {
                 type: 'problem_list',
                 problems: [<problem>, ...]
             }
+            
+            hint: {  // See show_help()
+                speak_prompt: <str>
+                speak_solution: <str>
+                help_speech: <str>
+                range: <list>
+                    // hint syntax: {range: [range-min, range-max, highlight-min, highlight-max]}
+                    // hint syntax: {range: [range-min, range-max, highlight-min, highlight-max, step]}
+                groups:
         */
         const PRBL = {
             add_to_five: function() {  // e.g. 2+?=[5]
@@ -478,7 +488,8 @@
                         const y = RND(7, 12);
                         if(x < y) { continue; }
                         const p = get_prob_swap(x, y);
-                        p.speak_prompt = undefined;
+                        p.hint.speak_prompt = undefined;
+                        p.use_timeout = true;
                         problems.push(p);
                     }
                 }
@@ -487,7 +498,8 @@
                         const x = RND(2, 6);
                         const y = RND(8, 12);
                         const p = get_prob_swap(x, y);
-                        p.speak_prompt = undefined;
+                        p.hint.speak_prompt = undefined;
+                        p.use_timeout = true;
                         problems.push(p);
                     }
                 }
@@ -497,7 +509,8 @@
                         const y = RND(2, 7);
                         if(x < y) { continue; }
                         const p = get_prob_swap(x, y);
-                        p.speak_prompt = undefined;
+                        p.hint.speak_prompt = undefined;
+                        p.use_timeout = true;
                         problems.push(p);
                     }
                 }
@@ -659,6 +672,11 @@
             score_anim_timeout: false,
             player: false,  // state: name of the player - scores are saved to browser under this name
             $input: $('.prompt .infield .inp'),
+            questiontimeout: { // state: used for question timeouts
+                $warn: $('.timeoutwarn'),
+                warn_timeout: false,
+                skip_timeout: false
+            },
             storage: {'players': {}},  // storage data that's saved into local storage
             giftlist: -1,
             score_goal: 30,  // config: controls the bar under the score and gifts
@@ -691,7 +709,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?161"></script>
+    <script src="assets/common.js?167"></script>
     <script>
 
         
@@ -702,8 +720,6 @@
 
         
         function show_help() {
-            // hint syntax: {range: [range-min, range-max, highlight-min, highlight-max]}
-            // hint syntax: {range: [range-min, range-max, highlight-min, highlight-max, step]}
             const data = bee.problem.hint;
             if(data === false) {
                 playme('notavail');
@@ -820,7 +836,6 @@
                 console.log("Value", value, "Target", bee.problem.solution);
                 
                 if((value - 0) == bee.problem.solution) { // Success!
-                    bee.can_type = false;
                     end_question();
                     $('.prompt').addClass('success');
                     if(!(bee.problem.hint 
@@ -949,8 +964,26 @@
         }
 
         
+        function manage_question_timeout() {
+            bee.questiontimeout.$warn.css('visibility', 'hidden');
+            if(bee.questiontimeout.warn_timeout) { clearTimeout(bee.questiontimeout.warn_timeout); }
+            if(bee.questiontimeout.skip_timeout) { clearTimeout(bee.questiontimeout.skip_timeout); }
+            if(bee.problem.use_timeout && !wentaway_penalty) {
+                bee.questiontimeout.warn_timeout = setTimeout(function() {
+                    bee.questiontimeout.$warn.css('visibility', 'visible');
+                }, 5000);
+                bee.questiontimeout.skip_timeout = setTimeout(function() {
+                    // Skip to the next question
+                    console.log('timeout: skipping to next question');
+                    end_question();
+                    setTimeout(new_question, 200);
+                }, 6000);
+            }
+        }
+        
         // Initialize a question
         function start_question() {
+            manage_question_timeout();
             bee.can_type = true;
             
             $('.problem').html(format_problem(bee.problem.problem));
@@ -1045,6 +1078,8 @@
         
         // Called when a question is finished
         function end_question() {
+            bee.can_type = false;
+            
             // For anti-cheat system
             bee.storage.players[bee.player].current_question_time = undefined;
             save_storage('success_qtimer', true); // true = skip hook
