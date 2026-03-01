@@ -1,5 +1,5 @@
 
-        const bee_app_version = 147;
+        const bee_app_version = 157;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -76,81 +76,25 @@
             videos = videos.concat(bee_local.local_videos);
         }
         
-
-        // Data and objects for the fireworks animation
-        const fireworks = {
-            obj: new Fireworks(document.querySelector('.fireworks-container'), {
-                sound: {
-                    enabled: true,
-                    files: [
-                        'assets/fireworks/explosion0.mp3',
-                        'assets/fireworks/explosion1.mp3',
-                        'assets/fireworks/explosion2.mp3'
-                    ],
-                    volume: {
-                        min: 1,
-                        max: 2
-                    }
-                },
-                lineWidth: { explosion: { min: 4, max: 6}, trace: { min: 4, max: 6}},
-                // intensity: 20, // default: 30
-                delay: { min: 5, max: 10 },
-            }),
-            playing: false,
-            slow_timeout: false,
-            stop_timeout: false,
-        };
-        setTimeout(function(){ $('.fireworks-container').hide(); }, 200);
-        
-
-        // Show fireworks for a few seconds
-        function show_fireworks(callback) {
-            console.log('fireworks: show');
-            $('.fireworks-container').show();
-            fireworks.obj.setOptions({ delay: { min: 5, max: 10 }});
-            if(fireworks.slow_timeout !== false) { 
-                console.log('fireworks: clear slow');
-                clearTimeout(fireworks.slow_timeout); 
-            }
-            if(fireworks.stop_timeout !== false) { 
-                console.log('fireworks: clear stop');
-                clearTimeout(fireworks.stop_timeout); 
-            }
-            if(!fireworks.playing) {
-                console.log('fireworks: start()');
-                fireworks.playing = true;
-                fireworks.obj.start();
-            }
-            // fireworks.pause()
-            // fireworks.clear()
-
-            fireworks.slow_timeout = setTimeout( function() {
-                // Gracefully stop the fireworks
-                fireworks.obj.setOptions({ delay: { min: 1000, max: 1000 }});
-                fireworks.slow_timeout = false;
-            }, 2*1000);
-            
-            fireworks.stop_timeout = setTimeout( function(){
-                console.log('fireworks: stop()');
-                fireworks.obj.stop();
-                $('.fireworks-container').hide();
-                fireworks.stop_timeout = false;
-                fireworks.playing = false;
-                if(callback) { callback(); }
-            }, 3.5*1000);
-        }
-        
         
         const bee_confetti = new JSConfetti();
         
         
-        // Show a reward animation (fireworks or confetti)
+        // Show a reward animation (confetti)
         function show_animation(callback) {
             const r = Math.random();
             if(r < .5) {
-                bee_confetti.addConfetti().then(callback);
+                bee_confetti.addConfetti({
+                    confettiColors: [
+                        '#00f', '#0c0', '#0ff', '#50f', '#0f0'
+                    ],
+                }).then(callback);
             } else {
-                show_fireworks(callback);
+                bee_confetti.addConfetti({
+                    confettiColors: [
+                        '#f00', '#f99', '#f5c', '#ff0', '#f90'
+                    ],
+                }).then(callback);
             }
         }
         

@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?147">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?157">
 
     <style>
         body {
@@ -137,10 +137,9 @@
 
     </style>
 
-    <script src="assets/fireworks/fireworks.js"></script>
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?147"></script>
+    <script src="assets/local/beelocal.js?157"></script>
 </head>
 <body>
     <div class="container">
@@ -224,8 +223,6 @@
         <span class="expand"></span> 
     </p>
     <p class="smallprint">Hint: Press F1, F2, ESC or the button under ESC (some may trigger other functions)</p>
-
-    <div class="fireworks-container"></div>
     
     <script>
     
@@ -447,14 +444,18 @@
                         const x = RND(7, 12);
                         const y = RND(7, 12);
                         if(x < y) { continue; }
-                        problems.push(get_prob_swap(x, y));
+                        const p = get_prob_swap(x, y);
+                        p.speak_prompt = undefined;
+                        problems.push(p);
                     }
                 }
                 if(aa == 14) { // mix (m,M)
                     while(problems.length < 30) {
                         const x = RND(2, 6);
                         const y = RND(8, 12);
-                        problems.push(get_prob_swap(x, y));
+                        const p = get_prob_swap(x, y);
+                        p.speak_prompt = undefined;
+                        problems.push(p);
                     }
                 }
                 if(aa == 15) { // two small numbers (s,S,X)
@@ -462,7 +463,9 @@
                         const x = RND(2, 7);
                         const y = RND(2, 7);
                         if(x < y) { continue; }
-                        problems.push(get_prob_swap(x, y));
+                        const p = get_prob_swap(x, y);
+                        p.speak_prompt = undefined;
+                        problems.push(p);
                     }
                 }
                 return {type: 'problem_list', problems: problems};
@@ -655,7 +658,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?147"></script>
+    <script src="assets/common.js?157"></script>
     <script>
 
         

@@ -16,14 +16,6 @@
             padding: 0 1rem;
         }
         
-        .fireworks-container {
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-        }
-        
         .scorewrap {
             position: absolute;
             right: 1rem;
