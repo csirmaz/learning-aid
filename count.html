@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?158">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?160">
 
     <style>
         body {
@@ -139,7 +139,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?158"></script>
+    <script src="assets/local/beelocal.js?160"></script>
 </head>
 <body>
     <div class="container">
@@ -658,7 +658,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?158"></script>
+    <script src="assets/common.js?160"></script>
     <script>
 
         
@@ -915,7 +915,7 @@
                 $('.problem').show();
                 bee.can_type = true;
                 wentaway_penalty = false;
-            }, wrong_answer ? 6*1000 : 10*1000);
+            }, wrong_answer ? 6*1000 : 14*1000);
         }
 
         
@@ -1046,7 +1046,8 @@
             }
             
             bee.queued_problems = [];
-            store_question([]);
+            store_question(bee.queued_problems);
+            bee.storage.players[bee.player].current_question_time = undefined;
 
             save_storage();
             init_problemset();
