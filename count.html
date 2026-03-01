@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?167">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?177">
 
     <style>
         body {
@@ -21,6 +21,10 @@
         body .prompt.success .prompticonsuccess { display: inline; }
         body .prompt.success .prompticon { display: none; }
 
+        .prompticonfailed { display: none; }
+        body .prompt.failed .prompticonfailed { display: inline; }
+        body .prompt.failed .prompticon { display: none; }
+
         .prompt .infield {
             background: #fffae4;
             border-radius: 0.5rem;
@@ -33,6 +37,7 @@
         
         .prompt .infield .inp { color: #000; }
         body .prompt.success .infield .inp { color: #090; }
+        body .prompt.failed .infield .inp { color: #c55; }
         
         .prompt .ph {
             color: #00b;
@@ -139,7 +144,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?167"></script>
+    <script src="assets/local/beelocal.js?177"></script>
 </head>
 <body>
     <div class="container">
@@ -153,7 +158,7 @@
         <div class="game prompt">
             <div class="infield">
                 <div class="problem"></div>
-                <div><span class="prompticon"></span><span class="prompticonsuccess"></span> <span class="prompt-ph"><span class="ph">a</span><span class="cmpop">=</span></span><span class="inp"></span></div>
+                <div><span class="prompticon"></span><span class="prompticonsuccess"></span><span class="prompticonfailed"></span> <span class="prompt-ph"><span class="ph">a</span><span class="cmpop">=</span></span><span class="inp"></span></div>
             </div>
             <div class="hintwrap">
                 <div class="hintloader"><img src="assets/images/loader.gif"></div>
@@ -703,19 +708,21 @@
         // Fix emojis
         $('.prompticon').html('👉'+"\ufe0f");
         $('.prompticonsuccess').html('✅'+"\ufe0f");
+        $('.prompticonfailed').html('👉'+"\ufe0f");
         // $('.keypad [data-i="ent"]').html('🆗'+"\ufe0f");
         $('.keypad [data-i="help"]').html('❓'+"\ufe0f");
         
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?167"></script>
+    <script src="assets/common.js?177"></script>
     <script>
 
         
         function clear_hint() {
             $('.hint').html('');
             $('body').removeClass('condense');
+            $('.hintloader').hide();
         }
 
         
@@ -848,7 +855,14 @@
                     }
                 }
                 else {
-                    penalty_delay(true);
+                    // Wrong answer
+                    if(bee.problem.use_timeout) {
+                        end_question();
+                        $('.prompt').addClass('failed');
+                        setTimeout(function(){ new_question('failed'); }, 800);
+                    } else {
+                        penalty_delay(true, 'wrong answer');
+                    }
                 }
                 return false;
             }
@@ -947,10 +961,12 @@
 
         // Delay answering as a penalty
         var wentaway_penalty = false;
-        function penalty_delay(wrong_answer) {
+        function penalty_delay(wrong_answer, reason) {
+            console.log('penalty_delay reason=', reason, 'wrong_answer=', wrong_answer, 'ongoing=', wentaway_penalty);
             if(wentaway_penalty) { return; }
             bee.can_type = false;
             wentaway_penalty = true;
+            if(!wrong_answer) { add_negative_score(.5); }
             $('.hintloader img').attr('src', wrong_answer ? 'assets/images/bricks.gif' : 'assets/images/loader.gif');
             $('.hintloader').show();
             if(!wrong_answer) { $('.problem').hide(); }
@@ -964,26 +980,29 @@
         }
 
         
-        function manage_question_timeout() {
+        function manage_question_timeout(at_new_question) {
+            console.log('#manage_question_timeout() at_new=', at_new_question);
             bee.questiontimeout.$warn.css('visibility', 'hidden');
             if(bee.questiontimeout.warn_timeout) { clearTimeout(bee.questiontimeout.warn_timeout); }
             if(bee.questiontimeout.skip_timeout) { clearTimeout(bee.questiontimeout.skip_timeout); }
-            if(bee.problem.use_timeout && !wentaway_penalty) {
+            if(at_new_question && bee.problem.use_timeout && !wentaway_penalty) {
                 bee.questiontimeout.warn_timeout = setTimeout(function() {
                     bee.questiontimeout.$warn.css('visibility', 'visible');
                 }, 5000);
                 bee.questiontimeout.skip_timeout = setTimeout(function() {
                     // Skip to the next question
                     console.log('timeout: skipping to next question');
+                    add_negative_score(1);
                     end_question();
-                    setTimeout(new_question, 200);
+                    setTimeout(function(){ new_question('manage_question_timeout()'); }, 200);
                 }, 6000);
             }
         }
         
         // Initialize a question
         function start_question() {
-            manage_question_timeout();
+            console.log('#start_question()');
+            manage_question_timeout(true); // true = at new question
             bee.can_type = true;
             
             $('.problem').html(format_problem(bee.problem.problem));
@@ -993,14 +1012,15 @@
             bee.typed = '';
             update_input_field();
             $('.prompt').removeClass('success');
+            $('.prompt').removeClass('failed');
             $('.prompt-ph').toggle(bee.problem.placeholder ? true : false);
             clear_hint();
 
             // Another cheat: switching to the calculator app and reload page
             const cqt = bee.storage.players[bee.player].current_question_time;
-            if(cqt !== undefined && Date.now() - cqt < 3*60*1000) { penalty_delay(); }
+            if(cqt !== undefined && Date.now() - cqt < 3*60*1000) { penalty_delay(false, 'reload page'); }
             bee.storage.players[bee.player].current_question_time = Date.now();
-            save_storage('start_question_qtimer', true); // true = skip hook
+            save_storage('set_question_qtime', true); // true = skip hook
         }
 
         
@@ -1020,11 +1040,12 @@
         document.addEventListener('visibilitychange', function() {
             if(bee.player === false) { return; }
             if(document.hidden) { wentaway++; return; }
-            if(wentaway) { penalty_delay(); }
+            if(wentaway) { penalty_delay(false, 'visibility change'); }
         });
 
         
-        function new_question() {
+        function new_question(reason) {
+            console.log('#new_question() caller=', reason);
             // Refresh the page periodically
             if(Date.now() - bee.load_time > 12*60*60*1000) {
                 window.location.reload(true);
@@ -1078,11 +1099,13 @@
         
         // Called when a question is finished
         function end_question() {
+            console.log('#end_question()');
+            manage_question_timeout(false); // false = not at new question
             bee.can_type = false;
             
             // For anti-cheat system
             bee.storage.players[bee.player].current_question_time = undefined;
-            save_storage('success_qtimer', true); // true = skip hook
+            save_storage('clear_qtime', true); // true = skip hook
 
             bee.queued_problems.shift();
             store_question(bee.queued_problems); // This is shorter now as we used shift()

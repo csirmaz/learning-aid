@@ -1,5 +1,5 @@
 
-        const bee_app_version = 167;
+        const bee_app_version = 177;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -177,15 +177,39 @@
                 bee.storage.players[bee.player].lifetime_score = bee.storage.players[bee.player].score;
             }
         }
+
+        
+        // "negative score" is used to lengthen a level as a penalty; we skip adding scores for every integer
+        function add_negative_score(v) {
+            if(bee.storage.players[bee.player].negative_score === undefined) {
+                bee.storage.players[bee.player].negative_score = v;
+            } else {
+                bee.storage.players[bee.player].negative_score += v;
+            }
+            const neg_max = 6;
+            if(bee.storage.players[bee.player].negative_score > neg_max) {
+                bee.storage.players[bee.player].negative_score = neg_max;
+            }
+            console.log("negative score: set to", bee.storage.players[bee.player].negative_score);
+            save_storage('add_negative_score');
+        }
         
         
-        // Add one to the score & update UI & animate
+        // Add one to the score. Returns the new score or '_SKIPPED_' if we're working through the negative scores
         function add_score() {
+            skipped_score = false;
             init_lifetime_score();
-            bee.storage.players[bee.player].score++;
+            if(bee.storage.players[bee.player].negative_score !== undefined && bee.storage.players[bee.player].negative_score >= 1) {
+                // "negative score" is used to lengthen a level as a penalty; we skip adding a score
+                bee.storage.players[bee.player].negative_score -= 1;
+                console.log("negative score: skipping adding score; neg score is now", bee.storage.players[bee.player].negative_score);
+                skipped_score = true;
+            } else {
+                bee.storage.players[bee.player].score++;
+            }
             bee.storage.players[bee.player].lifetime_score++;
             save_storage('add_score');
-            return bee.storage.players[bee.player].score;
+            return (skipped_score ? '_SKIPPED_' : bee.storage.players[bee.player].score);
         }
 
 
@@ -193,7 +217,7 @@
         function playme(f) {
             const d = audio[f];
             if(d.object === false) { 
-                console.log("Audio: setting up", d['file']);
+                // console.log("Audio: setting up", d['file']);
                 d.object = new Audio(d['file']); 
                 d.object.volume = d['volume']; 
             }            
@@ -206,11 +230,11 @@
             const i = Math.floor(Math.random() * audio[f].length);
             const d = audio[f][i];
             if(d.object === false) { 
-                console.log("Audio: setting up", d['file']);
+                // console.log("Audio: setting up", d['file']);
                 d.object = new Audio(d['file']); 
                 d.object.volume = d['volume']; 
             }
-            console.log("Audio: playing", d['file']);
+            // console.log("Audio: playing", d['file']);
             d.object.play();
         }
 
@@ -366,19 +390,20 @@
         
         // Implements common operations when a task is solved
         function success_common(fast_to_next_question) {
-            const score = add_score();
+            console.log('#success_common()');
+            const score = add_score();  // the new score or "_SKIPPED_"
             const new_next_gift_at = decide_gift(); // precede update_score_ui() to update remaining-to-gift display
             update_score_ui();
 
             // level complete logic (see "L" below)
-            if(score % bee.score_goal == 0) {
+            if(score !== '_SKIPPED_' && score % bee.score_goal == 0) {
                 if(typeof(bee_local) !== 'undefined' && bee_local.level_hook) { bee_local.level_hook(score); }
                 play_rnd_sound('level_complete');
                 bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 300}).then(
                     function() { 
                         setTimeout(function(){
                             if(play_video(new_question)) { 
-                                new_question();
+                                new_question('success_common:level:video');
                             }
                         }, 1500);
                     }
@@ -394,20 +419,27 @@
                 play_success_sound();
                 give_gift(function() {
                     update_score_ui(false);
-                    new_question();
+                    new_question('success_common:gift:give');
                 }, false);
                 return;
             }
-            
-            // default logic to go to next question (no periodic celebration - see "x" below)
+
             const celebrate_period = (bee.score_goal < 30 ? 4 : 5);
-            if(score % celebrate_period > 0) {
+            
+            // special logic for working through negative scores
+            if(score === '_SKIPPED_' && bee.storage.players[bee.player].lifetime_score !== undefined && bee.storage.players[bee.player].lifetime_score % celebrate_period == 0) {
+                show_animation(function() { setTimeout(function(){ new_question('success_common:negscore:period'); }, 1100); });
+                return;
+            }
+
+            // default logic to go to next question (no periodic celebration - see "x" below)
+            if(score === '_SKIPPED_' || score % celebrate_period > 0) {
                 if(fast_to_next_question) {
-                    setTimeout(new_question, 700);
+                    setTimeout(function(){ new_question('success_common:default:fast'); }, 700);
                 }
                 else {
                     play_success_sound();
-                    setTimeout(new_question, 2700);
+                    setTimeout(function(){ new_question('success_common:default:slow'); }, 2700);
                 }
                 return;
             }
@@ -431,18 +463,20 @@
             
             // periodic celebration (see "p", "B", "b")
                         
-            const period_ix = Math.floor(score / celebrate_period);
-            const periods_in_level = Math.floor(bee.score_goal / celebrate_period);
-            const period_ix_lev = (period_ix % periods_in_level);
             // Bigger celebration with video
             let bigger = false;
-            if(period_ix_lev == 2) { bigger = true; }
-            if(celebrate_period == 5 && period_ix_lev == 4) { bigger = true; }
-            if(celebrate_period == 4 && period_ix_lev == 4 && Math.random() <= .7) { bigger = true; }
+            if(score !== '_SKIPPED_') { // should always be true, see above
+                const period_ix = Math.floor(score / celebrate_period);
+                const periods_in_level = Math.floor(bee.score_goal / celebrate_period);
+                const period_ix_lev = (period_ix % periods_in_level);
+                if(period_ix_lev == 2) { bigger = true; }
+                if(celebrate_period == 5 && period_ix_lev == 4) { bigger = true; }
+                if(celebrate_period == 4 && period_ix_lev == 4 && Math.random() <= .7) { bigger = true; }
+            }
             play_success_sound();
-            if((!bigger) || play_video(new_question)) { // if `bigger`, bigger periodic celebration, see "B"
+            if((!bigger) || play_video(function(){ new_question('success_common:period:video'); })) { // if `bigger`, bigger periodic celebration, see "B"
                 // smaller periodic celebration, including when video is not available - see "p"
-                show_animation(function() { setTimeout(new_question, 1100); });
+                show_animation(function() { setTimeout(function(){ new_question('success_common:period:small'); }, 1100); });
             }
             return;
         }
