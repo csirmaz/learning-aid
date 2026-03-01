@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?157">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?158">
 
     <style>
         body {
@@ -139,7 +139,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?157"></script>
+    <script src="assets/local/beelocal.js?158"></script>
 </head>
 <body>
     <div class="container">
@@ -658,7 +658,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?157"></script>
+    <script src="assets/common.js?158"></script>
     <script>
 
         
@@ -788,7 +788,7 @@
                 
                 if((value - 0) == bee.problem.solution) { // Success!
                     bee.can_type = false;
-                    store_question(bee.queued_problems); // This is shorter now as we used shift()
+                    end_question();
                     $('.prompt').addClass('success');
                     if(!(bee.problem.hint 
                         && bee.problem.hint.speak_solution
@@ -1008,8 +1008,15 @@
                 store_question(bee.queued_problems);
             }
             
-            bee.problem = bee.queued_problems.shift();
+            bee.problem = bee.queued_problems[0];
             start_question();
+        }
+        
+        
+        // Called when a question is finished
+        function end_question() {
+            bee.queued_problems.shift();
+            store_question(bee.queued_problems); // This is shorter now as we used shift()
         }
         
         
