@@ -1,5 +1,5 @@
 
-        const bee_app_version = 160;
+        const bee_app_version = 161;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");

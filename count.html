@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?160">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?161">
 
     <style>
         body {
@@ -139,7 +139,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?160"></script>
+    <script src="assets/local/beelocal.js?161"></script>
 </head>
 <body>
     <div class="container">
@@ -658,7 +658,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?160"></script>
+    <script src="assets/common.js?161"></script>
     <script>
 
         
@@ -798,9 +798,6 @@
                     )) {
                         success_common();
                     }
-                    // For anti-cheat system
-                    bee.storage.players[bee.player].current_question_time = undefined;
-                    save_storage('success_qtimer', true); // true = skip hook
                 }
                 else {
                     penalty_delay(true);
@@ -1015,6 +1012,10 @@
         
         // Called when a question is finished
         function end_question() {
+            // For anti-cheat system
+            bee.storage.players[bee.player].current_question_time = undefined;
+            save_storage('success_qtimer', true); // true = skip hook
+
             bee.queued_problems.shift();
             store_question(bee.queued_problems); // This is shorter now as we used shift()
         }
