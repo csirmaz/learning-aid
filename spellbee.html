@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?177">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?178">
 
     <style>
     
@@ -70,7 +70,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?177"></script>
+    <script src="assets/local/beelocal.js?178"></script>
 </head>
 <body>
     <div class="container">
@@ -504,7 +504,7 @@
 
 
     </script>
-    <script src="assets/common.js?177"></script>
+    <script src="assets/common.js?178"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
@@ -886,7 +886,7 @@
             }
             save_storage('modify_wordlist');
             init_wordlist();
-            new_question();
+            new_question('modify_wordlist');
         }
         
         
@@ -896,7 +896,7 @@
             update_score_ui(false);
             $('.d_player').html(esc_html(bee.player));
             init_wordlist();
-            new_question();
+            new_question('main');
         }
         
         

@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?177">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?178">
 
     <style>
         body {
@@ -144,7 +144,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?177"></script>
+    <script src="assets/local/beelocal.js?178"></script>
 </head>
 <body>
     <div class="container">
@@ -715,7 +715,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?177"></script>
+    <script src="assets/common.js?178"></script>
     <script>
 
         
@@ -1002,7 +1002,6 @@
         // Initialize a question
         function start_question() {
             console.log('#start_question()');
-            manage_question_timeout(true); // true = at new question
             bee.can_type = true;
             
             $('.problem').html(format_problem(bee.problem.problem));
@@ -1021,6 +1020,9 @@
             if(cqt !== undefined && Date.now() - cqt < 3*60*1000) { penalty_delay(false, 'reload page'); }
             bee.storage.players[bee.player].current_question_time = Date.now();
             save_storage('set_question_qtime', true); // true = skip hook
+            
+            // We call this after possibly calling penalty_delay so wentaway_penalty would already be set
+            manage_question_timeout(true); // true = at new question
         }
 
         
@@ -1143,7 +1145,7 @@
 
             save_storage();
             init_problemset();
-            new_question();
+            new_question('modify_problemset');
         }
         
         
@@ -1154,7 +1156,7 @@
             update_score_ui(false);
             $('.d_player').html(esc_html(bee.player));
             init_problemset();
-            new_question();
+            new_question('main');
         }
         
         
