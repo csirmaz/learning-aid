@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?181">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?182">
 
     <style>
         body {
@@ -144,7 +144,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?181"></script>
+    <script src="assets/local/beelocal.js?182"></script>
 </head>
 <body>
     <div class="container">
@@ -444,7 +444,7 @@
                     range:[0,b*5,b*10,b*10,b]
                 }}; 
             },
-            mult_tables: function(aa) {  // aa=0..12 times tables, 13,14,15=big/mix/small part of 12-times tables
+            mult_tables: function(aa) {  // aa=0..12 times tables, 13,14,15=big/mix/small part of 12-times tables; 113,114,115=same w timeout
                 const get_prob = function(a, b) {
                     return {problem: a+'*'+b+'=', solution:(a*b), hint:{
                         speak_prompt: ''+a+' times '+b+'',
@@ -487,35 +487,35 @@
                   12|x  x  m  m  m  m  m  b  b  b  b  b  B
                 
                 */
-                if(aa == 13) { // two big numbers (b,B,X)
+                if(aa == 13 || aa == 113) { // two big numbers (b,B,X)
                     while(problems.length < 30) {
                         const x = RND(7, 12);
                         const y = RND(7, 12);
                         if(x < y) { continue; }
                         const p = get_prob_swap(x, y);
                         p.hint.speak_prompt = undefined;
-                        p.use_timeout = true;
+                        if(aa > 100) { p.use_timeout = true; }
                         problems.push(p);
                     }
                 }
-                if(aa == 14) { // mix (m,M)
+                if(aa == 14 || aa == 114) { // mix (m,M)
                     while(problems.length < 30) {
                         const x = RND(2, 6);
                         const y = RND(8, 12);
                         const p = get_prob_swap(x, y);
                         p.hint.speak_prompt = undefined;
-                        p.use_timeout = true;
+                        if(aa > 100) { p.use_timeout = true; }
                         problems.push(p);
                     }
                 }
-                if(aa == 15) { // two small numbers (s,S,X)
+                if(aa == 15 || aa == 115) { // two small numbers (s,S,X)
                     while(problems.length < 30) {
                         const x = RND(2, 7);
                         const y = RND(2, 7);
                         if(x < y) { continue; }
                         const p = get_prob_swap(x, y);
                         p.hint.speak_prompt = undefined;
-                        p.use_timeout = true;
+                        if(aa > 100) { p.use_timeout = true; }
                         problems.push(p);
                     }
                 }
@@ -715,7 +715,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?181"></script>
+    <script src="assets/common.js?182"></script>
     <script>
 
         
@@ -1121,7 +1121,7 @@
         
         // Choose a range of word sets to show words from
         function choose_problemset() {
-            let p = prompt("What set of problems should we use?\nType a number from 0 to "+max_problemset+" (simple to difficult);\nor 101 for the 1-time table, 102 for the 2-time table etc.;\n or 113, 114, 115 for mixed 12-times tables (big, mixed, small)") - 0;
+            let p = prompt("What set of problems should we use?\nType a number from 0 to "+max_problemset+" (simple to difficult);\nor 101 for the 1-time table, 102 for the 2-time table etc.;\nor 113, 114, 115 for mixed 12-times tables (big, mixed, small)\nor 213, 214, 215 for same with timeout") - 0;
             if(isNaN(p)) { p = 0; }
             return p;
         }
