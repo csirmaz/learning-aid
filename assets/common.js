@@ -1,5 +1,5 @@
 
-        const bee_app_version = 182;
+        const bee_app_version = 189;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -186,12 +186,12 @@
             } else {
                 bee.storage.players[bee.player].negative_score += v;
             }
-            const neg_max = 4;
+            const neg_max = bee.max_negative_score;
             if(bee.storage.players[bee.player].negative_score > neg_max) {
                 bee.storage.players[bee.player].negative_score = neg_max;
             }
             console.log("negative score: set to", bee.storage.players[bee.player].negative_score);
-            save_storage('add_negative_score');
+            save_storage('add_negative_score', true); // true == skip hook
         }
         
         
@@ -389,6 +389,7 @@
         
         
         // Implements common operations when a task is solved
+        // Return values: 'level_complete' | 'gift' | 'period_negative' | 'period'
         function success_common(fast_to_next_question) {
             console.log('#success_common()');
             const score = add_score();  // the new score or "_SKIPPED_"
@@ -402,14 +403,14 @@
                 bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 300}).then(
                     function() { 
                         setTimeout(function(){
-                            if(play_video(new_question)) { 
-                                new_question('success_common:level:video');
+                            if(play_video(function(){ new_question('success_common:level:video1'); })) { 
+                                new_question('success_common:level:video2');
                             }
                         }, 1500);
                     }
                     // no need to call the gift logic; gift will be given on next step
                 );
-                return;
+                return 'level_complete';
             }
             
             // check if gift is due (not represented in the chart)
@@ -421,7 +422,7 @@
                     update_score_ui(false);
                     new_question('success_common:gift:give');
                 }, false);
-                return;
+                return 'gift';
             }
 
             const celebrate_period = (bee.score_goal < 30 ? 4 : 5);
@@ -429,7 +430,7 @@
             // special logic for working through negative scores
             if(score === '_SKIPPED_' && bee.storage.players[bee.player].lifetime_score !== undefined && bee.storage.players[bee.player].lifetime_score % celebrate_period == 0) {
                 show_animation(function() { setTimeout(function(){ new_question('success_common:negscore:period'); }, 1100); });
-                return;
+                return 'period_negative';
             }
 
             // default logic to go to next question (no periodic celebration - see "x" below)
@@ -441,7 +442,7 @@
                     play_success_sound();
                     setTimeout(function(){ new_question('success_common:default:slow'); }, 2700);
                 }
-                return;
+                return 'default';
             }
             
             /*
@@ -478,7 +479,7 @@
                 // smaller periodic celebration, including when video is not available - see "p"
                 show_animation(function() { setTimeout(function(){ new_question('success_common:period:small'); }, 1100); });
             }
-            return;
+            return 'period';
         }
         
         

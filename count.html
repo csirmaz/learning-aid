@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?182">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?189">
 
     <style>
         body {
@@ -144,7 +144,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?182"></script>
+    <script src="assets/local/beelocal.js?189"></script>
 </head>
 <body>
     <div class="container">
@@ -665,27 +665,32 @@
 
         // Application data
         const bee = {
-            app_name: 'count',  // config
+            // Configuration
+            app_name: 'count',
+            score_goal: 30,        // controls the bar under the score and gifts
+            max_negative_score: 3, // maximum "negative" score where question doesn't give point
+            button_clicks: false,  // whether buttons make clicking sound
+            question_timeout_value: 10, // the timeout (if the problem specifies) in seconds
+            // State (common)
+            storage: {'players': {}},  // storage data that's saved into local storage
             load_time: Date.now(),
-            problemset: false, // index (int)
-            problem: false, // state: output of a problem generator, {problem:HTML, solution:STR, hint:OBJ}
-            queued_problems: false,
             can_type: false,
             typed: '',
             can_use_help: true,
             help_timeout: false,
             score_anim_timeout: false,
             player: false,  // state: name of the player - scores are saved to browser under this name
+            giftlist: -1,
+            // State (count)
+            problemset: false, // index (int)
+            problem: false, // state: output of a problem generator, {problem:HTML, solution:STR, hint:OBJ}
+            queued_problems: false,
             $input: $('.prompt .infield .inp'),
             questiontimeout: { // state: used for question timeouts
                 $warn: $('.timeoutwarn'),
                 warn_timeout: false,
                 skip_timeout: false
-            },
-            storage: {'players': {}},  // storage data that's saved into local storage
-            giftlist: -1,
-            score_goal: 30,  // config: controls the bar under the score and gifts
-            button_clicks: false  // config: whether buttons make clicking sound
+            }
         };
         
         // Try to load data
@@ -697,7 +702,7 @@
         }
 
         function save_storage(msg, skip_hook) {
-            console.log("Saving storage", msg, skip_hook);
+            console.log("  Saving storage", msg, skip_hook);
             const s = JSON.stringify(bee.storage);
             localStorage.count = s;
             if((!skip_hook) && typeof(bee_local) !== 'undefined' && bee_local.save_hook) {
@@ -715,7 +720,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?182"></script>
+    <script src="assets/common.js?189"></script>
     <script>
 
         
@@ -844,14 +849,16 @@
                 
                 if((value - 0) == bee.problem.solution) { // Success!
                     end_question();
+                    manage_level_stats('success');
                     $('.prompt').addClass('success');
                     if(!(bee.problem.hint 
                         && bee.problem.hint.speak_solution
                         && bee_tts.speak(bee.problem.hint.speak_solution, function() {
-                            success_common(true); // true = move fast to next question
+                            if(success_common(true) // true = move fast to next question
+                                == 'level_complete') { manage_level_stats('reset'); }
                         })
                     )) {
-                        success_common();
+                        if(success_common() == 'level_complete') { manage_level_stats('reset'); }
                     }
                 }
                 else {
@@ -863,6 +870,7 @@
                     } else {
                         penalty_delay(true, 'wrong answer');
                     }
+                    manage_level_stats('wrong');
                 }
                 return false;
             }
@@ -978,11 +986,21 @@
                 penalty_timeout_ongoing = false;
             }, wrong_answer ? 6*1000 : 14*1000);
         }
+        
+        
+        function manage_level_stats(m) {
+            const ps = bee.storage.players[bee.player];
+            if(ps.level_stats === undefined || m == 'reset') {
+                ps.level_stats = {'problem': 0, 'success': 0, 'wrong': 0, 'timeout': 0};
+            }
+            if(m == 'get') { return " problem "+ps.level_stats.problem+" success "+ps.level_stats.success+" wrong "+ps.level_stats.wrong+" timeout "+ps.level_stats.timeout; }
+            if(m != 'reset') { ps.level_stats[m]++; }
+        }
 
         
         function manage_question_timeout(at_new_question) {
             console.log('#manage_question_timeout() at_new=', at_new_question);
-            const qtimeout = 15;
+            const qtimeout = bee.question_timeout_value;
             bee.questiontimeout.$warn.css('visibility', 'hidden');
             if(bee.questiontimeout.warn_timeout) { clearTimeout(bee.questiontimeout.warn_timeout); }
             if(bee.questiontimeout.skip_timeout) { clearTimeout(bee.questiontimeout.skip_timeout); }
@@ -997,6 +1015,7 @@
                     if(!penalty_timeout_ongoing) {
                         console.log('timeout: skipping to next question');
                         add_negative_score(1);
+                        manage_level_stats('timeout');
                         end_question();
                         setTimeout(function(){ new_question('manage_question_timeout()'); }, 200);
                     }
@@ -1028,6 +1047,8 @@
             
             // We call this after possibly calling penalty_delay so penalty_timeout_ongoing would already be set
             manage_question_timeout(true); // true = at new question
+            
+            manage_level_stats('problem');
         }
 
         
