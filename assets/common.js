@@ -1,5 +1,5 @@
 
-        const bee_app_version = 191;
+        const bee_app_version = 194;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -84,18 +84,16 @@
         // Show a reward animation (confetti)
         function show_animation(callback) {
             const r = Math.random();
-            if(r < .5) {
-                bee_confetti.addConfetti({
-                    confettiColors: [
-                        '#00f', '#0c0', '#0ff', '#50f', '#0f0'
-                    ],
-                }).then(callback);
-            } else {
-                bee_confetti.addConfetti({
-                    confettiColors: [
-                        '#f00', '#f99', '#f5c', '#ff0', '#f90'
-                    ],
-                }).then(callback);
+            if(r > .8) {
+                bee_confetti.addConfetti({confettiColors: ['#00f', '#0c0', '#0ff', '#50f', '#0f0']}).then(callback);
+            } else if(r > .6) {
+                bee_confetti.addConfetti({confettiColors: ['#f00', '#f99', '#f5c', '#ff0', '#f90']}).then(callback);
+            } else if(r > .4) {
+                bee_confetti.addConfetti({emojis: ['🍭'+"\ufe0f", '🍥'+"\ufe0f", '🍬'+"\ufe0f"]}).then(callback);
+            } else if(r > .2) {                
+                bee_confetti.addConfetti({emojis: ['🌼'+"\ufe0f", '🌸'+"\ufe0f", '🍀'+"\ufe0f"]}).then(callback);
+            } else {                
+                bee_confetti.addConfetti({emojis: ['😀'+"\ufe0f", '🥳'+"\ufe0f", '😎'+"\ufe0f"]}).then(callback);
             }
         }
         
