@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?195">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?197">
 
     <style>
         body {
@@ -37,7 +37,7 @@
         
         .prompt .infield .inp { color: #000; }
         body .prompt.success .infield .inp { color: #090; }
-        body .prompt.failed .infield .inp { color: #c55; }
+        body .prompt.failed .infield .inp { color: #eee; background: #009; }
         
         .prompt .ph {
             color: #00b;
@@ -144,7 +144,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?195"></script>
+    <script src="assets/local/beelocal.js?197"></script>
 </head>
 <body>
     <div class="container">
@@ -258,6 +258,16 @@
             return ['Yes! ', 'Good! ', 'Great! '][RND(0, 2)];
         }
         
+        function speak_multiplication(a, b, is_success) {
+            // Return things to say on success and on failure
+            const p = ''+a+' times '+b+' is ';
+            if(is_success) { return speak_yes()+p+(a*b); }
+            const r = RND(0, 2);
+            if(r==0) { return 'Actually, '+p+(a*b); }
+            if(r==1) { return 'So '+p+(a*b); }
+            return p+'actually '+(a*b);
+        }
+        
         function multiply_hint(a, b) {
             return ((a==10 || b==10)?'To multiply by ten, just write a zero after the other number.':
                 ((a==0 || b==0)?'You are multiplying by zero':
@@ -299,6 +309,7 @@
             hint: {  // See show_help()
                 speak_prompt: <str>
                 speak_solution: <str>
+                speak_failed: <str>
                 help_speech: <str>
                 range: <list>
                     // hint syntax: {range: [range-min, range-max, highlight-min, highlight-max]}
@@ -448,7 +459,8 @@
                 const get_prob = function(a, b) {
                     return {problem: a+'*'+b+'=', solution:(a*b), hint:{
                         speak_prompt: ''+a+' times '+b+'',
-                        speak_solution: speak_yes()+a+' times '+b+' is '+(a*b),
+                        speak_solution: speak_multiplication(a, b, true),
+                        speak_failed: speak_multiplication(a, b, false),
                         groups: {in_group:(b==5?b:a), groups:(b==5?a:b), row_length:(b==5||a==5?2:1)},
                         help_speech: multiply_hint(a, b)
                     }}; 
@@ -732,7 +744,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?195"></script>
+    <script src="assets/common.js?197"></script>
     <script>
 
         
@@ -862,7 +874,6 @@
                 if((value - 0) == bee.problem.solution) { // Success!
                     end_question('success');
                     manage_level_stats('success');
-                    $('.prompt').addClass('success');
                     if(!(bee.problem.hint 
                         && bee.problem.hint.speak_solution
                         && bee_tts.speak(bee.problem.hint.speak_solution, function() {
@@ -877,11 +888,17 @@
                     // Wrong answer
                     if(bee.problem.use_timeout) {
                         end_question('failed');
-                        $('.prompt').addClass('failed');
-                        setTimeout(function(){ new_question('failed'); }, 800);
+                        if(!(bee.problem.hint
+                            && bee.problem.hint.speak_failed
+                            && bee_tts.speak(bee.problem.hint.speak_failed, function() {
+                                setTimeout(function(){ new_question('failed'); }, 600);
+                            })
+                        )) {
+                            setTimeout(function(){ new_question('failed'); }, 2000);
+                        }
                     } else {
-                        penalty_delay(true, 'wrong answer');
                         // User will retry here until it is correct
+                        penalty_delay(true, 'wrong answer');
                     }
                     manage_level_stats('wrong');
                 }
@@ -1030,7 +1047,14 @@
                         add_negative_score(1);
                         manage_level_stats('timeout');
                         end_question('timeout');
-                        setTimeout(function(){ new_question('timeout'); }, 200);
+                        if(!(bee.problem.hint
+                            && bee.problem.hint.speak_failed
+                            && bee_tts.speak(bee.problem.hint.speak_failed, function() {
+                                setTimeout(function(){ new_question('timeout'); }, 600);
+                            })
+                        )) {
+                            setTimeout(function(){ new_question('timeout'); }, 2000);
+                        }
                     }
                 }, qtimeout*1000);
             }
@@ -1150,10 +1174,14 @@
 
             const old_question = bee.queued_problems.shift();
             if(reason == 'failed' || reason == 'timeout') {
+                $('.prompt').addClass('failed');
+                bee.$input.html(esc_html(bee.problem.solution));
                 // Try to put the question back on the queue
                 if(bee.queued_problems.length) {
                     bee.queued_problems.splice(2, 0, old_question);
                 }
+            } else {
+                $('.prompt').addClass('success');
             }
             store_question(bee.queued_problems); // This is modified now
         }
