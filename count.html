@@ -456,6 +456,15 @@
                 const get_prob_swap = function(a, b) {
                     return (RND(0,1) ? get_prob(a, b) : get_prob(b, a));
                 };
+                const too_easy = function(a, b) {
+                    return (
+                        (a == 10) || (b == 10) 
+                        || (a == 1) || (b == 1)
+                        || (a == 0) || (b == 0)
+                        || (a == 11 && b < 10)
+                        || (b == 11 && a < 10)                        
+                    );
+                };
                 let problems = [];
                 if(aa <= 12) {  // times tables
                     for(let bb=2; bb<=12; bb++) { // 1..11
@@ -492,6 +501,7 @@
                         const x = RND(7, 12);
                         const y = RND(7, 12);
                         if(x < y) { continue; }
+                        if(too_easy(x, y) && RND(0, 2) != 0) { continue; }
                         const p = get_prob_swap(x, y);
                         p.hint.speak_prompt = undefined;
                         if(aa > 100) { p.use_timeout = true; }
@@ -502,6 +512,7 @@
                     while(problems.length < 30) {
                         const x = RND(2, 6);
                         const y = RND(8, 12);
+                        if(too_easy(x, y) && RND(0, 2) != 0) { continue; }
                         const p = get_prob_swap(x, y);
                         p.hint.speak_prompt = undefined;
                         if(aa > 100) { p.use_timeout = true; }
@@ -513,6 +524,7 @@
                         const x = RND(2, 7);
                         const y = RND(2, 7);
                         if(x < y) { continue; }
+                        if(too_easy(x, y) && RND(0, 2) != 0) { continue; }
                         const p = get_prob_swap(x, y);
                         p.hint.speak_prompt = undefined;
                         if(aa > 100) { p.use_timeout = true; }
