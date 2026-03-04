@@ -860,7 +860,7 @@
                 console.log("Value", value, "Target", bee.problem.solution);
                 
                 if((value - 0) == bee.problem.solution) { // Success!
-                    end_question();
+                    end_question('success');
                     manage_level_stats('success');
                     $('.prompt').addClass('success');
                     if(!(bee.problem.hint 
@@ -876,11 +876,12 @@
                 else {
                     // Wrong answer
                     if(bee.problem.use_timeout) {
-                        end_question();
+                        end_question('failed');
                         $('.prompt').addClass('failed');
                         setTimeout(function(){ new_question('failed'); }, 800);
                     } else {
                         penalty_delay(true, 'wrong answer');
+                        // User will retry here until it is correct
                     }
                     manage_level_stats('wrong');
                 }
@@ -1028,8 +1029,8 @@
                         console.log('timeout: skipping to next question');
                         add_negative_score(1);
                         manage_level_stats('timeout');
-                        end_question();
-                        setTimeout(function(){ new_question('manage_question_timeout()'); }, 200);
+                        end_question('timeout');
+                        setTimeout(function(){ new_question('timeout'); }, 200);
                     }
                 }, qtimeout*1000);
             }
@@ -1138,8 +1139,8 @@
         
         
         // Called when a question is finished
-        function end_question() {
-            console.log('#end_question()');
+        function end_question(reason) {
+            console.log('#end_question() reason=', reason);
             manage_question_timeout(false); // false = not at new question
             bee.can_type = false;
             
@@ -1147,8 +1148,14 @@
             bee.storage.players[bee.player].current_question_time = undefined;
             save_storage('clear_qtime', true); // true = skip hook
 
-            bee.queued_problems.shift();
-            store_question(bee.queued_problems); // This is shorter now as we used shift()
+            const old_question = bee.queued_problems.shift();
+            if(reason == 'failed' || reason == 'timeout') {
+                // Try to put the question back on the queue
+                if(bee.queued_problems.length) {
+                    bee.queued_problems.splice(2, 0, old_question);
+                }
+            }
+            store_question(bee.queued_problems); // This is modified now
         }
         
         
