@@ -1,5 +1,5 @@
 
-        const bee_app_version = 194;
+        const bee_app_version = 195;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -109,15 +109,19 @@
                 const video = videos[video_ix];
                 const $v = $('<video src="'+video+'" playsinline class="video_v" autoplay></video>');
                 const $inwrap = $('<div class="video_w1"></div>');
-                $v.on('ended', function() {
+                let ended = false;
+                const ending = function() {
+                    if(ended) { return; }
+                    ended = true;
+                    $v.remove();
                     setTimeout(function() {
-                        $v.remove();
-                        setTimeout(function() {
-                            $wrap.remove();
-                            if(callback) { callback(); }
-                        }, 1100);
-                    }, 700);
-                });
+                        $wrap.remove();
+                        if(callback) { callback(); }
+                    }, 1100);
+                };
+                $v.on('ended', function() { setTimeout(ending, 700); });
+                $v.on('stalled', ending);
+                $v.on('error', ending);
                 $inwrap.append($v);
                 $wrap.append($inwrap);
             }, 1000);
