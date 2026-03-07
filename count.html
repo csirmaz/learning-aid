@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?197">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?201">
 
     <style>
         body {
@@ -144,7 +144,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?197"></script>
+    <script src="assets/local/beelocal.js?201"></script>
 </head>
 <body>
     <div class="container">
@@ -255,17 +255,19 @@
         }
         
         function speak_yes() {
-            return ['Yes! ', 'Good! ', 'Great! '][RND(0, 2)];
+            return ['Yes! ', 'Good! ', 'Great! ', 'Correct! ', 'Good job! ', 'Well done! '][RND(0, 5)];
         }
         
         function speak_multiplication(a, b, is_success) {
             // Return things to say on success and on failure
             const p = ''+a+' times '+b+' is ';
+            const suffix = ['Let\'s try again!', 'Let\'s do it again!', 'Let\'s do it once more!', 'Can you type in the answer next?'][RND(0, 3)];
             if(is_success) { return speak_yes()+p+(a*b); }
-            const r = RND(0, 2);
-            if(r==0) { return 'Actually, '+p+(a*b); }
-            if(r==1) { return 'So '+p+(a*b); }
-            return p+'actually '+(a*b);
+            const r = RND(0, 3);
+            if(r==0) { return 'Actually, '+p+(a*b)+'. '+suffix; }
+            if(r==1) { return 'So, '+p+(a*b)+'. '+suffix; }
+            if(r==2) { return 'Did you know that '+p+(a*b)+' ? '+suffix; }
+            return p+'actually '+(a*b)+'. '+suffix;
         }
         
         function multiply_hint(a, b) {
@@ -692,7 +694,7 @@
             // Configuration
             app_name: 'count',
             score_goal: 30,        // controls the bar under the score and gifts
-            max_negative_score: 3, // maximum "negative" score where question doesn't give point
+            max_negative_score: 4, // maximum "negative" score where question doesn't give point
             button_clicks: false,  // whether buttons make clicking sound
             question_timeout_value: 10, // the timeout (if the problem specifies) in seconds
             // State (common)
@@ -737,14 +739,14 @@
         // Fix emojis
         $('.prompticon').html('👉'+"\ufe0f");
         $('.prompticonsuccess').html('✅'+"\ufe0f");
-        $('.prompticonfailed').html('👉'+"\ufe0f");
+        $('.prompticonfailed').html('🤔'+"\ufe0f");
         // $('.keypad [data-i="ent"]').html('🆗'+"\ufe0f");
         $('.keypad [data-i="help"]').html('❓'+"\ufe0f");
         
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?197"></script>
+    <script src="assets/common.js?201"></script>
     <script>
 
         
@@ -888,14 +890,6 @@
                     // Wrong answer
                     if(bee.problem.use_timeout) {
                         end_question('failed');
-                        if(!(bee.problem.hint
-                            && bee.problem.hint.speak_failed
-                            && bee_tts.speak(bee.problem.hint.speak_failed, function() {
-                                setTimeout(function(){ new_question('failed'); }, 600);
-                            })
-                        )) {
-                            setTimeout(function(){ new_question('failed'); }, 2000);
-                        }
                     } else {
                         // User will retry here until it is correct
                         penalty_delay(true, 'wrong answer');
@@ -1044,17 +1038,8 @@
                     // Skip to the next question
                     if(!penalty_timeout_ongoing) {
                         console.log('timeout: skipping to next question');
-                        add_negative_score(1);
                         manage_level_stats('timeout');
                         end_question('timeout');
-                        if(!(bee.problem.hint
-                            && bee.problem.hint.speak_failed
-                            && bee_tts.speak(bee.problem.hint.speak_failed, function() {
-                                setTimeout(function(){ new_question('timeout'); }, 600);
-                            })
-                        )) {
-                            setTimeout(function(){ new_question('timeout'); }, 2000);
-                        }
                     }
                 }, qtimeout*1000);
             }
@@ -1176,14 +1161,29 @@
             if(reason == 'failed' || reason == 'timeout') {
                 $('.prompt').addClass('failed');
                 bee.$input.html(esc_html(bee.problem.solution));
+                add_negative_score(2);
                 // Try to put the question back on the queue
                 if(bee.queued_problems.length) {
                     bee.queued_problems.splice(2, 0, old_question);
                 }
+                // Add the same question again
+                bee.queued_problems.unshift(old_question);
             } else {
                 $('.prompt').addClass('success');
             }
             store_question(bee.queued_problems); // This is modified now
+
+            if(reason == 'failed' || reason == 'timeout') {
+                if(!(bee.problem.hint
+                    && bee.problem.hint.speak_failed
+                    && bee_tts.speak(bee.problem.hint.speak_failed, function() {
+                        setTimeout(function(){ new_question(reason); }, 600);
+                    })
+                )) {
+                    setTimeout(function(){ new_question(reason); }, 2000);
+                }
+            }
+            // Going to the next question when reason=='success' is handled outside this function            
         }
         
         
