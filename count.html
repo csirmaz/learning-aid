@@ -696,7 +696,7 @@
             score_goal: 30,        // controls the bar under the score and gifts
             max_negative_score: 4, // maximum "negative" score where question doesn't give point
             button_clicks: false,  // whether buttons make clicking sound
-            question_timeout_value: 10, // the timeout (if the problem specifies) in seconds
+            question_timeout_value: 9, // the timeout (if the problem specifies) in seconds
             // State (common)
             storage: {'players': {}},  // storage data that's saved into local storage
             load_time: Date.now(),
@@ -706,7 +706,7 @@
             help_timeout: false,
             score_anim_timeout: false,
             player: false,  // state: name of the player - scores are saved to browser under this name
-            giftlist: -1,
+            giftlist: -1,  // state: which gift is shown when viewing them
             // State (count)
             problemset: false, // index (int)
             problem: false, // state: output of a problem generator, {problem:HTML, solution:STR, hint:OBJ}
@@ -1030,13 +1030,13 @@
             if(bee.questiontimeout.skip_timeout) { clearTimeout(bee.questiontimeout.skip_timeout); }
             if(at_new_question && bee.problem.use_timeout && !penalty_timeout_ongoing) {
                 bee.questiontimeout.warn_timeout = setTimeout(function() {
-                    if(!penalty_timeout_ongoing) {
+                    if((!penalty_timeout_ongoing) && bee.giftlist == -1) {
                         bee.questiontimeout.$warn.css('visibility', 'visible');
                     }
                 }, (qtimeout-1)*1000);
                 bee.questiontimeout.skip_timeout = setTimeout(function() {
                     // Skip to the next question
-                    if(!penalty_timeout_ongoing) {
+                    if((!penalty_timeout_ongoing) && bee.giftlist == -1) {
                         console.log('timeout: skipping to next question');
                         manage_level_stats('timeout');
                         end_question('timeout');
