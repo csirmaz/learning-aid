@@ -1,5 +1,5 @@
 
-        const bee_app_version = 201;
+        const bee_app_version = 203;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -99,15 +99,30 @@
         
         
         // Play a video as a reward. Return if an alternative reward should be shown.
-        function play_video(callback, video_ix) {
+        function play_video(callback) {
             if(videos.length == 0) { return true; } // true: show default reward
+            
+            // Choose unseen video
+            if(bee.storage.players[bee.player].videos_seen === undefined) {
+                bee.storage.players[bee.player].videos_seen = [];
+            }
+            let videos_seen = bee.storage.players[bee.player].videos_seen;
+            let videos_remaining = videos.filter((v) => videos_seen.indexOf(v) == -1);
+            if(videos_remaining.length == 0) { 
+                videos_remaining = videos;
+                bee.storage.players[bee.player].videos_seen = [];
+                videos_seen = bee.storage.players[bee.player].videos_seen;
+            }
+            const video_ix = Math.floor(Math.random() * videos_remaining.length);
+            const video_file = videos_remaining[video_ix];
+            videos_seen.push(video_file);
+            save_storage('videos_seen', true); // true == skip hook
+
             const $wrap = $('<div class="video_w2"></div>');
             $('body').append($wrap);
             setTimeout(function() {
-                if(video_ix === undefined) { video_ix = Math.floor(Math.random() * videos.length); }
-                console.log("Playing video", video_ix);
-                const video = videos[video_ix];
-                const $v = $('<video src="'+video+'" playsinline class="video_v" autoplay></video>');
+                console.log("Playing video", video_file);
+                const $v = $('<video src="'+video_file+'" playsinline class="video_v" autoplay></video>');
                 const $inwrap = $('<div class="video_w1"></div>');
                 let ended = false;
                 const ending = function() {
@@ -117,7 +132,7 @@
                     setTimeout(function() {
                         $wrap.remove();
                         if(callback) { callback(); }
-                    }, 1100);
+                    }, 3000);
                 };
                 $v.on('ended', function() { setTimeout(ending, 700); });
                 $v.on('stalled', ending);
