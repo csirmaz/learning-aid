@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?203">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?204">
 
     <style>
         body {
@@ -123,6 +123,26 @@
         table.hint td.nob {
             border: 0;
         }
+        
+        table.hint .longform {
+            text-align: right;
+            font-size: 1.2rem;
+            border: 1px solid #555;
+        }
+        table.hint .longformhead {
+            border: 0;
+            text-align: center;
+        }
+        table.hint .longformhead span {
+            display: inline-block;
+            border: 1px solid #009;
+            background: #00c;
+            border-radius: .3rem;
+            color: #fff;
+            margin: 0 .5rem;
+            padding: 0 .1rem;
+        }
+        
         table.hint .tdgroup {
             line-height: 1.1rem;
         }
@@ -144,7 +164,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?203"></script>
+    <script src="assets/local/beelocal.js?204"></script>
 </head>
 <body>
     <div class="container">
@@ -224,7 +244,7 @@
             | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
         </span>
         | Icons by <a href="https://icons8.com">I</a>cons8
-        | <a href="https://codeberg.org/csirmaz/learning-aid">Codebase</a>
+        | <a href="https://codeberg.org/csirmaz/learning-aid">C</a>odebase
         <span class="expand"></span> 
     </p>
     <p class="smallprint">Hint: Press F1, F2, ESC or the button under ESC (some may trigger other functions)</p>
@@ -313,10 +333,12 @@
                 speak_solution: <str>
                 speak_failed: <str>
                 help_speech: <str>
-                range: <list>
+                range: <list> // show grid of numbers
                     // hint syntax: {range: [range-min, range-max, highlight-min, highlight-max]}
                     // hint syntax: {range: [range-min, range-max, highlight-min, highlight-max, step]}
-                groups:
+                groups: // show matrix of symbols for multiplication
+                help_txt: // shown on screen
+                longform: [a, b]
         */
         const PRBL = {
             add_to_five: function() {  // e.g. 2+?=[5]
@@ -350,7 +372,8 @@
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{
                     speak_prompt: ''+a+' plus '+b+'',
                     speak_solution: speak_yes()+a+' plus '+b+' is '+(a+b),
-                    range:[11,30,11,a]
+                    // range:[11,30,11,a]
+                    longform: [a, b]
                 }};
             },
             add_hundreds: function () {  // e.g. 500+700=
@@ -359,7 +382,8 @@
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{
                     speak_prompt: 'What is '+a+' plus '+b+'?',
                     speak_solution: speak_yes()+a+' plus '+b+' is '+speak_thousands(a+b)+'.',
-                    range:[100,20*100,100,a,100]
+                    // range:[100,20*100,100,a,100]
+                    longform: [a, b]
                 }};
             },
             sub_five: function() {  // e.g. [5]-3=
@@ -429,7 +453,7 @@
                 const b2 = RND(0, 9-a2);
                 const a = a1*10+a2;
                 const b = b1*10+b2;
-                return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[a1*10+1,a1*10+20,a1*10+1,a]}};
+                return {problem: a+'+'+b+'=', solution:(a+b), hint:{longform:[a, b]}};
             },
             add_big_carry: function() { // e.g. 36+48= (always carry)
                 const a1 = RND(0, 9);
@@ -438,7 +462,7 @@
                 const b2 = RND(10-a2, 9);
                 const a = a1*10+a2;
                 const b = b1*10+b2;
-                return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[a1*10+1,a1*10+20,a1*10+1,a]}};
+                return {problem: a+'+'+b+'=', solution:(a+b), hint:{longform: [a, b]}};
             },
             add_big_small: function() { // e.g. 44+8=
                 const a1 = RND(0, 9);
@@ -446,7 +470,7 @@
                 const b2 = RND(0, 9);
                 const a = a1*10+a2;
                 const b = b2;
-                return {problem: a+'+'+b+'=', solution:(a+b), hint:{range:[a1*10+1,a1*10+20,a1*10+1,a]}};
+                return {problem: a+'+'+b+'=', solution:(a+b), hint:{longform: [a, b]}};
             },
             small_multiply: function() { // e.g. 3x2=
                 const a = RND(1, 5);
@@ -654,7 +678,7 @@
                 [PRBL.sub_ten_minus, 30],
                 [PRBL.sub_small, 20],
                 [PRBL.add_hundreds, 5],
-                [PRBL.add_big_no_carry, 1],
+                [PRBL.add_big_no_carry, 5],
                 [PRBL.small_multiply, 10],
                 [PRBL.halving, 10],
                 // [PRBL.halving_whole_ph, 5],
@@ -746,7 +770,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?203"></script>
+    <script src="assets/common.js?204"></script>
     <script>
 
         
@@ -783,6 +807,22 @@
                         }
                     } else {
                         playme('notavail');
+                    }
+                }
+                else if(data.longform) {
+                    let mx = Math.abs(data.longform[0]) + Math.abs(data.longform[1]);
+                    mx = Math.ceil(Math.log(mx) / Math.log(10));
+                    if(mx == 0){ mx = 1; }
+                    for(let i=0; i<mx; i++) {
+                        o += '<td class="longformhead"><span>1';
+                        for(let j=0; j<mx-i-1; j++) { o+='0'; }
+                        o += '</span></td>';
+                    }
+                    for(let ix=0; ix<2; ix++) {
+                        o += '</tr><tr>';
+                        let s = String(data.longform[ix]);
+                        while(s.length < mx) { s = ' '+s; }
+                        for(let i=0; i<mx; i++) { o += '<td class="longform">'+s[i]+'</td>'; }
                     }
                 }
                 else if(data.help_txt) {
@@ -824,7 +864,7 @@
                 }
                 
                 bee.can_type = true;
-            }, 3000); // hint wait time
+            }, 2000); // hint wait time
         }
 
         
