@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?204">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?205">
 
     <style>
         body {
@@ -164,7 +164,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?204"></script>
+    <script src="assets/local/beelocal.js?205"></script>
 </head>
 <body>
     <div class="container">
@@ -770,7 +770,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?204"></script>
+    <script src="assets/common.js?205"></script>
     <script>
 
         
@@ -1203,11 +1203,15 @@
                 bee.$input.html(esc_html(bee.problem.solution));
                 add_negative_score(2);
                 // Try to put the question back on the queue
+                const repeat_later = Object.assign({}, old_question); // clone
                 if(bee.queued_problems.length) {
-                    bee.queued_problems.splice(2, 0, old_question);
+                    bee.queued_problems.splice(2, 0, repeat_later);
                 }
                 // Add the same question again
-                bee.queued_problems.unshift(old_question);
+                const repeat_now = Object.assign({}, old_question); // clone
+                // this also prevents adding the same question multiple times if the app is left alone
+                repeat_now.use_timeout = false;
+                bee.queued_problems.unshift(repeat_now);
             } else {
                 $('.prompt').addClass('success');
             }
