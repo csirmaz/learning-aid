@@ -257,21 +257,56 @@
         
         function RND(min, max) { return min + Math.floor(Math.random() * (max + 1 - min)); } // inclusive
         
-        function speak_thousands(x) { // force speaking thousands
-            if(x >= 1000) {
-                x = '' + x;
-                return x.substring(0, x.length-3) + ',' + x.substring(x.length-3);
+        function speak_number(x) {
+            let o = '';
+            let fx = Math.floor(Math.abs(x));
+            if(fx >= 1000) {
+                o += Math.floor(fx / 1000) + ' thousand';
+                fx = (fx % 1000);
             }
-            return x;
+            if(fx >= 100) {
+                if(o != '') { o += ' '; }
+                o += Math.floor(fx / 100) + ' hundred';
+                fx = (fx % 100);
+            }
+            if(fx > 0) {
+                if(o != '') { o += ' and '; }
+                o += ('' + fx);
+            }
+            if(Math.abs((Math.abs(x) - Math.floor(Math.abs(x))) - .5) < .0001) { 
+                if(Math.floor(x) == 0) { return 'half'; }
+                if(Math.floor(x) == -1) { return 'minus half'; }
+                o += ' and a half'; 
+            }
+            if(x < 0) { o = 'minus ' + o; }
+            if(o == '') { return '0'; }
+            return o;
         }
         
-        function speak_half(x) {
-            const fx = Math.floor(x);
-            if(Math.abs((x - fx) - .5) < .0001) { 
-                if(fx == 0) { return 'half'; }
-                return fx + ' and a half'; 
+        const _n = speak_number;
+        
+        function test_speak_number() {
+            const t = [
+                [0, '0'],
+                [0.5, 'half'],
+                [-0.5, 'minus half'],
+                [5.5, '5 and a half'],
+                [-1.5, 'minus 1 and a half'],
+                [100, '1 hundred'],
+                [-2200, 'minus 2 thousand 2 hundred'],
+                [3103, '3 thousand 1 hundred and 3'],
+                [-3103, 'minus 3 thousand 1 hundred and 3'],
+                [-4100.5, 'minus 4 thousand 1 hundred and a half'],
+                [4100.5, '4 thousand 1 hundred and a half'],
+                [8765, '8 thousand 7 hundred and 65'],
+                [8765.5, '8 thousand 7 hundred and 65 and a half'],
+                [-765.5, 'minus 7 hundred and 65 and a half'],
+                [65.5, '65 and a half'],
+            ];
+            for(let i=0; i<t.length; i++) {
+                const ot = speak_number(t[i][0]);
+                if(ot != t[i][1]) { console.error("speak_number test fail", t[i][0], "["+t[i][1]+"]", "["+ot+"]"); }
             }
-            return x;
         }
         
         function speak_yes() {
@@ -280,14 +315,15 @@
         
         function speak_multiplication(a, b, is_success) {
             // Return things to say on success and on failure
-            const p = ''+a+' times '+b+' is ';
+            const p = ''+_n(a)+' times '+_n(b)+' is ';
+            const ab = _n(a*b);
             const suffix = ['Let\'s try again!', 'Let\'s do it again!', 'Let\'s do it once more!', 'Can you type in the answer next?'][RND(0, 3)];
-            if(is_success) { return speak_yes()+p+(a*b); }
+            if(is_success) { return speak_yes()+p+ab; }
             const r = RND(0, 3);
-            if(r==0) { return 'Actually, '+p+(a*b)+'. '+suffix; }
-            if(r==1) { return 'So, '+p+(a*b)+'. '+suffix; }
-            if(r==2) { return 'Did you know that '+p+(a*b)+' ? '+suffix; }
-            return p+'actually '+(a*b)+'. '+suffix;
+            if(r==0) { return 'Actually, '+p+ab+'. '+suffix; }
+            if(r==1) { return 'So, '+p+ab+'. '+suffix; }
+            if(r==2) { return 'Did you know that '+p+ab+' ? '+suffix; }
+            return p+'actually '+ab+'. '+suffix;
         }
         
         function multiply_hint(a, b) {
@@ -311,7 +347,7 @@
                 ((b==3)?('Take '+a+' times two, and add '+a+'.'):
                 ((a==6)?('Take how much'+b+' times five is, and add '+b+'.'):
                 ((b==6)?('Take how much'+a+' times five is, and add '+a+'.'):
-                ('Remember that '+a+' times '+(b-1)+' is '+(a*(b-1))+'.')
+                ('Remember that '+a+' times '+(b-1)+' is '+_n(a*(b-1))+'.')
                 ))))))))))))))))))));
 
         }
@@ -380,8 +416,8 @@
                 const a = RND(1, 10) * 100;
                 const b = RND(1, 10) * 100;
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{
-                    speak_prompt: 'What is '+a+' plus '+b+'?',
-                    speak_solution: speak_yes()+a+' plus '+b+' is '+speak_thousands(a+b)+'.',
+                    speak_prompt: 'What is '+_n(a)+' plus '+_n(b)+'?',
+                    speak_solution: speak_yes()+_n(a)+' plus '+_n(b)+' is '+_n(a+b)+'.',
                     // range:[100,20*100,100,a,100]
                     longform: [a, b]
                 }};
@@ -477,7 +513,7 @@
                 const b = RND(0, 4);
                 return {problem: a+'*'+b+'=', solution:(a*b), hint:{
                     speak_prompt: 'What is '+a+' times '+b+'?',
-                    speak_solution: speak_yes()+a+' times '+b+' is '+(a*b),
+                    speak_solution: speak_yes()+a+' times '+b+' is '+_n(a*b),
                     range:[0,b*5,b*10,b*10,b]
                 }}; 
             },
@@ -575,7 +611,7 @@
                 const get_prob = function(a, b) {
                     return {problem: a+'*'+b+'=', solution:(a*b), hint:{
                         speak_prompt: 'What is '+a+' times '+b+'?',
-                        speak_solution: speak_yes()+a+' times '+b+' is '+(a*b),
+                        speak_solution: speak_yes()+a+' times '+b+' is '+_n(a*b),
                         // range:[0,b*12,b*10,b*10,b],
                         /*
                         help_txt:
@@ -597,48 +633,48 @@
             halving: function() { // e.g. 10/2=
                 const a = RND(0, 12);
                 return {problem: a+'/2=', solution:(a/2), hint:{
-                    speak_prompt: 'What is half of '+a+'?',
-                    speak_solution: speak_yes()+a+' divided by two is '+speak_half(a/2)+'.',
+                    speak_prompt: 'What is half of '+_n(a)+'?',
+                    speak_solution: speak_yes()+_n(a)+' divided by two is '+_n(a/2)+'.',
                     range:[1,a,-1,-1]
                 }};
             },
             halving_whole_ph: function() {  // e.g. ?x[2]=8
                 const a = RND(1, 6)*2;
                 return {problem: '?*2='+a, placeholder: true, solution:(a/2), hint:{
-                    speak_prompt: 'What taken twice is '+a+'?',
-                    speak_solution: speak_yes()+(a/2)+' times two is '+a,
+                    speak_prompt: 'What taken twice is '+_n(a)+'?',
+                    speak_solution: speak_yes()+_n(a/2)+' times two is '+_n(a),
                     range:[1,a,-1,-1]
                 }};
             },
             halving_whole_phi: function() {  // e.g. [2]x?=8
                 const a = RND(1, 6)*2;
                 return {problem: '2*?='+a, placeholder: true, solution:(a/2), hint:{
-                    speak_prompt: 'Two taken how many times is '+a+'?',
-                    speak_solution: speak_yes()+'two times '+(a/2)+' is '+a,
+                    speak_prompt: 'Two taken how many times is '+_n(a)+'?',
+                    speak_solution: speak_yes()+'two times '+_n(a/2)+' is '+_n(a),
                     range:[1,a,-1,-1]
                 }};
             },
             third_whole: function() {  // e.g. 9/[3]=
                 const a = RND(1, 4)*3;
                 return {problem: a+'/3=', placeholder: false, solution:(a/3), hint:{
-                    speak_prompt: 'What is '+a+' divided by three?',
-                    speak_solution: speak_yes()+'The third of '+a+' is '+(a/3),
+                    speak_prompt: 'What is '+_n(a)+' divided by three?',
+                    speak_solution: speak_yes()+'The third of '+_n(a)+' is '+_n(a/3),
                     range:[1,a,-1,-1]
                 }};
             },
             third_whole_ph: function() {  // e.g. ?x[3]=9
                 const a = RND(1, 4)*3;
                 return {problem: '?*3='+a, placeholder: true, solution:(a/3), hint:{
-                    speak_prompt: 'What taken three times is '+a+'?',
-                    speak_solution: speak_yes()+(a/3)+' times three is '+a,
+                    speak_prompt: 'What taken three times is '+_n(a)+'?',
+                    speak_solution: speak_yes()+_n(a/3)+' times three is '+_n(a),
                     range:[1,a,-1,-1]
                 }};
             },
             third_whole_phi: function() {  // e.g. [3]x?=9
                 const a = RND(1, 4)*3;
                 return {problem: '3*?='+a, placeholder: true, solution:(a/3), hint:{
-                    speak_prompt: 'Three taken how many times is '+a+'?',
-                    speak_solution: speak_yes()+'Three times '+(a/3)+' is '+a,
+                    speak_prompt: 'Three taken how many times is '+_n(a)+'?',
+                    speak_solution: speak_yes()+'Three times '+_n(a/3)+' is '+_n(a),
                     range:[1,a,-1,-1]
                 }};
             },
@@ -646,7 +682,7 @@
                 const a = RND(1, 5)*5;
                 return {problem: a+'/5=', placeholder: false, solution:(a/5), hint:{
                     speak_prompt: 'What is '+a+' divided by five?',
-                    speak_solution: speak_yes()+'The fifth of '+a+' is '+(a/5),
+                    speak_solution: speak_yes()+'The fifth of '+a+' is '+_n(a/5),
                     range:[1,a,-1,-1]
                 }};
             },
@@ -654,7 +690,7 @@
                 const a = RND(1, 5)*5;
                 return {problem: '?*5='+a, placeholder: true, solution:(a/5), hint:{
                     speak_prompt: 'What taken five times is '+a+'?',
-                    speak_solution: speak_yes()+(a/5)+' times five is '+a,
+                    speak_solution: speak_yes()+_n(a/5)+' times five is '+a,
                     range:[1,a,-1,-1]
                 }};
             },
@@ -662,7 +698,7 @@
                 const a = RND(1, 5)*5;
                 return {problem: '5*?='+a, placeholder: true, solution:(a/5), hint:{
                     speak_prompt: 'Five taken how many times is '+a+'?',
-                    speak_solution: speak_yes()+'Five times '+(a/5)+' is '+a,
+                    speak_solution: speak_yes()+'Five times '+_n(a/5)+' is '+a,
                     range:[1,a,-1,-1]
                 }};
             },
@@ -1041,11 +1077,9 @@
             if(!wrong_answer) { add_negative_score(.5); }
             $('.hintloader img').attr('src', wrong_answer ? 'assets/images/bricks.gif' : 'assets/images/loader.gif');
             $('.hintloader').show();
-            if(!wrong_answer) { $('.problem').hide(); }
             setTimeout(function() {
                 $('.hintloader').hide();
                 $('.hintloader img').attr('src', 'assets/images/loader.gif');
-                $('.problem').show();
                 bee.can_type = true;
                 penalty_timeout_ongoing = false;
             }, wrong_answer ? 6*1000 : 14*1000);
