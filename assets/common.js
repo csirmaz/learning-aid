@@ -1,5 +1,5 @@
 
-        const bee_app_version = 205;
+        const bee_app_version = 207;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -197,11 +197,14 @@
 
         
         // "negative score" is used to lengthen a level as a penalty; we skip adding scores for every integer
-        function add_negative_score(v) {
+        function add_negative_score(v, is_absolute) {
             if(bee.storage.players[bee.player].negative_score === undefined) {
                 bee.storage.players[bee.player].negative_score = v;
             } else {
                 bee.storage.players[bee.player].negative_score += v;
+            }
+            if(is_absolute) {
+                bee.storage.players[bee.player].negative_score = v;
             }
             const neg_max = bee.max_negative_score;
             if(bee.storage.players[bee.player].negative_score > neg_max) {

@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?205">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?207">
 
     <style>
         body {
@@ -164,7 +164,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?205"></script>
+    <script src="assets/local/beelocal.js?207"></script>
 </head>
 <body>
     <div class="container">
@@ -806,7 +806,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?205"></script>
+    <script src="assets/common.js?207"></script>
     <script>
 
         
@@ -1082,7 +1082,7 @@
                 $('.hintloader img').attr('src', 'assets/images/loader.gif');
                 bee.can_type = true;
                 penalty_timeout_ongoing = false;
-            }, wrong_answer ? 6*1000 : 14*1000);
+            }, wrong_answer ? 6*1000 : 8*1000);
         }
         
         
@@ -1102,15 +1102,15 @@
             bee.questiontimeout.$warn.css('visibility', 'hidden');
             if(bee.questiontimeout.warn_timeout) { clearTimeout(bee.questiontimeout.warn_timeout); }
             if(bee.questiontimeout.skip_timeout) { clearTimeout(bee.questiontimeout.skip_timeout); }
-            if(at_new_question && bee.problem.use_timeout && !penalty_timeout_ongoing) {
+            if(at_new_question && bee.problem.use_timeout && (!penalty_timeout_ongoing)) {
                 bee.questiontimeout.warn_timeout = setTimeout(function() {
-                    if((!penalty_timeout_ongoing) && bee.giftlist == -1) {
+                    if((!penalty_timeout_ongoing) && bee.giftlist == -1 && (!is_away)) {
                         bee.questiontimeout.$warn.css('visibility', 'visible');
                     }
                 }, (qtimeout-1)*1000);
                 bee.questiontimeout.skip_timeout = setTimeout(function() {
                     // Skip to the next question
-                    if((!penalty_timeout_ongoing) && bee.giftlist == -1) {
+                    if((!penalty_timeout_ongoing) && bee.giftlist == -1 && (!is_away)) {
                         console.log('timeout: skipping to next question');
                         manage_level_stats('timeout');
                         end_question('timeout');
@@ -1160,11 +1160,12 @@
         }
         
         // Another cheat: switching to the calculator app and back
-        var wentaway = 0; // counts the switches away
+        var is_away = false; // counts the switches away
         document.addEventListener('visibilitychange', function() {
             if(bee.player === false) { return; }
-            if(document.hidden) { wentaway++; return; }
-            if(wentaway) { penalty_delay(false, 'visibility change'); }
+            if(document.hidden) { is_away = true; return; }
+            if(is_away && !penalty_timeout_ongoing) { penalty_delay(false, 'visibility change'); }
+            is_away = false;
         });
 
         
@@ -1293,6 +1294,7 @@
             bee.queued_problems = [];
             store_question(bee.queued_problems);
             bee.storage.players[bee.player].current_question_time = undefined;
+            add_negative_score(0, true); // true = absolute score
 
             save_storage();
             init_problemset();
