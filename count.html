@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?207">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?208">
 
     <style>
         body {
@@ -164,7 +164,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?207"></script>
+    <script src="assets/local/beelocal.js?208"></script>
 </head>
 <body>
     <div class="container">
@@ -257,6 +257,7 @@
         
         function RND(min, max) { return min + Math.floor(Math.random() * (max + 1 - min)); } // inclusive
         
+        // Convert a number to a string for TTS
         function speak_number(x) {
             let o = '';
             let fx = Math.floor(Math.abs(x));
@@ -351,7 +352,17 @@
                 ))))))))))))))))))));
 
         }
-        
+
+        function get_multiplication_problem(a, b) {
+            return {problem: a+'*'+b+'=', solution:(a*b), hint:{
+                speak_prompt: ''+a+' times '+b+'',
+                speak_solution: speak_multiplication(a, b, true),
+                speak_failed: speak_multiplication(a, b, false),
+                groups: {in_group:(b==5?b:a), groups:(b==5?a:b), row_length:(b==5||a==5?2:1)},
+                help_speech: multiply_hint(a, b)
+            }}; 
+        }
+
         /* Problem generators, returning <problem> := {
                 problem:STR,  // use '?' for the placeholder; '*' for multiplication, '/' for division. See format_problem()
                 solution:STR, 
@@ -511,24 +522,11 @@
             small_multiply: function() { // e.g. 3x2=
                 const a = RND(1, 5);
                 const b = RND(0, 4);
-                return {problem: a+'*'+b+'=', solution:(a*b), hint:{
-                    speak_prompt: 'What is '+a+' times '+b+'?',
-                    speak_solution: speak_yes()+a+' times '+b+' is '+_n(a*b),
-                    range:[0,b*5,b*10,b*10,b]
-                }}; 
+                return get_multiplication_problem(a, b);
             },
             mult_tables: function(aa) {  // aa=0..12 times tables, 13,14,15=big/mix/small part of 12-times tables; 113,114,115=same w timeout
-                const get_prob = function(a, b) {
-                    return {problem: a+'*'+b+'=', solution:(a*b), hint:{
-                        speak_prompt: ''+a+' times '+b+'',
-                        speak_solution: speak_multiplication(a, b, true),
-                        speak_failed: speak_multiplication(a, b, false),
-                        groups: {in_group:(b==5?b:a), groups:(b==5?a:b), row_length:(b==5||a==5?2:1)},
-                        help_speech: multiply_hint(a, b)
-                    }}; 
-                };
                 const get_prob_swap = function(a, b) {
-                    return (RND(0,1) ? get_prob(a, b) : get_prob(b, a));
+                    return (RND(0,1) ? get_multiplication_problem(a, b) : get_multiplication_problem(b, a));
                 };
                 const too_easy = function(a, b) {
                     return (
@@ -542,14 +540,14 @@
                 let problems = [];
                 if(aa <= 12) {  // times tables
                     for(let bb=2; bb<=12; bb++) { // 1..11
-                        problems.push(get_prob(aa, bb));
+                        problems.push(get_multiplication_problem(aa, bb));
                     }
                     for(let bb=11; bb>=0; bb--) { // 12..23
-                        problems.push(get_prob(aa, bb));
+                        problems.push(get_multiplication_problem(aa, bb));
                     }
-                    problems.push(get_prob(aa, 12)); // 24
+                    problems.push(get_multiplication_problem(aa, 12)); // 24
                     for(let bb=0; bb<6; bb++) { // 25..30
-                        problems.push(get_prob(aa, RND(2,12)));
+                        problems.push(get_multiplication_problem(aa, RND(2,12)));
                     }
                 }
                 /*
@@ -608,25 +606,11 @@
                 return {type: 'problem_list', problems: problems};
             },
             multiply: function() { // e.g. 3x6= (twelve times table) - return groups of 3
-                const get_prob = function(a, b) {
-                    return {problem: a+'*'+b+'=', solution:(a*b), hint:{
-                        speak_prompt: 'What is '+a+' times '+b+'?',
-                        speak_solution: speak_yes()+a+' times '+b+' is '+_n(a*b),
-                        // range:[0,b*12,b*10,b*10,b],
-                        /*
-                        help_txt:
-                            (b>0 ? a+'*'+(b-1)+'='+(a*(b-1))+'#' : '')
-                            + a+'*'+b+'=?#'
-                            + a+'*'+(b+1)+'='+(a*(b+1))
-                        */
-                        help_speech: multiply_hint(a, b)
-                    }}; 
-                };
                 const a = RND(2, 12);
                 const b = RND(2, 12);
                 let problems = [];
                 for(let bb=b; bb<=b+4; bb++) {
-                    problems.push(get_prob(a, bb>12?bb-11:bb));
+                    problems.push(get_multiplication_problem(a, bb>12?bb-11:bb));
                 }
                 return {type: 'problem_list', problems: problems};
             },
@@ -707,15 +691,16 @@
         // Lists problems and their relative frequencies
         const PROBLEMSETS = {
             0: [
-                [PRBL.add_to_five, 30],
-                [PRBL.add_to_ten, 30],
+                [PRBL.add_to_five, 5],
+                [PRBL.add_to_ten, 10],
                 [PRBL.add_mid, 20],
-                [PRBL.sub_five_minus, 30],
-                [PRBL.sub_ten_minus, 30],
-                [PRBL.sub_small, 20],
-                [PRBL.add_hundreds, 5],
-                [PRBL.add_big_no_carry, 5],
-                [PRBL.small_multiply, 10],
+                [PRBL.add_big_no_carry, 20],
+                [PRBL.sub_five_minus, 5],
+                [PRBL.sub_ten_minus, 10],
+                [PRBL.sub_small, 10],
+                [PRBL.sub_mid, 10],
+                [PRBL.add_hundreds, 20],
+                [PRBL.small_multiply, 20],
                 [PRBL.halving, 10],
                 // [PRBL.halving_whole_ph, 5],
                 // [PRBL.halving_whole_phi, 5],
@@ -806,7 +791,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?207"></script>
+    <script src="assets/common.js?208"></script>
     <script>
 
         
