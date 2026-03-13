@@ -26,12 +26,12 @@
         
         .prompt .infield {
             display: block;
-            line-height: 4rem;
+            line-height: 3rem;
             border-radius: 1rem;
             background: #fffae4;
             font-size: 2rem;
             margin: 1rem 0;
-            padding: 0 1rem;
+            padding: 1rem 1rem;
             min-width: 20rem;
             letter-spacing: .2rem;
         }
@@ -67,6 +67,7 @@
             margin-top: 4rem; 
             width: 24rem;
         }
+        .kbrow0 { text-align: right; }
         .kbrow1 { margin-left: .2rem; }
         .kbrow2 { margin-left: .4rem; }
         .kbrow3 { margin-left: 1.4rem; }
@@ -84,9 +85,8 @@
             text-align: center;
             line-height: 3rem;
         }
-        .kbdiv .kbspace {
-            width: 11rem;
-        }
+        .kbdiv .kbspace { width: 11rem; }
+        .kbdiv .kbbksp { width: 4rem; }
         
         .keyhelp {
             margin-top: 4rem;
@@ -115,10 +115,11 @@
         </div>
         
         <div class="game kbdiv">
+            <div class="kbrow kbrow0"><span class="kbkey kbbksp" data-key="BACKSPACE">⌫</span></div>
             <div class="kbrow kbrow1"></div>
             <div class="kbrow kbrow2"></div>
             <div class="kbrow kbrow3"></div>
-            <div class="kbrow kbrow4"><span class="kbkey kbspace" data-key="SPACE"></span></div>
+            <div class="kbrow kbrow4"><span class="kbkey kbspace" data-key=" "></span></div>
         </div>
         
         <div class="game keyhelp">1️⃣=❓ &nbsp; 2️⃣=💬</div>
@@ -564,7 +565,7 @@
                 let o = '';
                 for(let i=0; i<s.length; i++) {
                     const k = s[i];
-                    o += '<span class="kbkey" data-key="'+k+'">'+k+'</span>';
+                    o += '<span class="kbkey" data-key="'+k.toLowerCase()+'">'+k+'</span>';
                 }
                 $('.'+cls).html(o);
             };
@@ -601,8 +602,8 @@
                     const dist = tapdistance(ev, key, key_width);
                     measurements.push([$(key).data('key'), dist]);
                 }
-                const top3 = measurements.sort((a,b) => a[1]-b[1]).slice(0, 3);
-                console.log(top3);
+                const top4 = measurements.sort((a,b) => a[1]-b[1]).slice(0, 4);
+                process_typing('TYPING', top4, false);
             });
         });
 
@@ -803,15 +804,41 @@
                 console.log("Error during play_word", e);
             }
         }
-
         
-        function process_keypress(event) {
-            event.preventDefault = true;
-            
-            if((event.keyCode >= 65 && event.keyCode <= 90) || event.keyCode == 32) { // a-z, space
+        
+        function process_typing(group, key_distances, is_direct) {
+            if(group == 'TYPING') {
                 if(!bee.can_type) { playme('notavail'); return; }
+                
+                let typed_key = undefined;
+                if(is_direct) {
+                    typed_key = key_distances;
+                } else {
+                    // Check if the user could have meant the next correct character
+                    if(bee.typed.length < bee.processed_word.to_type.length) {
+                        const desired_char = bee.processed_word.to_type[bee.typed.length];
+                        for(let i=0; i<key_distances.length; i++) {
+                            if(key_distances[i][1] < .3 /* ratio to key width */ && key_distances[i][0].toLowerCase() == desired_char.toLowerCase()) {
+                                typed_key = desired_char; break;
+                            }
+                        }
+                    }
+                    if(typed_key === undefined) { 
+                        if(key_distances[0][1] > .5) { return; }
+                        typed_key = key_distances[0][0];
+                    }
+                }
+                
+                if(typed_key == 'BACKSPACE') {
+                    if(bee.typed.length > 0) {
+                        bee.typed = bee.typed.substring(0, bee.typed.length-1);
+                        update_input_field();
+                    }
+                    return;
+                }
+                
                 if(bee.typed.length < bee.processed_word.to_type.length) {
-                    bee.typed += event.key;
+                    bee.typed += typed_key;
                     update_input_field();
                     
                     if(bee.typed.toLowerCase() == bee.processed_word.to_type.toLowerCase()) { // Success!
@@ -829,28 +856,42 @@
                         }
                     }
                 }
+                return;
+            }
+            if(group == 'HELP') {
+                if(!bee.can_type) { return; }
+                if(!bee.can_use_help) { playme('notavail'); return; }
+                show_help(false);
+                return;
+            }
+            if(group == 'PLAY_WORD') {
+                if(!bee.can_type) { playme('notavail'); return; }
+                play_word(bee.processed_word.to_display);
+                return;
+            }
+        }
+
+        
+        function process_keypress(event) {
+            event.preventDefault = true;
+            
+            if((event.keyCode >= 65 && event.keyCode <= 90) || event.keyCode == 32) { // a-z, space
+                process_typing('TYPING', event.key, true);
                 return false;
             }
             
             if(event.keyCode == 8) { // backspace
-                if(!bee.can_type) { playme('notavail'); return false; }
-                if(bee.typed.length > 0) {
-                    bee.typed = bee.typed.substring(0, bee.typed.length-1);
-                    update_input_field();
-                }
+                process_typing('TYPING', 'BACKSPACE', true);
                 return false;
             }
                        
             if(event.keyCode == 112 || event.keyCode == 113 || event.keyCode == 27 || event.keyCode == 192 || event.keyCode == 49) { // F1, F2, ESC, pipe, 1
-                if(!bee.can_type) { return false; }
-                if(!bee.can_use_help) { playme('notavail'); return false; }
-                show_help(false);
+                process_typing('HELP');
                 return false;
             }
             
             if(event.keyCode == 50) {
-                if(!bee.can_type) { playme('notavail'); return false; }
-                play_word(bee.processed_word.to_display);
+                process_typing('PLAY_WORD');
                 return false;
             }
             
