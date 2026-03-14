@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?208">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?215">
 
     <style>
         body {
@@ -164,7 +164,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?208"></script>
+    <script src="assets/local/beelocal.js?215"></script>
 </head>
 <body>
     <div class="container">
@@ -238,10 +238,10 @@
         <span class="expand_tools">
             | <a href="#" onclick="bee_tts.test(); return false">TTS</a>
             <span class="localfunctions"></span>
-            | <a href="#" onclick="show_animation(); return false">Test animation</a>
             | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
             | <a href="#" onclick="modify_problemset(); return false">Update problem range</a>
             | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
+            | <a href="#" onclick="delete_user(); return false">Delete user</a>
         </span>
         | Icons by <a href="https://icons8.com">I</a>cons8
         | <a href="https://codeberg.org/csirmaz/learning-aid">C</a>odebase
@@ -603,6 +603,18 @@
                         problems.push(p);
                     }
                 }
+                if(aa == 16 || aa == 116) { // all
+                    while(problems.length < 30) {
+                        const x = RND(0, 12);
+                        const y = RND(0, 12);
+                        if(x < y) { continue; }
+                        if(too_easy(x, y) && RND(0, 3) != 0) { continue; }
+                        const p = get_prob_swap(x, y);
+                        p.hint.speak_prompt = undefined;
+                        if(aa > 100) { p.use_timeout = true; }
+                        problems.push(p);
+                    }
+                }
                 return {type: 'problem_list', problems: problems};
             },
             multiply: function() { // e.g. 3x6= (twelve times table) - return groups of 3
@@ -741,7 +753,7 @@
             score_goal: 30,        // controls the bar under the score and gifts
             max_negative_score: 4, // maximum "negative" score where question doesn't give point
             button_clicks: false,  // whether buttons make clicking sound
-            question_timeout_value: 9, // the timeout (if the problem specifies) in seconds
+            question_timeout_value: 8, // the timeout (if the problem specifies) in seconds
             // State (common)
             storage: {'players': {}},  // storage data that's saved into local storage
             load_time: Date.now(),
@@ -765,17 +777,17 @@
         };
         
         // Try to load data
-        if(localStorage.count) {
-            bee.storage = JSON.parse(localStorage.count);
+        if(localStorage[bee.app_name]) {
+            bee.storage = JSON.parse(localStorage[bee.app_name]);
             if(typeof(bee_local) !== 'undefined' && bee_local.loaded_hook) {
-                bee_local.loaded_hook('count');
+                bee_local.loaded_hook(bee.app_name);
             }
         }
 
         function save_storage(msg, skip_hook) {
             console.log("  Saving storage", msg, skip_hook);
             const s = JSON.stringify(bee.storage);
-            localStorage.count = s;
+            localStorage[bee.app_name] = s;
             if((!skip_hook) && typeof(bee_local) !== 'undefined' && bee_local.save_hook) {
                 bee_local.save_hook(s);
             }            
@@ -791,7 +803,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?208"></script>
+    <script src="assets/common.js?215"></script>
     <script>
 
         
@@ -1253,7 +1265,7 @@
         
         // Choose a range of word sets to show words from
         function choose_problemset() {
-            let p = prompt("What set of problems should we use?\nType a number from 0 to "+max_problemset+" (simple to difficult);\nor 101 for the 1-time table, 102 for the 2-time table etc.;\nor 113, 114, 115 for mixed 12-times tables (big, mixed, small)\nor 213, 214, 215 for same with timeout") - 0;
+            let p = prompt("What set of problems should we use?\nType a number from 0 to "+max_problemset+" (simple to difficult);\nor 101 for the 1-time table, 102 for the 2-time table etc.;\nor for mixed 12-times tables, use 113/213 (big), 114/214 (big+small), 115/215 (small),\n116/216 (all), where the 200 ones use timeout") - 0;
             if(isNaN(p)) { p = 0; }
             return p;
         }
@@ -1265,7 +1277,7 @@
             $('.d_wordsets').html(esc_html(p));
             bee.problemset = p;
         }
-        
+
         
         function modify_problemset() {
             if(bee.player === false) { alert("Choose a player first"); return; }

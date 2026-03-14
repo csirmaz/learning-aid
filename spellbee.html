@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?208">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?215">
 
     <style>
         body { margin: .5rem 0; }
@@ -33,6 +33,7 @@
             margin: 1rem 0;
             padding: 1rem 1rem;
             min-width: 20rem;
+            min-height: 9rem;
             letter-spacing: .2rem;
         }
         
@@ -54,7 +55,7 @@
             display: inline-block;
             border: 2px solid #f77;
             width: .2rem;
-            height: 2rem;
+            height: 1.5rem;
             margin-left: -1px;
             border-right: 0 solid transparent;
         }
@@ -64,7 +65,7 @@
         .wrongchar { text-decoration: underline dotted #05b .2rem; }
 
         .kbdiv { 
-            margin-top: 4rem; 
+            margin-top: 1rem; 
             width: 24rem;
         }
         .kbrow0 { text-align: right; }
@@ -89,16 +90,28 @@
         .kbdiv .kbbksp { width: 4rem; }
         
         .keyhelp {
-            margin-top: 4rem;
-            font-size: 1.5rem;
-            opacity: .7;
+            margin: 1rem 0 2rem 0;
+        }
+        .keyhelp .helpbutton {
+            display: inline-block;
+            position: relative;
+            border: 1px solid #777;
+            border-radius: .5rem;
+            padding: .5rem;
+            margin-left: 1rem;
+        }
+        .keyhelp .helpbutton .k {
+            font-size: 80%;
+            position: absolute;
+            bottom: -.5rem;
+            right: -.5rem;
         }
 
     </style>
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?208"></script>
+    <script src="assets/local/beelocal.js?215"></script>
 </head>
 <body>
     <div class="container">
@@ -122,7 +135,10 @@
             <div class="kbrow kbrow4"><span class="kbkey kbspace" data-key=" "></span></div>
         </div>
         
-        <div class="game keyhelp">1️⃣=❓ &nbsp; 2️⃣=💬</div>
+        <div class="game keyhelp">
+            <span class="helpbutton" data-help="HELP">❓<span class="k">1️⃣</span></span>
+            <span class="helpbutton" data-help="PLAY_WORD">💬<span class="k">2️⃣</span></span>
+        </div>
         
         <div class="startmenu"></div>
 
@@ -145,17 +161,14 @@
     v<span class="d_version"></span>
     Player: <span class="d_player"></span>
     | Word sets: <span class="d_wordsets"></span>
-    </p>
-    <p class="smallprint">Hint: Press 1, F1, F2, ESC or the button under ESC (some may trigger other functions)</p>
-    
-    <p class="smallprint">
-        <a href="#" class="handle">Tools &amp; Licences</a>
+    | <a href="#" class="handle">Tools &amp; Licences</a>
         <span class="expand_tools">
             | <a href="#" onclick="bee_tts.test(); return false">TTS</a>
             <span class="localfunctions"></span>
             | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
             | <a href="#" onclick="modify_wordlist(); return false">Update word sets</a>
             | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
+            | <a href="#" onclick="delete_user(); return false">Delete user</a>
         </span>
         | Icons by <a href="https://icons8.com">I</a>cons8
         | <a href="https://codeberg.org/csirmaz/learning-aid">C</a>odebase
@@ -187,6 +200,8 @@
             ],
             [ // Word set 1
                 ['🛌', 'bed'],
+            ],
+            [ // Word set 2
                 ['🐄', 'cow'],
                 ['🥁', 'drum'],
                 ['🏋️', 'gym'],
@@ -202,8 +217,6 @@
                 // ['🎾', 'tennis'],
                 ['🎾', 'play >t>e>n>n>i>s'],
                 ['⛺️', 'tent'],
-            ],
-            [ // Word set 2
                 ['🥚', 'egg'],      
                 ['👜', 'bag'],
                 ['🏃🏻‍♂️‍➡️', 'run'],
@@ -221,8 +234,6 @@
                 ['🪆', 'toy'],
                 ['🧑', 'boy'],
                 ['👍🏿', 'thumb'],
-            ],
-            [ // Word set 3
                 ['🖍', 'crayon'],
                 ['👁', 'eye'],
                 ['▶️', 'play'],
@@ -247,8 +258,6 @@
                 ['🪽', 'wing'],
                 // ['😀', 'happy'],
                 ['😀', 'I am >h>a>p>p>y'],
-            ],
-            [ // Word set 4
                 ['👃🏻', 'nose'],
                 ['👂', 'ear'],
                 ['👞', 'shoe'],
@@ -314,8 +323,6 @@
                 ['🌋', '>l>a>v>a is hot'],
                 ['🪰', 'fly'],
                 ['🛑', 'stop'],
-            ],
-            [ // Word set 5
                 ['🖼', 'picture'],
                 ['👄', 'mouth'],
                 ['🦴', 'bone'],
@@ -369,8 +376,6 @@
                 ['📰', 'good >n>e>w>s'],
                 //['🌍', 'world'],
                 ['🌍', 'the whole >w>o>r>l>d'],
-            ],
-            [ // Word set 6
                 ['🪞', 'mirror'],
                 ['☁️', 'cloud'],
                 //['🧗', 'climb'],
@@ -439,7 +444,7 @@
                 ['📥', 'There was nothing >i>n> >t>h>e tray.'],
                 ['📥', 'There was nothing in the >t>r>a>y.'],
             ],
-            [ // Word set 7
+            [ // Word set 3
                 //['🪙', 'coin'],
                 ['🪙', '>g>o>l>d coin'],
                 ['🪙', 'gold >c>o>i>n'],
@@ -525,17 +530,17 @@
         };
 
         // Try to load data
-        if(localStorage.spellbee) {
-            bee.storage = JSON.parse(localStorage.spellbee);
+        if(localStorage[bee.app_name]) {
+            bee.storage = JSON.parse(localStorage[bee.app_name]);
             if(typeof(bee_local) !== 'undefined' && bee_local.loaded_hook) {
-                bee_local.loaded_hook('spellbee');
+                bee_local.loaded_hook(bee.app_name);
             }
         }
 
         function save_storage(msg, skip_hook) {
             console.log("  Saving storage", msg, skip_hook);
             const s = JSON.stringify(bee.storage);
-            localStorage.count = s;
+            localStorage[bee.app_name] = s;
             if((!skip_hook) && typeof(bee_local) !== 'undefined' && bee_local.save_hook) {
                 bee_local.save_hook(s);
             }            
@@ -543,7 +548,7 @@
 
 
     </script>
-    <script src="assets/common.js?208"></script>
+    <script src="assets/common.js?215"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
@@ -595,7 +600,7 @@
             
             $('.kbdiv').on('click', function(ev) {
                 // Correct for mistaps. Get the top keys the user may have meant.
-                const key_width = $all_keys[0].getBoundingClientRect().width;
+                const key_width = $all_keys[3].getBoundingClientRect().width;
                 const measurements = [];
                 for(let keyix=0; keyix<$all_keys.length; keyix++) {
                     const key = $all_keys[keyix];
@@ -604,6 +609,12 @@
                 }
                 const top4 = measurements.sort((a,b) => a[1]-b[1]).slice(0, 4);
                 process_typing('TYPING', top4, false);
+                return false;
+            });
+            
+            $('.helpbutton').on('click', function(ev) {
+                process_typing($(this).data('help'));
+                return false;
             });
         });
 
@@ -728,7 +739,7 @@
             }
             
             const help_duration_loading = 1800; // duration of the loading animation
-            const help_duration_1 = (is_initial ? 800 : 1200) + bee.processed_word.to_display.length * 200; // full color
+            const help_duration_1 = (is_initial ? 700 : 1200) + bee.processed_word.to_display.length * 160; // full color
             const help_duration_2 = 1500; // fading
             const help_duration_enable = 4400; // time to enable help again
 
@@ -885,12 +896,12 @@
                 return false;
             }
                        
-            if(event.keyCode == 112 || event.keyCode == 113 || event.keyCode == 27 || event.keyCode == 192 || event.keyCode == 49) { // F1, F2, ESC, pipe, 1
+            if(event.keyCode == 49) { // 1
                 process_typing('HELP');
                 return false;
             }
             
-            if(event.keyCode == 50) {
+            if(event.keyCode == 50) { // 2
                 process_typing('PLAY_WORD');
                 return false;
             }

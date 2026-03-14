@@ -1,5 +1,5 @@
 
-        const bee_app_version = 208;
+        const bee_app_version = 215;
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -503,7 +503,16 @@
         }
         
         
+        function delete_user() {
+            if(bee.player === false) { alert("Choose a player first"); return; }
+            const conf = prompt("Type 'delete' to delete the user: " + bee.player);
+            if(conf != 'delete') { alert("Not deleting"); return; }
+            delete bee.storage.players[bee.player];
+            save_storage('delete_user', true);
+        }
+        
         // text-to-speech support
+        
         const bee_tts = {
             status: 'init', // 'init' | 'ready' | 'fail'
             voice: false,  // selected voice
