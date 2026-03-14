@@ -9,9 +9,9 @@ Feel free to edit the code (vanilla JavaScript) to fit your needs or use the com
 - Spelling: https://csirmaz.codeberg.page/learning-aid/@main/spellbee.html
 - Arithmetic: https://csirmaz.codeberg.page/learning-aid/@main/count.html
 
-![screenshot](https://www.postminart.com/cdn/spell-sample.jpg)
+![screenshot](https://www.epcsirmaz.co.uk/files/learn/spell-sample.png)
 
-![screenshot](https://www.postminart.com/cdn/count-sample.jpg)
+![screenshot](https://www.epcsirmaz.co.uk/files/learn/count-sample.png)
 
 ## Common features
 
