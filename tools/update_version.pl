@@ -32,3 +32,8 @@ sub procfile {
 procfile('count.html', 'HTML');
 procfile('spellbee.html', 'HTML');
 procfile('assets/common.js', 'JS');
+
+$localver = 'assets/local/version.php';
+if(-f $localver) {
+    procfile($localver, 'JS');
+}

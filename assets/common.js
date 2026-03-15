@@ -1,5 +1,5 @@
 
-        const bee_app_version = 221;
+        const bee_app_version = 225;
         
         if(typeof(bee_local) !== 'undefined' && bee_local.check_version) { bee_local.check_version(); }
 
@@ -11,7 +11,7 @@
 
 
         const audio = {
-            click: {'file':'assets/sounds/click.mp3', 'volume':.3, 'object':false},
+            click: {'file':'assets/sounds/click.ogg', 'volume':.3, 'object':false},
             notavail: {'file':'assets/sounds/wronganswer-37702.mp3', 'volume':1, 'object':false},
             level_complete: [
                 {file: 'assets/sounds/success/congrats1.mp3', volume: 1, object: false},
