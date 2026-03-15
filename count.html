@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?215">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?221">
 
     <style>
         body {
@@ -164,7 +164,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?215"></script>
+    <script src="assets/local/beelocal.js?221"></script>
 </head>
 <body>
     <div class="container">
@@ -605,8 +605,8 @@
                 }
                 if(aa == 16 || aa == 116) { // all
                     while(problems.length < 30) {
-                        const x = RND(0, 12);
-                        const y = RND(0, 12);
+                        const x = RND(2, 12);
+                        const y = RND(2, 12);
                         if(x < y) { continue; }
                         if(too_easy(x, y) && RND(0, 3) != 0) { continue; }
                         const p = get_prob_swap(x, y);
@@ -753,7 +753,7 @@
             score_goal: 30,        // controls the bar under the score and gifts
             max_negative_score: 4, // maximum "negative" score where question doesn't give point
             button_clicks: false,  // whether buttons make clicking sound
-            question_timeout_value: 8, // the timeout (if the problem specifies) in seconds
+            question_timeout_value: 7, // the timeout (if the problem specifies) in seconds
             // State (common)
             storage: {'players': {}},  // storage data that's saved into local storage
             load_time: Date.now(),
@@ -803,7 +803,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?215"></script>
+    <script src="assets/common.js?221"></script>
     <script>
 
         
@@ -1168,11 +1168,7 @@
         
         function new_question(reason) {
             console.log('#new_question() caller=', reason);
-            // Refresh the page periodically
-            if(Date.now() - bee.load_time > 12*60*60*1000) {
-                window.location.reload(true);
-                return;
-            }
+            page_update();
 
             try{ document.activeElement.blur(); }catch(e){}
 

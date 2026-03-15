@@ -1,5 +1,7 @@
 
-        const bee_app_version = 215;
+        const bee_app_version = 221;
+        
+        if(typeof(bee_local) !== 'undefined' && bee_local.check_version) { bee_local.check_version(); }
 
         // Fix emojis
         $('.score .icon').html('🪙'+"\ufe0f");
@@ -79,6 +81,16 @@
         
         
         const bee_confetti = new JSConfetti();
+        
+        
+        // Check if the page should be refreshed to bring in new versions
+        function page_update() {
+            if(Date.now() - bee.load_time > 4*60*60*1000) {
+                window.location.reload(true);
+                return;
+            }
+            if(typeof(bee_local) !== 'undefined' && bee_local.check_version) { bee_local.check_version(); }            
+        }
         
         
         // Show a reward animation (confetti)

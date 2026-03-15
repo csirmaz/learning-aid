@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# Resize images for gifts
+
 opendir my $dh, '.' or die $!;
 my @files = readdir $dh;
 

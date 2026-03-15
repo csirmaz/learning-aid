@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?215">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?221">
 
     <style>
         body { margin: .5rem 0; }
@@ -111,7 +111,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?215"></script>
+    <script src="assets/local/beelocal.js?221"></script>
 </head>
 <body>
     <div class="container">
@@ -548,7 +548,7 @@
 
 
     </script>
-    <script src="assets/common.js?215"></script>
+    <script src="assets/common.js?221"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
@@ -941,11 +941,7 @@
         
         function new_question(reason) {
             console.log('#new_question() caller=', reason);
-            // Refresh the page periodically
-            if(Date.now() - bee.load_time > 4*60*60*1000) {
-                window.location.reload(true);
-                return;
-            }
+            page_update();
             
             try{ document.activeElement.blur(); }catch(e){}
             
