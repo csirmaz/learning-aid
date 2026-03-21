@@ -12,6 +12,7 @@ sub procfile {
         if($type eq 'HTML') {
             if((!$newver) && /common.css\?([0-9]+)"/) {
                 $newver = $1 + 1;
+                print "New version: $newver\n";
             }
             s/common.css\?([0-9]+)"/common.css?$newver"/g;
             s/common.js\?([0-9]+)"/common.js?$newver"/g;

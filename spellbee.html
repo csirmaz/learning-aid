@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?225">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?231">
 
     <style>
         body { margin: .5rem 0; }
@@ -111,7 +111,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?225"></script>
+    <script src="assets/local/beelocal.js?231"></script>
 </head>
 <body>
     <div class="container">
@@ -180,6 +180,7 @@
         // Words, split into sets
         // Format: ['{emoji}', '{word to spell}'], or
         //         ['{emoji}', '{phrase with > before every character to type}']   (e.g. ['*', 'Look! A >s>t>a>r!'])
+        //         If the {word} starts with a #, use TTS instead of playing a sound file
         // Use e.g. https://getemoji.com/
 
         // The page will attempt to play assets/sounds/words/<word to spell>.mp3 (lowercased and spaces replaced by underscores)
@@ -442,7 +443,19 @@
                 ['📥', '>T>h>e>r>e> >w>a>s nothing in the tray.'],
                 ['📥', 'There was >n>o>t>h>i>n>g in the tray.'],
                 ['📥', 'There was nothing >i>n> >t>h>e tray.'],
-                ['📥', 'There was nothing in the >t>r>a>y.'],
+                ['📥', 'There was nothing in the >t>r>a>y.'],                
+                ['🧑‍🍳', '#The >c>h>e>f works in the kitchen'],
+                ['🧑‍🍳', '#The chef >w>o>r>k>s in the kitchen'],
+                ['🧑‍🍳', '#The chef works in the >k>i>t>c>h>e>n'],
+                ['🕰️', '#>J>u>s>t a bit of time, please'],
+                ['🕰️', '#Just >a> >b>i>t> >o>f time, please'],
+                ['🕰️', '#Just a bit of >t>i>m>e, please'],
+                ['🕰️', '#Just a bit of time, >p>l>e>a>s>e'],
+                ['🪫', '#The >m>a>c>h>i>n>e ran out of battery'],
+                ['🪫', '#The machine >r>a>n> >o>u>t of battery'],
+                ['🪫', '#The machine ran out of >b>a>t>t>e>r>y'],
+                ['🤖', '#>S>i>l>l>y machine!'],
+                ['🤖', '#Silly >m>a>c>h>i>n>e!'],
             ],
             [ // Word set 3
                 //['🪙', 'coin'],
@@ -495,7 +508,33 @@
                 ['🎂', 'It is my >b>i>r>t>h>d>a>y!'],
                 ['🎂', '>I>t> >i>s> >m>y birthday!'],
                 ['⚽️', '">G>o>a>l!" shouted everyone.'],
+                ['🤨', '#The car broke down again. >T>y>p>i>c>a>l.'],
+                ['🤨', '#The car >b>r>o>k>e down again. Typical.'],
+                ['🤨', '#The car broke down >a>g>a>i>n. Typical.'],
+                ['🖥', '#>s>y>s>t>e>m error'],
+                ['🖥', '#system >e>r>r>o>r'],
+                ['🥸', '#fake >m>o>u>s>t>a>c>h>e'],
+                ['🤸🏾‍♀️', '#She can do it >e>a>s>i>l>y'],
+                ['🤸🏾‍♀️', '#She >c>a>n> >d>o> >i>t easily'],
+                ['🏂', '#He >b>r>a>v>e>l>y slid down'],
+                ['🏂', '#He bravely slid >d>o>w>n'],
+                ['🤫', '#>W>e> >m>u>s>t meet secretly'],
+                ['🤫', '#We must >m>e>e>t secretly'],
+                ['🤫', '#We must meet >s>e>c>r>e>t>l>y'],
+                ['😸', '#>F>i>n>a>l>l>y the cat had enough to eat'],
+                ['😸', '#Finally the cat had >e>n>o>u>g>h to eat'],
+                ['😸', '#Finally the cat had enough to >e>a>t'],
+                ['🌤', '#>S>u>m>m>e>rs are usually hot'],
+                ['🌤', '#Summers are >u>s>u>a>l>l>y hot'],
+                ['💥', '#>S>o>m>ething went horribly wrong'],
+                ['💥', '#Some>t>h>i>n>g went horribly wrong'],
+                ['💥', '#>S>o>m>e>t>h>i>n>g went horribly wrong'],
+                ['💥', '#Something >w>e>n>t horribly wrong'],
+                ['💥', '#Something went horribly >w>r>o>n>g'],
+                ['💥', '#Something went >h>o>r>r>i>b>l>y wrong'],
             ],
+            [ // Word set 4
+            ]
         ];
         // [WORDS END]
         
@@ -520,7 +559,8 @@
             // State (spellbee)
             word_ix: false,
             processed_word: false,
-            help_asked: 0,  // how many times help was asked for for the current word
+            help_asked: 0,  // state: how many times help was asked for for the current word
+            backspace_used: 0, // state
             $image: $('.prompt .img'),
             $input: $('.prompt .infield .inp'),
             $help: $('.prompt .infield .help'),
@@ -548,7 +588,7 @@
 
 
     </script>
-    <script src="assets/common.js?225"></script>
+    <script src="assets/common.js?231"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
@@ -620,13 +660,20 @@
 
         // Extract the to_type string from a word entry
         function get_processed_word(word_ix) {
-            if(words[word_ix][1].indexOf('>') == -1) { 
-                return {'to_type': words[word_ix][1], 'to_display': words[word_ix][1], 'mask': false}; 
+            let wd = words[word_ix][1];
+            let use_tts = false;
+            if(wd.indexOf('#') == 0) {
+                use_tts = true;
+                wd = wd.substring(1);
             }
+            if(wd.indexOf('>') == -1) { 
+                return {'to_type': wd, 'to_display': wd, 'mask': false, 'use_tts': use_tts}; 
+            }
+            
             let to_type_str = '';
             let to_disp_str = '';
             let mask_str = '';
-            const full = words[word_ix][1];
+            const full = wd;
             let ttype = false;
             for(let i=0; i<full.length; i++) {
                 if(full[i] == '>') { ttype = true; continue; }
@@ -641,13 +688,13 @@
                     mask_str += '*';
                 }
             }
-            return {'to_type': to_type_str, 'to_display': to_disp_str, 'mask': mask_str};
+            return {'to_type': to_type_str, 'to_display': to_disp_str, 'mask': mask_str, 'use_tts': use_tts};
         }
 
         
         // Render a typed input into HTML. prefix=what is typed, s=full string
         function render_to_html(for_help) {
-            const line_length = 17; // word wrap after this many characters
+            const line_length = 15; // word wrap after this many characters
     
             const s = bee.processed_word.to_display;
             
@@ -746,7 +793,7 @@
             setTimeout(function() {
                 bee.$helpwait.hide();
                 bee.$help.show();
-                play_word(bee.processed_word.to_display);
+                play_word(bee.processed_word.to_display, bee.processed_word.use_tts);
                 setTimeout(function() {
                     bee.$help.fadeOut({duration: help_duration_2, complete: function() {
                         bee.$input.show();
@@ -795,12 +842,17 @@
         
 
         // Play the mp3 assigned to a word
-        function play_word(s) {
+        function play_word(s, use_tts) {
             if(bee.word_audio_timeout !== false) {
                 // prevent playing word too frequently
                 return;
             }
             bee.word_audio_timeout = setTimeout(function() { bee.word_audio_timeout = false; }, 3000);
+            
+            if(use_tts) {
+                bee_tts.speak(s);
+                return;
+            }
             
             s = s.toLowerCase().replaceAll(/ /g, '_').replaceAll(/[^a-z_]/g, '');
             file = 'assets/sounds/words/'+s+'.mp3';
@@ -844,6 +896,7 @@
                     if(bee.typed.length > 0) {
                         bee.typed = bee.typed.substring(0, bee.typed.length-1);
                         update_input_field();
+                        bee.backspace_used++;
                     }
                     return;
                 }
@@ -858,7 +911,8 @@
                         bee.$input.addClass('success');
                         success_common();
                         
-                        if(bee.help_asked == 0) {
+                        console.log('success help=', bee.help_asked, 'backspace=', bee.backspace_used);
+                        if(bee.help_asked == 0 && bee.backspace_used < 3) {
                             add_known_word(bee.processed_word.to_type);
                         }
                         
@@ -877,7 +931,7 @@
             }
             if(group == 'PLAY_WORD') {
                 if(!bee.can_type) { playme('notavail'); return; }
-                play_word(bee.processed_word.to_display);
+                play_word(bee.processed_word.to_display, bee.processed_word.use_tts);
                 return;
             }
         }
@@ -933,6 +987,7 @@
             bee.processed_word = get_processed_word(word_ix);
             bee.$help.html(render_to_html(true));
             bee.help_asked = 0;
+            bee.backspace_used = 0;
             update_input_field();
             bee.$input.removeClass('success');
             show_help(true);
