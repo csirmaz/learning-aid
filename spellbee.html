@@ -994,21 +994,22 @@
 
         
         // Initialize a question
-        function start_question(word_ix) {
-            bee.word_ix = word_ix;
+        function start_question2(problem) {
+            bee.word_ix = problem.word_ix;
+            bee.is_repeat = problem.is_repeat;
             bee.can_type = true;
             bee.can_use_help = true;
             if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); bee.help_timeout = false; }
             
             // Show picture
             // Ensure emoji code ends in picture modifier
-            let emoji = words[word_ix][0];
+            let emoji = words[bee.word_ix][0];
             if(emoji[emoji.lenght-1] != "\ufe0f") { emoji += "\ufe0f"; }
             bee.$image.html(esc_html(emoji));
             
             // Add help & input
             bee.typed = '';
-            bee.processed_word = get_processed_word(word_ix);
+            bee.processed_word = get_processed_word(bee.word_ix);
             bee.$help.html(render_to_html(true));
             bee.help_asked = 0;
             bee.backspace_used = 0;
@@ -1024,9 +1025,14 @@
             
             try{ document.activeElement.blur(); }catch(e){}
             
-            let word_ix = get_question_from_store();
+            let problem = get_question_from_store();
             let log = '';
-            if(word_ix === undefined) {
+            if(problem !== undefined) {
+                log += ' from store';
+                if(problem.word_ix >= words.length) { problem = undefined; }
+            }
+            if(problem === undefined) {
+                let word_ix;
                 while(true) {
                     word_ix = Math.floor(Math.random() * words.length);
                     log += " w:"+word_ix;
@@ -1037,16 +1043,15 @@
                     const known_count = is_known_word(procword.to_type);
                     log += " k:"+known_count;
                     if(known_count == 2 && Math.random() < .5) { log += ' no2'; continue; }
-                    if(known_count > 2 && Math.random() < .8) { log += ' no2+'; continue; }
-                    if(known_count > 5 && Math.random() < .95) { log += ' no5+'; continue; }
+                    if(known_count > 2 && Math.random() < .75) { log += ' no2+'; continue; }
+                    if(known_count > 5 && Math.random() < .9) { log += ' no5+'; continue; }
                     break;
                 }
-            } else {
-                log += ' from store';
+                problem = {'word_ix':word_ix, 'is_repeat':false};
             }
-            console.log("Selecting new word:", log);
-            store_question(word_ix);
-            start_question(word_ix);
+            console.log("Selecting new word:", problem, log);
+            store_question2(problem);
+            start_question2(problem);
         }
         
         
@@ -1095,10 +1100,13 @@
             return bee.storage.players[bee.player].scheduled_questions;
         }
         
+        function purge_question_queue() {
+            bee.storage.players[bee.player].scheduled_questions = [];
+        }
         
         // Prevent getting a new question when the page is refreshed
-        function store_question(word_ix) {
-            get_question_queue().unshift(word_ix);
+        function store_question2(problem) {
+            get_question_queue().unshift(problem);
             save_storage('store_question');
         }
         
@@ -1112,7 +1120,7 @@
             const s = get_question_queue();
             s.shift();
             while(s.length < 2) { s.push(undefined); }
-            s.push(word_ix);
+            s.push({'word_ix':word_ix, 'is_repeat':true});
             save_storage('schedule_question');
         }
         
@@ -1120,8 +1128,8 @@
         function get_question_from_store() {
             const w = get_question_queue().shift(); // undefined returned on empty
             if(w === undefined) { return undefined; }
-            if(w >= words.length) { return undefined; }
-            return w;
+            if(typeof(w) == 'object') { return w; }
+            return undefined;
         }
         
         
@@ -1133,6 +1141,7 @@
             if(typeof(bee_local) !== 'undefined' && bee_local.problemset_hook) {
                 bee_local.problemset_hook(String(wordsets));
             }
+            purge_question_queue();
             save_storage('modify_wordlist');
             init_wordlist();
             new_question('modify_wordlist');
