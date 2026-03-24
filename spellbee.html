@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?237">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?238">
 
     <style>
         body { margin: .5rem 0; }
@@ -79,8 +79,10 @@
         .kbdiv .kbkey {
             display: inline-block;
             font-size: 1rem;
-            background: #848;
+            font-weight: bold;
+            background: #b38;
             color: #fff;
+            text-shadow: 0 0 .2rem black;
             width: 2.1rem;
             height: 3rem;
             border-radius: .5rem;
@@ -88,8 +90,21 @@
             text-align: center;
             line-height: 3rem;
         }
-        .kbdiv .kbspace { width: 11rem; }
-        .kbdiv .kbbksp { width: 4rem; }
+        .kbdiv .kbspace { width: 11rem; background:#309; }
+        .kbdiv .kbbksp { width: 4rem; background:#b22; }
+        .kbdiv .kbkey[data-key="'"] { background:#309; }
+        .kbdiv .kbkey[data-key="a"],
+        .kbdiv .kbkey[data-key="e"],
+        .kbdiv .kbkey[data-key="i"],
+        .kbdiv .kbkey[data-key="o"],
+        .kbdiv .kbkey[data-key="u"] { background: #3b2; }
+        .kbdiv .kbkey[data-key="y"],
+        .kbdiv .kbkey[data-key="w"] { background: #ca2; }
+        
+        .kbdiv .kbkey.kbactive {
+            box-shadow: 0 0 .8rem black  inset;
+            outline: .2rem solid #fc0;
+        }
         
         .keyhelp {
             margin: 1rem 0 2rem 0;
@@ -113,7 +128,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?237"></script>
+    <script src="assets/local/beelocal.js?238"></script>
 </head>
 <body>
     <div class="container">
@@ -173,6 +188,7 @@
             | <a href="#" onclick="reset_known_words(); return false">Reset known words</a>
             | <a href="#" onclick="delete_user(); return false">Delete user</a>
         </span>
+        | <span class="d_queue"></span>
         | Icons by <a href="https://icons8.com">I</a>cons8
         | <a href="https://codeberg.org/csirmaz/learning-aid">C</a>odebase
         <span class="expand"></span> 
@@ -604,7 +620,7 @@
 
 
     </script>
-    <script src="assets/common.js?237"></script>
+    <script src="assets/common.js?238"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
@@ -911,7 +927,7 @@
                     if(bee.typed.length < bee.processed_word.to_type.length) {
                         const desired_char = bee.processed_word.to_type[bee.typed.length];
                         for(let i=0; i<key_distances.length; i++) {
-                            if(key_distances[i][1] < .3 /* ratio to key width */ && key_distances[i][0].toLowerCase() == desired_char.toLowerCase()) {
+                            if(key_distances[i][1] < .5 /* ratio to key width */ && key_distances[i][0].toLowerCase() == desired_char.toLowerCase()) {
                                 typed_key = desired_char; break;
                             }
                         }
@@ -927,6 +943,10 @@
                         bee.typed = bee.typed.substring(0, bee.typed.length-1);
                         update_input_field();
                         bee.backspace_used++;
+                        
+                        const $keyelem = $('.kbdiv .kbbksp');
+                        $keyelem.addClass('kbactive');
+                        setTimeout(function(){ $keyelem.removeClass('kbactive'); }, 200);
                     }
                     return;
                 }
@@ -934,6 +954,10 @@
                 if(bee.typed.length < bee.processed_word.to_type.length) {
                     bee.typed += typed_key;
                     update_input_field();
+                    
+                    const $keyelem = $('.kbdiv .kbkey[data-key="'+typed_key.toLowerCase()+'"]');
+                    $keyelem.addClass('kbactive');
+                    setTimeout(function(){ $keyelem.removeClass('kbactive'); }, 200);
                     
                     if(bee.typed.toLowerCase() == bee.processed_word.to_type.toLowerCase()) { // Success!
                         bee.can_type = false;
@@ -1116,8 +1140,21 @@
         
         // Prevent getting a new question when the page is refreshed
         function store_question2(problem) {
-            get_question_queue().unshift(problem);
+            const s = get_question_queue();
+            s.unshift(problem);
             save_storage('store_question');
+            // Html rendering for debugging
+            let o='';
+            for(let i=0; i<s.length; i++) {
+                if(o.length) { o += ','; }
+                try {
+                    if(s[i] === undefined) { o += 'u'; }
+                    else { o += s[i].word_ix; }
+                }catch(e) {
+                    o += 'ERROR';
+                }
+            }
+            $('.d_queue').html('['+o+']');
         }
         
         function queue_success() {
