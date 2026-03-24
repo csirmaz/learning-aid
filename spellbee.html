@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?236">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?237">
 
     <style>
         body { margin: .5rem 0; }
@@ -113,7 +113,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?236"></script>
+    <script src="assets/local/beelocal.js?237"></script>
 </head>
 <body>
     <div class="container">
@@ -190,6 +190,7 @@
         // Use e.g. https://ttsmp3.com/ to generate them
         
         // [WORDS START]
+        const no_words_available = ['?', '#No words available> '];
         const word_sets = [
             [ // Word set 0
                 ['📦', 'box'],
@@ -603,7 +604,7 @@
 
 
     </script>
-    <script src="assets/common.js?236"></script>
+    <script src="assets/common.js?237"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
@@ -1082,6 +1083,7 @@
             for(let i=min_wordset; i<=max_wordset; i++) {
                 words = words.concat(word_sets[i]);
             }
+            if(words.length == 0) { words.push(no_words_available); }
             $('.d_wordsets').html(
                 esc_html(min_wordset) + " to " + 
                 esc_html(max_wordset) + " (" + words.length + " words)"
