@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?232">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?234">
 
     <style>
         body { margin: .5rem 0; }
@@ -111,7 +111,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?232"></script>
+    <script src="assets/local/beelocal.js?234"></script>
 </head>
 <body>
     <div class="container">
@@ -168,6 +168,7 @@
             | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
             | <a href="#" onclick="modify_wordlist(); return false">Update word sets</a>
             | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
+            | <a href="#" onclick="reset_known_words(); return false">Reset known words</a>
             | <a href="#" onclick="delete_user(); return false">Delete user</a>
         </span>
         | Icons by <a href="https://icons8.com">I</a>cons8
@@ -436,9 +437,9 @@
                 // ['👦', 'brother'],
                 ['👦', 'my >b>r>o>t>h>e>r'],
                 ['👦', '>m>y brother'],
-                ['🥕', 'I >w>o>u>l>d like a carrot, please.'],
-                ['🥕', 'I would >l>i>k>e a carrot, please.'],
-                ['🥕', 'I would like a >c>a>r>r>o>t, please.'],
+                ['🥕', '#I >w>o>u>l>d like a carrot.'],
+                ['🥕', '#I would >l>i>k>e a carrot.'],
+                ['🥕', '#I would like a >c>a>r>r>o>t.'],
                 ['🥕', 'I would like a carrot, >p>l>e>a>s>e.'],
                 ['📥', '>T>h>e>r>e> >w>a>s nothing in the tray.'],
                 ['📥', 'There was >n>o>t>h>i>n>g in the tray.'],
@@ -599,7 +600,7 @@
 
 
     </script>
-    <script src="assets/common.js?232"></script>
+    <script src="assets/common.js?234"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
@@ -836,6 +837,15 @@
         }
         
         
+        function reset_known_words() {
+            if(bee.storage.players[bee.player].known_words) {
+                bee.storage.players[bee.player].known_words = {};
+            }
+            save_storage('reset_known_words');
+            alert('List of known words reset');
+        }
+        
+        
         // Return the count of successful entries of a word
         function is_known_word(word) {
             if(bee.storage.players[bee.player].known_words) {
@@ -918,15 +928,18 @@
                     
                     if(bee.typed.toLowerCase() == bee.processed_word.to_type.toLowerCase()) { // Success!
                         bee.can_type = false;
-                        store_question(undefined);
-                        bee.$input.addClass('success');
-                        success_common();
-                        
                         console.log('success help=', bee.help_asked, 'backspace=', bee.backspace_used);
                         if(bee.help_asked == 0 && bee.backspace_used < 3) {
-                            add_known_word(bee.processed_word.to_type);
+                            queue_success();
+                            if(bee.backspace_used < 2) {
+                                add_known_word(bee.processed_word.to_type);
+                            }
+                        } else {
+                            reschedule_question(bee.word_ix);
                         }
-                        
+                        bee.$input.addClass('success');
+                        success_common();
+
                         if(typeof(bee_local) !== 'undefined' && bee_local.success_hook) {
                             bee_local.success_hook(bee.word_ix, words[bee.word_ix][1], bee.player, bee.help_asked, -1);
                         }
@@ -1062,15 +1075,50 @@
             );
         }
         
+        /*
+            Before getting a new question:    [a, b]         | [b, undef, A] | [undef, A]
+                                                             |               |
+            new_question():                                  |               |
+            After get_question_from_store:    [b]            | [undef, A]    | [A]
+            After store_question:             [A, b]         | [B, undef, A] | [X, A]
+                                                             |               |
+            Finish:                                          |               |
+            successful                        [b]            | [undef, A]*   | [A]
+            reschedule                        [b, undef, A]* | [undef, A, B] | [A, undef, X]
+        */
+        
+        function get_question_queue() {
+            delete bee.storage.players[bee.player].current_question;
+            if(bee.storage.players[bee.player].scheduled_questions === undefined) {
+                bee.storage.players[bee.player].scheduled_questions = [];
+            }
+            return bee.storage.players[bee.player].scheduled_questions;
+        }
+        
         
         // Prevent getting a new question when the page is refreshed
         function store_question(word_ix) {
-            bee.storage.players[bee.player].current_question = word_ix;
+            get_question_queue().unshift(word_ix);
             save_storage('store_question');
         }
         
+        function queue_success() {
+            get_question_queue().shift();
+            save_storage('queue_success');
+        }
+        
+        // Schedule question to be shown 2 questions later
+        function reschedule_question(word_ix) {
+            const s = get_question_queue();
+            s.shift();
+            while(s.length < 2) { s.push(undefined); }
+            s.push(word_ix);
+            save_storage('schedule_question');
+        }
+        
+        // Return stored or scheduled questions
         function get_question_from_store() {
-            const w = bee.storage.players[bee.player].current_question;
+            const w = get_question_queue().shift(); // undefined returned on empty
             if(w === undefined) { return undefined; }
             if(w >= words.length) { return undefined; }
             return w;

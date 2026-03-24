@@ -1,5 +1,5 @@
 
-        const bee_app_version = 232;
+        const bee_app_version = 234;
         
         if(typeof(bee_local) !== 'undefined' && bee_local.check_version) { bee_local.check_version(); }
 
