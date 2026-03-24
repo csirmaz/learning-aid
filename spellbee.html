@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?235">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?236">
 
     <style>
         body { margin: .5rem 0; }
@@ -43,6 +43,8 @@
         }
 
         .prompt .infield .help { color: #05b; }
+        .prompt .infield .help .help_totype { background: #fff; text-decoration: underline solid #cfa .2rem; text-underline-offset: .6rem; }
+        
         .prompt .infield .inp { color: #000; }
         .prompt .infield .inp .spacehelp { color: #ccc; }
         body .prompt .infield .success { color: #090; }
@@ -62,7 +64,7 @@
         
         .infield .help .cursor { visibility: hidden; }
         
-        .wrongchar { text-decoration: underline dotted #05b .2rem; }
+        .wrongchar { text-decoration: underline dotted #05b .2rem; text-underline-offset: .6rem; }
 
         .kbdiv { 
             margin-top: 1rem; 
@@ -111,7 +113,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?235"></script>
+    <script src="assets/local/beelocal.js?236"></script>
 </head>
 <body>
     <div class="container">
@@ -601,7 +603,7 @@
 
 
     </script>
-    <script src="assets/common.js?235"></script>
+    <script src="assets/common.js?236"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
@@ -746,9 +748,14 @@
                 
                 if(for_help) { // We are rendering the help string
                 
-                    // possibly we can use totype to highlight what needs to be typed
-                    o += (s[i] == ' ' ? '&nbsp;' : esc_html(s[i]));
-                    if(wrap_at[i]) { o += '<br>'; }
+                    if(totype) { // We are in the area that should be typed
+                        o += '<span class="help_totype">';
+                        o += (s[i] == ' ' ? '&nbsp;' : esc_html(s[i]));
+                        o += '</span>';
+                    } else { // This does not need to be typed
+                        o += (s[i] == ' ' ? '&nbsp;' : esc_html(s[i]));
+                        if(wrap_at[i]) { o += '<br>'; }
+                    }
                     
                 } else { // We are rendering what the user entered, plus surrounding phrase
                 
