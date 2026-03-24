@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?234">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?235">
 
     <style>
         body { margin: .5rem 0; }
@@ -111,7 +111,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?234"></script>
+    <script src="assets/local/beelocal.js?235"></script>
 </head>
 <body>
     <div class="container">
@@ -570,6 +570,7 @@
             giftlist: -1,  // state: which gift is shown when viewing them
             // State (spellbee)
             word_ix: false,
+            is_repeat: false, // whether the question is a repeat
             processed_word: false,
             help_asked: 0,  // state: how many times help was asked for for the current word
             backspace_used: 0, // state
@@ -600,7 +601,7 @@
 
 
     </script>
-    <script src="assets/common.js?234"></script>
+    <script src="assets/common.js?235"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
@@ -938,7 +939,7 @@
                             reschedule_question(bee.word_ix);
                         }
                         bee.$input.addClass('success');
-                        success_common();
+                        success_common({'skip_this_score':bee.is_repeat});
 
                         if(typeof(bee_local) !== 'undefined' && bee_local.success_hook) {
                             bee_local.success_hook(bee.word_ix, words[bee.word_ix][1], bee.player, bee.help_asked, -1);

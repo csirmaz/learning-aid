@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?234">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?235">
 
     <style>
         body {
@@ -164,7 +164,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?234"></script>
+    <script src="assets/local/beelocal.js?235"></script>
 </head>
 <body>
     <div class="container">
@@ -806,7 +806,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?234"></script>
+    <script src="assets/common.js?235"></script>
     <script>
 
         
@@ -955,11 +955,11 @@
                     if(!(bee.problem.hint 
                         && bee.problem.hint.speak_solution
                         && bee_tts.speak(bee.problem.hint.speak_solution, function() {
-                            if(success_common(true) // true = move fast to next question
+                            if(success_common({'fast_to_next_question':true})
                                 == 'level_complete') { manage_level_stats('reset'); }
                         })
                     )) {
-                        if(success_common() == 'level_complete') { manage_level_stats('reset'); }
+                        if(success_common({}) == 'level_complete') { manage_level_stats('reset'); }
                     }
                 }
                 else {

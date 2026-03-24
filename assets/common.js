@@ -1,5 +1,5 @@
 
-        const bee_app_version = 234;
+        const bee_app_version = 235;
         
         if(typeof(bee_local) !== 'undefined' && bee_local.check_version) { bee_local.check_version(); }
 
@@ -227,14 +227,17 @@
         }
         
         
-        // Add one to the score. Returns the new score or '_SKIPPED_' if we're working through the negative scores
-        function add_score() {
+        // Add one to the score. Returns the new score or
+        // '_SKIPPED_' if we're working through the negative scores or skip_this_score is set
+        function add_score(skip_this_score) {
             skipped_score = false;
             init_lifetime_score();
             if(bee.storage.players[bee.player].negative_score !== undefined && bee.storage.players[bee.player].negative_score >= 1) {
                 // "negative score" is used to lengthen a level as a penalty; we skip adding a score
                 bee.storage.players[bee.player].negative_score -= 1;
                 console.log("negative score: skipping adding score; neg score is now", bee.storage.players[bee.player].negative_score);
+                skipped_score = true;
+            } else if(skip_this_score) {
                 skipped_score = true;
             } else {
                 bee.storage.players[bee.player].score++;
@@ -422,9 +425,13 @@
         
         // Implements common operations when a task is solved
         // Return values: 'level_complete' | 'gift' | 'period_negative' | 'period'
-        function success_common(fast_to_next_question) {
+        // Note: there are two ways to skip adding a score. Either add 'skip_this_score':true to options, or increment the negative score
+        function success_common(options) {
+            const fast_to_next_question = options.fast_to_next_question;
+            const skip_this_score = options.skip_this_score;
+            
             console.log('#success_common()');
-            const score = add_score();  // the new score or "_SKIPPED_"
+            const score = add_score(skip_this_score);  // the new score or "_SKIPPED_"
             const new_next_gift_at = decide_gift(); // precede update_score_ui() to update remaining-to-gift display
             update_score_ui();
 
