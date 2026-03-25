@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?238">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?245">
 
     <style>
         body { margin: .5rem 0; }
@@ -22,6 +22,13 @@
             height: 5rem;
             line-height: 5rem;
             width: 5rem;
+        }
+        .prompt .img img {
+            min-height: 3rem;
+            max-height: 4rem;
+            max-width: 4rem;
+            vertical-align: -0.5rem;
+            image-rendering: pixelated;
         }
         
         .prompt .infield {
@@ -128,7 +135,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?238"></script>
+    <script src="assets/local/beelocal.js?245"></script>
 </head>
 <body>
     <div class="container">
@@ -569,6 +576,16 @@
         ];
         // [WORDS END]
         
+        if(typeof(bee_local) !== 'undefined' && bee_local.local_wordsets) {
+            for(let i=0; i<bee_local.local_wordsets.length; i++) {
+                if(word_sets[i] === undefined) {
+                    word_sets[i] = bee_local.local_wordsets[i];
+                } else {
+                    word_sets[i] = word_sets[i].concat(bee_local.local_wordsets[i]);
+                }
+            }
+        }
+
         let words = [];
 
         // Application data
@@ -620,7 +637,7 @@
 
 
     </script>
-    <script src="assets/common.js?238"></script>
+    <script src="assets/common.js?245"></script>
     <script>
     
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
@@ -1035,10 +1052,15 @@
             if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); bee.help_timeout = false; }
             
             // Show picture
-            // Ensure emoji code ends in picture modifier
             let emoji = words[bee.word_ix][0];
-            if(emoji[emoji.lenght-1] != "\ufe0f") { emoji += "\ufe0f"; }
-            bee.$image.html(esc_html(emoji));
+            if(emoji[0] == '#') {
+                // Picture
+                bee.$image.html('<img src="' + emoji.substring(1) + '">');
+            } else {
+                // Ensure emoji code ends in picture modifier
+                if(emoji[emoji.lenght-1] != "\ufe0f") { emoji += "\ufe0f"; }
+                bee.$image.html(esc_html(emoji));
+            }
             
             // Add help & input
             bee.typed = '';
@@ -1070,7 +1092,7 @@
                     word_ix = Math.floor(Math.random() * words.length);
                     log += " w:"+word_ix;
                     // ensure we choose a new word
-                    if(bee.word_ix !== false && word_ix == bee.word_ix) { log += ' norep'; continue; }
+                    if(words.length > 1 && bee.word_ix !== false && word_ix == bee.word_ix) { log += ' norep'; continue; }
                     // Avoid already known words (typed without help)
                     const procword = get_processed_word(word_ix);
                     const known_count = is_known_word(procword.to_type);
@@ -1150,7 +1172,7 @@
                 try {
                     if(s[i] === undefined) { o += 'u'; }
                     else { o += s[i].word_ix; }
-                }catch(e) {
+                } catch(e) {
                     o += 'ERROR';
                 }
             }
@@ -1175,7 +1197,10 @@
         function get_question_from_store() {
             const w = get_question_queue().shift(); // undefined returned on empty
             if(w === undefined) { return undefined; }
-            if(typeof(w) == 'object') { return w; }
+            if(typeof(w) == 'object') {
+                if(w === null) { return undefined; } // unsure why this would happen
+                return w; 
+            }
             return undefined;
         }
         
