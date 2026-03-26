@@ -1,5 +1,5 @@
 
-        const bee_app_version = 245;
+        const bee_app_version = 250;
         
         if(typeof(bee_local) !== 'undefined' && bee_local.check_version) { bee_local.check_version(); }
 
@@ -118,35 +118,41 @@
             if(bee.storage.players[bee.player].videos_seen === undefined) {
                 bee.storage.players[bee.player].videos_seen = [];
             }
-            let videos_seen = bee.storage.players[bee.player].videos_seen;
-            let videos_remaining = videos.filter((v) => videos_seen.indexOf(v) == -1);
-            if(videos_remaining.length == 0) { 
-                videos_remaining = videos;
-                bee.storage.players[bee.player].videos_seen = [];
-                videos_seen = bee.storage.players[bee.player].videos_seen;
+            const videos_seen = bee.storage.players[bee.player].videos_seen;
+            let videos_remaining;
+            while(true) {
+                videos_remaining = videos.filter((v) => videos_seen.indexOf(v) == -1);
+                if(videos_remaining.length == 0) {
+                    for(let i=0; i<6; i++) { videos_seen.shift(); }
+                    continue;
+                }
+                break;
             }
             const video_ix = Math.floor(Math.random() * videos_remaining.length);
             const video_file = videos_remaining[video_ix];
             videos_seen.push(video_file);
             save_storage('videos_seen', true); // true == skip hook
 
-            const $wrap = $('<div class="video_w2"></div>');
+            const $wrap = $('<div class="video_w2"><div class="videoclose">X</div></div>');
             $('body').append($wrap);
             setTimeout(function() {
                 console.log("Playing video", video_file);
                 const $v = $('<video src="'+video_file+'" playsinline class="video_v" autoplay></video>');
                 const $inwrap = $('<div class="video_w1"></div>');
                 let ended = false;
-                const ending = function() {
-                    if(ended) { return; }
-                    ended = true;
-                    $v.remove();
-                    setTimeout(function() {
-                        $wrap.remove();
-                        if(callback) { callback(); }
-                    }, 3000);
+                const ending = function(curtain_delay) {
+                    return function() {
+                        if(ended) { return; }
+                        ended = true;
+                        $v.remove();
+                        setTimeout(function() {
+                            $wrap.remove();
+                            if(callback) { callback(); }
+                        }, curtain_delay);
+                    };
                 };
-                $v.on('ended', function() { setTimeout(ending, 700); });
+                $('.video_w2 .videoclose').on('click', ending(200));
+                $v.on('ended', function() { setTimeout(ending(3000), 700); });
                 $v.on('stalled', ending);
                 $v.on('error', ending);
                 $inwrap.append($v);
