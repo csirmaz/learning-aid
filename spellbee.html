@@ -121,8 +121,9 @@
             text-align: center;
             line-height: 3rem;
         }
-        .kbdiv .kbspace { width: 11rem; background:#309; }
+        .kbdiv .kbspace { width: 11rem; background:#309; margin-right: 3rem; }
         .kbdiv .kbbksp { width: 4rem; background:#b22; }
+        .kbdiv .kbhelp { background: #999; }
         .kbdiv .kbkey[data-key="'"] { background:#309; }
         .kbdiv .kbkey[data-key="a"],
         .kbdiv .kbkey[data-key="e"],
@@ -135,24 +136,6 @@
         .kbdiv .kbkey.kbactive {
             box-shadow: 0 0 .8rem black  inset;
             outline: .2rem solid #fc0;
-        }
-        
-        .keyhelp {
-            margin: 1rem 0 2rem 0;
-        }
-        .keyhelp .helpbutton {
-            display: inline-block;
-            position: relative;
-            border: 1px solid #777;
-            border-radius: .5rem;
-            padding: .5rem;
-            margin-left: 1rem;
-        }
-        .keyhelp .helpbutton .k {
-            font-size: 80%;
-            position: absolute;
-            bottom: -.5rem;
-            right: -.5rem;
         }
 
     </style>
@@ -181,12 +164,7 @@
             <div class="kbrow kbrow1"></div>
             <div class="kbrow kbrow2"></div>
             <div class="kbrow kbrow3"></div>
-            <div class="kbrow kbrow4"><span class="kbkey kbspace" data-key=" "></span></div>
-        </div>
-        
-        <div class="game keyhelp">
-            <span class="helpbutton" data-help="HELP">❓<span class="k">1️⃣</span></span>
-            <span class="helpbutton" data-help="PLAY_WORD">💬<span class="k">2️⃣</span></span>
+            <div class="kbrow kbrow4"><span class="kbkey kbspace" data-key=" ">&nbsp;</span><span class="kbkey kbhelp" data-key="HELP">?</span><span class="kbkey kbhelp" data-key="PLAY_WORD">💬</span></div>
         </div>
         
         <div class="startmenu"></div>
@@ -720,10 +698,6 @@
                 return false;
             });
             
-            $('.helpbutton').on('click', function(ev) {
-                process_typing($(this).data('help'));
-                return false;
-            });
         });
 
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
@@ -1024,6 +998,13 @@
         }
         
         
+        function highlight_key(selector) {
+            const $keyelem = $(selector);
+            $keyelem.addClass('kbactive');
+            setTimeout(function(){ $keyelem.removeClass('kbactive'); }, 200);
+        }
+        
+        
         function process_typing(group, key_distances, is_direct) {
             if(group == 'TYPING') {
                 if(!bee.can_type) { playme('notavail'); return; }
@@ -1052,21 +1033,27 @@
                         bee.typed = bee.typed.substring(0, bee.typed.length-1);
                         update_input_field();
                         bee.backspace_used++;
-                        
-                        const $keyelem = $('.kbdiv .kbbksp');
-                        $keyelem.addClass('kbactive');
-                        setTimeout(function(){ $keyelem.removeClass('kbactive'); }, 200);
+                        highlight_key('.kbdiv .kbbksp');
                     }
                     return;
                 }
-                
+
+                if(typed_key == 'HELP') {
+                    highlight_key('.kbdiv .kbkey[data-key="'+typed_key+'"]');
+                    if(!bee.can_use_help) { playme('notavail'); return; }
+                    show_help(false);
+                    return;
+                }
+                if(typed_key == 'PLAY_WORD') {
+                    highlight_key('.kbdiv .kbkey[data-key="'+typed_key+'"]');
+                    play_word();
+                    return;
+                }
+
                 if(bee.typed.length < bee.processed_word.to_type.length) {
                     bee.typed += typed_key;
                     update_input_field();
-                    
-                    const $keyelem = $('.kbdiv .kbkey[data-key="'+typed_key.toLowerCase()+'"]');
-                    $keyelem.addClass('kbactive');
-                    setTimeout(function(){ $keyelem.removeClass('kbactive'); }, 200);
+                    highlight_key('.kbdiv .kbkey[data-key="'+typed_key.toLowerCase()+'"]');
                     
                     if(bee.typed.toLowerCase() == bee.processed_word.to_type.toLowerCase()) { // Success!
                         bee.can_type = false;
@@ -1089,17 +1076,6 @@
                 }
                 return;
             }
-            if(group == 'HELP') {
-                if(!bee.can_type) { return; }
-                if(!bee.can_use_help) { playme('notavail'); return; }
-                show_help(false);
-                return;
-            }
-            if(group == 'PLAY_WORD') {
-                if(!bee.can_type) { playme('notavail'); return; }
-                play_word();
-                return;
-            }
         }
 
         
@@ -1115,21 +1091,23 @@
                 process_typing('TYPING', 'BACKSPACE', true);
                 return false;
             }
-                       
+             
+            /*
             if(event.keyCode == 49) { // 1
-                process_typing('HELP');
+                process_typing('TYPING', 'HELP', true);
                 return false;
             }
             
             if(event.keyCode == 50) { // 2
-                process_typing('PLAY_WORD');
+                process_typing('TYPING', 'PLAY_WORD', true);
                 return false;
             }
             
-            /* if(event.keyCode == 51) {
+            if(event.keyCode == 51) {
                 toggle_play_music(0);
                 return false;
-            } */
+            } 
+            */
 
             // console.log("key", event);
         }
