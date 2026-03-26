@@ -1,13 +1,20 @@
 
-        const bee_app_version = 250;
+const bee_app_version = 252;
         
-        if(typeof(bee_local) !== 'undefined' && bee_local.check_version) { bee_local.check_version(); }
+if(typeof(bee_local) !== 'undefined' && bee_local.check_version) { bee_local.check_version(); }
 
-        // Fix emojis
-        $('.score .icon').html('🪙'+"\ufe0f");
-        $('.gifts .open').html('🎁'+"\ufe0f");
-        $('.giftannounce span').html('🎁'+"\ufe0f");
-        $('.timeoutwarn').html('⏰'+"\ufe0f");
+function shuffle(array) {  // in-place
+    for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+    }
+}
+
+// Fix emojis
+$('.score .icon').html('🪙'+"\ufe0f");
+$('.gifts .open').html('🎁'+"\ufe0f");
+$('.giftannounce span').html('🎁'+"\ufe0f");
+$('.timeoutwarn').html('⏰'+"\ufe0f");
 
 
         const audio = {

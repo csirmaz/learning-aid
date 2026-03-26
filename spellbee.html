@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?250">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?252">
 
     <style>
         body { margin: .5rem 0; }
@@ -33,15 +33,37 @@
         
         .prompt .infield {
             display: block;
-            line-height: 3rem;
             border-radius: 1rem;
             background: #fffae4;
-            font-size: 2rem;
             margin: 1rem 0;
-            padding: 1rem 1rem;
+            font-size: 2rem;
+            line-height: 3rem;
+            padding: 1rem;
             min-width: 20rem;
             min-height: 9rem;
             letter-spacing: .2rem;
+        }
+        
+        body .prompt .infield.infield_story,
+        .prompt .addwords {
+            font-family: odr;
+            font-size: 1rem;
+            line-height: 1.7rem;
+            padding: .5rem;
+            letter-spacing: normal;
+        }
+        .prompt .addwords {
+            border-radius: 1rem;
+            background: #fffae4;
+            margin: 1rem 0;
+        }
+        .prompt .addwords span {
+            display: inline-block;
+            border: 1px solid #05b;
+            color: #05b;
+            border-radius: .5rem;
+            margin: 0 .5rem;
+            padding: .1rem .2rem;
         }
         
         .prompt .infield .help,
@@ -51,6 +73,7 @@
 
         .prompt .infield .help { color: #05b; }
         .prompt .infield .help .help_totype { background: #fff; text-decoration: underline solid #cfa .2rem; text-underline-offset: .6rem; }
+        .prompt .infield_story .story_totype { background: #fff; text-decoration: underline solid #cfa .2rem; text-underline-offset: .3rem; color: #fff; }
         
         .prompt .infield .inp { color: #000; }
         .prompt .infield .inp .spacehelp { color: #ccc; }
@@ -68,10 +91,11 @@
             margin-left: -1px;
             border-right: 0 solid transparent;
         }
-        
+        .infield_story .cursor { height: 1rem; width: .1rem; }
         .infield .help .cursor { visibility: hidden; }
         
         .wrongchar { text-decoration: underline dotted #05b .2rem; text-underline-offset: .6rem; }
+        .infield_story .wrongchar { text-underline-offset: .3rem; }
 
         .kbdiv { 
             margin-top: 1rem; 
@@ -135,7 +159,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?250"></script>
+    <script src="assets/local/beelocal.js?252"></script>
 </head>
 <body>
     <div class="container">
@@ -149,6 +173,7 @@
         <div class="game prompt">
             <span class="img"></span>
             <span class="infield"><span class="help"></span><img class="helpwait" src="assets/images/loader.gif"><span class="inp"></span></span>
+            <div class="addwords"></div>
         </div>
         
         <div class="game kbdiv">
@@ -204,13 +229,19 @@
     <script>
     
         // Words, split into sets
-        // Format: ['{emoji}', '{word to spell}'], or
-        //         ['{emoji}', '{phrase with > before every character to type}']   (e.g. ['*', 'Look! A >s>t>a>r!'])
+        // Format: ['{emoji}', 'word to spell'], or
+        //         ['{emoji}', 'phrase with > before every character to type']   (e.g. ['*', 'Look! A >s>t>a>r!'])
+        //                        or wrap thing to spell in {}
+        //         The page will attempt to play assets/sounds/words/<word to spell>.mp3 (lowercased and spaces 
+        //         replaced by underscores)
         //         If the {word} starts with a #, use TTS instead of playing a sound file
+        //         If the {emoji} starts with a #, treat the rest of the string as a URL to an image
+        //
+        // Story format
+        //         ['#STORY', '#{image url}', 'Text with words to add in {}']
+        //
         // Use e.g. https://getemoji.com/
-
-        // The page will attempt to play assets/sounds/words/<word to spell>.mp3 (lowercased and spaces replaced by underscores)
-        // Use e.g. https://ttsmp3.com/ to generate them
+        // Use e.g. https://ttsmp3.com/ to generate TTS
         
         // [WORDS START]
         const no_words_available = ['?', '#No words available> '];
@@ -637,21 +668,9 @@
 
 
     </script>
-    <script src="assets/common.js?250"></script>
+    <script src="assets/common.js?252"></script>
     <script>
-    
-        /* EXPLANATION OF TYPED, TO_TYPE, etc.
-        
-            word = ['o', 'pear']
-            bee.processed_word = {to_type: 'pear', to_display: 'pear', mask: false}
-        
-            word = ['o', 'I eat >a>p>p>l>e.']
-            bee.processed_word = {to_type: 'apple', to_display: 'I eat apple.', mask: '******_____*'}
-            
-            bee.typed = 'ap'
-            Display: "I eat ap___."
-        */
-        
+
         // Initialize keyboard
         $(function() {
             
@@ -707,69 +726,130 @@
             });
         });
 
+        /* EXPLANATION OF TYPED, TO_TYPE, etc.
+        
+            word = ['o', 'pear']
+            bee.processed_word = {to_type: 'pear', to_display: 'pear', mask: false}
+        
+            word = ['o', 'I eat >a>p>p>l>e.']
+            bee.processed_word = {to_type: 'apple', to_display: 'I eat apple.', mask: '******_____*'}
+            
+            word = ['#STORY', 'o', 'This {is} very {good}.']
+            bee.processed_word = {to_type: 'isgood', to_display: 'This is very good.', mask: '******__******____*'}
+            
+            bee.typed = 'ap'
+            Display: "I eat ap___."
+            
+            Further properties
+            emoji: str
+            use_tts: BOOL
+            is_story: BOOL
+            add_words: [str]  // if is_story
+        */
+
         // Extract the to_type string from a word entry
         function get_processed_word(word_ix) {
-            let wd = words[word_ix][1];
+            const is_story = (words[word_ix][0] == '#STORY');
             let use_tts = false;
-            if(wd.indexOf('#') == 0) {
-                use_tts = true;
-                wd = wd.substring(1);
-            }
-            if(wd.indexOf('>') == -1) { 
-                return {'to_type': wd, 'to_display': wd, 'mask': false, 'use_tts': use_tts}; 
+            let wd;
+            
+            if(!is_story) {
+                wd = words[word_ix][1];
+                if(wd.indexOf('#') == 0) {
+                    use_tts = true;
+                    wd = wd.substring(1);
+                }
+                if(wd.indexOf('>') == -1 && wd.indexOf('{') == -1) { 
+                    return {
+                        'to_type': wd, 
+                        'to_display': wd, 
+                        'mask': false, 
+                        'use_tts': use_tts, 
+                        'is_story': is_story, 
+                        'emoji': words[word_ix][0]
+                    };
+                }
+            } else { // is_story
+                wd = words[word_ix][2];
             }
             
             let to_type_str = '';
             let to_disp_str = '';
             let mask_str = '';
+            const add_words = [];
+            let current_add_word = '';
             const full = wd;
-            let ttype = false;
+            let next_type = false;  // next character is typed
+            let in_type = false;  // in typing mode
             for(let i=0; i<full.length; i++) {
-                if(full[i] == '>') { ttype = true; continue; }
-                if(ttype) { 
-                    to_type_str += full[i]; 
+                if(full[i] == '>') { next_type = true; continue; }
+                if(full[i] == '{') { in_type = true; current_add_word = ''; continue; }
+                if(full[i] == '}') { in_type = false; add_words.push(current_add_word); continue; }
+                if(next_type || in_type) { 
+                    to_type_str += full[i];
                     to_disp_str += full[i];
+                    current_add_word += full[i];
                     mask_str += '_';
-                    ttype = false; 
+                    if(next_type) { next_type = false; }
                     continue; 
                 } else {
                     to_disp_str += full[i];
                     mask_str += '*';
                 }
             }
-            return {'to_type': to_type_str, 'to_display': to_disp_str, 'mask': mask_str, 'use_tts': use_tts};
+            shuffle(add_words);
+            return {
+                'to_type': to_type_str, 
+                'to_display': to_disp_str, 
+                'mask': mask_str, 
+                'use_tts': use_tts, 
+                'is_story': is_story, 
+                'emoji': (is_story ? words[word_ix][1] : words[word_ix][0]),
+                'add_words': add_words
+            };
+        }
+        
+        
+        function render_addwords() {
+            let o = '';
+            for(let i=0; i<bee.processed_word.add_words.length; i++) {
+                o += '<span>'+bee.processed_word.add_words[i]+'</span>';
+            }
+            return o;
         }
 
         
         // Render a typed input into HTML. prefix=what is typed, s=full string
         function render_to_html(for_help) {
-            const line_length = 15; // word wrap after this many characters
+            const line_length = 15; // word wrap after this many characters (for non-stories)
     
             const s = bee.processed_word.to_display;
             
-            // The aim is to leave the underscores in place, so we word
-            // wrap according to the target string
+            // The aim is to leave the underscores in place, so we word wrap according to the target string
+            // With a story, wrap_at stays empty and so there is no forced wrapping
             const wrap_at = {};
-            let cur_line = 0;
-            for(let i=0; i<s.length; i++) {
-                cur_line++;
-                if(cur_line >= line_length) {
-                    wrap_at[i] = 'forced';
-                    cur_line = 0;
-                    continue;
-                }
-                if(s[i] == ' ') {
-                    let is_full = true;
-                    for(let j=1; j<=line_length-cur_line; j++) { // lookahead
-                        // console.log("ij", i, j, cur_line);
-                        if(i+j >= s.length || s[i+j] == ' ') { 
-                            is_full = false; 
-                            break; 
-                        }
-                    }
-                    if(is_full) {
-                        wrap_at[i] = 'at space';
+            if(!bee.processed_word.is_story) {
+                let cur_line = 0;
+                for(let i=0; i<s.length; i++) {
+                    cur_line++;
+                    if(cur_line >= line_length) {
+                        wrap_at[i] = 'forced';
                         cur_line = 0;
+                        continue;
+                    }
+                    if(s[i] == ' ') {
+                        let is_full = true;
+                        for(let j=1; j<=line_length-cur_line; j++) { // lookahead
+                            // console.log("ij", i, j, cur_line);
+                            if(i+j >= s.length || s[i+j] == ' ') { 
+                                is_full = false; 
+                                break; 
+                            }
+                        }
+                        if(is_full) {
+                            wrap_at[i] = 'at space';
+                            cur_line = 0;
+                        }
                     }
                 }
             }
@@ -798,18 +878,21 @@
                             const userchar = bee.typed[typed_ix];
                             const wrongchar = (s[i].toLowerCase() != userchar.toLowerCase());
                             if(wrongchar) { o += '<span class="wrongchar">'; }
-                            o += (userchar == ' ' ? '&nbsp;' : esc_html(userchar));
+                            o += (userchar == ' ' && (!bee.processed_word.is_story) ? '&nbsp;' : esc_html(userchar));
                             if(wrongchar) { o += '</span>'; }
                             if(wrap_at[i]) { o += '<br>'; }
-                            if(typed_ix == bee.typed.length - 1) { o += '<span class="cursor"></span>'; } // add cursor after last char typed
                         } else { // The user is still to type this
-                            if(typed_ix == 0) { o += '<span class="cursor"></span>'; } // add cursor at beginning if no char typed
-                            o += (s[i] == ' ' ? '<span class="spacehelp">_</span>' : '_');
+                            if(typed_ix == bee.typed.length) { o += '<span class="cursor"></span>'; } // add cursor at beginning if no char typed
+                            if(bee.processed_word.is_story) {
+                                o += '<span class="story_totype">'+esc_html(s[i])+'</span>';
+                            } else {
+                                o += (s[i] == ' ' ? '<span class="spacehelp">_</span>' : '_');
+                            }
                             if(wrap_at[i]) { o += '<br>'; }
                         }
                         typed_ix++;
                     } else { // This does not need to be typed
-                        o += (s[i] == ' ' ? '&nbsp;' : esc_html(s[i]));
+                        o += (s[i] == ' ' && (!bee.processed_word.is_story) ? '&nbsp;' : esc_html(s[i]));
                         if(wrap_at[i]) { o += '<br>'; }
                     }
                 
@@ -828,6 +911,12 @@
         // Display target word briefly
         function show_help(is_initial) {
             console.log("Disabling help");
+            if(bee.processed_word.is_story) {
+                bee.$help.hide();
+                bee.$input.show();
+                return; 
+            }
+            
             bee.can_use_help = false;
             if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); }
 
@@ -847,7 +936,7 @@
             setTimeout(function() {
                 bee.$helpwait.hide();
                 bee.$help.show();
-                play_word(bee.processed_word.to_display, bee.processed_word.use_tts);
+                play_word();
                 setTimeout(function() {
                     bee.$help.fadeOut({duration: help_duration_2, complete: function() {
                         bee.$input.show();
@@ -905,7 +994,10 @@
         
 
         // Play the mp3 assigned to a word
-        function play_word(s, use_tts) {
+        function play_word() {
+            let s = bee.processed_word.to_display;
+            const use_tts = bee.processed_word.use_tts || bee.processed_word.is_story;
+            
             if(bee.word_audio_timeout !== false) {
                 // prevent playing word too frequently
                 return;
@@ -1005,7 +1097,7 @@
             }
             if(group == 'PLAY_WORD') {
                 if(!bee.can_type) { playme('notavail'); return; }
-                play_word(bee.processed_word.to_display, bee.processed_word.use_tts);
+                play_word();
                 return;
             }
         }
@@ -1050,9 +1142,11 @@
             bee.can_type = true;
             bee.can_use_help = true;
             if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); bee.help_timeout = false; }
-            
+
+            bee.processed_word = get_processed_word(bee.word_ix);
+
             // Show picture
-            let emoji = words[bee.word_ix][0];
+            let emoji = bee.processed_word.emoji;
             if(emoji[0] == '#') {
                 // Picture
                 bee.$image.html('<img src="' + emoji.substring(1) + '">');
@@ -1064,12 +1158,19 @@
             
             // Add help & input
             bee.typed = '';
-            bee.processed_word = get_processed_word(bee.word_ix);
-            bee.$help.html(render_to_html(true));
             bee.help_asked = 0;
             bee.backspace_used = 0;
+
+            if(!bee.processed_word.is_story) { 
+                bee.$help.html(render_to_html(true));
+                $('.prompt .addwords').hide();
+            } else {
+                $('.prompt .addwords').html(render_addwords()).show();
+            }
             update_input_field();
+            $('.prompt .infield').toggleClass('infield_story', !!bee.processed_word.is_story);
             bee.$input.removeClass('success');
+            
             show_help(true);
         }
         
