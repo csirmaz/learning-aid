@@ -1,5 +1,5 @@
 
-const bee_app_version = 260;
+const bee_app_version = 261;
         
 if(typeof(bee_local) !== 'undefined' && bee_local.check_version) { bee_local.check_version(); }
 
@@ -607,6 +607,7 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
         bee_tts.speak = function(s, callback) {
             if(bee_tts.status != 'ready') {
                 console.log("TTS speak: not ready");
+                setTimeout(callback, 1000);
                 return false;
             }
             try {
@@ -622,6 +623,7 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
                 return true;
             } catch(e) {
                 console.log("TTS speak error", e);
+                setTimeout(callback, 1000);
                 return false;
             }
         };

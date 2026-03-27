@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?260">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?261">
 
     <style>
         body { margin: .5rem 0; }
@@ -82,9 +82,13 @@
 
         @keyframes blink-animation { to { visibility: hidden; } }
         
+        .cursor_outer { position: relative; }
         .cursor {
             animation: blink-animation 2s steps(2, start) infinite;
-            display: inline-block;
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
             border: 2px solid #f77;
             width: .2rem;
             height: 1.5rem;
@@ -142,7 +146,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?260"></script>
+    <script src="assets/local/beelocal.js?261"></script>
 </head>
 <body>
     <div class="container">
@@ -653,7 +657,7 @@
 
 
     </script>
-    <script src="assets/common.js?260"></script>
+    <script src="assets/common.js?261"></script>
     <script>
 
         // Initialize keyboard
@@ -844,7 +848,7 @@
                             if(wrongchar) { o += '</span>'; }
                             if(wrap_at[i]) { o += '<br>'; }
                         } else { // The user is still to type this
-                            if(typed_ix == bee.typed.length) { o += '<span class="cursor"></span>'; } // add cursor at beginning if no char typed
+                            if(typed_ix == bee.typed.length) { o += '<span class="cursor_outer"><span class="cursor"></span></span>'; } // add cursor at beginning if no char typed
                             if(bee.processed_word.is_story) {
                                 o += '<span class="story_totype">'+esc_html(s[i])+'</span>';
                             } else {
