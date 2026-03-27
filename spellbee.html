@@ -207,293 +207,302 @@
     <script>
     
         // Words, split into sets
-        // Format: ['{emoji}', 'word to spell'], or
-        //         ['{emoji}', 'phrase with > before every character to type']   (e.g. ['*', 'Look! A >s>t>a>r!'])
-        //                        or wrap thing to spell in {}
-        //         The page will attempt to play assets/sounds/words/<word to spell>.mp3 (lowercased and spaces 
-        //         replaced by underscores)
-        //         If the {word} starts with a #, use TTS instead of playing a sound file
-        //
-        //         If the {emoji} starts with a #, treat the rest of the string as a URL to an image
-        //         If the {emoji} starts with a $, try to resolve a reference
-        //
-        // Story format
-        //         ['#STORY', '#{image url}', 'Text with words to add in {}']
-        //
+        /*
+            Object properties:
+            - story (0|1)
+            - level (int)
+            - emoji (str) optional
+            - ref (str) optional (for referenced emojis)
+            - text (str)
+            - mp3 (0|1) optional
+            
+            Text:
+            - word to spell
+            - text with <> around parts to type
+            
+            - If mp3, we will attempt to play assets/sounds/words/<word to spell>.mp3 (lowercased and spaces replaced by underscores)
+            Otherwise we use TTS
+        */
         // Use e.g. https://getemoji.com/
         // Use e.g. https://ttsmp3.com/ to generate TTS
         
         // [WORDS START]
-        const no_words_available = ['?', '#No words available> '];
-        const word_sets = [
+        const word_sets2 = [
             [ // Word set 0
-                ['📦', 'box'],
-                ['🐈‍', 'cat'],
-                ['🍱', 'food'],
-                ['🔥', 'hot'],
-                ['🖊️', 'pen'],      
-                ['🟥', 'red'],
-                ['🌹', '>r>e>d rose'],
-                ['🏊', 'swim'],
-                ['🌳', 'tree'],
+                [0, '📦', 'box'],
+                [0, '🐈‍$cat', 'cat'],
+                [0, '🔥', 'hot'],
+                [0, '🖊️', 'pen'],      
+                [0, '🟥', 'red'],
+                [0, '🌹', '{red} rose'],
+                [0, '🏊', 'swim'],
+                [0, '🌳', 'tree'],
+                [0, '🛌', 'bed'],
+                [0, '🥁', 'drum'],
+                [0, '🏋️', 'gym'],
+                [0, '🏨', 'Sleep in a {hotel}'],
+                [0, '🪺', 'nest'],
+                [0, '📌', 'pin'],
+                [0, '💍', 'ring'],
+                [0, '🦈', 'shark'],
+                [0, '🐍', 'snake'],
+                [0, '🎾', 'play {tennis}'],
+                [0, '⛺️', 'tent'],
+                [0, '🥚', 'egg'],      
+                [0, '👜', 'bag'],
+                [0, '🏃🏻‍♂️‍➡️', 'run'],
+                [0, '🐖', 'pig'],
+                [0, '🥛', 'I drink {milk}'],
+                [0, '🖐️', 'hand'],
+                [0, '😁', 'happy {grin}'],
+                [0, '🐠', 'fish'],
+                [0, '🥄', 'spoon'],
+                [0, '🙅🏼‍♀️', 'not'],
+                [0, '🪆', 'toy'],
+                [0, '🧑', 'boy'],
+                [0, '🪨', 'rock'],
+                [0, '🔒', 'lock'],
+                [0, '🔔', 'ring the {bell}'],
+                [0, '🔔', '{ring} the bell'],
+                [0, '🐑', 'sheep'],
+                [0, '🍋', 'lemon'],
+                [0, '⛳️', '{play} golf'],
+                [0, '⛳️', 'play {golf}'],
+                [0, '🏦', 'bank'],
+                [0, '💳', 'pay with {card}'],
+                [0, '🌞', 'The {sun} shines.'],
+                [0, '🪽', 'wing'],
+                [0, '😀', 'I am {happy}'],
+                [0, '👞', 'shoe'],
+                [0, '🍬', 'sweet {candy}'],
+                [0, '🌹', 'red {rose}'],
+                [0, '🚂', 'train'],
+                [0, '$fox', 'fox'],
+                [0, '🐴', 'horse'],
+                [0, '🐶', 'dog'],
+                [0, '🦆', 'duck'],
+                [0, '🌽', 'I like {corn}'],
+                [0, '🌽', 'I {like} corn'],
+                [0, '🚗', 'car'],
+                [0, '🟩', 'green'],
+                [0, '🦻🏽', 'I hear {you}'],
+                [0, '🐭', 'The mouse {likes} cheese'],
             ],
             [ // Word set 1
-                ['🛌', 'bed'],
+                [1, '🍱', 'food'],
+                [1, '🐄', 'cow'],
+                [1, '🥝', 'kiwi'],
+                [1, '🍝', 'pasta'],
+                [1, '🥛', 'I {drink} milk'],
+                [1, '🌜', 'moon'],
+                [1, '🚪', 'door'],
+                [1, '👍🏿', 'thumb'],
+                [1, '🖍', 'crayon'],
+                [1, '▶️', 'play'],
+                [1, '❄️', 'snow'],
+                [1, '🧸', 'teddy'],
+                [1, '🧥', 'coat'],
+                [1, '🧊', '{cold} ice'],
+                [1, '🔑', 'key'],
+                [1, '🧣', 'warm {scarf}'],
+                [1, '🫂', 'I {love} you'],
+                [1, '🫂', 'I love {you}'],
+                [1, '👃🏻', 'nose'],
+                [1, '👂', 'ear'],
+                [1, '🍕', 'I love {pizza}'],
+                [1, '🍕', '{I love} pizza'],
+                [1, '🎹', 'play the {piano}'],
+                [1, '🧱', 'wall'],
+                [1, '🐤', 'chick'],
+                [1, '⬜️', 'white'],
+                [1, '⬛️', 'black'],
+                [1, '🥩', 'Eat {meat}'],
+                [1, '📨', 'mail'],
+                [1, '👨‍🦱', 'male'],
+                [1, '🦶🏽', 'heel'],
+                [1, '👨🏾‍⚕️', 'heal'],
+                [1, '🪢', 'knot'],
+                [1, '🛣', 'road'],
+                [1, '⛏', 'It can >b>r>e>a>k stone'],
+                [1, '⛏', 'It can break >s>t>o>n>e'],
+                [1, '🦻🏽', 'I {hear} you'],
+                [1, '🍟', 'I want >c>h>i>p>s!'],
+                [1, '🍟', '>I> >w>a>n>t chips!'],
+                [1, '🏫', 'school'],
+                [1, '🌃', 'Good {night}!'],
+                [1, '🏞️', 'river'],
+                [1, '🐭', 'The {mouse} likes cheese'],
             ],
             [ // Word set 2
-                ['🐄', 'cow'],
-                ['🥁', 'drum'],
-                ['🏋️', 'gym'],
-                //['🏨', 'hotel'],
-                ['🏨', 'Sleep in a >h>o>t>e>l'],
-                ['🥝', 'kiwi'],
-                ['🪺', 'nest'],
-                ['🍝', 'pasta'],
-                ['📌', 'pin'],
-                ['💍', 'ring'],
-                ['🦈', 'shark'],
-                ['🐍', 'snake'],
-                // ['🎾', 'tennis'],
-                ['🎾', 'play >t>e>n>n>i>s'],
-                ['⛺️', 'tent'],
-                ['🥚', 'egg'],      
-                ['👜', 'bag'],
-                ['🏃🏻‍♂️‍➡️', 'run'],
-                ['🐖', 'pig'],
-                //['🥛', 'milk'],
-                ['🥛', 'I drink >m>i>l>k'],
-                ['🖐️', 'hand'],
-                //['😁', 'grin'],
-                ['😁', 'happy >g>r>i>n'],
-                ['🐠', 'fish'],
-                ['🌜', 'moon'],
-                ['🚪', 'door'],
-                ['🥄', 'spoon'],
-                ['🙅🏼‍♀️', 'not'],
-                ['🪆', 'toy'],
-                ['🧑', 'boy'],
-                ['👍🏿', 'thumb'],
-                ['🖍', 'crayon'],
-                ['👁', 'eye'],
-                ['▶️', 'play'],
-                ['🛡', 'shield'],
-                // ['🌞', 'sun'],
-                ['🌞', 'The >s>u>n shines.'],
-                ['❄️', 'snow'],
-                ['🪨', 'rock'],
-                ['🔒', 'lock'],
-                // ['🔔', 'bell'],
-                ['🔔', 'ring the >b>e>l>l'],
-                ['🔔', '>r>i>n>g the bell'],
-                ['🐑', 'sheep'],
-                ['🍋', 'lemon'],
-                //['⛳️', 'golf'],
-                ['⛳️', '>p>l>a>y golf'],
-                ['⛳️', 'play >g>o>l>f'],
-                ['🏦', 'bank'],
-                // ['💳', 'card'],
-                ['💳', 'pay with >c>a>r>d'],
-                ['🧸', 'teddy'],
-                ['🪽', 'wing'],
-                // ['😀', 'happy'],
-                ['😀', 'I am >h>a>p>p>y'],
-                ['👃🏻', 'nose'],
-                ['👂', 'ear'],
-                ['👞', 'shoe'],
-                ['🧥', 'coat'],
-                ['🌈', 'rainbow'],
-                //['🧊', 'ice'],
-                ['🧊', 'cold >i>c>e'],
-                ['🧊', '>c>o>l>d ice'],
-                ['🍿', 'popcorn'],
-                ['🚜', 'tractor'],
-                ['🧺', 'basket'],
-                ['🔑', 'key'],
-                ['📏', 'ruler'],
-                ['❤️', 'heart'],
-                //['🧣', 'scarf'],
-                ['🧣', 'warm >s>c>a>r>f'],
-                //['🫂', 'love'],
-                ['🫂', 'I >l>o>v>e you'],
-                ['🫂', 'I love >y>o>u'],
-                ['⛄️', 'snowman'],
-                // ['🍕', 'pizza'],
-                ['🍕', 'I love >p>i>z>z>a'],
-                ['🍕', '>I> >l>o>v>e pizza'],
-                //['🎹', 'piano'],
-                ['🎹', 'play the >p>i>a>n>o'],
-                ['🧱', 'wall'],
-                ['🍄', 'mushroom'],
-                ['🐤', 'chick'],
-                //['🍬', 'candy'],
-                ['🍬', 'sweet >c>a>n>d>y'],
-                // ['🌹', 'rose'],
-                ['🌹', 'red >r>o>s>e'],
-                //['🐇', 'rabbit'],
-                ['🐇', '>R>a>b>b>i>t>s like carrots.'],
-                ['🐇', 'Rabbits like >c>a>r>r>o>t>s.'],
-                ['🚂', 'train'],
-                ['🎺', 'trumpet'],
-                ['🦊', 'fox'],
-                ['🐴', 'horse'],
-                ['🐶', 'dog'],
-                ['🦆', 'duck'],
-                //['🌽', 'corn'],
-                ['🌽', 'I like >c>o>r>n'],
-                ['🌽', 'I >l>i>k>e corn'],
-                //['🐭', 'mouse'],
-                ['🐭', 'The >m>o>u>s>e likes cheese'],
-                ['🐭', 'The mouse >l>i>k>e>s cheese'],
-                ['🐵', 'monkey'],
-                ['💧', 'water'],
-                ['🚗', 'car'],
-                ['⬜️', 'white'],
-                ['⬛️', 'black'],
-                ['🟩', 'green'],
-                ['🏫', 'school'],
-                //['🌃', 'night'],
-                ['🌃', 'Good >n>i>g>h>t!'],
-                ['🏞️', 'river'],
-                //['🌅', 'morning'],
-                ['🌅', 'early >m>o>r>n>i>n>g'],
-                ['🏡', 'home'],
-                ['🥶', 'cold'],
-                //['🌋', 'lava'],
-                ['🌋', '>l>a>v>a is hot'],
-                ['🪰', 'fly'],
-                ['🛑', 'stop'],
-                ['🖼', 'picture'],
-                ['👄', 'mouth'],
-                ['🦴', 'bone'],
-                ['🦜', 'parrot'],
-                // ['☔️', 'rain'],
-                ['☔️', '>r>a>i>n falls'],
+                [2, '👁', 'eye'],
+                [2, '🛡', 'shield'],
+                [2, '📏', 'ruler'],
+                [2, '❤️', 'heart'],
+                [2, '🍿', 'popcorn'],
+                [2, '🚜', 'tractor'],
+                [2, '🧺', 'basket'],
+                [2, '🧊', 'cold {ice}'],
+                [2, '🎺', 'trumpet'],
+                [2, '🐇', '{Rabbits} like carrots.'],
+                [2, '🐇', 'Rabbits like {carrots}.'],
+                [2, '⛄️', 'snowman'],
+                [2, '🍄', 'mushroom'],
+                [2, '🌈', 'rainbow'],
+                [2, '🐵', 'monkey'],
+                [2, '💧', 'water'],
+                [2, '🐭', '#Mice like {cheese}'],
+
+                [2, '🌅', 'early {morning}'],
+                [0, '🏡', 'home'],
+                [0, '🥶', 'cold'],
+                [0, '🌋', '{lava} is hot'],
+                [0, '🪰', 'fly'],
+                [0, '🛑', 'stop'],
+                [2, '🖼', 'picture'],
+                [1, '👄', 'mouth'],
+                [1, '🦴', 'bone'],
+                [2, '🦜', 'parrot'],
+                [1, '☔️', '{rain} falls'],
                 ['🍪', 'cookie'],
                 ['🍌', 'banana'],
                 ['😢', 'cry'],
                 ['👶', 'baby'],
-                //['👑', 'crown'],
-                ['👑', 'The king\'s >c>r>o>w>n'],
+                ['👑', 'The king\'s {crown}'],
                 ['🧦', 'socks'],
-                //['🦶', 'foot'],
-                ['🦶', 'smelly >f>o>o>t'],
-                //['🔥', 'fire'],
-                ['🔥', '>F>i>r>e is hot'],
+                ['🦶', 'smelly {foot}'],
+                ['🔥', '{Fire} is hot'],
                 ['✈️', 'plane'],
                 ['🏠', 'house'],
-                //['📱', 'phone'],
                 ['📱', 'Call the >p>h>o>n>e'],
                 ['🪧', 'sign'],
                 ['🤖', 'robot'],
                 ['🏜️', 'desert'],
-                // ['👩‍🦰', 'woman'],
-                ['👩‍🦰', 'one >w>o>m>a>n'],
-                //['👭', 'women'],
-                ['👭', 'two >w>o>m>e>n'],
-                //['🥩', 'meat'],
-                ['🥩', 'Eat >m>e>a>t'],
-                ['📨', 'mail'],
-                ['👨‍🦱', 'male'],
-                ['🦶🏽', 'heel'],
-                ['👨🏾‍⚕️', 'heal'],
-                ['🪢', 'knot'],
-                ['🛣', 'road'],
-                //['⛏', 'break'],
-                ['⛏', 'It can >b>r>e>a>k stone'],
-                ['⛏', 'It can break >s>t>o>n>e'],
-                //['🦻🏽', 'hear'],
-                ['🦻🏽', 'I >h>e>a>r you'],
-                ['🦻🏽', 'I hear >y>o>u'],
-                //['🎃', 'scary'],
-                //['🎃', 'pumpkin'],
+                ['👩‍🦰', 'one {woman}'],
+                ['👭', 'two {women}'],
                 ['🎃', '>s>c>a>r>y pumpkin'],
                 ['🎃', 'scary >p>u>m>p>k>i>n'],
-                //['📦', 'thing'],
                 ['📦', 'It\'s a >t>h>i>n>g'],
                 ['🔩', 'screw'],
-                //['📰', 'news'],
                 ['📰', 'good >n>e>w>s'],
-                //['🌍', 'world'],
                 ['🌍', 'the whole >w>o>r>l>d'],
                 ['🪞', 'mirror'],
                 ['☁️', 'cloud'],
-                //['🧗', 'climb'],
-                ['🧗', '>c>l>i>m>b up'],
-                ['🛝', 'slide'],
-                ['🧑‍🏫', 'teacher'],
-                ['👕', 'shirt'],
-                ['🏥', 'hospital'],
-                ['🍉', 'watermelon'],
-                ['🕷', 'spider'],
-                ['⚙️', 'steel'],
-                // ['🗺️', 'here'],
-                ['🗺️', 'We are >h>e>r>e.'],
-                ['🦘', 'kangaroo'],
-                ['👩‍✈️', 'pilot'],
-                ['🌊', 'wave'],
-                //['🏭', 'factory'],
-                ['🏭', 'She works in a >f>a>c>t>o>r>y.'],
-                ['🪥', 'toothbrush'],
-                ['🏷', 'nametag'],
+                [2, '🧗', '{climb} up'],
+                [1, '🛝', 'slide'],
+                [2, '🧑‍🏫', 'teacher'],
+                [1, '👕', 'shirt'],
+                [2, '🏥', 'hospital'],
+                [2, '🍉', 'watermelon'],
+                [2, '🕷', 'spider'],
+                [1, '⚙️', 'steel'],
+                [1, '🗺️', 'We are {here}.'],
+                [3, '🦘', 'kangaroo'],
+                [2, '👩‍✈️', 'pilot'],
+                [1, '🌊', 'wave'],
+                ['🏭', 'She works in a {factory}.'],
+                [3, '🪥', 'toothbrush'],
+                [2, '🏷', 'nametag'],
 
-                ['☔️', 'It is >r>a>i>n>i>n>g.'],
-                ['☔️', 'It is >r>a>i>ning.'],
-                ['☔️', '>I>t> >i>s raining.'],
+            ['$potion', '#potion'],
+            ['$slime', '#slime block'], //
+            ['$enchant', '#>e>n>c>h>a>n>t>i>n>g table'],
+            ['$command', '#command block'],
+            ['$axolotl', '#axolotl'], //
+            ['$sulphurc', '#sulphur cube'],            
+            ['$jungle', '#>j>u>n>g>l>e biome'],
+            ['$jungle', '#jungle >b>i>o>m>e'],
+            ['$bamboo', '#bamboo'],
+            ['$trapdoor', '#trapdoor'], //
+            ['$crafting', '#>c>r>a>f>t>i>n>g table'],
+            ['$crafting', '#crafting >t>a>b>l>e'],
+            ['$badomen', '#bad omen'],
+            ['$levitation', '#levitation'],            
+            ['$poison', '#poison'],
+            ['$polarbear', '#polar bear'],
+            ['$pufferfish', '#pufferfish'], //
+            ['$phantom.gif', '#phantom'],
+            ['$blaze.gif', '#blaze'],
+            ['$witch', '#witch'],
+            ['$magmac', '#magma cube'], //
+            ['$turtle', '#turtle'],
+            ['$itemframe', '#item frame'],
+            ['$bow', '#bow'],
+            ['$cocoa', '#cocoa'],
+            ['$enderpearl', '#ender pearl'],
+            ['$skeletonskull', '#>s>k>e>l>e>t>o>n skull'],
+            ['$skeletonskull', '#skeleton >s>k>u>l>l'],
+            ['$copperore', '#>c>o>p>p>e>r ore'],
+            ['$copperore', '#copper >o>r>e'],
+            ['$netherportal', '#nether >p>o>r>t>a>l'],
+            ['$cherry', '#cherry leaves'],
+            ['$paleoaksign', '#>p>a>l>e oak sign'], //
+            ['$paleoaksign', '#pale >o>a>k sign'], //
+            ['$paleoaksign', '#pale oak >s>i>g>n'], //
+            ['$zombiehead', '#zombie head'],
+            ['$hangingsign', '#>h>a>n>g>i>n>g sign'],
+            ['$hangingsign', '#hanging >s>i>g>n'],
+            ['$chestplate', '#chestplate'],
+            ['$cporkc', '#>c>o>o>k>e>d porkchop'],
+            ['$cporkc', '#cooked >p>o>r>k>c>h>o>p'],
+            ['$melons', '#melon slice'],
+            ['$diamond', '#diamond'],
+            ['$nquartz', '#nether >q>u>a>r>t>z'],
+            ['$foxegg', '#fox >s>p>a>w>n> >e>g>g'], //
+
+                
+                ['☔️', 'It is {raining}.'],
+                ['☔️', 'It is {rain}ing.'],
+                ['☔️', '{It is} raining.'],
                 ['😽', 'Cat >g>i>v>e>s kiss.'],
                 ['😽', 'Cat gives >k>i>s>s.'],
                 ['😾', 'This cat >i>s> >a>n>g>r>y.'],
                 ['🚶‍♀️‍➡️', 'She is >w>a>l>k>i>n>g.'],
                 ['🚶‍♀️‍➡️', '>S>h>e> >i>s walking.'],
                 ['🏃‍♂️‍➡️', 'He is >r>u>n>n>i>n>g.'],
-                ['👨🏻‍🍼', 'feeding the baby'],
-                // ['🛀🏾', 'having a bath'],
-                ['🛀🏾', 'I am >h>a>v>i>n>g a bath.'],
-                ['🛀🏾', 'I am having a >b>a>t>h.'],
-                ['🍟', 'I want >c>h>i>p>s!'],
-                ['🍟', '>I> >w>a>n>t chips!'],
-                ['🚻', '>W>h>e>r>e is the toilet?'],
-                ['🚻', 'Where >i>s> >t>h>e toilet?'],
-                ['🚻', 'Where is the >t>o>i>l>e>t?'],
-                ['🏖', 'We are going on a >h>o>l>i>d>a>y!'],
-                ['🏖', '>W>e> >a>r>e going on a holiday!'],
-                ['🏖', 'We are >g>o>i>n>g on a holiday!'],
-                ['🗺', '>W>h>e>r>e are we?'],
-                ['🗺', 'Where >a>r>e> >w>e?'],
-                ['🤫', 'Keep it a >s>e>c>r>e>t!'],
-                ['🤫', '>K>e>e>p it a secret!'],
+                [2, '👨🏻‍🍼', '{feeding} the baby'],
+                [1, '👨🏻‍🍼', 'feeding the {baby}'],
+                [1, '🛀🏾', 'I am >h>a>v>i>n>g a bath.'],
+                [0, '🛀🏾', 'I am having a >b>a>t>h.'],
+                [0, '🚻', '{Where} is the toilet?'],
+                [1, '🚻', 'Where {is the} toilet?'],
+                [2, '🚻', 'Where is the {toilet}?'],
+                [2, '🏖', 'We are going on a {holiday}!'],
+                [1, '🏖', '{We are} going on a holiday!'],
+                [1, '🏖', 'We are {going} on a holiday!'],
+                [0, '🗺', '{Where} are we?'],
+                [1, '🗺', 'Where {are we}?'],
+                [2, '🤫', 'Keep it a {secret}!'],
+                [0, '🤫', '{Keep} it a secret!'],
 
-                //['🪜', 'ladder'],
-                ['🪜', 'climb up the >l>a>d>d>e>r'],
-                ['🪜', '>c>l>i>m>b> >u>p the ladder'],
-                // ['🛞', 'wheel'],
-                ['🛞', 'The >w>h>e>e>l turns.'],
-                ['📎', '>p>a>p>e>r clip'],
-                ['📎', 'paper >c>l>i>p'],
-                ['🚓', '>p>o>l>i>c>e car'],
-                ['🚓', 'police >c>a>r'],
-                // ['👦', 'brother'],
-                ['👦', 'my >b>r>o>t>h>e>r'],
-                ['👦', '>m>y brother'],
-                ['🥕', '#I >w>o>u>l>d like a carrot.'],
-                ['🥕', '#I would >l>i>k>e a carrot.'],
-                ['🥕', '#I would like a >c>a>r>r>o>t.'],
-                ['🥕', 'I would like a carrot, >p>l>e>a>s>e.'],
-                ['📥', '>T>h>e>r>e> >w>a>s nothing in the tray.'],
-                ['📥', 'There was >n>o>t>h>i>n>g in the tray.'],
-                ['📥', 'There was nothing >i>n> >t>h>e tray.'],
-                ['📥', 'There was nothing in the >t>r>a>y.'],                
-                ['🧑‍🍳', '#The >c>h>e>f works in the kitchen'],
-                ['🧑‍🍳', '#The chef >w>o>r>k>s in the kitchen'],
-                ['🧑‍🍳', '#The chef works in the >k>i>t>c>h>e>n'],
-                ['🕰️', '#>J>u>s>t a bit of time, please'],
-                ['🕰️', '#>A> >b>i>t> >o>f time, please'],
-                ['🕰️', '#A bit of >t>i>m>e, please'],
-                ['🕰️', '#A bit of time, >p>l>e>a>s>e'],
+                [2, '🪜', 'climb up the {ladder}'],
+                [2, '🪜', '{climb up} the ladder'],
+                [1, '🛞', 'The {wheel} turns.'],
+                [1, '📎', '{paper} clip'],
+                [1, '📎', 'paper {clip}'],
+                [2, '🚓', '{police} car'],
+                [0, '🚓', 'police {car}'],
+                ['👦', 'my {brother}'],
+                ['👦', '{my} brother'],
+                ['🥕', '#I {would} like a carrot.'],
+                ['🥕', '#I would {like} a carrot.'],
+                ['🥕', '#I would like a {carrot}.'],
+                ['🥕', 'I would like a carrot, {please}.'],
+                ['📥', '{There was} nothing in the tray.'],
+                ['📥', 'There was {nothing} in the tray.'],
+                ['📥', 'There was nothing {in the} tray.'],
+                ['📥', 'There was nothing in the {tray}.'],                
+                ['🧑‍🍳', '#The {chef} works in the kitchen'],
+                ['🧑‍🍳', '#The chef {works} in the kitchen'],
+                ['🧑‍🍳', '#The chef works in the {kitchen}'],
+                ['🕰️', '#{Just} a bit of time, please'],
+                ['🕰️', '#{A bit of} time, please'],
+                ['🕰️', '#A bit of {time}, please'],
+                ['🕰️', '#A bit of time, {please}'],
                 ['🪫', '#The >m>a>c>h>i>n>e ran out of battery'],
                 ['🪫', '#The machine >r>a>n> >o>u>t of battery'],
                 ['🪫', '#The machine ran out of >b>a>t>t>e>r>y'],
-                ['🤖', '#>S>i>l>l>y machine!'],
-                ['🤖', '#Silly >m>a>c>h>i>n>e!'],
+                ['🤖', '#{Silly} machine!'],
+                ['🤖', '#Silly {machine}!'],
                 
                 ['🗓️', '#>M>o>n>d>a>y, Tuesday'],
                 ['🗓️', '#Monday, >T>u>e>s>d>a>y'],
@@ -504,31 +513,23 @@
                 ['🗓️', '#The weekend is Saturday and >S>u>n>d>a>y'],
             ],
             [ // Word set 3
-                //['🪙', 'coin'],
-                ['🪙', '>g>o>l>d coin'],
-                ['🪙', 'gold >c>o>i>n'],
-                // ['🪶', 'feather'],
+                ['🪙', '{gold} coin'],
+                ['🪙', 'gold {coin}'],
                 ['🪶', '>l>i>g>h>t as a feather'],
                 ['🪶', 'light as a >f>e>a>t>h>e>r'],
                 ['🪶', 'light >a>s> >a feather'],
-                //['📦', 'package'],
                 ['📦', 'A >p>a>c>k>a>g>e arrived.'],
                 ['📦', 'A package >a>r>r>i>v>e>d.'],
-                //['🦒', 'giraffe'],
                 ['🦒', 'The >g>i>r>a>f>f>e is tall.'],
                 ['🦒', 'The giraffe is >t>a>l>l.'],
                 ['🚁', 'helicopter'],
-                // ['🛬', 'arrive'],
                 ['🧚‍♂️', 'appear'],
-                //['👯‍♀️', 'group'],
                 ['👯‍♀️', 'a >g>r>o>u>p of people'],
-                // ['🎶', 'hymn'],
                 ['🎶', 'We sing a >h>y>m>n.'],
                 ['🇪🇬', 'Egypt'],
                 ['🔣', 'symbol'],
                 ['🕵️', 'mystery'],
                 ['🏜️', 'pyramid'],
-                // ['🐬', 'dolphin'],
                 ['🐬', 'The >d>o>l>p>h>i>n likes fish.'],
                 ['🐬', 'The dolphin >l>i>k>e>s> >f>i>s>h.'],
                 ['💎', 'diamond'],
@@ -536,15 +537,12 @@
                 ['👻', 'myth'],
                 ['🤔', 'forgetting'],
                 ['☑️', 'preferred'],
-                //['⛔️', 'forbidden'],
                 ['⛔️', 'Smoking is >f>o>r>b>i>d>d>e>n'],
                 ['😯', 'beginner'],
-                // ['😎', 'expert'],
                 ['😎', 'He is an >e>x>p>e>r>t.'],
                 ['🏤', 'post office'],
                 ['📉', 'going down'],
                 ['🛣', 'motorway'],
-                //['🗓️', 'year'],
                 ['🗓️', 'A >y>e>a>r later'],
 
                 ['🪤', 'Careful! It is a >t>r>a>p!'],
@@ -553,7 +551,7 @@
                 ['💇🏾‍♂️', 'Adam >n>e>e>d>s a haircut.'],
                 ['🎂', 'It is my >b>i>r>t>h>d>a>y!'],
                 ['🎂', '>I>t> >i>s> >m>y birthday!'],
-                ['⚽️', '">G>o>a>l!" shouted everyone.'],
+                ['⚽️', '>G>o>a>l! shouted everyone.'],
                 ['🤨', '#The car broke down again. >T>y>p>i>c>a>l.'],
                 ['🤨', '#The car >b>r>o>k>e down again. Typical.'],
                 ['🤨', '#The car broke down >a>g>a>i>n. Typical.'],
@@ -606,19 +604,12 @@
                 ['#STORY', '$sign', 'If you wax a {sign}, no player can {change} the text on it. Use dyes and {glow ink} to change how the text looks.'],
                 ['#STORY', '$sign', 'You can {burn} overworld signs in a {furnace}. Nether signs (crimson and warped) {cannot be} used as fuel.'],
                 ['#STORY', '$sign', 'You can burn overworld {signs} in a furnace. Nether signs ({crimson} and warped) cannot be used as {fuel}.'],
+                ['#STORY', '$cat', '{Cats are} good to chase away phantoms and creepers. {Black} cats are {only} born during full moon.'],
+                ['#STORY', '$cat', 'Cats are {good} to {chase} away phantoms and creepers. Black cats are only born {during} full moon.'],
+                ['#STORY', '$cat', 'Cats are good {to chase away} phantoms and creepers. Black cats are only born during {full moon}.'],
             ]
         ];
         // [WORDS END]
-        
-        if(typeof(bee_local) !== 'undefined' && bee_local.local_wordsets) {
-            for(let i=0; i<bee_local.local_wordsets.length; i++) {
-                if(word_sets[i] === undefined) {
-                    word_sets[i] = bee_local.local_wordsets[i];
-                } else {
-                    word_sets[i] = word_sets[i].concat(bee_local.local_wordsets[i]);
-                }
-            }
-        }
 
         let words = [];
 
@@ -727,13 +718,13 @@
 
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
         
-            word = ['o', 'pear']
+            word = 'pear'
             bee.processed_word = {to_type: 'pear', to_display: 'pear', mask: false}
         
-            word = ['o', 'I eat >a>p>p>l>e.']
+            word = 'I eat >a>p>p>l>e.'
             bee.processed_word = {to_type: 'apple', to_display: 'I eat apple.', mask: '******_____*'}
             
-            word = ['#STORY', 'o', 'This {is} very {good}.']
+            word = 'This {is} very {good}.'
             bee.processed_word = {to_type: 'isgood', to_display: 'This is very good.', mask: '******__******____*'}
             
             bee.typed = 'ap'
@@ -741,6 +732,7 @@
             
             Further properties
             emoji: str
+            ref: str
             use_tts: BOOL
             is_story: BOOL
             add_words: [str]  // if is_story
@@ -748,48 +740,23 @@
 
         // Extract the to_type string from a word entry
         function get_processed_word(word_ix) {
-            const is_story = (words[word_ix][0] == '#STORY');
-            let use_tts = false;
-            let wd;
-            
-            if(!is_story) {
-                wd = words[word_ix][1];
-                if(wd.indexOf('#') == 0) {
-                    use_tts = true;
-                    wd = wd.substring(1);
-                }
-                if(wd.indexOf('>') == -1 && wd.indexOf('{') == -1) { 
-                    return {
-                        'to_type': wd, 
-                        'to_display': wd, 
-                        'mask': false, 
-                        'use_tts': use_tts, 
-                        'is_story': is_story, 
-                        'emoji': words[word_ix][0]
-                    };
-                }
-            } else { // is_story
-                wd = words[word_ix][2];
-            }
+            const word_data = words[word_ix];
             
             let to_type_str = '';
             let to_disp_str = '';
             let mask_str = '';
             const add_words = [];
             let current_add_word = '';
-            const full = wd;
-            let next_type = false;  // next character is typed
+            const full = word_data.text;
             let in_type = false;  // in typing mode
             for(let i=0; i<full.length; i++) {
-                if(full[i] == '>') { next_type = true; continue; }
-                if(full[i] == '{') { in_type = true; current_add_word = ''; continue; }
-                if(full[i] == '}') { in_type = false; add_words.push(current_add_word); continue; }
-                if(next_type || in_type) { 
+                if(full[i] == '<') { in_type = true; current_add_word = ''; continue; }
+                if(full[i] == '>') { in_type = false; add_words.push(current_add_word); continue; }
+                if(in_type) { 
                     to_type_str += full[i];
                     to_disp_str += full[i];
                     current_add_word += full[i];
                     mask_str += '_';
-                    if(next_type) { next_type = false; }
                     continue; 
                 } else {
                     to_disp_str += full[i];
@@ -801,9 +768,10 @@
                 'to_type': to_type_str, 
                 'to_display': to_disp_str, 
                 'mask': mask_str, 
-                'use_tts': use_tts, 
-                'is_story': is_story, 
-                'emoji': (is_story ? words[word_ix][1] : words[word_ix][0]),
+                'use_tts': !word_data.mp3, 
+                'is_story': !!word_data.story, 
+                'emoji': word_data.emoji,
+                'ref': word_data.ref,
                 'add_words': add_words
             };
         }
@@ -1157,21 +1125,18 @@
             bee.processed_word = get_processed_word(bee.word_ix);
 
             // Show picture
-            let emoji = bee.processed_word.emoji;
-            if(emoji[0] == '$') {
-                let deref = '?';
-                if(typeof(bee_local) !== 'undefined' && bee_local.emoji_ref) {
-                    deref = bee_local.emoji_ref(emoji);
-                }
-                bee.$image.html(deref);
+            if(bee.processed_word.ref !== undefined && typeof(bee_local) !== 'undefined' && bee_local.emoji_ref) {
+                bee.$image.html(bee_local.emoji_ref(bee.processed_word.ref));
             }
-            else if(emoji[0] == '#') {
-                // Picture
-                bee.$image.html('<img src="' + emoji.substring(1) + '">');
-            } else {
-                // Ensure emoji code ends in picture modifier
-                if(emoji[emoji.lenght-1] != "\ufe0f") { emoji += "\ufe0f"; }
-                bee.$image.html(esc_html(emoji));
+            else {
+                if(bee.processed_word.emoji === undefined) {
+                    bee.$image.html('?');
+                } else {
+                    let emoji = bee.processed_word.emoji;
+                    // Ensure emoji code ends in picture modifier
+                    if(emoji[emoji.lenght-1] != "\ufe0f") { emoji += "\ufe0f"; }
+                    bee.$image.html(esc_html(emoji));
+                }
             }
             
             // Add help & input
