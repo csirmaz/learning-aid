@@ -1,11 +1,4 @@
 
-@font-face {
-    font-family: 'odr';
-    src: url('opendyslexic/OpenDyslexic-Regular.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-}
-
 body {
     font-family: monospace, sans-serif;
     background: #fec;

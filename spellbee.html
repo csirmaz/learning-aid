@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?256">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?259">
 
     <style>
         body { margin: .5rem 0; }
@@ -46,11 +46,11 @@
         
         body .prompt .infield.infield_story,
         .prompt .addwords {
-            font-family: odr;
-            font-size: 1rem;
-            line-height: 1.8rem;
+            font-weight: bold;
+            font-size: 1.2rem;
+            line-height: 2rem;
             padding: .5rem;
-            letter-spacing: normal;
+            letter-spacing: .1rem;
         }
         .prompt .addwords {
             border-radius: 1rem;
@@ -91,7 +91,7 @@
             margin-left: -1px;
             border-right: 0 solid transparent;
         }
-        .infield_story .cursor { height: 1rem; width: .1rem; }
+        .infield_story .cursor { height: 1.2rem; width: .1rem; }
         .infield .help .cursor { visibility: hidden; }
         
         .wrongchar { text-decoration: underline dotted #05b .2rem; text-underline-offset: .6rem; }
@@ -142,7 +142,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?256"></script>
+    <script src="assets/local/beelocal.js?259"></script>
 </head>
 <body>
     <div class="container">
@@ -671,7 +671,7 @@
 
 
     </script>
-    <script src="assets/common.js?256"></script>
+    <script src="assets/common.js?259"></script>
     <script>
 
         // Initialize keyboard
@@ -870,14 +870,18 @@
                         if(wrap_at[i]) { o += '<br>'; }
                     }
                     
-                } else { // We are rendering what the user entered, plus surrounding phrase
+                } else { // We are rendering the input field
                 
                     if(totype) { // We are in the area that should be typed
                         if(typed_ix < bee.typed.length) { // The user typed this much
                             const userchar = bee.typed[typed_ix];
                             const wrongchar = (s[i].toLowerCase() != userchar.toLowerCase());
                             if(wrongchar) { o += '<span class="wrongchar">'; }
-                            o += (userchar == ' ' && (!bee.processed_word.is_story) ? '&nbsp;' : esc_html(userchar));
+                            if(userchar == ' ') {
+                                if((!bee.processed_word.is_story) || wrongchar) { o += '&nbsp;'; } else { o += ' '; }
+                            } else {
+                                o += esc_html(userchar);
+                            }
                             if(wrongchar) { o += '</span>'; }
                             if(wrap_at[i]) { o += '<br>'; }
                         } else { // The user is still to type this
@@ -993,16 +997,15 @@
         
 
         // Play the mp3 assigned to a word
-        function play_word() {
+        function play_word(callback) {
             let s = bee.processed_word.to_display;
             const use_tts = bee.processed_word.use_tts || bee.processed_word.is_story;
 
-            if(bee.processed_word.is_story) { return; } // TTS works fine but let's force reading
             if(bee.word_audio_timeout !== false) { return; } // prevent playing word too frequently
             bee.word_audio_timeout = setTimeout(function() { bee.word_audio_timeout = false; }, 3000);
             
             if(use_tts) {
-                bee_tts.speak(s);
+                bee_tts.speak(s, callback);
                 return;
             }
             
@@ -1069,6 +1072,7 @@
                 }
                 if(typed_key == 'PLAY_WORD') {
                     highlight_key('.kbdiv .kbkey[data-key="'+typed_key+'"]');
+                    if(bee.processed_word.is_story) { return; }
                     play_word();
                     return;
                 }
@@ -1079,8 +1083,10 @@
                     highlight_key('.kbdiv .kbkey[data-key="'+typed_key.toLowerCase()+'"]');
                     
                     if(bee.typed.toLowerCase() == bee.processed_word.to_type.toLowerCase()) { // Success!
-                        bee.can_type = false;
+                        bee.can_type = false;                        
                         console.log('success help=', bee.help_asked, 'backspace=', bee.backspace_used);
+                        bee.$input.addClass('success');
+                        
                         if(bee.help_asked == 0 && bee.backspace_used < (bee.processed_word.is_story ? 4 : 3)) {
                             queue_success();
                             if(bee.backspace_used < (bee.processed_word.is_story ? 3 : 2)) {
@@ -1089,12 +1095,16 @@
                         } else {
                             reschedule_question(bee.word_ix);
                         }
-                        bee.$input.addClass('success');
-                        success_common({'skip_this_score':bee.is_repeat});
 
                         if(typeof(bee_local) !== 'undefined' && bee_local.success_hook) {
                             bee_local.success_hook(bee.word_ix, words[bee.word_ix][1], bee.player, bee.help_asked, -1);
                         }
+
+                        const on_success = function() {
+                            success_common({'skip_this_score':bee.is_repeat});
+                        };
+
+                        if(bee.processed_word.is_story) { play_word(on_success); } else { on_success(); }
                     }
                 }
                 return;
