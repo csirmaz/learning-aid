@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?255">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?256">
 
     <style>
         body { margin: .5rem 0; }
@@ -142,7 +142,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?255"></script>
+    <script src="assets/local/beelocal.js?256"></script>
 </head>
 <body>
     <div class="container">
@@ -671,7 +671,7 @@
 
 
     </script>
-    <script src="assets/common.js?255"></script>
+    <script src="assets/common.js?256"></script>
     <script>
 
         // Initialize keyboard
@@ -996,11 +996,9 @@
         function play_word() {
             let s = bee.processed_word.to_display;
             const use_tts = bee.processed_word.use_tts || bee.processed_word.is_story;
-            
-            if(bee.word_audio_timeout !== false) {
-                // prevent playing word too frequently
-                return;
-            }
+
+            if(bee.processed_word.is_story) { return; } // TTS works fine but let's force reading
+            if(bee.word_audio_timeout !== false) { return; } // prevent playing word too frequently
             bee.word_audio_timeout = setTimeout(function() { bee.word_audio_timeout = false; }, 3000);
             
             if(use_tts) {
@@ -1083,9 +1081,9 @@
                     if(bee.typed.toLowerCase() == bee.processed_word.to_type.toLowerCase()) { // Success!
                         bee.can_type = false;
                         console.log('success help=', bee.help_asked, 'backspace=', bee.backspace_used);
-                        if(bee.help_asked == 0 && bee.backspace_used < 3) {
+                        if(bee.help_asked == 0 && bee.backspace_used < (bee.processed_word.is_story ? 4 : 3)) {
                             queue_success();
-                            if(bee.backspace_used < 2) {
+                            if(bee.backspace_used < (bee.processed_word.is_story ? 3 : 2)) {
                                 add_known_word(bee.processed_word.to_type);
                             }
                         } else {
@@ -1174,8 +1172,10 @@
             if(!bee.processed_word.is_story) { 
                 bee.$help.html(render_to_html(true));
                 $('.prompt .addwords').hide();
+                $('.kbdiv .kbhelp').css({'visibility': 'visible'});
             } else {
                 $('.prompt .addwords').html(render_addwords()).show();
+                $('.kbdiv .kbhelp').css({'visibility': 'hidden'}); // TTS works fine but let's force reading
             }
             update_input_field();
             $('.prompt .infield').toggleClass('infield_story', !!bee.processed_word.is_story);
