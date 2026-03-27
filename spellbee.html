@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?252">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?255">
 
     <style>
         body { margin: .5rem 0; }
@@ -48,7 +48,7 @@
         .prompt .addwords {
             font-family: odr;
             font-size: 1rem;
-            line-height: 1.7rem;
+            line-height: 1.8rem;
             padding: .5rem;
             letter-spacing: normal;
         }
@@ -142,7 +142,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?252"></script>
+    <script src="assets/local/beelocal.js?255"></script>
 </head>
 <body>
     <div class="container">
@@ -213,7 +213,9 @@
         //         The page will attempt to play assets/sounds/words/<word to spell>.mp3 (lowercased and spaces 
         //         replaced by underscores)
         //         If the {word} starts with a #, use TTS instead of playing a sound file
+        //
         //         If the {emoji} starts with a #, treat the rest of the string as a URL to an image
+        //         If the {emoji} starts with a $, try to resolve a reference
         //
         // Story format
         //         ['#STORY', '#{image url}', 'Text with words to add in {}']
@@ -581,6 +583,29 @@
                 
             ],
             [ // Word set 4
+                ['#STORY', '$fox', 'A fox {hunts} small animals, and can {carry} items in its mouth. It runs {away} if you are not sneaking.'],
+                ['#STORY', '$fox', 'A fox hunts small {animals}, and can carry items in its {mouth}. It runs away if you are not {sneaking}.'],
+                ['#STORY', '$slime', '{Slimes} can spawn in {swamps} when there is not much light. They spawn most {often} on a full {moon}.'],
+                ['#STORY', '$slime', 'Slimes can {spawn} in swamps when there {is} not much light. They spawn most often on a {full} moon.'],
+                ['#STORY', '$axolotl', 'An axolotl is an {aquatic} mob found in {lush caves} and sometimes in buckets. It can {assist} you in combat.'],
+                ['#STORY', '$axolotl', 'An axolotl is an aquatic mob {found in} lush caves and sometimes in {buckets}. It can assist you in {combat}.'],
+                ['#STORY', '$trapdoor', 'Trapdoors {can} be moved by {pistons}. They also block flowing water and {lava}.'],
+                ['#STORY', '$trapdoor', 'Mobs think all {trapdoors} are closed, and fall {through} open trapdoors. You can use this to make a {trap}.'],
+                ['#STORY', '$trapdoor', 'Mobs {think} all trapdoors are closed, and {fall} through open trapdoors. You can use this {to make} a trap.'],
+                ['#STORY', '$pufferfish', 'Pufferfish live in {oceans} and use poison to {defend} themselves. They inflate {if} you get too close.'],
+                ['#STORY', '$pufferfish', 'Pufferfish {live} in oceans and use {poison} to defend themselves. They {inflate} if you {get} too close.'],
+                ['#STORY', '$magmac', '{Magma} cubes are {fireproof} and jump like slime blocks. They can swim {in water}, but can also drown.'],
+                ['#STORY', '$magmac', 'Magma cubes {are} fireproof and {jump} like slime blocks. They can {swim} in water, but can also {drown}.'],
+                ['#STORY', '$frog', '{Frogs} live {in} swamps. They use their long {tongues} to {eat} small slimes and small magma cubes.'],
+                ['#STORY', '$frog', 'Frogs live {in swamps}. They use their {long} tongues to eat small slimes and {small} magma {cubes}.'],
+                ['#STORY', '$frog', 'When a {frog} eats a magma cube, you get a {froglight}. Different frog types make different coloured {lights}.'],
+                ['#STORY', '$frog', 'When a frog {eats} a magma cube, you get a froglight. Different frog {types} make {different} coloured lights.'],
+                ['#STORY', '$frog', 'Frogs will {follow} you if you hold a slime ball, and you are closer to them than {six} blocks. You can {feed} them.'],
+                ['#STORY', '$frog', 'Frogs will follow you if you hold a slime ball, and {you are} closer to them {than} six blocks. You {can feed} them.'],
+                ['#STORY', '$sign', 'If you {wax} a sign, no {player} can change the text on it. Use dyes and glow ink to change {how} the text looks.'],
+                ['#STORY', '$sign', 'If you wax a {sign}, no player can {change} the text on it. Use dyes and {glow ink} to change how the text looks.'],
+                ['#STORY', '$sign', 'You can {burn} overworld signs in a {furnace}. Nether signs (crimson and warped) {cannot be} used as fuel.'],
+                ['#STORY', '$sign', 'You can burn overworld {signs} in a furnace. Nether signs ({crimson} and warped) cannot be used as {fuel}.'],
             ]
         ];
         // [WORDS END]
@@ -646,7 +671,7 @@
 
 
     </script>
-    <script src="assets/common.js?252"></script>
+    <script src="assets/common.js?255"></script>
     <script>
 
         // Initialize keyboard
@@ -1125,7 +1150,14 @@
 
             // Show picture
             let emoji = bee.processed_word.emoji;
-            if(emoji[0] == '#') {
+            if(emoji[0] == '$') {
+                let deref = '?';
+                if(typeof(bee_local) !== 'undefined' && bee_local.emoji_ref) {
+                    deref = bee_local.emoji_ref(emoji);
+                }
+                bee.$image.html(deref);
+            }
+            else if(emoji[0] == '#') {
                 // Picture
                 bee.$image.html('<img src="' + emoji.substring(1) + '">');
             } else {
