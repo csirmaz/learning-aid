@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?261">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?263">
 
     <style>
         body { margin: .5rem 0; }
@@ -146,7 +146,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?261"></script>
+    <script src="assets/local/beelocal.js?263"></script>
 </head>
 <body>
     <div class="container">
@@ -606,8 +606,6 @@
 ];
 // [WORDS END]
 
-        let words = [];
-
         // Application data
         const bee = {
             // Configuration
@@ -625,6 +623,7 @@
             player: false,  // state: name of the player - scores are saved to browser under this name
             giftlist: -1,  // state: which gift is shown when viewing them
             // State (spellbee)
+            words: [],
             word_ix: false,
             is_repeat: false, // whether the question is a repeat
             processed_word: false,
@@ -657,7 +656,7 @@
 
 
     </script>
-    <script src="assets/common.js?261"></script>
+    <script src="assets/common.js?263"></script>
     <script>
 
         // Initialize keyboard
@@ -735,12 +734,15 @@
 
         // Extract the to_type string from a word entry
         function get_processed_word(word_ix) {
-            const word_data = words[word_ix];
+            const word_data = bee.words[word_ix];
+            if(word_data.proc_cache !== undefined) {
+                return word_data.proc_cache;
+            }
             
             let to_type_str = '';
             let to_disp_str = '';
             let mask_str = '';
-            const add_words = [];
+            const add_words = []; // words user needs to type in a story
             let current_add_word = '';
             const full = word_data.text;
             let in_type = false;  // in typing mode
@@ -758,8 +760,7 @@
                     mask_str += '*';
                 }
             }
-            shuffle(add_words);
-            return {
+            const proc = {
                 'to_type': to_type_str, 
                 'to_display': to_disp_str, 
                 'mask': mask_str, 
@@ -769,10 +770,14 @@
                 'ref': word_data.ref,
                 'add_words': add_words
             };
+            word_data.proc_cache = proc;
+            return proc;
         }
         
         
+        // Render words user needs to type in a story
         function render_addwords() {
+            shuffle(bee.processed_word.add_words); // WARNING in-place
             let o = '';
             for(let i=0; i<bee.processed_word.add_words.length; i++) {
                 o += '<span>'+bee.processed_word.add_words[i]+'</span>';
@@ -944,7 +949,10 @@
         
         
         // Return the count of successful entries of a word
-        function is_known_word(word) {
+        function is_known_word(word_ix) {
+            const procword = get_processed_word(word_ix);
+            const word = procword.to_type;
+            
             if(bee.storage.players[bee.player].known_words) {
                 const c = bee.storage.players[bee.player].known_words[word];
                 if(c === undefined) { 
@@ -1060,7 +1068,7 @@
                         }
 
                         if(typeof(bee_local) !== 'undefined' && bee_local.success_hook) {
-                            bee_local.success_hook(bee.word_ix, words[bee.word_ix][1], bee.player, bee.help_asked, -1);
+                            bee_local.success_hook(bee.word_ix, bee.words[bee.word_ix].text, bee.player, bee.help_asked, -1);
                         }
 
                         const on_success = function() {
@@ -1165,22 +1173,28 @@
             let log = '';
             if(problem !== undefined) {
                 log += ' from store';
-                if(problem.word_ix >= words.length) { problem = undefined; }
+                if(problem.word_ix >= bee.words.length) { problem = undefined; }
             }
             if(problem === undefined) {
-                let word_ix;
+            
+                let word_ix = undefined;
                 while(true) {
-                    word_ix = Math.floor(Math.random() * words.length);
-                    log += " w:"+word_ix;
+                    const weight_point = Math.random() * bee.word_weight_sum;
+                    word_ix = undefined;
+                    for(let i=0; i<bee.words.length; i++) {
+                        if(weight_point < bee.word_weights_cumulative[i]) { word_ix = i; break; }
+                    }
+                    if(word_ix === undefined) { word_ix = bee.words.length - 1; }
+                
+                    log += " wix:"+word_ix+" lev:"+bee.words[word_ix].level;
                     // ensure we choose a new word
-                    if(words.length > 1 && bee.word_ix !== false && word_ix == bee.word_ix) { log += ' norep'; continue; }
+                    if(bee.words.length > 1 && bee.word_ix !== false && word_ix == bee.word_ix) { log += ' norep'; continue; }
                     // Avoid already known words (typed without help)
-                    const procword = get_processed_word(word_ix);
-                    const known_count = is_known_word(procword.to_type);
-                    log += " k:"+known_count;
-                    if(known_count == 2 && Math.random() < .5) { log += ' no2'; continue; }
-                    if(known_count > 2 && Math.random() < .75) { log += ' no2+'; continue; }
-                    if(known_count > 5 && Math.random() < .9) { log += ' no5+'; continue; }
+                    const known_count = is_known_word(word_ix);
+                    log += " known:"+known_count;
+                    if(known_count == 2 && Math.random() < .8) { log += ' no2'; continue; }
+                    if(known_count > 2 && Math.random() < .9) { log += ' no2+'; continue; }
+                    if(known_count > 5 && Math.random() < .99) { log += ' no5+'; continue; }
                     break;
                 }
                 problem = {'word_ix':word_ix, 'is_repeat':false};
@@ -1206,15 +1220,24 @@
             if(min_wordset === undefined) { min_wordset = 0; }
             const max_wordset = bee.storage.players[bee.player].wordsets;
 
-            words = [];
+            bee.words = [];
             for(let i=0; i<word_repository.length; i++) {
                 if(word_repository[i].level >= min_wordset && word_repository[i].level <= max_wordset) {
-                    words.push(word_repository[i]);
+                    bee.words.push(word_repository[i]);
                 }
             }
+            
+            bee.word_weights_cumulative = [];
+            bee.word_weight_sum = 0;
+            for(let i=0; i<bee.words.length; i++) {
+                const w = Math.pow(2, -bee.words[i].level);
+                bee.word_weight_sum += w;
+                bee.word_weights_cumulative.push(bee.word_weight_sum);
+            }
+            
             $('.d_wordsets').html(
                 esc_html(min_wordset) + " to " + 
-                esc_html(max_wordset) + " (" + words.length + " words)"
+                esc_html(max_wordset) + " (" + bee.words.length + " words)"
             );
         }
         
