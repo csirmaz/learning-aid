@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?263">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?264">
 
     <style>
         body { margin: .5rem 0; }
@@ -146,7 +146,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?263"></script>
+    <script src="assets/local/beelocal.js?264"></script>
 </head>
 <body>
     <div class="container">
@@ -251,7 +251,7 @@
 {"story":0, "level":0, "emoji":"🐍", "text":"<snake>", "mp3":1},
 {"story":0, "level":0, "emoji":"🎾", "text":"play <tennis>", "mp3":1},
 {"story":0, "level":0, "emoji":"⛺️", "text":"<tent>", "mp3":1},
-{"story":0, "level":0, "emoji":"🥚", "text":"<egg>", "mp3":1},
+{"story":0, "level":0, "emoji":"🥚", "ref":"egg", "text":"<egg>", "mp3":1},
 {"story":0, "level":0, "emoji":"👜", "text":"<bag>", "mp3":1},
 {"story":0, "level":0, "emoji":"🏃🏻‍♂️‍➡️", "text":"<run>", "mp3":1},
 {"story":0, "level":0, "emoji":"🐖", "text":"<pig>", "mp3":1},
@@ -298,7 +298,7 @@
 {"story":0, "level":0, "emoji":"😢", "text":"<cry>", "mp3":1},
 {"story":0, "level":0, "emoji":"🧦", "text":"<socks>", "mp3":1},
 {"story":0, "level":0, "emoji":"🦶", "text":"smelly <foot>", "mp3":1},
-{"story":0, "level":0, "emoji":"🔥", "text":"<Fire> is hot", "mp3":1},
+{"story":0, "level":0, "emoji":"🔥", "ref":"fire", "text":"<Fire> is hot", "mp3":1},
 {"story":0, "level":0, "emoji":"✈️", "text":"<plane>", "mp3":1},
 {"story":0, "level":0, "emoji":"🏠", "text":"<house>", "mp3":1},
 {"story":0, "level":0, "emoji":"📱", "text":"Call the <phone>", "mp3":1},
@@ -323,17 +323,23 @@
 {"story":0, "level":0, "emoji":"🪤", "text":"Careful! It is a <trap>!", "mp3":1},
 {"story":0, "level":0, "emoji":"🏂", "text":"He bravely slid <down>"},
 {"story":0, "level":0, "emoji":"😸", "text":"Finally the cat had enough to <eat>"},
-{"story":0, "level":0, "emoji":"🥕", "text":"I would <like> a carrot."},
+{"story":0, "level":0, "emoji":"🥕", "ref":"carrot", "text":"I would <like> a carrot."},
 {"story":0, "level":0, "emoji":"🕰️", "text":"<Just> a bit of time, please"},
 {"story":0, "level":0, "emoji":"🕰️", "text":"A bit of <time>, please"},
-{"story":0, "level":0, "emoji":"🪶", "text":"<light> as a feather", "mp3":1},
-{"story":0, "level":0, "emoji":"🪶", "text":"light <as a> feather", "mp3":1},
+{"story":0, "level":0, "emoji":"🪶", "ref":"feather", "text":"<light> as a feather", "mp3":1},
+{"story":0, "level":0, "emoji":"🪶", "ref":"feather", "text":"light <as a> feather", "mp3":1},
 {"story":0, "level":0, "emoji":"🦒", "text":"The giraffe is <tall>.", "mp3":1},
 
 {"story":1, "level":0, "ref":"trapdoor", "text":"Trapdoors <can> be moved <by> pistons. <They> also block flowing water and lava."},
 {"story":1, "level":0, "ref":"frog", "text":"Frogs <will> follow you if <you> hold a slime ball, and you are closer to them than six blocks. You can <feed> them."},
 {"story":1, "level":0, "ref":"trapdoor", "text":"Mobs <think> all trapdoors are closed, and <fall> through open trapdoors. You can use this to <make> a trap."},
-{"story":1, "level":1, "ref":"cat", "text":"<Cats> do not get <hurt> by falling, <and> they can <see> you even if you are invisible."},
+{"story":1, "level":0, "ref":"egg", "text":"Foxes may appear with <an> egg in <their> mouth. If you drop <some> food, the fox will drop the egg."},
+{"story":1, "level":0, "ref":"feather", "text":"You can get a feather as a <morning> gift from your <cat> when you <wake> up."},
+{"story":1, "level":0, "ref":"mushroom", "text":"If you <put> a small mushroom on <top> of a full block where it is <dark>, it can <grow> into a huge mushroom."},
+{"story":1, "level":0, "ref":"carrot", "text":"Carrots can heal <horses>, donkeys and mules, and can also <make> them grow, but carrots <cannot> breed them."},
+{"story":1, "level":0, "ref":"carrot", "text":"In the Java version of Minecraft, there is a <bug>, and skeleton <horses> can also eat carrots."},
+{"story":1, "level":0, "ref":"fire", "text":"You can put out <fire> by powder <snow>, rain, <water>, or a cauldron."},
+{"story":1, "level":0, "ref":"fire", "text":"Fire <is> caused by lightning, <lava>, flint and <steel>, or a fire charge."},
 
 {"story":0, "level":1, "emoji":"🍱", "text":"<food>", "mp3":1},
 {"story":0, "level":1, "emoji":"🐄", "text":"<cow>", "mp3":1},
@@ -420,9 +426,9 @@
 {"story":0, "level":1, "emoji":"🛞", "text":"The <wheel> turns.", "mp3":1},
 {"story":0, "level":1, "emoji":"📎", "text":"<paper> clip", "mp3":1},
 {"story":0, "level":1, "emoji":"👦", "text":"my <brother>", "mp3":1},
-{"story":0, "level":1, "emoji":"🥕", "text":"I <would> like a carrot."},
-{"story":0, "level":1, "emoji":"🥕", "text":"I would like a <carrot>."},
-{"story":0, "level":1, "emoji":"🥕", "text":"I would like a carrot, <please>.", "mp3":1},
+{"story":0, "level":1, "emoji":"🥕", "ref":"carrot", "text":"I <would> like a carrot."},
+{"story":0, "level":1, "emoji":"🥕", "ref":"carrot", "text":"I would like a <carrot>."},
+{"story":0, "level":1, "emoji":"🥕", "ref":"carrot", "text":"I would like a carrot, <please>.", "mp3":1},
 {"story":0, "level":1, "emoji":"📥", "text":"There was nothing <in the> tray.", "mp3":1},
 {"story":0, "level":1, "emoji":"📥", "text":"There was nothing in the <tray>.", "mp3":1},
 {"story":0, "level":1, "emoji":"🧑‍🍳", "text":"The chef <works> in the kitchen"},
@@ -452,6 +458,13 @@
 {"story":1, "level":1, "ref":"frog", "text":"Frogs will <follow> you if you hold a slime ball, and you are closer to them than <six> blocks. You can <feed> them."},
 {"story":1, "level":1, "ref":"frog", "text":"Frogs will follow you if you hold a slime ball, and <you are> closer to them <than> six blocks. You <can feed> them."},
 {"story":1, "level":1, "ref":"cat", "text":"<Cats are> good to chase away phantoms and creepers. <Black> cats are <only> born during full moon."},
+{"story":1, "level":1, "ref":"cat", "text":"<Cats> do not get <hurt> by falling, <and> they can <see> you even if you are invisible."},
+{"story":1, "level":1, "ref":"cat", "text":"You can make a cat sit or <stand> by pressing the use button on it. Then the cat <does not> teleport."},
+{"story":1, "level":1, "ref":"egg", "text":"Foxes may appear with an egg <in their> mouth. If you drop <some> food, <the fox> will drop the egg."},
+{"story":1, "level":1, "ref":"feather", "text":"You can get <a feather> as a morning gift from your cat <when> you wake <up>."},
+{"story":1, "level":1, "ref":"mushroom", "text":"If you put a <small> mushroom on top of a full block <where> it is dark, it can grow into a <huge> mushroom."},
+{"story":1, "level":1, "ref":"carrot", "text":"<Carrots> can heal horses, <donkeys> and mules, and can also make them <grow>, but carrots cannot breed them."},
+{"story":1, "level":1, "ref":"carrot", "text":"In the Java version of Minecraft, <there is> a bug, and skeleton horses <can also> eat carrots."},
 
 {"story":0, "level":2, "ref":"crafting", "text":"<crafting> table"},
 {"story":0, "level":2, "emoji":"👁", "text":"<eye>", "mp3":1},
@@ -466,7 +479,7 @@
 {"story":0, "level":2, "emoji":"🐇", "text":"<Rabbits> like carrots.", "mp3":1},
 {"story":0, "level":2, "emoji":"🐇", "text":"Rabbits like <carrots>.", "mp3":1},
 {"story":0, "level":2, "emoji":"⛄️", "text":"<snowman>", "mp3":1},
-{"story":0, "level":2, "emoji":"🍄", "text":"<mushroom>", "mp3":1},
+{"story":0, "level":2, "emoji":"🍄", "ref":"mushroom", "text":"<mushroom>", "mp3":1},
 {"story":0, "level":2, "emoji":"🌈", "text":"<rainbow>", "mp3":1},
 {"story":0, "level":2, "emoji":"🐵", "text":"<monkey>", "mp3":1},
 {"story":0, "level":2, "emoji":"💧", "text":"<water>", "mp3":1},
@@ -494,7 +507,6 @@
 {"story":0, "level":2, "ref":"hangingsign", "text":"<hanging> sign"},
 {"story":0, "level":2, "ref":"cporkc", "text":"<cooked> porkchop"},
 {"story":0, "level":2, "ref":"melons", "text":"<melon slice>"},
-{"story":0, "level":2, "ref":"diamond", "text":"<diamond>"},
 {"story":0, "level":2, "emoji":"🚻", "text":"Where is the <toilet>?", "mp3":1},
 {"story":0, "level":2, "emoji":"🏖", "text":"We are going on a <holiday>!", "mp3":1},
 {"story":0, "level":2, "emoji":"🤫", "text":"Keep it a <secret>!", "mp3":1},
@@ -513,7 +525,7 @@
 {"story":0, "level":2, "emoji":"📦", "text":"A <package> arrived.", "mp3":1},
 {"story":0, "level":2, "emoji":"📦", "text":"A package <arrived>.", "mp3":1},
 {"story":0, "level":2, "emoji":"🐬", "text":"The <dolphin> likes fish.", "mp3":1},
-{"story":0, "level":2, "emoji":"💎", "text":"<diamond>", "mp3":1},
+{"story":0, "level":2, "emoji":"💎", "ref":"diamond", "text":"<diamond>", "mp3":1},
 {"story":0, "level":2, "emoji":"🪤", "text":"<Careful>! It is a trap!", "mp3":1},
 {"story":0, "level":2, "emoji":"💇🏾‍♂️", "text":"Adam needs a <haircut>.", "mp3":1},
 {"story":0, "level":2, "emoji":"🎂", "text":"It is my <birthday>!", "mp3":1},
@@ -532,6 +544,11 @@
 {"story":1, "level":2, "ref":"pufferfish", "text":"Pufferfish <live> in oceans and use <poison> to defend themselves. They <inflate> if you <get> too close."},
 {"story":1, "level":2, "ref":"sign", "text":"If you <wax> a sign, no <player> can change the text on it. Use dyes and glow ink to change <how> the text looks."},
 {"story":1, "level":2, "ref":"sign", "text":"If you wax a <sign>, no player can <change> the text on it. Use dyes and <glow ink> to change how the text looks."},
+{"story":1, "level":2, "ref":"egg", "text":"Foxes may <appear> with an egg in their <mouth>. If you drop some food, the fox <will drop> the egg."},
+{"story":1, "level":2, "ref":"diamond", "text":"You need diamonds to make <fireworks> and smithing templates to decorate the <edges> of your armour."},
+{"story":1, "level":2, "ref":"cat", "text":"You can make <a cat> sit or stand <by> pressing the use <button> on it. Then the cat does not teleport."},
+{"story":1, "level":2, "ref":"fire", "text":"You can <put out> fire by <powder> snow, rain, water, <or> a cauldron."},
+{"story":1, "level":2, "ref":"fire", "text":"Fire is <caused by> lightning, lava, <flint> and steel, or <a> fire charge."},
 
 {"story":0, "level":3, "ref":"jungle", "text":"<jungle> biome"},
 {"story":0, "level":3, "ref":"bamboo", "text":"<bamboo>"},
@@ -574,6 +591,9 @@
 {"story":1, "level":3, "ref":"sign", "text":"You can <burn> overworld signs in a <furnace>. Nether signs (crimson and warped) <cannot be> used as fuel."},
 {"story":1, "level":3, "ref":"cat", "text":"Cats are <good> to <chase> away phantoms and creepers. Black cats are only born <during> full moon."},
 {"story":1, "level":3, "ref":"trapdoor", "text":"Mobs think all <trapdoors> are closed, and fall <through> open trapdoors. You can use this to make a <trap>."},
+{"story":1, "level":3, "ref":"diamond", "text":"You need <diamonds> to make fireworks and smithing templates to <decorate> the edges <of> your armour."},
+{"story":1, "level":3, "ref":"cat", "text":"You can make a cat sit <or> stand by <pressing> the use button on it. Then the cat does not <teleport>."},
+{"story":1, "level":3, "ref":"carrot", "text":"In the Java <version> of <Minecraft>, there is a bug, and <skeleton> horses can also eat carrots."},
 
 {"story":0, "level":4, "emoji":"☑️", "text":"<preferred>", "mp3":1},
 {"story":0, "level":4, "emoji":"⛔️", "text":"Smoking is <forbidden>", "mp3":1},
@@ -586,6 +606,8 @@
 {"story":0, "level":4, "ref":"nquartz", "text":"nether <quartz>"},
 
 {"story":1, "level":4, "ref":"axolotl", "text":"An axolotl is an <aquatic> mob found in <lush caves> and sometimes in buckets. It can <assist> you in combat."},
+{"story":1, "level":4, "ref":"diamond", "text":"You need diamonds to <make> fireworks and smithing <templates> to decorate the edges of your <armour>."},
+{"story":1, "level":4, "ref":"fire", "text":"<Fire is> extinguished by <powder> snow, rain, water, or a <cauldron>."},
 
 {"story":0, "level":5, "ref":"sulphurc", "text":"<sulphur cube>"},
 {"story":0, "level":5, "ref":"levitation", "text":"<levitation>"},
@@ -656,7 +678,7 @@
 
 
     </script>
-    <script src="assets/common.js?263"></script>
+    <script src="assets/common.js?264"></script>
     <script>
 
         // Initialize keyboard
