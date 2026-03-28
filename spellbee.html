@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?264">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?274">
 
     <style>
         body { margin: .5rem 0; }
@@ -146,7 +146,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?264"></script>
+    <script src="assets/local/beelocal.js?274"></script>
 </head>
 <body>
     <div class="container">
@@ -420,7 +420,7 @@
 {"story":0, "level":1, "emoji":"🌤", "text":"<Summer>s are usually hot"},
 {"story":0, "level":1, "emoji":"💥", "text":"Something went horribly <wrong>"},
 {"story":0, "level":1, "ref":"hangingsign", "text":"hanging <sign>"},
-{"story":0, "level":1, "ref":"blaze.gif", "text":"<blaze>"},
+{"story":0, "level":1, "ref":"blaze", "text":"<blaze>"},
 {"story":0, "level":1, "ref":"witch", "text":"<witch>"},
 {"story":0, "level":1, "ref":"skeletonskull", "text":"skeleton <skull>"},
 {"story":0, "level":1, "emoji":"🛞", "text":"The <wheel> turns.", "mp3":1},
@@ -601,7 +601,7 @@
 {"story":0, "level":4, "emoji":"🤫", "text":"We must meet <secretly>"},
 {"story":0, "level":4, "emoji":"💥", "text":"Something went <horribly> wrong"},
 {"story":0, "level":4, "ref":"enchant", "text":"<enchanting> table"},
-{"story":0, "level":4, "ref":"phantom.gif", "text":"<phantom>"},
+{"story":0, "level":4, "ref":"phantom", "text":"<phantom>"},
 {"story":0, "level":4, "ref":"enderpearl", "text":"<ender pearl>"},
 {"story":0, "level":4, "ref":"nquartz", "text":"nether <quartz>"},
 
@@ -632,7 +632,7 @@
         const bee = {
             // Configuration
             app_name: 'spellbee',
-            score_goal: 20,        // controls the bar under the score and gifts
+            score_goal: 30,        // controls the bar under the score and gifts
             max_negative_score: 4, // maximum "negative" score where question doesn't give point
             // State (common)
             storage: {'players': {}},  // storage data that's saved into local storage
@@ -678,8 +678,38 @@
 
 
     </script>
-    <script src="assets/common.js?264"></script>
+    <script src="assets/common.js?274"></script>
     <script>
+    
+        const bee_current_data_version = 4; // used for new players
+        
+        function data_migration() {
+            if(bee.player === false) { console.warn('no player to migrate'); return; }
+            const pstore = bee.storage.players[bee.player];
+            let version = pstore.data_version;
+            if(version === undefined) { version = 0; }
+            
+            // [1] Migrate known_words[to_type] to known_questions[question text]
+            if(version < 4 && bee.words.length > 0) {
+                version = 4;
+                if(pstore.known_questions === undefined) { pstore.known_questions = {}; }
+                if(pstore.known_words !== undefined) {
+                    for(let i=0; i<bee.words.length; i++) {
+                        const word = get_processed_word(i).to_type;
+                        const k = pstore.known_words[word];
+                        if(k !== undefined && k != 0) {
+                            pstore.known_questions[bee.words[i].text] = k;
+                        }
+                    }
+                }
+                // alert("Migrated datastore to version "+version);
+            }
+            
+            // [2] Add further migrations here
+            
+            pstore.data_version = version;
+            save_storage('data migration');
+        }
 
         // Initialize keyboard
         $(function() {
@@ -790,7 +820,7 @@
                 'is_story': !!word_data.story, 
                 'emoji': word_data.emoji,
                 'ref': word_data.ref,
-                'add_words': add_words
+                'add_words': add_words // TODO only if story
             };
             word_data.proc_cache = proc;
             return proc;
@@ -948,23 +978,26 @@
                 
         // Mark a word as known, and count how many times it was successfully entered
         // A word is known if it could be typed without help
-        function add_known_word(word) {
-            if(!bee.storage.players[bee.player].known_words) {
-                bee.storage.players[bee.player].known_words = {};
-            }
-            if(bee.storage.players[bee.player].known_words[word] === undefined) {
-                bee.storage.players[bee.player].known_words[word] = 1;
-            } else {
-                bee.storage.players[bee.player].known_words[word]++;
-            }
+        function add_known_word() {
+            data_migration();
+            const pstore = bee.storage.players[bee.player];
+            
+            // TODO remove known_words
+            const word = bee.processed_word.to_type;
+            if(!pstore.known_words) { pstore.known_words = {}; }
+            if(pstore.known_words[word] === undefined) { pstore.known_words[word] = 1; } else { pstore.known_words[word]++; }
+            
+            const q = bee.words[bee.word_ix].text;
+            if(!pstore.known_questions) { pstore.known_questions = {}; }
+            if(pstore.known_questions[q] === undefined) { pstore.known_questions[q] = 1; } else { pstore.known_questions[q]++; }
             save_storage('add_known_word');
         }
         
         
         function reset_known_words() {
-            if(bee.storage.players[bee.player].known_words) {
-                bee.storage.players[bee.player].known_words = {};
-            }
+            const pstore = bee.storage.players[bee.player];
+            if(pstore.known_words) { pstore.known_words = {}; }
+            if(pstore.known_questions) { pstore.known_questions = {}; }
             save_storage('reset_known_words');
             alert('List of known words reset');
         }
@@ -972,19 +1005,14 @@
         
         // Return the count of successful entries of a word
         function is_known_word(word_ix) {
-            const procword = get_processed_word(word_ix);
-            const word = procword.to_type;
+            data_migration();
+            const q = bee.words[word_ix].text;
             
-            if(bee.storage.players[bee.player].known_words) {
-                const c = bee.storage.players[bee.player].known_words[word];
-                if(c === undefined) { 
-                    console.log("Known words/read:", word, "unknown word");
-                    return 0;
-                }
-                console.log("Known words/read:", word, "returning", c);
+            if(bee.storage.players[bee.player].known_questions) {
+                const c = bee.storage.players[bee.player].known_questions[q];
+                if(c === undefined) { return 0; }
                 return c;
             }
-            console.log("Known words/read:", word, "no storage");
             return 0;
         }
         
@@ -1083,7 +1111,7 @@
                         if(bee.help_asked == 0 && bee.backspace_used < (bee.processed_word.is_story ? 4 : 3)) {
                             queue_success();
                             if(bee.backspace_used < (bee.processed_word.is_story ? 3 : 2)) {
-                                add_known_word(bee.processed_word.to_type);
+                                add_known_word();
                             }
                         } else {
                             reschedule_question(bee.word_ix);
@@ -1214,9 +1242,9 @@
                     // Avoid already known words (typed without help)
                     const known_count = is_known_word(word_ix);
                     log += " known:"+known_count;
-                    if(known_count == 2 && Math.random() < .8) { log += ' no2'; continue; }
-                    if(known_count > 2 && Math.random() < .9) { log += ' no2+'; continue; }
-                    if(known_count > 5 && Math.random() < .99) { log += ' no5+'; continue; }
+                    if(known_count == 2 && Math.random() < .9) { log += ' no2'; continue; }
+                    if(known_count == 3 && Math.random() < .95) { log += ' no3'; continue; }
+                    if(known_count >= 4 && Math.random() < .99) { log += ' no4+'; continue; }
                     break;
                 }
                 problem = {'word_ix':word_ix, 'is_repeat':false};
@@ -1298,6 +1326,7 @@
                 if(o.length) { o += ','; }
                 try {
                     if(s[i] === undefined) { o += 'u'; }
+                    else if(s[i] === null) { o += 'n'; }
                     else { o += s[i].word_ix; }
                 } catch(e) {
                     o += 'ERROR';
@@ -1306,16 +1335,17 @@
             $('.d_queue').html('['+o+']');
         }
         
+        // Called if the question is answered successfully
         function queue_success() {
             get_question_queue().shift();
             save_storage('queue_success');
         }
         
-        // Schedule question to be shown 2 questions later
+        // Schedule question to be shown N questions later
         function reschedule_question(word_ix) {
             const s = get_question_queue();
             s.shift();
-            while(s.length < 2) { s.push(undefined); }
+            while(s.length < 3) { s.push(undefined); }
             s.push({'word_ix':word_ix, 'is_repeat':true});
             save_storage('schedule_question');
         }
@@ -1325,7 +1355,7 @@
             const w = get_question_queue().shift(); // undefined returned on empty
             if(w === undefined) { return undefined; }
             if(typeof(w) == 'object') {
-                if(w === null) { return undefined; } // unsure why this would happen
+                if(w === null) { return undefined; } // JSON storing turns undefined into null
                 return w; 
             }
             return undefined;
@@ -1378,7 +1408,12 @@
                     // Initialize
                     if(!bee.storage.players[bee.player]) {
                         const wordsets = choose_wordsets();
-                        bee.storage.players[bee.player] = {'score': 0, 'min_wordset': wordsets[0], 'wordsets': wordsets[1]};
+                        bee.storage.players[bee.player] = {
+                            'data_version': bee_current_data_version,
+                            'score': 0, 
+                            'min_wordset': wordsets[0], 
+                            'wordsets': wordsets[1]
+                        };
                         save_storage('init');
                     } else {
                         alert("That player already exists. Loading player data");
@@ -1387,6 +1422,7 @@
                     bee.player = $(this).data('player');
                 }
                 
+                data_migration();
                 $('.startmenu').hide();
                 $('.game').show();
                 main();
