@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?277">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?278">
 
     <style>
         body { margin: .5rem 0; }
@@ -148,7 +148,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?277"></script>
+    <script src="assets/local/beelocal.js?278"></script>
 </head>
 <body>
     <div class="container">
@@ -263,6 +263,7 @@
 {"story":0, "level":0, "emoji":"🏋️", "text":"<gym>", "mp3":1},
 {"story":0, "level":1, "emoji":"☔️", "text":"<It is> raining.", "mp3":1},
 {"story":0, "level":3, "emoji":"👻", "text":"<myth>", "mp3":1},
+{"story":0, "level":0, "ref":"cat", "text":"You can make a Minecraft cat <sit> or stand"},
 
 //o=Io
 {"story":0, "level":0, "emoji":"📦", "text":"<box>", "mp3":1},
@@ -280,6 +281,7 @@
 {"story":0, "level":0, "emoji":"🏦", "text":"<bank>", "mp3":1},
 {"story":0, "level":0, "emoji":"🪤", "text":"Careful! It is a <trap>!", "mp3":1},
 {"story":0, "level":2, "ref":"hangingsign", "text":"<hanging> sign"},
+{"story":0, "level":0, "ref":"cat", "text":"You can make a Minecraft cat sit or <stand>"},
 
 {"story":0, "level":1, "emoji":"🎃", "text":"<scary> pumpkin", "mp3":1},
 
@@ -406,6 +408,8 @@
 {"story":0, "level":1, "emoji":"🚪", "text":"<door>", "mp3":1},
 {"story":0, "level":2, "emoji":"🍿", "text":"<popcorn>", "mp3":1},
 
+{"story":0, "level":0, "emoji":"🙅🏼‍♂️", "text":"I don't want any <more>!"},
+
 // ar
 {"story":0, "level":0, "emoji":"🦈", "text":"<shark>", "mp3":1},
 {"story":0, "level":0, "emoji":"💳", "text":"pay with <card>", "mp3":1},
@@ -425,6 +429,7 @@
 {"story":0, "level":1, "emoji":"👶", "text":"<baby>", "mp3":1},
 {"story":0, "level":1, "emoji":"👨🏻‍🍼", "text":"feeding the <baby>", "mp3":1},
 {"story":0, "level":3, "emoji":"🕵️", "text":"<mystery>", "mp3":1},
+{"story":0, "level":3, "emoji":"🕵️", "text":"It's a <mystery>", "mp3":1},
 
 
 // o
@@ -442,6 +447,7 @@
 {"story":0, "level":1, "emoji":"⬛️", "text":"<black>", "mp3":1},
 {"story":0, "level":1, "emoji":"🐤", "text":"<chick>", "mp3":1},
 {"story":0, "level":3, "ref":"command", "text":"command <block>"},
+{"story":0, "level":1, "ref":"pillager", "text":"The village is under <attack>!"},
 
 // th
 {"story":0, "level":0, "emoji":"📦", "text":"It's a <thing>", "mp3":1},
@@ -450,7 +456,8 @@
 {"story":0, "level":1, "emoji":"👄", "text":"<mouth>", "mp3":1},
 {"story":0, "level":0, "emoji":"👦", "text":"my <brother>", "mp3":1},
 {"story":0, "level":3, "emoji":"🪥", "text":"<toothbrush>", "mp3":1},
-
+{"story":0, "level":0, "ref":"trial", "text":"<There>'s something under me!"},
+{"story":0, "level":2, "ref":"trial", "text":"<There's> something under me!"},
 
 // ph
 {"story":0, "level":0, "emoji":"📱", "text":"Call the <phone>", "mp3":1},
@@ -468,9 +475,12 @@
 {"story":0, "level":1, "emoji":"🏞️", "text":"<river>", "mp3":1},
 {"story":0, "level":2, "emoji":"🪜", "text":"climb up the <ladder>", "mp3":1},
 {"story":0, "level":2, "emoji":"🕷", "text":"<spider>", "mp3":1},
+{"story":0, "level":0, "ref":"pillager", "text":"The village is <under> attack!"},
+{"story":0, "level":0, "ref":"trial", "text":"There's something <under> me!"},
 
 // $kn
 {"story":0, "level":1, "emoji":"🪢", "text":"<knot>", "mp3":1},
+{"story":0, "level":1, "emoji":"🤷🏼", "text":"I don't <know>"},
 
 // igh
 {"story":0, "level":1, "emoji":"🌃", "text":"Good <night>!", "mp3":1},
@@ -509,6 +519,13 @@
 
 // Common words
 {"story":0, "level":0, "emoji":"🦻🏽", "text":"I hear <you>", "mp3":1},
+{"story":0, "level":2, "ref":"pillager", "text":"<The> village is under attack!"},
+{"story":0, "level":0, "emoji":"🙅🏼‍♂️", "text":"I don't want <any> more!"},
+{"story":0, "level":1, "emoji":"🙅🏼‍♂️", "text":"I <don't> want any more!"},
+{"story":0, "level":1, "emoji":"🙅🏼‍♂️", "text":"I don't <want> any more!"},
+{"story":0, "level":0, "emoji":"🤷🏼", "text":"<I> don't know"},
+{"story":0, "level":1, "emoji":"🤷🏼", "text":"I <don't> know"},
+{"story":0, "level":0, "ref":"trial", "text":"There's something under <me>!"},
 
 // Tricky words
 {"story":0, "level":0, "ref":"zombiehead", "text":"zombie <head>"},
@@ -803,7 +820,7 @@
 
 
     </script>
-    <script src="assets/common.js?277"></script>
+    <script src="assets/common.js?278"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
