@@ -1,5 +1,5 @@
 
-const bee_app_version = 282;
+const bee_app_version = 284;
         
 if(typeof(bee_local) !== 'undefined' && bee_local.check_version) { bee_local.check_version(); }
 
@@ -130,7 +130,7 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
             while(true) {
                 videos_remaining = videos.filter((v) => videos_seen.indexOf(v) == -1);
                 if(videos_remaining.length == 0) {
-                    for(let i=0; i<6; i++) { videos_seen.shift(); }
+                    for(let i=0; i<8; i++) { videos_seen.shift(); }
                     continue;
                 }
                 break;

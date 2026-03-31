@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?282">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?284">
 
     <style>
         body { margin: .5rem 0; }
@@ -148,7 +148,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?282"></script>
+    <script src="assets/local/beelocal.js?284"></script>
 </head>
 <body>
     <div class="container">
@@ -814,8 +814,6 @@
             giftlist: -1,  // state: which gift is shown when viewing them
             // State (spellbee)
             words: [],  // words in the selected level range
-            word_weights_cumulative: false, // weight limits to select words by level
-            word_weight_sum: false, // sum of weights to select words by level
             class_to_ix: false, // {wordclass:[word_ix, ...
             problem: false, // current problem {word_ix:, is_repeat:, is_reveal:}
             processed_word: false,
@@ -848,7 +846,7 @@
 
 
     </script>
-    <script src="assets/common.js?282"></script>
+    <script src="assets/common.js?284"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1455,8 +1453,9 @@
                     const ixs = bee.class_to_ix[word_class];
                     if(ixs === undefined) { log += ' class_not_found'; break; }
                     if(ixs.length == 0) { log += ' class_empty'; break; }
-                    word_ix = ixs[Math.floor(Math.random() * ixs.length)];
-                    log += ' wix:'+word_ix;
+                    // Choose using levels
+                    word_ix = choose_using_levels(ixs);
+                    log += ' wix:'+word_ix+" lev:"+bee.words[word_ix].level;
                     // ensure we choose a new word (check the queue)
                     if(trials > 0) {
                         let dupl = false;
@@ -1472,13 +1471,9 @@
                     break;
                 }
                 
-                if(word_class === undefined) { // first word, use levels
-                    const weight_point = Math.random() * bee.word_weight_sum;
-                    word_ix = undefined;
-                    for(let i=0; i<bee.words.length; i++) {
-                        if(weight_point < bee.word_weights_cumulative[i]) { word_ix = i; break; }
-                    }
-                    if(word_ix === undefined) { word_ix = bee.words.length - 1; }
+                if(word_class === undefined) { // first word
+                    // Choose using levels
+                    word_ix = choose_using_levels(undefined); // undefined:from all words
                     log += " wix:"+word_ix+" lev:"+bee.words[word_ix].level;
                     // ensure we choose a new word (check the queue)
                     if(bee.words.length > 1 && trials > 0) {
@@ -1535,7 +1530,7 @@
                 
                 const word_ixs = bee.class_to_ix[word_class];
                 if(word_ixs !== undefined && word_ixs.length > 0) {
-                    const desired_number_of_words = Math.min(3, word_ixs.length); // Aim for groups of 4
+                    const desired_number_of_words = Math.min(4, word_ixs.length); // Aim for groups of 5
                     log += ' desired:'+desired_number_of_words;
                     for(let j=0; j<desired_number_of_words; j++) {
                         const group_word = try_get_new_word(word_class);
@@ -1573,15 +1568,6 @@
                 }
             }
 
-            // Weights to choose words by level
-            out.word_weights_cumulative = [];
-            out.word_weight_sum = 0;
-            for(let i=0; i<out.words.length; i++) {
-                const w = Math.pow(2, -out.words[i].level);
-                out.word_weight_sum += w;
-                out.word_weights_cumulative.push(out.word_weight_sum);
-            }
-            
             // Classes
             out.class_to_ix = {};
             for(let i=0; i<out.words.length; i++) {
@@ -1598,6 +1584,33 @@
             return out;
         }
         
+
+        // Choose an item using the levels from the list of word indices or all words if undefined
+        function choose_using_levels(list_of_wordix) {
+            const word_weights_cumulative = [];
+            let word_weight_sum = 0;
+
+            // Get list of cumulative weights
+            const loop_limit = (list_of_wordix === undefined ? bee.words.length : list_of_wordix.length);
+            for(let i=0; i<loop_limit; i++) {
+                const word_ix = (list_of_wordix === undefined ? i : list_of_wordix[i]);
+                const w = Math.pow(2, -bee.words[word_ix].level);
+                word_weight_sum += w;
+                word_weights_cumulative.push(word_weight_sum);
+            }
+            
+            const weight_point = Math.random() * word_weight_sum;
+            let ix_chosen = undefined;
+            for(let i=0; i<loop_limit; i++) {
+                if(weight_point < word_weights_cumulative[i]) { ix_chosen = i; break; }
+            }
+            if(ix_chosen === undefined) { ix_chosen = loop_limit - 1; }
+            
+            const word_ix_chosen = (list_of_wordix === undefined ? ix_chosen : list_of_wordix[ix_chosen]);
+            if(word_ix_chosen === undefined) { console.error("choose_using_levels", list_of_wordix, weight_point, ix_chosen); }
+            return word_ix_chosen;
+        }
+        
         
         function init_wordlist() {
             const min_wordset = bee.storage.players[bee.player].min_wordset; // min level
@@ -1606,8 +1619,6 @@
             
             const r = init_wordlist_impl(min_wordset, max_wordset);
             bee.words = r.words;
-            bee.word_weights_cumulative = r.word_weights_cumulative;
-            bee.word_weight_sum = r.word_weight_sum;
             bee.class_to_ix = r.class_to_ix;
             
             $('.d_wordsets').html(
