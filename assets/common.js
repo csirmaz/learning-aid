@@ -1,5 +1,5 @@
 
-const bee_app_version = 286;
+const bee_app_version = 289;
         
 if(typeof(bee_local) !== 'undefined' && bee_local.check_version) { bee_local.check_version(); }
 
@@ -119,25 +119,28 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
         
         // Play a video as a reward. Return if an alternative reward should be shown.
         function play_video(callback) {
-            if(videos.length == 0) { return true; } // true: show default reward
-            
-            // Choose unseen video
-            if(bee.storage.players[bee.player].videos_seen === undefined) {
-                bee.storage.players[bee.player].videos_seen = [];
-            }
-            const videos_seen = bee.storage.players[bee.player].videos_seen;
-            let videos_remaining;
-            while(true) {
-                videos_remaining = videos.filter((v) => videos_seen.indexOf(v) == -1);
-                if(videos_remaining.length == 0) {
-                    for(let i=0; i<8; i++) { videos_seen.shift(); }
-                    continue;
+            let video_file = undefined;
+            if(typeof(bee_local) !== 'undefined' && bee_local.choose_video) { video_file = bee_local.choose_video(); }
+            if(video_file === undefined) {
+                if(videos.length == 0) { return true; } // true: show default reward
+                // Choose unseen video
+                if(bee.storage.players[bee.player].videos_seen === undefined) {
+                    bee.storage.players[bee.player].videos_seen = [];
                 }
-                break;
+                const videos_seen = bee.storage.players[bee.player].videos_seen;
+                let videos_remaining;
+                while(true) {
+                    videos_remaining = videos.filter((v) => videos_seen.indexOf(v) == -1);
+                    if(videos_remaining.length == 0) {
+                        for(let i=0; i<8; i++) { videos_seen.shift(); }
+                        continue;
+                    }
+                    break;
+                }
+                const video_ix = Math.floor(Math.random() * videos_remaining.length);
+                video_file = videos_remaining[video_ix];
+                videos_seen.push(video_file);
             }
-            const video_ix = Math.floor(Math.random() * videos_remaining.length);
-            const video_file = videos_remaining[video_ix];
-            videos_seen.push(video_file);
             save_storage('videos_seen', true); // true == skip hook
 
             const $wrap = $('<div class="video_w2"><div class="videoclose">X</div></div>');
