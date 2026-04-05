@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?292">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?295">
 
     <style>
         body { margin: .5rem 0; }
@@ -148,7 +148,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?292"></script>
+    <script src="assets/local/beelocal.js?295"></script>
 </head>
 <body>
     <div class="container">
@@ -889,7 +889,6 @@
             $input: $('.prompt .infield .inp'),
             $help: $('.prompt .infield .help'),
             $helpwait: $('.prompt .infield .helpwait'),
-            word_audio: false,
             word_audio_timeout: false
         };
 
@@ -912,7 +911,7 @@
 
 
     </script>
-    <script src="assets/common.js?292"></script>
+    <script src="assets/common.js?295"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1192,26 +1191,28 @@
             }
             
             const help_duration_loading = 1800; // duration of the loading animation
-            const help_duration_1 = (is_initial ? 700 : 1200) + bee.processed_word.to_display.length * 160; // full color
-            const help_duration_2 = 1500; // fading
+            const help_duration_1 = (is_initial ? 700 : 1200) + bee.processed_word.to_display.length * 120; // full color, max time while playing
+            const help_duration_2 = 800 + bee.processed_word.to_display.length * 60; // fading
+            const help_duration_3 = 700; // nothing shown
             const help_duration_enable = 4400; // time to enable help again
 
             setTimeout(function() {
                 bee.$helpwait.hide();
                 bee.$help.show();
-                play_word();
-                setTimeout(function() {
+                play_word(function() {
                     bee.$help.fadeOut({duration: help_duration_2, complete: function() {
-                        bee.$input.show();
-                        bee.can_type = true;
-                        console.log("Scheduling enabling help");
-                        bee.help_timeout = setTimeout(function(){ 
-                            console.log("Enabling help");
-                            bee.can_use_help = true;
-                            bee.help_timeout = false;
-                        }, help_duration_enable);
+                        setTimeout(function() {
+                            bee.$input.show();
+                            bee.can_type = true;
+                            console.log("Scheduling enabling help");
+                            bee.help_timeout = setTimeout(function(){ 
+                                console.log("Enabling help");
+                                bee.can_use_help = true;
+                                bee.help_timeout = false;
+                            }, help_duration_enable);
+                        }, help_duration_3);
                     }});
-                }, help_duration_1); // initial wait while showing the word
+                }, help_duration_1, is_initial);
             }, is_initial ? 0 : help_duration_loading);
         }
         
@@ -1258,10 +1259,17 @@
         
 
         // Play the mp3 assigned to a word
-        function play_word(callback) {
+        function play_word(callback, max_timeout, force) {
             let s = bee.processed_word.to_display;
 
-            if(bee.word_audio_timeout !== false) { return; } // prevent playing word too frequently
+            if(force && bee.word_audio_timeout !== false) {
+                clearTimeout(bee.word_audio_timeout);
+                bee.word_audio_timeout = false;
+            }
+            if(bee.word_audio_timeout !== false) { // prevent playing word too frequently
+                console.log("skipping play_word due to timeout");
+                return; 
+            }
             bee.word_audio_timeout = setTimeout(function() { bee.word_audio_timeout = false; }, 3000);
             
             if(bee.processed_word.use_tts) {
@@ -1270,16 +1278,26 @@
             }
             
             s = s.toLowerCase().replaceAll(/ /g, '_').replaceAll(/[^a-z_]/g, '');
-            file = 'assets/sounds/words/'+s+'.mp3';
-            if(bee.word_audio === false) {
-                bee.word_audio = new Audio(audio.success[0].file);
-                bee.word_audio.volume = 1;
-            }
+            const file = 'assets/sounds/words/'+s+'.mp3';
+            
+            let has_ended = false;
+            const do_end = function(){
+                if(has_ended) { return; }
+                has_ended = true;
+                if(callback) { callback(); }
+            };
+            
+            if(max_timeout !== undefined) { setTimeout(do_end, max_timeout); }
+            const word_audio = new Audio(audio.success[0].file);
+            word_audio.volume = 1;            
             try {
-                bee.word_audio.src = file;
-                bee.word_audio.play();
+                word_audio.src = file;
+                word_audio.addEventListener('ended', (e) => { do_end(); });
+                word_audio.addEventListener('stalled', (e) => { do_end(); });
+                word_audio.play();
             } catch(e) {
                 console.log("Error during play_word", e);
+                do_end();
             }
         }
         
@@ -1395,7 +1413,7 @@
                             success_common({'skip_this_score':bee.problem.is_repeat});
                         };
 
-                        if(bee.processed_word.is_story && !bee.problem.is_reveal) { play_word(on_success); } else { on_success(); }
+                        if(bee.processed_word.is_story && !bee.problem.is_reveal) { play_word(on_success, undefined, true); } else { on_success(); }
                     }
                 }
                 return;
