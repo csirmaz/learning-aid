@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?289">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?292">
 
     <style>
         body {
@@ -164,7 +164,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?289"></script>
+    <script src="assets/local/beelocal.js?292"></script>
 </head>
 <body>
     <div class="container">
@@ -622,7 +622,7 @@
                 const a = RND(2, 12);
                 const b = RND(2, 12);
                 let problems = [];
-                for(let bb=b; bb<=b+4; bb++) {
+                for(let bb=b; bb<=b+3; bb++) {
                     problems.push(get_multiplication_problem(a, bb>12?bb-11:bb));
                 }
                 return {type: 'problem_list', problems: problems};
@@ -734,7 +734,7 @@
                 [PRBL.add_big_carry, 20],
                 [PRBL.add_big_small, 10],
                 [PRBL.add_hundreds, 10],
-                [PRBL.multiply, 20],
+                [PRBL.multiply, 10],
                 [PRBL.halving, 8],
                 [PRBL.halving_whole_ph, 4],
                 [PRBL.halving_whole_phi, 4],
@@ -806,7 +806,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?289"></script>
+    <script src="assets/common.js?292"></script>
     <script>
 
         

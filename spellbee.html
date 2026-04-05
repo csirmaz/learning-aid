@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?289">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?292">
 
     <style>
         body { margin: .5rem 0; }
@@ -148,7 +148,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?289"></script>
+    <script src="assets/local/beelocal.js?292"></script>
 </head>
 <body>
     <div class="container">
@@ -335,7 +335,7 @@
 
 // oo=U   di:ooU
 {"story":0, "level":0, "emoji":"🦶", "text":"smelly <foot>", "mp3":1, "class":["di:ooU"]},
-{"story":0, "level":0, "ref":"book", "text":"enchanting <book>", "class":["di:ooU"]},
+{"story":0, "level":0, "ref":"enchantedbook", "text":"enchanted <book>", "class":["di:ooU"]},
 {"story":0, "level":0, "ref":"bookshelf", "text":"<bookshelf>", "class":["di:ooU"]},
 {"story":0, "level":1, "emoji":"🍪", "text":"<cookie>", "mp3":1, "class":["di:ooU", "end:ie"]},
 {"story":0, "level":2, "ref":"cporkc", "text":"<cooked> porkchop", "class":["di:ooU"]},
@@ -716,6 +716,8 @@
 {"story":0, "level":3, "ref":"potion", "text":"<potion>", "class":["cons:ti"]},
 {"story":0, "level":5, "ref":"levitation", "text":"<levitation>", "class":["cons:ti"]},
 {"story":0, "level":3, "emoji":"🏃🏾‍♂️‍➡️", "text":"<competition>", "class":["cons:ti"]},
+{"story":0, "level":4, "ref":"tnt", "text":"<destruction>", "class":["cons:ti"]},
+{"story":0, "level":4, "emoji":"💌", "text":"<invitation>", "class":["cons:ti"]},
 
 
 // ly$   end:ly
@@ -910,7 +912,7 @@
 
 
     </script>
-    <script src="assets/common.js?289"></script>
+    <script src="assets/common.js?292"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1474,19 +1476,9 @@
             $('.prompt .infield').toggleClass('infield_story', !!bee.processed_word.is_story);
             bee.$input.removeClass('success');
             
-            if(!bee.problem.is_reveal) {
-                bee.can_type = true;
-                bee.can_use_help = true;
-                show_help(true);
-            } else {
-                bee.can_type = false;
-                bee.can_use_help = false;
-                const repeat = ["Let's type it in again!", "Let's do it once more!", "Could you type it in again?", "Let's type it this way"];
-                bee_tts.speak(repeat[Math.floor(Math.random()*repeat.length)], function() {
-                    bee.can_type = true;
-                    bee.can_use_help = true;
-                });
-            }
+            bee.can_type = true;
+            bee.can_use_help = true;
+            show_help(true);
         }
         
         
@@ -1752,7 +1744,7 @@
             while(s.length < 3) { s.push(undefined); }
             s.splice(3, 0, {'word_ix':problem.word_ix, 'is_repeat':true, 'is_reveal':false});
             if(add_reveal) {
-                s.splice(0, 0, {'word_ix':problem.word_ix, 'is_repeat':true, 'is_reveal':true});
+                s.splice(1, 0, {'word_ix':problem.word_ix, 'is_repeat':true, 'is_reveal':true});
             }
             save_storage('schedule_question');
         }
