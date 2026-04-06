@@ -1,5 +1,5 @@
 
-const bee_app_version = 328;
+const bee_app_version = 330;
 
 call_local_hook('check_version', []);
 
@@ -365,7 +365,7 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
         function gift_label_to_img(l) {
             if(String(l)[0] == 'L') {
                 l = l.substring(1, l.length) - 0;
-                if(local_hook_callable('local_gifts')) {
+                if(local_hook_has('local_gifts')) {
                     return bee_local.local_gifts[l];
                 }
                 return 'assets/images/unknown_gift.png';
