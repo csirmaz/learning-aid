@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?330">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?331">
 
     <style>
         body {
@@ -164,7 +164,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?330"></script>
+    <script src="assets/local/beelocal.js?331"></script>
 </head>
 <body>
     <div class="container">
@@ -815,7 +815,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?330"></script>
+    <script src="assets/common.js?331"></script>
     <script>
 
         
@@ -961,13 +961,12 @@
                 if((value - 0) == bee.problem.solution) { // Success!
                     end_question('success');
                     manage_level_stats('success');
-                    if(!(bee.problem.hint 
-                        && bee.problem.hint.speak_solution
-                        && bee_tts.speak(bee.problem.hint.speak_solution, function() {
+                    if(bee.problem.hint && bee.problem.hint.speak_solution) {
+                        bee_tts.speak(bee.problem.hint.speak_solution, function() {
                             if(success_common({'fast_to_next_question':true})
                                 == 'level_complete') { manage_level_stats('reset'); }
-                        })
-                    )) {
+                        });
+                    } else {
                         if(success_common({}) == 'level_complete') { manage_level_stats('reset'); }
                     }
                 }
@@ -1146,7 +1145,10 @@
 
             // Another cheat: switching to the calculator app and reload page
             const cqt = bee.storage.players[bee.player].current_question_time;
-            if(cqt !== undefined && Date.now() - cqt < 3*60*1000) { penalty_delay(false, 'reload page'); }
+            if(cqt !== undefined && Date.now() - cqt < 3*60*1000) {
+                console.log('current_question_time penalty', cqt, Date.now() - cqt);
+                penalty_delay(false, 'reload page'); 
+            }
             bee.storage.players[bee.player].current_question_time = Date.now();
             save_storage('set_question_qtime', true); // true = skip hook
             
@@ -1259,12 +1261,11 @@
             store_question(bee.queued_problems); // This is modified now
 
             if(reason == 'failed' || reason == 'timeout') {
-                if(!(bee.problem.hint
-                    && bee.problem.hint.speak_failed
-                    && bee_tts.speak(bee.problem.hint.speak_failed, function() {
+                if(bee.problem.hint && bee.problem.hint.speak_failed) {
+                    bee_tts.speak(bee.problem.hint.speak_failed, function() {
                         setTimeout(function(){ new_question(reason); }, 600);
-                    })
-                )) {
+                    });
+                } else {
                     setTimeout(function(){ new_question(reason); }, 2000);
                 }
             }
