@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?295">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?328">
 
     <style>
         body {
@@ -164,7 +164,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?295"></script>
+    <script src="assets/local/beelocal.js?328"></script>
 </head>
 <body>
     <div class="container">
@@ -622,7 +622,7 @@
                 const a = RND(2, 12);
                 const b = RND(2, 12);
                 let problems = [];
-                for(let bb=b; bb<=b+3; bb++) {
+                for(let bb=b; bb<b+3; bb++) {
                     problems.push(get_multiplication_problem(a, bb>12?bb-11:bb));
                 }
                 return {type: 'problem_list', problems: problems};
@@ -733,7 +733,7 @@
                 [PRBL.add_big_no_carry, 10],
                 [PRBL.add_big_carry, 20],
                 [PRBL.add_big_small, 10],
-                [PRBL.add_hundreds, 10],
+                [PRBL.add_hundreds, 5],
                 [PRBL.multiply, 10],
                 [PRBL.halving, 8],
                 [PRBL.halving_whole_ph, 4],
@@ -778,21 +778,30 @@
                 skip_timeout: false
             }
         };
+
+        function local_hook_has(hook_name) {
+            return (typeof(bee_local) !== 'undefined' && bee_local[hook_name]);
+        }
         
+        function call_local_hook(hook_name, args) {
+            if(local_hook_has(hook_name)) {
+                return bee_local[hook_name].apply(null, args);
+            }
+            return undefined;
+        }
+
         // Try to load data
         if(localStorage[bee.app_name]) {
             bee.storage = JSON.parse(localStorage[bee.app_name]);
-            if(typeof(bee_local) !== 'undefined' && bee_local.loaded_hook) {
-                bee_local.loaded_hook(bee.app_name);
-            }
+            call_local_hook('loaded_hook', [bee.app_name]);
         }
 
         function save_storage(msg, skip_hook) {
             console.log("  Saving storage", msg, skip_hook);
             const s = JSON.stringify(bee.storage);
             localStorage[bee.app_name] = s;
-            if((!skip_hook) && typeof(bee_local) !== 'undefined' && bee_local.save_hook) {
-                bee_local.save_hook(s);
+            if(!skip_hook) { 
+                call_local_hook('save_hook', [s]);
             }            
         }
 
@@ -806,7 +815,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?295"></script>
+    <script src="assets/common.js?328"></script>
     <script>
 
         
@@ -1145,6 +1154,7 @@
             manage_question_timeout(true); // true = at new question
             
             manage_level_stats('problem');
+            call_local_hook('start_question_hook', []);
         }
 
         
@@ -1283,9 +1293,7 @@
             const p = choose_problemset();
             bee.storage.players[bee.player].problemset = p;
 
-            if(typeof(bee_local) !== 'undefined' && bee_local.problemset_hook) {
-                bee_local.problemset_hook(p);
-            }
+            call_local_hook('problemset_hook', [p]);
             
             bee.queued_problems = [];
             store_question(bee.queued_problems);
@@ -1355,6 +1363,7 @@
         
         
     </script>
+    <div class="footercontent"></div>
 
 </body>
 </html>

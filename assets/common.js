@@ -1,7 +1,7 @@
 
-const bee_app_version = 295;
-        
-if(typeof(bee_local) !== 'undefined' && bee_local.check_version) { bee_local.check_version(); }
+const bee_app_version = 328;
+
+call_local_hook('check_version', []);
 
 function shuffle(array) {  // in-place
     for (let i = array.length - 1; i > 0; i--) {
@@ -82,7 +82,7 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
         // Videos played at times as a reward
         let videos = [
         ];
-        if(typeof(bee_local) !== 'undefined' && bee_local.local_videos) {
+        if(local_hook_has('local_videos')) {
             videos = videos.concat(bee_local.local_videos);
         }
         
@@ -96,7 +96,7 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
                 window.location.reload(true);
                 return;
             }
-            if(typeof(bee_local) !== 'undefined' && bee_local.check_version) { bee_local.check_version(); }            
+            call_local_hook('check_version', []);
         }
         
         
@@ -120,7 +120,7 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
         // Play a video as a reward. Return if an alternative reward should be shown.
         function play_video(callback) {
             let video_file = undefined;
-            if(typeof(bee_local) !== 'undefined' && bee_local.choose_video) { video_file = bee_local.choose_video(); }
+            if(local_hook_has('choose_video')) { video_file = bee_local.choose_video(); }
             if(video_file === undefined) {
                 if(videos.length == 0) { return true; } // true: show default reward
                 // Choose unseen video
@@ -365,7 +365,7 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
         function gift_label_to_img(l) {
             if(String(l)[0] == 'L') {
                 l = l.substring(1, l.length) - 0;
-                if(typeof(bee_local) !== 'undefined' && bee_local.local_gifts) {
+                if(local_hook_callable('local_gifts')) {
                     return bee_local.local_gifts[l];
                 }
                 return 'assets/images/unknown_gift.png';
@@ -384,7 +384,7 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
             
             // Load list of available gifts
             let local_gifts = [];
-            if(typeof(bee_local) !== 'undefined' && bee_local.local_gifts) {
+            if(local_hook_has('local_gifts')) {
                 local_gifts = bee_local.local_gifts;
             }
             
@@ -396,7 +396,7 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
             
             // Choose gift we can give. Number: normal gift, L+number: local gift
             let gix = false;
-            if(typeof(bee_local) !== 'undefined' && bee_local.choose_gift_hook) {
+            if(local_hook_has('choose_gift_hook')) {
                 gix = bee_local.choose_gift_hook(giftarray);
             }
             if(gix === false) {
@@ -453,7 +453,7 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
 
             // level complete logic (see "L" below)
             if(score !== '_SKIPPED_' && score % bee.score_goal == 0) {
-                if(typeof(bee_local) !== 'undefined' && bee_local.level_hook) { bee_local.level_hook(score); }
+                call_local_hook('level_hook', [score]);
                 play_rnd_sound('level_complete');
                 bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 300}).then(
                     function() { 

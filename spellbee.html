@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?295">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?328">
 
     <style>
         body { margin: .5rem 0; }
@@ -148,7 +148,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?295"></script>
+    <script src="assets/local/beelocal.js?328"></script>
 </head>
 <body>
     <div class="container">
@@ -594,7 +594,7 @@
 {"story":0, "level":1, "emoji":"👶", "text":"<baby>", "mp3":1, "class":["end:y@"]},
 {"story":0, "level":1, "emoji":"👨🏻‍🍼", "text":"feeding the <baby>", "mp3":1, "class":["end:y@"]},
 {"story":0, "level":3, "emoji":"🕵️", "text":"<mystery>", "mp3":1, "class":["end:y@"]},
-{"story":0, "level":3, "emoji":"🕵️", "text":"It's a <mystery>", "mp3":1, "class":["end:y@"]},
+{"story":0, "level":3, "emoji":"🕵️", "text":"It's a <mystery>", "class":["end:y@"]},
 {"story":0, "level":3, "emoji":"🏭", "text":"She works in a <factory>.", "mp3":1, "class":["end:y@", "lax:a"]},
 {"story":0, "level":0, "emoji":"🍬", "text":"sweet <candy>", "mp3":1, "class":["end:y@"]},
 {"story":0, "level":2, "emoji":"🪫", "text":"The machine ran out of <battery>", "class":["end:y@", "lax:a", "lax:dbl"]},
@@ -891,27 +891,36 @@
             $helpwait: $('.prompt .infield .helpwait'),
             word_audio_timeout: false
         };
+        
+        function local_hook_has(hook_name) {
+            return (typeof(bee_local) !== 'undefined' && bee_local[hook_name]);
+        }
+        
+        function call_local_hook(hook_name, args) {
+            if(local_hook_has(hook_name)) {
+                return bee_local[hook_name].apply(null, args);
+            }
+            return undefined;
+        }
 
         // Try to load data
         if(localStorage[bee.app_name]) {
             bee.storage = JSON.parse(localStorage[bee.app_name]);
-            if(typeof(bee_local) !== 'undefined' && bee_local.loaded_hook) {
-                bee_local.loaded_hook(bee.app_name);
-            }
+            call_local_hook('loaded_hook', [bee.app_name]);
         }
 
         function save_storage(msg, skip_hook) {
             console.log("  Saving storage", msg, skip_hook);
             const s = JSON.stringify(bee.storage);
             localStorage[bee.app_name] = s;
-            if((!skip_hook) && typeof(bee_local) !== 'undefined' && bee_local.save_hook) {
-                bee_local.save_hook(s);
+            if(!skip_hook) { 
+                call_local_hook('save_hook', [s]);
             }            
         }
 
 
     </script>
-    <script src="assets/common.js?295"></script>
+    <script src="assets/common.js?328"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1140,7 +1149,9 @@
                             if(wrongchar) { o += '</span>'; }
                             if(wrap_at[i]) { o += '<br>'; }
                         } else { // The user is still to type this
-                            if(typed_ix == bee.typed.length) { o += '<span class="cursor_outer"><span class="cursor"></span></span>'; } // add cursor at beginning if no char typed
+                            if(typed_ix == bee.typed.length) { 
+                                o += '<span class="cursor_outer"><span class="cursor"></span></span>';
+                            } 
                             if(bee.problem.is_reveal) {
                                 o += '<span class="reveal_totype">';
                                 o += (s[i] == ' ' && (!bee.processed_word.is_story) ? '&nbsp;' : esc_html(s[i]));
@@ -1176,6 +1187,8 @@
             if(bee.processed_word.is_story) {
                 bee.$help.hide();
                 bee.$input.show();
+                update_input_field();
+                call_local_hook('keyboard_press_hook', [undefined]);
                 return; 
             }
             
@@ -1203,6 +1216,8 @@
                     bee.$help.fadeOut({duration: help_duration_2, complete: function() {
                         setTimeout(function() {
                             bee.$input.show();
+                            update_input_field();
+                            call_local_hook('keyboard_press_hook', [undefined]);
                             bee.can_type = true;
                             console.log("Scheduling enabling help");
                             bee.help_timeout = setTimeout(function(){ 
@@ -1306,6 +1321,7 @@
             const $keyelem = $(selector);
             $keyelem.addClass('kbactive');
             setTimeout(function(){ $keyelem.removeClass('kbactive'); }, 200);
+            call_local_hook('keyboard_press_hook', [$keyelem]);
         }
         
         
@@ -1405,9 +1421,9 @@
                             queue_success();
                         }
                         
-                        /* if(typeof(bee_local) !== 'undefined' && bee_local.success_hook) {
-                            bee_local.success_hook(bee.problem.word_ix, bee.words[bee.problem.word_ix].text, bee.player, bee.help_asked, -1);
-                        } */
+                        /* 
+                        call_local_hook('success_hook', [bee.problem.word_ix, bee.words[bee.problem.word_ix].text, bee.player, bee.help_asked, -1]);
+                        */
 
                         const on_success = function() {
                             success_common({'skip_this_score':bee.problem.is_repeat});
@@ -1463,7 +1479,7 @@
             bee.processed_word = get_processed_word(bee.problem.word_ix);
 
             // Show picture
-            if(bee.processed_word.ref !== undefined && typeof(bee_local) !== 'undefined' && bee_local.emoji_ref) {
+            if(bee.processed_word.ref !== undefined && local_hook_has('emoji_ref')) {
                 bee.$image.html(bee_local.emoji_ref(bee.processed_word.ref));
             }
             else {
@@ -1490,12 +1506,13 @@
                 $('.prompt .addwords').html(render_addwords()).show();
                 $('.kbdiv .kbhelp').css({'visibility': 'hidden'}); // TTS works fine but let's force reading
             }
-            update_input_field();
+            bee.$input.html('');
             $('.prompt .infield').toggleClass('infield_story', !!bee.processed_word.is_story);
             bee.$input.removeClass('success');
             
             bee.can_type = true;
             bee.can_use_help = true;
+            call_local_hook('start_question_hook', []);
             show_help(true);
         }
         
@@ -1786,9 +1803,7 @@
             const wordsets = choose_wordsets();
             bee.storage.players[bee.player].min_wordset = wordsets[0];
             bee.storage.players[bee.player].wordsets = wordsets[1];
-            if(typeof(bee_local) !== 'undefined' && bee_local.problemset_hook) {
-                bee_local.problemset_hook(String(wordsets));
-            }
+            call_local_hook('problemset_hook', [String(wordsets)]);
             purge_question_queue();
             save_storage('modify_wordlist');
             init_wordlist();
@@ -1850,6 +1865,7 @@
         }, 200);
         
     </script>
+    <div class="footercontent"></div>
 
 </body>
 </html>
