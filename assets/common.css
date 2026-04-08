@@ -58,7 +58,9 @@ body.condense .scorewrap { zoom: 70%; }
 }
 .gifts.opened .close { display: inline-block; }
 
-.gifts .needed {
+.gifts .needed,
+.score .needed {
+    z-index: 1;
     display: inline-block;
     background: #eee;
     font-size: 1rem;

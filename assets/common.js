@@ -1,5 +1,5 @@
 
-const bee_app_version = 339;
+const bee_app_version = 345;
 
 call_local_hook('check_version', []);
 
@@ -204,6 +204,7 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
             // bar
             $('.score .bar .barfill').css('width', ((score % bee.score_goal) / bee.score_goal * 100.)+'%');
             $('.score').toggleClass('goal_reached', score >= bee.score_goal);
+            $('.score .needed').html(bee.score_goal - (score % bee.score_goal));
             
             // remaining to next gift
             if(bee.storage.players[bee.player].lifetime_score !== undefined
