@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?345">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?346">
 
     <style>
         body { margin: .5rem 0; }
@@ -148,7 +148,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?345"></script>
+    <script src="assets/local/beelocal.js?346"></script>
 </head>
 <body>
     <div class="container">
@@ -249,7 +249,7 @@
 {"story":0, "level":0, "emoji":"🔔", "ref":"bell", "text":"ring the <bell>", "mp3":1, "class":["lax:e"]},
 {"story":0, "level":0, "emoji":"🦶", "text":"<smelly> foot", "mp3":1, "class":["lax:e", "end:y@", "lax:dbl"]},
 
-// i,y=I lax:i
+// i=I lax:i
 {"story":0, "level":0, "emoji":"🐬", "text":"The dolphin likes <fish>.", "mp3":1, "class":["lax:i"]},
 {"story":0, "level":0, "emoji":"🏊", "text":"<swim>", "mp3":1, "class":["lax:i"]},
 {"story":0, "level":0, "emoji":"📌", "text":"<pin>", "mp3":1, "class":["lax:i"]},
@@ -268,9 +268,12 @@
 {"story":0, "level":2, "emoji":"🖥", "text":"<system> error", "class":["lax:i"]},
 {"story":0, "level":1, "emoji":"🥝", "text":"<kiwi>", "mp3":1, "class":["lax:i"]},
 {"story":0, "level":1, "emoji":"🍟", "text":"I want <chips>!", "mp3":1, "class":["lax:i"]},
+{"story":0, "level":0, "emoji":"🍟", "text":"I want chips <with> ketchup!", "class":["lax:i"]},
 {"story":0, "level":1, "emoji":"😽", "text":"Cat <gives> kiss.", "mp3":1, "class":["lax:i"]},
+{"story":0, "level":0, "emoji":"💳", "text":"pay <with> card", "mp3":1, "class":["lax:i"]},
+{"story":0, "level":0, "emoji":"👨🏻‍🎤", "text":"He <is> a rapper", "class":["lax:i", "common"]},
 
-
+// y=I lax:y
 {"story":0, "level":0, "emoji":"🏋️", "text":"<gym>", "mp3":1, "class":["lax:y"]},
 {"story":0, "level":3, "emoji":"👻", "text":"<myth>", "mp3":1, "class":["lax:y"]},
 {"story":0, "level":3, "emoji":"🏜️", "text":"<pyramid>", "mp3":1, "class":["lax:y"]},
@@ -286,7 +289,7 @@
 {"story":0, "level":0, "emoji":"🛑", "text":"<stop>", "mp3":1, "class":["lax:o"]},
 {"story":0, "level":2, "emoji":"🏖", "text":"We are going on a <holiday>!", "mp3":1, "class":["lax:o", "di:ay"]},
 {"story":0, "level":2, "emoji":"🐵", "text":"<monkey>", "mp3":1, "class":["lax:o"]},
-
+{"story":0, "level":1, "emoji":"🍫", "text":"<chocolate>", "class":["lax:o"]},
 
 // a=ae lax:a
 {"story":0, "level":0, "emoji":"🐈‍", "ref":"cat", "text":"<cat>", "mp3":1, "class":["lax:a"]},
@@ -297,6 +300,7 @@
 {"story":0, "level":0, "emoji":"🪤", "text":"Careful! It is a <trap>!", "mp3":1, "class":["lax:a"]},
 {"story":0, "level":2, "ref":"hangingsign", "text":"<hanging> sign", "class":["lax:a"]},
 {"story":0, "level":0, "ref":"cat", "text":"You can make a Minecraft cat sit or <stand>", "class":["lax:a"]},
+{"story":0, "level":1, "emoji":"👨🏻‍🎤", "text":"He is a <rapper>", "class":["lax:a", "lax:dbl"]},
 
 {"story":0, "level":1, "emoji":"🎃", "text":"<scary> pumpkin", "mp3":1, "class":["lax:a"]},
 {"story":0, "level":2, "emoji":"🪤", "text":"<Careful>! It is a trap!", "mp3":1, "class":["lax:a"]},
@@ -311,6 +315,8 @@
 {"story":0, "level":1, "emoji":"🎃", "text":"scary <pumpkin>", "mp3":1, "class":["lax:u"]},
 {"story":0, "level":1, "emoji":"🏃‍♂️‍➡️", "text":"He is <running>.", "mp3":1, "class":["lax:u", "lax:dbl"]},
 {"story":0, "level":2, "emoji":"🍄", "ref":"mushroom", "text":"<mushroom>", "mp3":1, "class":["lax:u"]},
+{"story":0, "level":2, "emoji":"🍟", "text":"I want chips with <ketchup>!", "class":["lax:u"]},
+
 
 {"story":0, "level":1, "ref":"skeletonskull", "text":"skeleton <skull>", "class":["lax:u"]},
 
@@ -490,6 +496,8 @@
 // tense:e
 {"story":0, "level":3, "emoji":"🇪🇬", "text":"<Egypt>", "mp3":1, "class":["tense:e"]},
 {"story":0, "level":1, "ref":"steve", "text":"I am <Steve>", "class":["tense:e"]},
+{"story":0, "level":0, "emoji":"👨🏻‍🎤", "text":"<He> is a rapper", "class":["tense:e", "common"]},
+{"story":0, "level":0, "emoji":"👩‍🔧", "text":"<She> works in a factory.", "mp3":1, "class":["tense:e", "common"]},
 {"story":0, "level":2, "emoji":"🎞️", "text":"Let's pause the <video>", "class":["tense:e"]},
 
 // i=aI tense:i
@@ -503,6 +511,7 @@
 {"story":0, "level":3, "ref":"itemframe", "text":"<item frame>", "class":["tense:i", "tense:a"]},
 {"story":0, "level":2, "emoji":"📦", "text":"A package <arrived>.", "mp3":1, "class":["tense:i"]},
 {"story":0, "level":5, "ref":"jungle", "text":"jungle <biome>", "class":["tense:i"]},
+{"story":0, "level":0, "emoji":"🍟", "text":"<I> want chips with ketchup!", "class":["tense:i", "common"]},
 // y=aI tense:y
 {"story":0, "level":0, "emoji":"😢", "text":"<cry>", "mp3":1, "class":["tense:y"]},
 {"story":0, "level":0, "emoji":"🪰", "text":"<fly>", "mp3":1, "class":["tense:y"]},
@@ -798,6 +807,7 @@
 {"story":1, "level":0, "ref":"frog", "text":"Frogs <will> follow you if <you> hold a slime ball, and you are closer to them than six blocks. You can <feed> them.", "class":["common", "di:ee"]},
 {"story":1, "level":1, "ref":"carrot", "text":"In the Java version of Minecraft, <there is> a bug, and skeleton horses <can also> eat carrots.", "class":["common", "cons:th"]},
 {"story":1, "level":0, "ref":"egg", "text":"Foxes may appear with <an> egg in <their> mouth. If you drop <some> food, the fox will drop the egg.", "class":["common"]},
+{"story":1, "level":0, "ref":"egg", "text":"Foxes may appear <with> an egg in their mouth. If <you> drop some food, the fox <will> drop the egg.", "class":["common", "lax:i"]},
 
 
 // Tricky words  tricky
@@ -929,7 +939,7 @@
 
 
     </script>
-    <script src="assets/common.js?345"></script>
+    <script src="assets/common.js?346"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
