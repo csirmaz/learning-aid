@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?346">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?348">
 
     <style>
         body { margin: .5rem 0; }
@@ -148,7 +148,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?346"></script>
+    <script src="assets/local/beelocal.js?348"></script>
 </head>
 <body>
     <div class="container">
@@ -248,6 +248,7 @@
 {"story":0, "level":0, "emoji":"🥚", "ref":"egg", "text":"<egg>", "mp3":1, "class":["lax:e"]},
 {"story":0, "level":0, "emoji":"🔔", "ref":"bell", "text":"ring the <bell>", "mp3":1, "class":["lax:e"]},
 {"story":0, "level":0, "emoji":"🦶", "text":"<smelly> foot", "mp3":1, "class":["lax:e", "end:y@", "lax:dbl"]},
+{"story":0, "level":2, "emoji":"⬅️", "text":"turn <left>", "class":["lax:e"]},
 
 // i=I lax:i
 {"story":0, "level":0, "emoji":"🐬", "text":"The dolphin likes <fish>.", "mp3":1, "class":["lax:i"]},
@@ -272,6 +273,7 @@
 {"story":0, "level":1, "emoji":"😽", "text":"Cat <gives> kiss.", "mp3":1, "class":["lax:i"]},
 {"story":0, "level":0, "emoji":"💳", "text":"pay <with> card", "mp3":1, "class":["lax:i"]},
 {"story":0, "level":0, "emoji":"👨🏻‍🎤", "text":"He <is> a rapper", "class":["lax:i", "common"]},
+{"story":0, "level":2, "emoji":"🧑‍🍳", "text":"The chef works in the <kitchen>", "class":["lax:i"]},
 
 // y=I lax:y
 {"story":0, "level":0, "emoji":"🏋️", "text":"<gym>", "mp3":1, "class":["lax:y"]},
@@ -290,6 +292,8 @@
 {"story":0, "level":2, "emoji":"🏖", "text":"We are going on a <holiday>!", "mp3":1, "class":["lax:o", "di:ay"]},
 {"story":0, "level":2, "emoji":"🐵", "text":"<monkey>", "mp3":1, "class":["lax:o"]},
 {"story":0, "level":1, "emoji":"🍫", "text":"<chocolate>", "class":["lax:o"]},
+{"story":0, "level":1, "emoji":"💥", "text":"<Something> went horribly wrong", "class":["cons:th", "lax:o"]},
+
 
 // a=ae lax:a
 {"story":0, "level":0, "emoji":"🐈‍", "ref":"cat", "text":"<cat>", "mp3":1, "class":["lax:a"]},
@@ -396,7 +400,6 @@
 {"story":1, "level":3, "ref":"frog", "text":"<Frogs> live <in> swamps. They use their long <tongues> to <eat> small slimes and small magma cubes.", "class":["di:ea"]},
 {"story":1, "level":2, "ref":"frog", "text":"When a frog <eats> a magma cube, you get a froglight. Different frog <types> make <different> coloured lights.", "class":["di:ea", "lax:dbl", "tense:y"]},
 
-
 {"story":0, "level":3, "emoji":"🧚‍♂️", "text":"<appear>", "mp3":1, "class":["di:ea"]},
 
 
@@ -411,6 +414,9 @@
 {"story":0, "level":1, "ref":"furnace", "text":"The food is <ready>", "class":["di:eae"]},
 {"story":0, "level":2, "emoji":"↔️", "text":"<instead>", "class":["di:eae"]},
 {"story":1, "level":1, "ref":"feather", "text":"You can get <a feather> as a morning gift from your cat <when> you wake <up>.", "class":["di:eae", "cons:th"]},
+
+{"story":0, "level":3, "ref":"polarbear", "text":"<polar bear>", "class":["di:eae", "tense:o"]},
+{"story":0, "level":1, "emoji":"🧸", "text":"teddy <bear>", "class":["di:eae"]},
 
 
 // ow=^U di:ow
@@ -465,6 +471,7 @@
 {"story":0, "level":0, "emoji":"🪶", "ref":"feather", "text":"<light> as a feather", "mp3":1, "class":["t:igh"]},
 {"story":0, "level":1, "emoji":"🌃", "text":"Good <night>!", "mp3":1, "class":["t:igh"]},
 {"story":1, "level":3, "ref":"frog", "text":"When a <frog> eats a magma cube, you get a <froglight>. Different frog types make different coloured <lights>.", "class":["t:igh"]},
+{"story":0, "level":2, "emoji":"➡️", "text":"turn <right>", "class":["t:igh"]},
 
 
 // --- tense monograph ---
@@ -512,6 +519,8 @@
 {"story":0, "level":2, "emoji":"📦", "text":"A package <arrived>.", "mp3":1, "class":["tense:i"]},
 {"story":0, "level":5, "ref":"jungle", "text":"jungle <biome>", "class":["tense:i"]},
 {"story":0, "level":0, "emoji":"🍟", "text":"<I> want chips with ketchup!", "class":["tense:i", "common"]},
+{"story":0, "level":2, "emoji":"🧗", "text":"<climb> up", "mp3":1, "class":["tense:i"]},
+{"story":0, "level":2, "emoji":"🪜", "text":"<climb up> the ladder", "mp3":1, "class":["tense:i", "lax:u"]},
 // y=aI tense:y
 {"story":0, "level":0, "emoji":"😢", "text":"<cry>", "mp3":1, "class":["tense:y"]},
 {"story":0, "level":0, "emoji":"🪰", "text":"<fly>", "mp3":1, "class":["tense:y"]},
@@ -571,7 +580,7 @@
 {"story":0, "level":2, "ref":"netherportal", "text":"nether <portal>", "class":["br:or", "end:al@"]},
 {"story":1, "level":0, "ref":"carrot", "text":"In the Java version of Minecraft, there is a <bug>, and skeleton <horses> can also eat carrots.", "class":["lax:u", "br:or"]},
 
-// ar=(I:  br:ar
+// ar=(]:  br:ar
 {"story":0, "level":0, "emoji":"🦈", "text":"<shark>", "mp3":1, "class":["br:ar"]},
 {"story":0, "level":0, "emoji":"💳", "text":"pay with <card>", "mp3":1, "class":["br:ar"]},
 {"story":0, "level":0, "emoji":"🚗", "text":"<car>", "mp3":1, "class":["br:ar"]},
@@ -591,12 +600,20 @@
 {"story":0, "level":1, "emoji":"🛞", "text":"The wheel <turns>.", "mp3":1, "class":["br:ur3"]},
 {"story":1, "level":1, "ref":"cat", "text":"<Cats> do not get <hurt> by falling, <and> they can <see> you even if you are invisible.", "class":["br:ur3", "di:ee"]},
 {"story":0, "level":2, "emoji":"🖼", "text":"<picture>", "mp3":1, "class":["br:ur3"]},
+{"story":0, "level":2, "emoji":"➡️", "text":"<turn> right", "class":["br:ur3"]},
+{"story":0, "level":2, "ref":"fire", "text":"The fire <burns>", "class":["br:ur3"]},
 
-//   br:eai@
-{"story":0, "level":1, "emoji":"👂", "text":"<ear>", "mp3":1, "class":["br:eai@"]},
-{"story":0, "level":1, "emoji":"🦻🏽", "text":"I <hear> you", "mp3":1, "class":["br:eai@"]},
-{"story":0, "level":1, "emoji":"🗓️", "text":"A <year> later", "mp3":1, "class":["br:eai@"]},
+//   br:ea:i@
+{"story":0, "level":1, "emoji":"👂", "text":"<ear>", "mp3":1, "class":["br:ea:i@"]},
+{"story":0, "level":1, "emoji":"🦻🏽", "text":"I <hear> you", "mp3":1, "class":["br:ea:i@"]},
+{"story":0, "level":1, "emoji":"🗓️", "text":"A <year> later", "mp3":1, "class":["br:ea:i@"]},
 
+// air = e@   br:ai:e@
+{"story":0, "level":2, "emoji":"💇🏾‍♂️", "text":"Adam needs a <haircut>.", "mp3":1, "class":["br:ai:e@", "lax:u"]},
+{"story":0, "level":2, "emoji":"☴", "text":"<air>", "class":["br:ai:e@"]},
+{"story":0, "level":2, "emoji":"👱‍♀️", "text":"long <hair>", "class":["br:ai:e@"]},
+{"story":0, "level":2, "emoji":"😡", "text":"It's not <fair>!", "class":["br:ai:e@"]},
+{"story":0, "level":2, "emoji":"🧑🏽‍🐰‍🧑🏼", "text":"<pair>", "class":["br:ai:e@"]},
 
 // --------- schwa -------------------
 
@@ -682,6 +699,7 @@
 {"story":0, "level":3, "emoji":"🦒", "text":"The <giraffe> is tall.", "mp3":1, "class":["cons:dZ"]},
 {"story":1, "level":1, "ref":"mushroom", "text":"If you put a <small> mushroom on top of a full block <where> it is dark, it can grow into a <huge> mushroom.", "class":["dark:al", "cons:gZ"]},
 {"story":1, "level":2, "ref":"diamond", "text":"You need diamonds to make <fireworks> and smithing templates to decorate the <edges> of your armour.", "class":["cons:gZ", "tense:i"]},
+{"story":1, "level":2, "ref":"sign", "text":"If you wax a <sign>, no player can <change> the text on it. Use dyes and <glow> ink to change how the text looks.", "class":["tense:a", "cons:gZ", "di:ow@"]},
 
 // ck cons:ck
 {"story":0, "level":0, "emoji":"🪨", "text":"<rock>", "mp3":1, "class":["cons:ck"]},
@@ -725,7 +743,7 @@
 // $kn  beg:kn
 {"story":0, "level":1, "emoji":"🪢", "text":"<knot>", "mp3":1, "class":["beg:kn"]},
 {"story":0, "level":1, "emoji":"🤷🏼", "text":"I don't <know>", "class":["beg:kn", "di:ow@"]},
-{"story":0, "level":1, "emoji":"♞", "text":"<knight>", "class":["beg:kn"]},
+{"story":0, "level":1, "emoji":"♞", "text":"<knight>", "class":["beg:kn", "t:igh"]},
 {"story":0, "level":1, "ref":"bookshelf", "text":"<knowledge> is power", "class":["beg:kn", "cons:gZ"]},
 
 // $wr
@@ -817,11 +835,15 @@
 {"story":0, "level":1, "emoji":"👩‍🦰", "text":"one <woman>", "mp3":1, "class":["tricky"]},
 {"story":0, "level":2, "emoji":"👭", "text":"two <women>", "mp3":1, "class":["tricky"]},
 {"story":0, "level":2, "emoji":"💧", "text":"<water>", "mp3":1, "class":["tricky"]},
+{"story":0, "level":2, "emoji":"🍉", "text":"<watermelon>", "mp3":1, "class":["tricky"]},
 {"story":0, "level":3, "emoji":"😸", "text":"Finally the cat had <enough> to eat", "class":["tricky"]},
 {"story":0, "level":1, "emoji":"🤨", "text":"The car broke down <again>.", "class":["tricky"]},
 {"story":0, "level":1, "emoji":"🪧", "ref":"sign", "text":"<sign>", "mp3":1, "class":["tricky"]},
 {"story":0, "level":1, "ref":"hangingsign", "text":"hanging <sign>", "class":["tricky"]},
+// ear=(]:
 {"story":0, "level":2, "emoji":"❤️", "text":"<heart>", "mp3":1, "class":["tricky"]},
+{"story":0, "level":0, "emoji":"👞", "text":"<shoe>", "mp3":1, "class":["tricky"]},
+{"story":0, "level":1, "ref":"witch", "text":"<witch>", "class":["tricky"]},
 // ea=eI .....
 {"story":0, "level":1, "emoji":"⛏", "text":"It can <break> stone", "mp3":1, "class":["tricky"]},
 // ou ......
@@ -837,6 +859,7 @@
 {"story":1, "level":1, "ref":"egg", "text":"Foxes may appear with an egg <in their> mouth. If you drop <some> food, <the fox> will drop the egg.", "class":["cons:th", "common", "lax:o"]},
 {"story":1, "level":0, "ref":"fire", "text":"You can put out <fire> by powder <snow>, rain, <water>, or a cauldron.", "class":["tricky", "di:ow@", "tense:i"]},
 
+// calendar
 {"story":1, "level":2, "emoji":"🗓️", "text":"The weekend is <Saturday> and <Sunday>", "class":["calendar", "lax:u", "di:ay", "lax:a"]},
 {"story":1, "level":2, "emoji":"🗓️", "text":"Friday, <Saturday>, <Sunday>", "class":["calendar", "lax:u", "di:ay", "lax:a"]},
 {"story":1, "level":2, "emoji":"🗓️", "text":"The workweek starts with <Monday>, then it's <Tuesday>", "class":["calendar", "lax:o", "di:ay"]},
@@ -848,25 +871,8 @@
 
 
 
-
-
-
-{"story":0, "level":0, "emoji":"👞", "text":"<shoe>", "mp3":1},
-{"story":0, "level":1, "emoji":"💥", "text":"<Something> went horribly wrong"},
-{"story":0, "level":1, "ref":"witch", "text":"<witch>"},
-
-
-
-{"story":0, "level":2, "emoji":"🧗", "text":"<climb> up", "mp3":1},
-{"story":0, "level":2, "emoji":"🪜", "text":"<climb up> the ladder", "mp3":1},
-{"story":0, "level":2, "emoji":"🍉", "text":"<watermelon>", "mp3":1},
-{"story":0, "level":2, "emoji":"🧑‍🍳", "text":"The chef works in the <kitchen>"},
-{"story":0, "level":2, "emoji":"💇🏾‍♂️", "text":"Adam needs a <haircut>.", "mp3":1},
-{"story":0, "level":3, "ref":"polarbear", "text":"<polar bear>"},
-
-{"story":1, "level":2, "ref":"pufferfish", "text":"Pufferfish live in <oceans> and use poison to <defend> themselves. They inflate <if> you get too close."},
-{"story":1, "level":2, "ref":"sign", "text":"If you wax a <sign>, no player can <change> the text on it. Use dyes and <glow ink> to change how the text looks."},
-
+// unclassified
+{"story":1, "level":3, "ref":"pufferfish", "text":"Pufferfish live in <oceans> and use poison to <defend> themselves. They inflate <if> you get too close."},
 {"story":1, "level":3, "ref":"diamond", "text":"You need <diamonds> to make fireworks and smithing templates to <decorate> the edges <of> your armour."},
 
 {"story":0, "level":4, "emoji":"☑️", "text":"<preferred>", "mp3":1},
@@ -939,7 +945,7 @@
 
 
     </script>
-    <script src="assets/common.js?346"></script>
+    <script src="assets/common.js?348"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
