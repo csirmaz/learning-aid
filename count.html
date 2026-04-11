@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?354">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?355">
 
     <style>
         body {
@@ -164,7 +164,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?354"></script>
+    <script src="assets/local/beelocal.js?355"></script>
 </head>
 <body>
     <div class="container">
@@ -354,13 +354,17 @@
                 ))))))))))))))))))));
 
         }
+        
+        function multipl_group_help(a, b) {
+            return {in_group:(b==5?b:a), groups:(b==5?a:b), row_length:(b==5||a==5?2:1)};
+        }
 
         function get_multiplication_problem(a, b) {
             return {problem: a+'*'+b+'=', solution:(a*b), hint:{
                 speak_prompt: ''+a+' times '+b+'',
                 speak_solution: speak_multiplication(a, b, true),
                 speak_failed: speak_multiplication(a, b, false),
-                groups: {in_group:(b==5?b:a), groups:(b==5?a:b), row_length:(b==5||a==5?2:1)},
+                groups: multipl_group_help(a, b),
                 help_speech: multiply_hint(a, b)
             }}; 
         }
@@ -641,7 +645,7 @@
                 return {problem: '?*2='+a, placeholder: true, solution:(a/2), hint:{
                     speak_prompt: 'What taken twice is '+_n(a)+'?',
                     speak_solution: speak_yes()+_n(a/2)+' times two is '+_n(a),
-                    range:[1,a,-1,-1]
+                    groups: multipl_group_help(a/2, 2)
                 }};
             },
             halving_whole_phi: function() {  // e.g. [2]x?=8
@@ -649,7 +653,7 @@
                 return {problem: '2*?='+a, placeholder: true, solution:(a/2), hint:{
                     speak_prompt: 'Two taken how many times is '+_n(a)+'?',
                     speak_solution: speak_yes()+'two times '+_n(a/2)+' is '+_n(a),
-                    range:[1,a,-1,-1]
+                    groups: multipl_group_help(2, a/2)
                 }};
             },
             third_whole: function() {  // e.g. 9/[3]=
@@ -657,7 +661,7 @@
                 return {problem: a+'/3=', placeholder: false, solution:(a/3), hint:{
                     speak_prompt: 'What is '+_n(a)+' divided by three?',
                     speak_solution: speak_yes()+'The third of '+_n(a)+' is '+_n(a/3),
-                    range:[1,a,-1,-1]
+                    groups: multipl_group_help(a/3, 3)
                 }};
             },
             third_whole_ph: function() {  // e.g. ?x[3]=9
@@ -665,7 +669,7 @@
                 return {problem: '?*3='+a, placeholder: true, solution:(a/3), hint:{
                     speak_prompt: 'What taken three times is '+_n(a)+'?',
                     speak_solution: speak_yes()+_n(a/3)+' times three is '+_n(a),
-                    range:[1,a,-1,-1]
+                    groups: multipl_group_help(a/3, 3)
                 }};
             },
             third_whole_phi: function() {  // e.g. [3]x?=9
@@ -673,7 +677,7 @@
                 return {problem: '3*?='+a, placeholder: true, solution:(a/3), hint:{
                     speak_prompt: 'Three taken how many times is '+_n(a)+'?',
                     speak_solution: speak_yes()+'Three times '+_n(a/3)+' is '+_n(a),
-                    range:[1,a,-1,-1]
+                    groups: multipl_group_help(3, a/3)
                 }};
             },
             fifth_whole: function() {  // e.g. 9/[5]=
@@ -681,7 +685,7 @@
                 return {problem: a+'/5=', placeholder: false, solution:(a/5), hint:{
                     speak_prompt: 'What is '+a+' divided by five?',
                     speak_solution: speak_yes()+'The fifth of '+a+' is '+_n(a/5),
-                    range:[1,a,-1,-1]
+                    groups: multipl_group_help(a/5, 5)
                 }};
             },
             fifth_whole_ph: function() {  // e.g. ?x[5]=25
@@ -689,7 +693,7 @@
                 return {problem: '?*5='+a, placeholder: true, solution:(a/5), hint:{
                     speak_prompt: 'What taken five times is '+a+'?',
                     speak_solution: speak_yes()+_n(a/5)+' times five is '+a,
-                    range:[1,a,-1,-1]
+                    groups: multipl_group_help(a/5, 5)
                 }};
             },
             fifth_whole_phi: function() {  // e.g. [5]x?=25
@@ -697,7 +701,7 @@
                 return {problem: '5*?='+a, placeholder: true, solution:(a/5), hint:{
                     speak_prompt: 'Five taken how many times is '+a+'?',
                     speak_solution: speak_yes()+'Five times '+_n(a/5)+' is '+a,
-                    range:[1,a,-1,-1]
+                    groups: multipl_group_help(5, a/5)
                 }};
             },
         };
@@ -816,7 +820,7 @@
         $('.hintloader').hide();
 
     </script>
-    <script src="assets/common.js?354"></script>
+    <script src="assets/common.js?355"></script>
     <script>
 
         
