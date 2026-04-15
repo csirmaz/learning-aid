@@ -1,5 +1,5 @@
 
-const bee_app_version = 355;
+const bee_app_version = 359;
 
 call_local_hook('check_version', []);
 
@@ -720,6 +720,17 @@ Music by <a href="https://pixabay.com/users/fassounds-3433550/?utm_source=link-a
             if(giftarray === undefined || giftarray.length == 0) { return false; }
             bee.giftlist++;
             if(bee.giftlist >= giftarray.length) { bee.giftlist = 0; }
+            $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
+            return false;
+        });
+        
+        // Go to previous gift
+        $('.giftlist .list .prev').on('click', function() {
+            if(bee.giftlist == -1) { return false; }
+            const giftarray = bee.storage.players[bee.player].gifts;
+            if(giftarray === undefined || giftarray.length == 0) { return false; }
+            bee.giftlist--;
+            if(bee.giftlist <= 0) { bee.giftlist = giftarray.length - 1; }
             $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
             return false;
         });

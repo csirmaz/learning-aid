@@ -184,6 +184,7 @@ body.condense .prompt { padding-top: 3rem; }
 }
 
 .giftlist .list .next,
+.giftlist .list .prev,
 .giftlist .list .exchange {
     border: 2px solid #555;
     border-radius: 1rem;
@@ -193,9 +194,19 @@ body.condense .prompt { padding-top: 3rem; }
     vertical-align: bottom;
     display: block;
     position: absolute;
-    right: 1rem;
     top: 5rem;
     background:rgba(255,255,255,.3);
+}
+
+.giftlist .list .next,
+.giftlist .list .exchange {
+    right: 1rem;
+}
+
+.giftlist .list .prev {
+    left: 1rem;
+    font-size: 1rem;
+    line-height: 1.5rem;
 }
 
 .giftlist .list .exchange {
