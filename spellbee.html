@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?369">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?370">
 
     <style>
         body { margin: .5rem 0; }
@@ -148,7 +148,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?369"></script>
+    <script src="assets/local/beelocal.js?370"></script>
 </head>
 <body>
     <div class="container">
@@ -963,7 +963,7 @@
 
 
     </script>
-    <script src="assets/common.js?369"></script>
+    <script src="assets/common.js?370"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1320,11 +1320,11 @@
                 if(typeof(level_counts[wlevel]) == 'undefined') { level_counts[wlevel] = 0; }
                 if(typeof(known_counts[wlevel]) == 'undefined') { known_counts[wlevel] = 0; }
                 level_counts[wlevel]++;
-                if(is_known_word(i) >= 2) { known_counts[wlevel]++; }
+                if(is_known_word(i) >= 3) { known_counts[wlevel]++; }
             }
             let o = '';
             for(let i=0; i<level_counts.length; i++) {
-                if(o.length) { o += ','; }
+                if(o.length) { o += ', '; }
                 o += known_counts[i] + '/' + level_counts[i];
             }
             return '('+o+')';
@@ -1613,8 +1613,9 @@
         function known_score_to_choice(score) {
             let limit = 0;
             if(score < 2) { return true; }
-            if(score == 2) { limit = .9; }
-            else if(score == 3) { limit = .95; }
+            if(score == 2) { limit = .8; }
+            else if(score == 3) { limit = .9; }
+            else if(score == 4) { limit = .95; }
             else { limit = .99; }
             return (Math.random() > limit);
         }
@@ -1773,7 +1774,7 @@
             const loop_limit = (list_of_wordix === undefined ? bee.words.length : list_of_wordix.length);
             for(let i=0; i<loop_limit; i++) {
                 const word_ix = (list_of_wordix === undefined ? i : list_of_wordix[i]);
-                const w = Math.pow(2, -bee.words[word_ix].level);
+                const w = Math.pow(1.5, -bee.words[word_ix].level);
                 word_weight_sum += w;
                 word_weights_cumulative.push(word_weight_sum);
             }
