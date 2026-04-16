@@ -1,5 +1,5 @@
 
-const bee_app_version = 359;
+const bee_app_version = 364;
 
 call_local_hook('check_version', []);
 
@@ -184,6 +184,17 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
                 if(a2.includes(a1[i])) { return true; }
             }
             return false;
+        }
+        
+        
+        function check_url(url, callback) {
+            $.ajax({
+                type: 'HEAD',
+                url: url,
+                success: function(){ callback(true); },
+                error: function(){ callback(false); },
+                timeout: 1000
+            });
         }
 
 
@@ -627,7 +638,7 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
                 return true;
             } catch(e) {
                 console.log("TTS speak error", e);
-                setTimeout(callback, 1000);
+                if(callback) { setTimeout(callback, 1000); }
                 return false;
             }
         };
