@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?367">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?368">
 
     <style>
         body { margin: .5rem 0; }
@@ -148,7 +148,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?367"></script>
+    <script src="assets/local/beelocal.js?368"></script>
 </head>
 <body>
     <div class="container">
@@ -958,7 +958,7 @@
 
 
     </script>
-    <script src="assets/common.js?367"></script>
+    <script src="assets/common.js?368"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1304,6 +1304,24 @@
                 return c;
             }
             return 0;
+        }
+        
+        
+        function get_stats_of_known_words() {
+            const level_counts = [];
+            const known_counts = [];
+            for(let i=0; i<bee.words.length; i++) {
+                const wlevel = bee.words[i].level;
+                if(typeof(level_counts[wlevel]) == 'undefined') { level_counts[wlevel] = 0; }
+                if(typeof(known_counts[wlevel]) == 'undefined') { known_counts[wlevel] = 0; }
+                level_counts[wlevel]++;
+                if(is_known_word(i)) { known_counts[wlevel]++; }
+            }
+            let o = '';
+            for(let i=0; i<level_counts.length; i++) {
+                o += known_counts[i] + '/' + level_counts[i] + ';';
+            }
+            return o;
         }
         
 
@@ -1705,27 +1723,23 @@
             render_question_queue();
             start_question2(problem); // the first word
         }
-        
-        
-        // Choose a range of word sets to show words from
-        function choose_wordsets() {
-            let min_wordset = prompt("What range of levels sets should we use?\nType a number for the bottom end of the range") - 0;
-            if(isNaN(min_wordset)) { min_wordset = 0; }
-            let max_wordset = prompt("Type a number from "+min_wordset+" for the top end of the range") - 0;
-            if(isNaN(max_wordset)) { max_wordset = 0; }
-            return [min_wordset, max_wordset];
-        }
-        
+
         
         function init_wordlist_impl(min_level, max_level) {
             const out = {};
             
             out.words = [];
+            out.level_counts = [];
             for(let i=0; i<word_repository.length; i++) {
-                if(word_repository[i].level >= min_level && word_repository[i].level <= max_level) {
+                const wlevel = word_repository[i].level;
+                if(wlevel >= min_level && wlevel <= max_level) {
                     out.words.push(word_repository[i]);
+                    
+                    if(typeof(out.level_counts[wlevel]) == 'undefined') { out.level_counts[wlevel] = 0; }
+                    out.level_counts[wlevel]++;
                 }
             }
+            console.log("NUMBER OF WORDS PER LEVEL", out.level_counts);
 
             // Classes
             out.class_to_ix = {};
@@ -1779,6 +1793,7 @@
             const r = init_wordlist_impl(min_wordset, max_wordset);
             bee.words = r.words;
             bee.class_to_ix = r.class_to_ix;
+            bee.level_counts = r.level_counts;
             
             $('.d_wordsets').html(
                 esc_html(min_wordset) + " to " + 
@@ -1864,7 +1879,17 @@
             }
             return undefined;
         }
-        
+
+
+        // Choose a range of word sets to show words from
+        function choose_wordsets() {
+            let min_wordset = prompt("What range of levels sets should we use?\nType a number for the bottom end of the range") - 0;
+            if(isNaN(min_wordset)) { min_wordset = 0; }
+            let max_wordset = prompt("Type a number from "+min_wordset+" for the top end of the range") - 0;
+            if(isNaN(max_wordset)) { max_wordset = 0; }
+            return [min_wordset, max_wordset];
+        }
+
         
         function modify_wordlist() {
             if(bee.player === false) { alert("Choose a player first"); return; }
