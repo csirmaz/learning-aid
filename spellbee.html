@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?375">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?376">
 
     <style>
         body { margin: .5rem 0; }
@@ -57,7 +57,7 @@
             background: #fffae4;
             margin: 1rem 0;
         }
-        .prompt .addwords span {
+        .prompt .addwords .word {
             display: inline-block;
             border: 1px solid #05b;
             color: #05b;
@@ -73,13 +73,16 @@
 
         .prompt .infield .help { color: #05b; }
         .prompt .infield .help .help_totype  { background: #fff; text-decoration: underline solid #cfa .2rem; text-underline-offset: .6rem; }
+        .prompt .infield .help .help_totype.help_classhighlight { color: #b38; }
         .prompt .infield_story .story_totype { background: #fff; text-decoration: underline solid #cfa .2rem; text-underline-offset: .3rem; color: #fff; }
         .prompt .infield .reveal_totype      { background: #fff; text-decoration: underline solid #cfa .2rem; text-underline-offset: .6rem; color: #ccc; }
+        .prompt .infield .reveal_totype.help_classhighlight { color: #fac; }
         .prompt .infield_story .reveal_totype  { text-underline-offset: .3rem; }
         
         .prompt .infield .inp { color: #000; }
         .prompt .infield .inp .spacehelp { color: #ccc; }
         body .prompt .infield .success { color: #090; }
+        body .prompt .infield .success .typed_classhighlight { color: #b38; }
         .prompt .infield .helpwait { display: none; }
 
         @keyframes blink-animation { to { visibility: hidden; } }
@@ -148,7 +151,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?375"></script>
+    <script src="assets/local/beelocal.js?376"></script>
 </head>
 <body>
     <div class="container">
@@ -231,6 +234,72 @@
         */
         // Use e.g. https://getemoji.com/
         // Use e.g. https://ttsmp3.com/ to generate TTS
+        
+        // Regexes that highlight parts of the word based on the class
+        // If there are no matching groups, highlight whole word, otherwise the matching groups
+        const class_highlight_rules = {
+            "lax:e": "e",
+            "lax:i": "i",
+            "lax:y": "y",
+            "lax:o": "o",
+            "lax:u": "u",
+            "lax:a": "a",
+            "lax:dbl": "bb|dd|ff|gg|kk|ll|mm|nn|pp|rr|ss|tt|vv|zz",
+            "di:ee": "ee",
+            "di:oo": "oo",
+            "di:ooU": "oo",
+            "di:ai": "ai",
+            "di:ay": "ay",
+            "di:ow": "ow",
+            "di:ow@": "ow",
+            "di:oi": "oi",
+            "di:oy": "oy",
+            "di:ou": "ou",
+            "di:oa": "oa",
+            "di:ea": "ea",
+            "di:eae": "ea",
+            "di:ew": "ew",
+            "di:aw": "aw",
+            "t:igh": "igh",
+            "tense:y": "y",
+            "end:y@": "y(?: |$)",
+            "end:er": "er(?: |$)",
+            "end:ie": "ie(?: |$)",
+            "end:et": "et(?: |$)",
+            "end:ot": "ot(?: |$)",
+            "end:al@": "al(?: |$)",
+            "end:le": "le(?: |$)",
+            "end:ly": "ly(?: |$)",
+            "tense:a": "(a)[bcdfgklmnpstvz](e)|(a)(?: |$)",
+            "tense:aa": "a",
+            "tense:e": "(e)[bcdfgklmnpstvz](e)|(e)(?: |$)",
+            "tense:i": "(i)[bcdfgklmnpstvz](e)|(i)(?: |$)",
+            "tense:y": "(a)[bcdfgklmnpstvz](e)|(y)(?: |$)",
+            "tense:o": "(o)[bcdfgklmnpstvz](e)|(o)(?: |$)",
+            "tense:u": "(u)[bcdfgklmnpstvz](e)|(u)(?: |$)",
+            "dark:al": "all?",
+            "dark:ol": "ol",
+            "br:or": "or",
+            "br:ar": "ar",
+            "br:ir": "ir",
+            "br:or3": "or",
+            "br:ur3": "ur",
+            "br:ea:i@": "ea",
+            "br:ai:e@": "ai",
+            "br:er3": "er",
+            "o@": "o",
+            "a@": "a",
+            "cons:gZ": "g[ie]",
+            "cons:th": "th",
+            "cons:ph": "ph",
+            "cons:ck": "ck",
+            "cons:wh": "wh",
+            "cons:cs": "c[ie]",
+            "beg:kn": "(?: |^)kn",
+            "beg:wr": "(?: |^)wr",
+            "cons:chS": "ch[ie]",
+            "cons:ti": "ti",
+        };
         
         // [WORDS START]
         const word_repository = [
@@ -315,6 +384,7 @@
 {"level":0, "emoji":"🌞", "text":"The <sun> shines.", "class":["lax:u"]},
 {"level":1, "emoji":"🦆", "text":"<duck>", "class":["lax:u", "cons:ck"]},
 {"level":1, "emoji":"🕰️", "text":"<Just> a bit of time, please", "class":["lax:u"]},
+{"level":2, "emoji":"👨‍👦", "text":"<Adult>s are boring, but they make the ice cream", "class":["lax:u"]},
 {"level":4, "emoji":"🎃", "text":"scary <pumpkin>", "class":["lax:u"]},
 {"level":3, "emoji":"🏃‍♂️‍➡️", "text":"He is <running>.", "class":["lax:u", "lax:dbl"]},
 {"level":6, "emoji":"🍄", "ref":"mushroom", "text":"<mushroom>", "class":["lax:u"]},
@@ -563,12 +633,12 @@
 {"level":0, "emoji":"📱", "text":"<Call> the phone", "class":["dark:al"]},
 {"level":0, "emoji":"🦒", "text":"The giraffe is <tall>.", "class":["dark:al"]},
 {"level":3, "emoji":"🧱", "text":"<wall>", "class":["dark:al"]},
-{"level":0, "ref":"trapdoor", "text":"Mobs <think> all trapdoors are closed, and <fall> through open trapdoors. You can use this to <make> a trap.", "class":["cons:th", "dark:al"]},
+{"level":2, "ref":"trapdoor", "text":"Mobs <think> all trapdoors are closed, and <fall> through open trapdoors. You can use this to <make> a trap.", "class":["cons:th", "dark:al"]},
 {"level":4, "ref":"trapdoor", "text":"Mobs think all trapdoors are closed, and <fall> through open <trapdoors>. You can use this <to make> a trap.", "class":["dark:al"]},
 {"level":4, "emoji":"🚶‍♀️‍➡️", "text":"She is <walking>.", "class":["dark:al"]},
 
 // ol  dark:ol
-{"level":0, "emoji":"⛳️", "text":"play <golf>", "class":["dark:ol"]},
+{"level":1, "emoji":"⛳️", "text":"play <golf>", "class":["dark:ol"]},
 {"level":0, "emoji":"🥶", "text":"<cold>", "class":["dark:ol"]},
 {"level":0, "emoji":"🪙", "text":"<gold> coin", "class":["dark:ol"]},
 {"level":3, "emoji":"🧊", "text":"<cold> ice", "class":["dark:ol"]},
@@ -760,9 +830,9 @@
 {"level":3, "emoji":"♞", "text":"<knight>", "class":["beg:kn", "t:igh"]},
 {"level":5, "ref":"bookshelf", "text":"<knowledge> is power", "class":["beg:kn", "cons:gZ"]},
 
-// $wr
-{"level":4, "emoji":"💥", "text":"Something went horribly <wrong>"},
-
+// $wr  beg:wr
+{"level":4, "emoji":"💥", "text":"Something went horribly <wrong>", "class":["beg:wr"]},
+// TODO
 
 // ch=S   cons:chS
 {"level":6, "emoji":"🧑‍🍳", "text":"The <chef> works in the kitchen", "class":["cons:chS"]},
@@ -858,12 +928,13 @@
 {"level":4, "emoji":"🤨", "text":"The car broke down <again>.", "class":["tricky"]},
 {"level":5, "emoji":"🪧", "ref":"sign", "text":"<sign>", "class":["tricky"]},
 {"level":5, "ref":"hangingsign", "text":"hanging <sign>", "class":["tricky"]},
+{"level":3, "emoji":"🧴", "text":"Let's <wash> hands", "class":["tricky"]},
 // ear=(]:
 {"level":6, "emoji":"❤️", "text":"<heart>", "class":["tricky"]},
 {"level":2, "emoji":"👞", "text":"<shoe>", "class":["tricky"]},
 {"level":5, "ref":"witch", "text":"<witch>", "class":["tricky"]},
 // ea=eI .....
-{"level":4, "emoji":"⛏", "text":"It can <break> stone", "class":["tricky"]},
+{"level":4, "emoji":"⛏", "ref":"pickaxe", "text":"It can <break> stone", "class":["tricky"]},
 // ou ......
 {"level":5, "emoji":"👯‍♀️", "text":"a <group> of people", "class":["tricky"]},
 // ey=i: di:eyi
@@ -924,7 +995,7 @@
             // State (spellbee)
             words: [],  // words in the selected level range
             class_to_ix: false, // {wordclass:[word_ix, ...
-            problem: false, // current problem {word_ix:, is_repeat:, is_reveal:}
+            problem: false, // current problem {word_ix:, word_class:, is_repeat:, is_reveal:}
             processed_word: false,
             help_asked: 0,  // state: how many times help was asked for for the current word
             backspace_used: 0, // state
@@ -963,7 +1034,7 @@
 
 
     </script>
-    <script src="assets/common.js?375"></script>
+    <script src="assets/common.js?376"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1115,7 +1186,37 @@
             shuffle(words); // WARNING changes array
             let o = '';
             for(let i=0; i<words.length; i++) {
-                o += '<span>'+words[i]+'</span>';
+                o += '<span class="word">'+words[i]+'</span>';
+            }
+            return o;
+        }
+        
+        
+        // Choose characters to highlight in the help text from the ones to be typed
+        // If there are no matching groups, we highlight all matches, otherwise the matching groups
+        function get_class_highlight_mask(to_type_str, word_class) {
+            if(word_class === undefined) { return undefined; }
+            let rule = class_highlight_rules[word_class];
+            if(rule === undefined) { return undefined; }
+            rule = new RegExp(rule, 'gdi');
+            
+            const match = rule.exec(to_type_str);
+            if(match === null) { return undefined; } // the rule didn't match
+            const match2 = rule.exec(to_type_str);
+            if(match2 !== null) { return undefined; } // multiple matches
+            
+            let o = '';
+            for(let i=0; i<to_type_str.length; i++) {
+                if(match.indices.length == 1 && i >= match.indices[0][0] && i < match.indices[0][1]) {
+                    o += '#'; continue;
+                }
+                let do_highlight = false;
+                for(let j=1; j<match.indices.length; j++) {
+                    if(i >= match.indices[j][0] && i < match.indices[j][1]) {
+                        do_highlight = true; break;
+                    }
+                }
+                o += (do_highlight ? '#' : '-');
             }
             return o;
         }
@@ -1126,7 +1227,9 @@
             const line_length = 15; // word wrap after this many characters (for non-stories)
     
             const s = bee.processed_word.to_display;
+            const class_highlight_mask = get_class_highlight_mask(bee.processed_word.to_type, bee.problem.word_class);
             
+            // Determine line breaks
             // The aim is to leave the underscores in place, so we word wrap according to the target string
             // With a story, wrap_at stays empty and so there is no forced wrapping
             const wrap_at = {};
@@ -1165,13 +1268,15 @@
                 if(for_help) { // We are rendering the help string
                 
                     if(totype) { // We are in the area that should be typed
-                        o += '<span class="help_totype">';
+                        const add_class = (class_highlight_mask !== undefined && class_highlight_mask[typed_ix] == '#' ? 'help_classhighlight' : '');
+                        o += '<span class="help_totype '+add_class+'">';
                         o += (s[i] == ' ' ? '&nbsp;' : esc_html(s[i]));
                         o += '</span>';
+                        typed_ix++;
                     } else { // This does not need to be typed
                         o += (s[i] == ' ' ? '&nbsp;' : esc_html(s[i]));
-                        if(wrap_at[i]) { o += '<br>'; }
                     }
+                    if(wrap_at[i]) { o += '<br>'; }
                     
                 } else { // We are rendering the input field
                 
@@ -1179,20 +1284,24 @@
                         if(typed_ix < bee.typed.length) { // The user typed this much
                             const userchar = bee.typed[typed_ix];
                             const wrongchar = (s[i].toLowerCase() != userchar.toLowerCase());
+                            const do_class_highlight = (class_highlight_mask !== undefined && class_highlight_mask[typed_ix] == '#');
                             if(wrongchar) { o += '<span class="wrongchar">'; }
+                            else if(do_class_highlight) { o += '<span class="typed_classhighlight">'; }
+                            
                             if(userchar == ' ') {
                                 if((!bee.processed_word.is_story) || wrongchar) { o += '&nbsp;'; } else { o += ' '; }
                             } else {
                                 o += esc_html(userchar);
                             }
-                            if(wrongchar) { o += '</span>'; }
+                            if(wrongchar | do_class_highlight) { o += '</span>'; }
                             if(wrap_at[i]) { o += '<br>'; }
                         } else { // The user is still to type this
                             if(typed_ix == bee.typed.length) { 
                                 o += '<span class="cursor_outer"><span class="cursor"></span></span>';
                             } 
                             if(bee.problem.is_reveal) {
-                                o += '<span class="reveal_totype">';
+                                const add_class = (class_highlight_mask !== undefined && class_highlight_mask[typed_ix] == '#' ? 'help_classhighlight' : '');
+                                o += '<span class="reveal_totype '+add_class+'">';
                                 o += (s[i] == ' ' && (!bee.processed_word.is_story) ? '&nbsp;' : esc_html(s[i]));
                                 o += '</span>';
                             } else if(bee.processed_word.is_story) {
@@ -1565,7 +1674,7 @@
         
         // Initialize a question
         function start_question2(problem) {
-            bee.problem = problem; // {word_ix:, is_repeat:, is_reveal:}
+            bee.problem = problem; // {word_ix:, word_class:, is_repeat:, is_reveal:}
             if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); bee.help_timeout = false; }
 
             bee.processed_word = get_processed_word(bee.problem.word_ix);
@@ -1702,16 +1811,17 @@
                     if(word_ix === undefined) { alert('No first word found, trying again'); continue; }
                     break;
                 }
-                log += ' first_word:'+word_ix;
-                problem = {'word_ix':word_ix, 'is_repeat':false};
-                store_question2(problem);
                 
                 // Word class group
                 let word_class = bee.words[word_ix].class;
                 if(word_class === undefined || word_class.length == 0) { word_class = ['noclass:']; }
                 word_class = word_class[Math.floor(Math.random() * word_class.length)];
                 log += ' group_class:'+word_class;
-                
+
+                log += ' first_word:'+word_ix;
+                problem = {'word_ix':word_ix, 'is_repeat':false, 'word_class':word_class};
+                store_question2(problem);
+
                 const word_ixs = bee.class_to_ix[word_class];
                 if(word_ixs !== undefined && word_ixs.length > 0) {
                     const desired_number_of_words = Math.min(5, word_ixs.length); // Aim for groups of 6
@@ -1720,7 +1830,7 @@
                         const group_word = try_get_new_word(word_class);
                         log += ' group_word:'+group_word;
                         if(group_word !== undefined) {
-                            store_question2({'word_ix':group_word, 'is_repead':false});
+                            store_question2({'word_ix':group_word, 'is_repead':false, 'word_class':word_class});
                         }
                     }
                 }
@@ -1867,9 +1977,9 @@
             const s = get_question_queue();
             s.shift(); // remove this question
             while(s.length < 3) { s.push(undefined); }
-            s.splice(3, 0, {'word_ix':problem.word_ix, 'is_repeat':true, 'is_reveal':false});
+            s.splice(3, 0, {'word_ix':problem.word_ix, 'word_class':problem.word_class, 'is_repeat':true, 'is_reveal':false});
             if(add_reveal) {
-                s.splice(1, 0, {'word_ix':problem.word_ix, 'is_repeat':true, 'is_reveal':true});
+                s.splice(1, 0, {'word_ix':problem.word_ix, 'word_class':problem.word_class, 'is_repeat':true, 'is_reveal':true});
             }
             save_storage('schedule_question');
         }
