@@ -1,5 +1,5 @@
 
-const bee_app_version = 376;
+const bee_app_version = 377;
 
 call_local_hook('check_version', []);
 

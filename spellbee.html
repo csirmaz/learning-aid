@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?376">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?377">
 
     <style>
         body { margin: .5rem 0; }
@@ -151,7 +151,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?376"></script>
+    <script src="assets/local/beelocal.js?377"></script>
 </head>
 <body>
     <div class="container">
@@ -1034,7 +1034,7 @@
 
 
     </script>
-    <script src="assets/common.js?376"></script>
+    <script src="assets/common.js?377"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1212,6 +1212,7 @@
                 }
                 let do_highlight = false;
                 for(let j=1; j<match.indices.length; j++) {
+                    if(match.indices[j] === undefined) { continue; }
                     if(i >= match.indices[j][0] && i < match.indices[j][1]) {
                         do_highlight = true; break;
                     }
