@@ -25,7 +25,7 @@ mp3_dir = '../../assets/sounds/words/'
 
 def generate_tts(text, outfile, voice_ix):
     pipe = KPipeline(lang_code="b", repo_id="hexgrad/Kokoro-82M")
-    voices = ['bf_alice', 'bf_lily', 'bm_lewis', 'bm_george']
+    voices = ['bf_alice', 'bm_lewis', 'bm_george']
     audio = []
     for _, _, chunk in pipe(text, voice=voices[voice_ix]):
         audio.append(chunk)
@@ -48,7 +48,7 @@ def check_text(phrase):
         return
     
     print(f"Need to generate: {phrase} -> {filename}")
-    voice_ix = np.random.randint(4)
+    voice_ix = np.random.randint(3)
     generate_tts(phrase, filename, voice_ix)
 
 
@@ -73,4 +73,6 @@ def scan_words():
                     for p in parts:
                         check_text(p)
 
-scan_words()                
+scan_words()
+# generate_tts("Eight is a feather", "test0.mp3", 0)
+# generate_tts("Eight is a feather", "test1.mp3", 1)
