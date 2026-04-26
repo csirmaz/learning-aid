@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?378">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?379">
 
     <style>
         body { margin: .5rem 0; }
@@ -151,7 +151,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?378"></script>
+    <script src="assets/local/beelocal.js?379"></script>
 </head>
 <body>
     <div class="container">
@@ -335,7 +335,7 @@
 {"level":2, "emoji":"😽", "text":"Cat gives <kiss>.", "class":["lax:i"]},
 {"level":3, "emoji":"☔️", "text":"<It is> raining.", "class":["lax:i"]},
 {"level":0, "ref":"cat", "text":"You can make a Minecraft cat <sit> or stand", "class":["lax:i"]},
-{"level":6, "emoji":"🖥", "text":"<system> error", "class":["lax:i"]},
+{"level":6, "emoji":"🖥", "text":"<system> error", "class":["lax:y"]},
 {"level":5, "emoji":"🥝", "text":"<kiwi>", "class":["lax:i"]},
 {"level":4, "emoji":"🍟", "text":"I want <chips>!", "class":["lax:i"]},
 {"level":0, "emoji":"🍟", "text":"I want chips <with> ketchup!", "class":["lax:i"]},
@@ -348,8 +348,9 @@
 {"level":2, "emoji":"🏋️", "text":"<gym>", "class":["lax:y"]},
 {"level":8, "emoji":"👻", "text":"<myth>", "class":["lax:y"]},
 {"level":8, "emoji":"🏜️", "text":"<pyramid>", "class":["lax:y"]},
-{"level":8, "emoji":"🎤", "text":"<lyric>", "class":["lax:y"]},
-{"level":8, "emoji":"🎶", "text":"We sing a <hymn>.", "class":["lax:y"]},
+{"level":9, "ref":"amethyst", "text":"<crystal>", "class":["lax:y"]},
+// {"level":8, "emoji":"🎤", "text":"<lyric>", "class":["lax:y"]},
+// {"level":8, "emoji":"🎶", "text":"We sing a <hymn>.", "class":["lax:y"]},
 
 //o=Io lax:o
 {"level":2, "emoji":"📦", "text":"<box>", "class":["lax:o"]},
@@ -427,7 +428,8 @@
 // oo=U   di:ooU
 {"level":1, "emoji":"🦶", "text":"smelly <foot>", "class":["di:ooU"]},
 {"level":1, "ref":"enchantedbook", "text":"enchanted <book>", "class":["di:ooU"]},
-{"level":2, "ref":"bookshelf", "text":"<bookshelf>", "class":["di:ooU"]},
+{"level":1, "ref":"quill", "text":"write <a book>", "class":["di:ooU"]},
+{"level":10, "ref":"bookshelf", "text":"<bookshelf>", "class":["di:ooU"]},
 {"level":4, "emoji":"🍪", "text":"<cookie>", "class":["di:ooU", "end:ie"]},
 {"level":7, "ref":"cporkc", "text":"<cooked> porkchop", "class":["di:ooU"]},
 {"level":4, "emoji":"👩🏾‍🍳", "text":"<cook>", "class":["di:ooU"]},
@@ -754,8 +756,8 @@
 // y  end:y@
 {"level":3, "emoji":"👶", "text":"<baby>", "class":["end:y@"]},
 {"level":3, "emoji":"👨🏻‍🍼", "text":"feeding the <baby>", "class":["end:y@"]},
-{"level":8, "emoji":"🕵️", "text":"<mystery>", "class":["end:y@"]},
-{"level":8, "emoji":"🕵️", "text":"It's a <mystery>", "class":["end:y@"]},
+{"level":8, "emoji":"🕵️", "text":"<mystery>", "class":["end:y@", "lax:y"]},
+{"level":8, "emoji":"🕵️", "text":"It's a <mystery>", "class":["end:y@", "lax:y"]},
 {"level":8, "emoji":"🏭", "text":"She works in a <factory>.", "class":["end:y@", "lax:a"]},
 {"level":1, "emoji":"🍬", "text":"sweet <candy>", "class":["end:y@"]},
 {"level":7, "emoji":"🪫", "text":"The machine ran out of <battery>", "class":["end:y@", "lax:a", "lax:dbl"]},
@@ -766,6 +768,8 @@
 // end:et
 {"level":7, "emoji":"🎺", "text":"<trumpet>", "class":["lax:u", "end:et"]},
 {"level":6, "emoji":"🤫", "text":"Keep it a <secret>!", "class":["lax:u", "end:et"]},
+{"level":2, "ref":"waterbucket", "text":"<water bucket>", "class":["lax:u", "end:et", "end:er"]},
+{"level":2, "ref":"waterbucket", "text":"water <bucket>", "class":["lax:u", "end:et"]},
 {"level":8, "ref":"axolotl", "text":"An axolotl is an aquatic mob <found in> lush caves and sometimes in <buckets>. It can assist you in <combat>.", "class":["lax:u", "end:et", "di:ou"]},
 
 
@@ -871,7 +875,7 @@
 
 // $wr  beg:wr
 {"level":4, "emoji":"💥", "text":"Something went horribly <wrong>", "class":["beg:wr"]},
-// TODO
+{"level":10, "ref":"quill", "text":"<write> a book", "class":["beg:wr", "tense:i"]},
 
 // ch=S   cons:chS
 {"level":6, "emoji":"🧑‍🍳", "text":"The <chef> works in the kitchen", "class":["cons:chS"]},
@@ -963,8 +967,9 @@
 {"level":6, "emoji":"👁", "text":"<eye>", "class":["tricky"]},
 {"level":4, "emoji":"👩‍🦰", "text":"one <woman>", "class":["tricky"]},
 {"level":6, "emoji":"👭", "text":"two <women>", "class":["tricky"]},
-{"level":6, "emoji":"💧", "text":"<water>", "class":["tricky"]},
-{"level":6, "emoji":"🍉", "text":"<watermelon>", "class":["tricky"]},
+{"level":6, "emoji":"💧", "text":"<water>", "class":["tricky", "end:er"]},
+{"level":6, "emoji":"🍉", "text":"<watermelon>", "class":["tricky", "end:er"]},
+{"level":2, "ref":"waterbucket", "text":"<water> bucket", "class":["end:er", "tricky"]},
 {"level":8, "emoji":"😸", "text":"Finally the cat had <enough> to eat", "class":["tricky"]},
 {"level":4, "emoji":"🤨", "text":"The car broke down <again>.", "class":["tricky"]},
 {"level":5, "emoji":"🪧", "ref":"sign", "text":"<sign>", "class":["tricky"]},
@@ -1076,7 +1081,7 @@
 
 
     </script>
-    <script src="assets/common.js?378"></script>
+    <script src="assets/common.js?379"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
