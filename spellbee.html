@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?379">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?382">
 
     <style>
         body { margin: .5rem 0; }
@@ -151,7 +151,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?379"></script>
+    <script src="assets/local/beelocal.js?382"></script>
 </head>
 <body>
     <div class="container">
@@ -264,7 +264,7 @@
             "tense:y": "y",
             "end:y@": "y(?: |$)",
             "end:er": "er(?: |$)",
-            "end:ie": "ie(?: |$)",
+            "end:ie": "ie",
             "end:et": "et(?: |$)",
             "end:ot": "ot(?: |$)",
             "end:al@": "al(?: |$)",
@@ -735,14 +735,13 @@
 // --------- schwa -------------------
 
 // er$  end:er
-{"level":0, "emoji":"📎", "text":"<paper> clip", "class":["end:er"]},
-{"level":3, "emoji":"🏞️", "text":"<river>", "class":["end:er"]},
-{"level":7, "emoji":"🪜", "text":"climb up the <ladder>", "class":["end:er", "lax:dbl"]},
+{"level":3, "emoji":"🏞️", "text":"<river>", "class":["end:er", "lax:i"]},
+{"level":7, "emoji":"🪜", "text":"climb up the <ladder>", "class":["end:er", "lax:dbl", "lax:a"]},
 {"level":6, "emoji":"🕷", "text":"<spider>", "class":["end:er", "tense:i"]},
-{"level":0, "ref":"pillager", "text":"The village is <under> attack!", "class":["end:er"]},
+{"level":0, "ref":"pillager", "text":"The village is <under> attack!", "class":["end:er", "lax:u"]},
 {"level":0, "ref":"trial", "text":"There's something <under> me!", "class":["end:er"]},
 {"level":5, "ref":"trial", "text":"There's <something> under me!", "class":["cons:th"]},
-{"level":8, "emoji":"😯", "text":"<beginner>", "class":["end:er"]},
+{"level":8, "emoji":"😯", "text":"<beginner>", "class":["end:er", "lax:dbl"]},
 {"level":8, "emoji":"🚁", "text":"<helicopter>", "class":["end:er"]},
 {"level":3, "emoji":"📎", "text":"<paper> clip", "class":["end:er", "tense:a"]},
 {"level":7, "emoji":"🪶", "text":"light as a <feather>", "class":["end:er", "cons:th", "di:eae"]},
@@ -754,12 +753,12 @@
 {"level":9, "emoji":"🎓", "text":"He goes to <university>", "class":["br:er3", "tense:u", "end:y@"]},
 
 // y  end:y@
-{"level":3, "emoji":"👶", "text":"<baby>", "class":["end:y@"]},
+{"level":3, "emoji":"👶", "text":"<baby>", "class":["end:y@", "tense:a"]},
 {"level":3, "emoji":"👨🏻‍🍼", "text":"feeding the <baby>", "class":["end:y@"]},
 {"level":8, "emoji":"🕵️", "text":"<mystery>", "class":["end:y@", "lax:y"]},
 {"level":8, "emoji":"🕵️", "text":"It's a <mystery>", "class":["end:y@", "lax:y"]},
 {"level":8, "emoji":"🏭", "text":"She works in a <factory>.", "class":["end:y@", "lax:a"]},
-{"level":1, "emoji":"🍬", "text":"sweet <candy>", "class":["end:y@"]},
+{"level":1, "emoji":"🍬", "text":"sweet <candy>", "class":["end:y@", "lax:a"]},
 {"level":7, "emoji":"🪫", "text":"The machine ran out of <battery>", "class":["end:y@", "lax:a", "lax:dbl"]},
 
 // end:ie
@@ -1081,7 +1080,7 @@
 
 
     </script>
-    <script src="assets/common.js?379"></script>
+    <script src="assets/common.js?382"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1878,7 +1877,7 @@
                         const group_word = try_get_new_word(word_class);
                         log += ' group_word:'+group_word;
                         if(group_word !== undefined) {
-                            store_question2({'word_ix':group_word, 'is_repead':false, 'word_class':word_class});
+                            store_question2({'word_ix':group_word, 'is_repeat':false, 'word_class':word_class});
                         }
                     }
                 }

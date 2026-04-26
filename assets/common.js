@@ -1,5 +1,5 @@
 
-const bee_app_version = 379;
+const bee_app_version = 382;
 
 call_local_hook('check_version', []);
 
@@ -9,6 +9,21 @@ function shuffle(array) {  // in-place
         [array[i], array[j]] = [array[j], array[i]];
     }
 }
+
+
+function remove_one_duplicate(array) {
+    let seen = {};
+    const o = [];
+    let removed = false;
+    for(let i=0; i<array.length; i++) {
+        if(removed) { o.push(array[i]); continue; }
+        if(seen[array[i]]) { removed = true; continue; }
+        o.push(array[i]);
+        seen[array[i]] = true;
+    }
+    return [o, removed];
+}
+
 
 // Fix emojis
 $('.score .icon').html('🪙'+"\ufe0f");
@@ -347,6 +362,14 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
         function decide_gift() {
             init_lifetime_score();
             const ls = bee.storage.players[bee.player].lifetime_score;
+            
+            // Fix: remove duplicate gifts
+            const giftarray = bee.storage.players[bee.player].gifts;
+            const removal = remove_one_duplicate(giftarray);
+            if(removal[1]) { // removed
+                bee.storage.players[bee.player].gifts = removal[0];
+                return ls+2;
+            }
             
             if(bee.storage.players[bee.player].next_gift_at === undefined) {
                 const completed_goals = Math.floor(ls / bee.score_goal);
