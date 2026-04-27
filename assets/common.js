@@ -1,5 +1,5 @@
 
-const bee_app_version = 382;
+const bee_app_version = 385;
 
 call_local_hook('check_version', []);
 
@@ -11,17 +11,15 @@ function shuffle(array) {  // in-place
 }
 
 
-function remove_one_duplicate(array) {
+function remove_duplicates(array) {
     let seen = {};
     const o = [];
-    let removed = false;
     for(let i=0; i<array.length; i++) {
-        if(removed) { o.push(array[i]); continue; }
-        if(seen[array[i]]) { removed = true; continue; }
+        if(seen[array[i]]) { continue; }
         o.push(array[i]);
         seen[array[i]] = true;
     }
-    return [o, removed];
+    return o;
 }
 
 
@@ -363,14 +361,6 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
             init_lifetime_score();
             const ls = bee.storage.players[bee.player].lifetime_score;
             
-            // Fix: remove duplicate gifts
-            const giftarray = bee.storage.players[bee.player].gifts;
-            const removal = remove_one_duplicate(giftarray);
-            if(removal[1]) { // removed
-                bee.storage.players[bee.player].gifts = removal[0];
-                return ls+2;
-            }
-            
             if(bee.storage.players[bee.player].next_gift_at === undefined) {
                 const completed_goals = Math.floor(ls / bee.score_goal);
                 const completed_two_goals = Math.floor(completed_goals / 2) * 2;
@@ -415,6 +405,7 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
             if(bee.storage.players[bee.player].gifts === undefined) {
                 bee.storage.players[bee.player].gifts = [];
             }
+            bee.storage.players[bee.player].gifts = remove_duplicates(bee.storage.players[bee.player].gifts);
             const giftarray = bee.storage.players[bee.player].gifts;
             
             // Load list of available gifts
@@ -755,6 +746,7 @@ Music by <a href="https://pixabay.com/users/fassounds-3433550/?utm_source=link-a
             bee.giftlist++;
             if(bee.giftlist >= giftarray.length) { bee.giftlist = 0; }
             $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
+            $('.d_queue').html(giftarray[bee.giftlist]);
             return false;
         });
         
@@ -766,6 +758,7 @@ Music by <a href="https://pixabay.com/users/fassounds-3433550/?utm_source=link-a
             bee.giftlist--;
             if(bee.giftlist <= 0) { bee.giftlist = giftarray.length - 1; }
             $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
+            $('.d_queue').html(giftarray[bee.giftlist]);
             return false;
         });
         
