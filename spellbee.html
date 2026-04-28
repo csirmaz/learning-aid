@@ -121,6 +121,7 @@
             font-size: 1rem;
             font-weight: bold;
             background: #b38;
+            transition: color 0.3s ease;
             color: #fff;
             text-shadow: 0 0 .2rem black;
             width: 2.1rem;
@@ -144,7 +145,12 @@
         
         .kbdiv .kbkey.kbactive {
             box-shadow: 0 0 .8rem black  inset;
-            outline: .2rem solid #fc0;
+            outline: .3rem solid #ca2;
+        }
+        body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
+        body .kbdiv .kbkey.kbdisabledkey {
+            text-shadow: none;
+            color: transparent;
         }
 
     </style>
@@ -1114,6 +1120,21 @@
                 save_storage('data migration');
             }
         }
+        
+        function disable_typing() {
+            if(bee.can_type) {
+                bee.can_type = false;
+                $('.kbdiv').addClass('kbdisabled');
+            }
+        }
+        
+        function enable_typing() {
+            if(!bee.can_type) {
+                bee.can_type = true;
+                $('.kbdiv').removeClass('kbdisabled');
+                $('.kbdiv .kbkey').removeClass('kbdisabledkey');
+            }
+        }
 
         // Initialize keyboard
         $(function() {
@@ -1390,7 +1411,7 @@
             bee.can_use_help = false;
             if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); }
 
-            bee.can_type = false;
+            disable_typing();
             bee.$input.hide();
             
             if(!is_initial) { 
@@ -1413,7 +1434,7 @@
                             bee.$input.show();
                             update_input_field();
                             call_local_hook('keyboard_press_hook', [undefined]);
-                            bee.can_type = true;
+                            enable_typing();
                             console.log("Scheduling enabling help");
                             bee.help_timeout = setTimeout(function(){ 
                                 console.log("Enabling help");
@@ -1534,17 +1555,26 @@
         }
         
         
-        function highlight_key(selector) {
+        function highlight_key(selector, mode) {
             const $keyelem = $(selector);
-            $keyelem.addClass('kbactive');
-            setTimeout(function(){ $keyelem.removeClass('kbactive'); }, 200);
-            call_local_hook('keyboard_press_hook', [$keyelem]);
+            const kclass = (mode == 'disabled' ? 'kbdisabledkey' : 'kbactive');
+            $keyelem.addClass(kclass);
+            if(mode != 'disabled') {
+                setTimeout(function(){ $keyelem.removeClass(kclass); }, 200);
+                call_local_hook('keyboard_press_hook', [$keyelem]);
+            }
         }
         
         
         function process_typing(group, key_distances, is_direct) {
             if(group == 'TYPING') {
-                if(!bee.can_type) { playme('notavail'); return; }
+                if(!bee.can_type) { 
+                    /* playme('notavail'); */
+                    if(key_distances[0][1] < .5) {
+                        highlight_key('.kbdiv .kbkey[data-key="'+key_distances[0][0]+'"]', 'disabled');
+                    }
+                    return; 
+                }
                 
                 let typed_key = undefined;
                 if(is_direct) {
@@ -1554,7 +1584,7 @@
                     if(bee.typed.length < bee.processed_word.to_type.length) {
                         const desired_char = bee.processed_word.to_type[bee.typed.length];
                         for(let i=0; i<key_distances.length; i++) {
-                            if(key_distances[i][1] < .5 /* ratio to key width */ && key_distances[i][0].toLowerCase() == desired_char.toLowerCase()) {
+                            if(key_distances[i][1] < .6 /* ratio to key width */ && key_distances[i][0].toLowerCase() == desired_char.toLowerCase()) {
                                 typed_key = desired_char; break;
                             }
                         }
@@ -1570,7 +1600,7 @@
                         bee.typed = bee.typed.substring(0, bee.typed.length-1);
                         update_input_field();
                         bee.backspace_used++;
-                        highlight_key('.kbdiv .kbbksp');
+                        highlight_key('.kbdiv .kbkey[data-key="'+typed_key+'"]');
                     }
                     return;
                 }
@@ -1625,7 +1655,7 @@
                     highlight_key('.kbdiv .kbkey[data-key="'+typed_key.toLowerCase()+'"]');
                     
                     if(bee.typed.toLowerCase() == bee.processed_word.to_type.toLowerCase()) { // Success!
-                        bee.can_type = false;
+                        disable_typing();
                         bee.$input.addClass('success');
                         
                         let outcome = 'UNSURE';
@@ -1758,7 +1788,7 @@
             $('.prompt .infield').toggleClass('infield_story', !!bee.processed_word.is_story);
             bee.$input.removeClass('success');
             
-            bee.can_type = true;
+            enable_typing();
             bee.can_use_help = true;
             call_local_hook('start_question_hook', []);
             show_help(true);
