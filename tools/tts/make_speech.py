@@ -33,6 +33,24 @@ def generate_tts(text, outfile, voice_ix):
     sf.write(outfile, audio, 24000, bitrate_mode='CONSTANT', compression_level=.5) # .mp3
 
 
+def avoid_tts(text):
+    """Return true if we should not generate mp3 for this text"""
+    # For these the model does not work well
+    return text in [
+        'Monday',
+        'Tuesday',
+        'Wednesday',
+        'Thursday',
+        'Friday',
+        'Saturday',
+        'Sunday',
+        'feather',
+        'a feather',
+        'put',
+        'pay by card',
+        'card'
+    ]
+
 seen = set()
 def check_text(phrase):
     filename = phrase.lower().replace(' ', '_')
@@ -45,6 +63,10 @@ def check_text(phrase):
     
     if os.path.exists(filename):
         print(f"{phrase} OK")
+        return
+    
+    if avoid_tts(phrase):
+        print(f"Avoiding generating for {phrase}")
         return
     
     print(f"Need to generate: {phrase} -> {filename}")
