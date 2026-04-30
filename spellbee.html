@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?385">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?388">
 
     <style>
         body { margin: .5rem 0; }
@@ -148,16 +148,12 @@
             outline: .3rem solid #ca2;
         }
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
-        body .kbdiv .kbkey.kbdisabledkey {
-            text-shadow: none;
-            color: transparent;
-        }
 
     </style>
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?385"></script>
+    <script src="assets/local/beelocal.js?388"></script>
 </head>
 <body>
     <div class="container">
@@ -1086,7 +1082,7 @@
 
 
     </script>
-    <script src="assets/common.js?385"></script>
+    <script src="assets/common.js?388"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1555,24 +1551,19 @@
         }
         
         
-        function highlight_key(selector, mode) {
+        function highlight_key(selector) {
             const $keyelem = $(selector);
-            const kclass = (mode == 'disabled' ? 'kbdisabledkey' : 'kbactive');
+            const kclass = 'kbactive';
             $keyelem.addClass(kclass);
-            if(mode != 'disabled') {
-                setTimeout(function(){ $keyelem.removeClass(kclass); }, 200);
-                call_local_hook('keyboard_press_hook', [$keyelem]);
-            }
+            setTimeout(function(){ $keyelem.removeClass(kclass); }, 200);
+            call_local_hook('keyboard_press_hook', [$keyelem]);
         }
         
         
         function process_typing(group, key_distances, is_direct) {
             if(group == 'TYPING') {
                 if(!bee.can_type) { 
-                    /* playme('notavail'); */
-                    if(key_distances[0][1] < .5) {
-                        highlight_key('.kbdiv .kbkey[data-key="'+key_distances[0][0]+'"]', 'disabled');
-                    }
+                    playme('notavail');
                     return; 
                 }
                 
