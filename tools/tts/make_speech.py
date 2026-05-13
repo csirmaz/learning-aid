@@ -10,6 +10,10 @@
 # tools/tts$ . ~/pythonenvs/tts/bin/activate
 # tools/tts$ pip install kokoro soundfile
 
+# RUNNING
+# tools/tts$ . ~/pythonenvs/tts/bin/activate
+# tools/tts$ python make_speech.py
+
 # See https://github.com/hexgrad/kokoro
 # See https://thomazrb.github.io/posts/python-tts-kokoro/
 
@@ -48,11 +52,15 @@ def avoid_tts(text):
         'a feather',
         'put',
         'pay by card',
-        'card'
+        'card',
+        'hook',
+        'thief',
+        'heavy',
     ]
 
 seen = set()
 def check_text(phrase):
+    # print(f"{phrase} checking...")
     filename = phrase.lower().replace(' ', '_')
     filename = re.sub(r'[^a-z_]', '', filename)
     filename = mp3_dir + filename + '.mp3'
@@ -84,7 +92,8 @@ def scan_words():
             word_area = False
             continue
         if word_area:
-            match = re.search(r'"text"\s*:\s*"([^"]+)"', line)
+            # print(line)
+            match = re.search(r'^\s*"[0-9]+\|[^\|]+\|([^\|]+)\|', line)
             if match:
                 phrase = match.group(1)
                 phrase = phrase.replace(r"\'", "'")

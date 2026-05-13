@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?388">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?392">
 
     <style>
         body { margin: .5rem 0; }
@@ -153,7 +153,7 @@
 
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?388"></script>
+    <script src="assets/local/beelocal.js?392"></script>
 </head>
 <body>
     <div class="container">
@@ -301,723 +301,737 @@
             "beg:wr": "(?: |^)wr",
             "cons:chS": "ch[ie]",
             "cons:ti": "ti",
+            "cons:tur:tS": "tur"
         };
         
+        // For the format, see process_word_data()
         // [WORDS START]
         const word_repository = [
 
 // --- lax monograph ---
 
 // e=e lax:e
-{"level":0, "emoji":"🖊️", "text":"<pen>",     "class":["lax:e"]},
-{"level":0, "emoji":"🟥", "text":"<red>",     "class":["lax:e"]},
-{"level":0, "emoji":"🌹", "text":"<red> rose", "class":["lax:e"]},
-{"level":0, "emoji":"🛌", "text":"<bed>", "class":["lax:e"]},
-{"level":0, "emoji":"🪺", "text":"<nest>", "class":["lax:e"]},
-{"level":0, "emoji":"⛺️", "text":"<tent>", "class":["lax:e"]},
-{"level":0, "emoji":"🥚", "ref":"egg", "text":"<egg>", "class":["lax:e"]},
-{"level":0, "emoji":"🔔", "ref":"bell", "text":"ring the <bell>", "class":["lax:e"]},
-{"level":1, "emoji":"🦶", "text":"<smelly> foot", "class":["lax:e", "end:y@", "lax:dbl"]},
-{"level":2, "emoji":"🔟", "text":"<ten>", "class":["lax:e"]},
-{"level":6, "emoji":"⬅️", "text":"turn <left>", "class":["lax:e"]},
+"0|@🖊️|<pen>|lax:e",
+"0|@🟥|<red>|lax:e",
+"0|@🌹|<red> rose|lax:e",
+"0|@🛌|<bed>|lax:e",
+"0|@🪺|<nest>|lax:e",
+"0|@⛺️|<tent>|lax:e",
+"0|egg@🥚|<egg>|lax:e",
+"0|bell@🔔|ring the <bell>|lax:e",
+"1|@🦶|<smelly> foot|lax:e,end:y@,lax:dbl",
+"2|@🔟|<ten>|lax:e",
+"6|@⬅️|turn <left>|lax:e",
+"10|@⛱️|We use <sun>screen to <prevent> burns.|lax:e,lax:u",
+"10|@🚄|Is <this> the <express> <train> to London?|lax:e,cons:th",
 
 // i=I lax:i
-{"level":0, "emoji":"🐬", "text":"The dolphin likes <fish>.", "class":["lax:i"]},
-{"level":2, "emoji":"🏊", "text":"<swim>", "class":["lax:i"]},
-{"level":0, "emoji":"📌", "text":"<pin>", "class":["lax:i"]},
-{"level":0, "emoji":"💍", "text":"<ring>", "class":["lax:i"]},
-{"level":0, "emoji":"🥛", "text":"I <drink> milk", "class":["lax:i"]},
-{"level":0, "emoji":"🐖", "ref":"pig", "text":"<pig>", "class":["lax:i"]},
-{"level":0, "emoji":"😁", "text":"happy <grin>", "class":["lax:i"]},
-{"level":2, "emoji":"🐠", "text":"<fish>", "class":["lax:i"]},
-{"level":0, "emoji":"🥛", "text":"I drink <milk>", "class":["lax:i"]},
-{"level":0, "emoji":"🔔", "text":"<ring> the bell", "class":["lax:i"]},
-{"level":2, "emoji":"🪽", "text":"<wing>", "class":["lax:i"]},
-{"level":0, "emoji":"📎", "text":"paper <clip>", "class":["lax:i"]},
-{"level":2, "emoji":"😽", "text":"Cat gives <kiss>.", "class":["lax:i"]},
-{"level":3, "emoji":"☔️", "text":"<It is> raining.", "class":["lax:i"]},
-{"level":0, "ref":"cat", "text":"You can make a Minecraft cat <sit> or stand", "class":["lax:i"]},
-{"level":6, "emoji":"🖥", "text":"<system> error", "class":["lax:y"]},
-{"level":5, "emoji":"🥝", "text":"<kiwi>", "class":["lax:i"]},
-{"level":4, "emoji":"🍟", "text":"I want <chips>!", "class":["lax:i"]},
-{"level":0, "emoji":"🍟", "text":"I want chips <with> ketchup!", "class":["lax:i"]},
-{"level":5, "emoji":"😽", "text":"Cat <gives> kiss.", "class":["lax:i"]},
-{"level":0, "emoji":"💳", "text":"pay <with> card", "class":["lax:i"]},
-{"level":0, "emoji":"👨🏻‍🎤", "text":"He <is> a rapper", "class":["lax:i", "common"]},
-{"level":6, "emoji":"🧑‍🍳", "text":"The chef works in the <kitchen>", "class":["lax:i"]},
+"0|@🐬|The dolphin likes <fish>.|lax:i",
+"2|@🏊|<swim>|lax:i",
+"0|@📌|<pin>|lax:i",
+"0|@💍|<ring>|lax:i",
+"0|@🥛|I <drink> milk|lax:i",
+"0|pig@🐖|<pig>|lax:i",
+"0|@😁|happy <grin>|lax:i",
+"2|@🐠|<fish>|lax:i",
+"0|@🥛|I drink <milk>|lax:i",
+"0|@🔔|<ring> the bell|lax:i",
+"2|@🪽|<wing>|lax:i",
+"0|@📎|paper <clip>|lax:i",
+"2|@😽|Cat gives <kiss>.|lax:i",
+"3|@☔️|<It is> raining.|lax:i",
+"0|cat|You can make a Minecraft cat <sit> or stand|lax:i",
+"6|@🖥|<system> error|lax:y",
+"5|@🥝|<kiwi>|lax:i",
+"4|@🍟|I want <chips>!|lax:i",
+"0|@🍟|I want chips <with> ketchup!|lax:i",
+"5|@😽|Cat <gives> kiss.|lax:i",
+"0|@💳|pay <with> card|lax:i",
+"0|@👨🏻‍🎤|He <is> a rapper|lax:i,common",
+"6|@🧑‍🍳|The chef works in the <kitchen>|lax:i",
 
 // y=I lax:y
-{"level":2, "emoji":"🏋️", "text":"<gym>", "class":["lax:y"]},
-{"level":8, "emoji":"👻", "text":"<myth>", "class":["lax:y"]},
-{"level":8, "emoji":"🏜️", "text":"<pyramid>", "class":["lax:y"]},
-{"level":9, "ref":"amethyst", "text":"<crystal>", "class":["lax:y"]},
+"2|@🏋️|<gym>|lax:y",
+"8|@👻|<myth>|lax:y",
+"8|@🏜️|<pyramid>|lax:y",
+"9|amethyst|<crystal>|lax:y",
 // {"level":8, "emoji":"🎤", "text":"<lyric>", "class":["lax:y"]},
 // {"level":8, "emoji":"🎶", "text":"We sing a <hymn>.", "class":["lax:y"]},
 
 //o=Io lax:o
-{"level":2, "emoji":"📦", "text":"<box>", "class":["lax:o"]},
-{"level":0, "emoji":"🔥", "text":"<hot>", "class":["lax:o"]},
-{"level":0, "emoji":"🙅🏼‍♀️", "text":"<not>", "class":["lax:o"]},
-{"level":2, "ref":"fox", "text":"<fox>",  "class":["lax:o"]},
-{"level":0, "emoji":"🐶", "text":"<dog>",  "class":["lax:o"]},
-{"level":0, "emoji":"🛑", "text":"<stop>", "class":["lax:o"]},
-{"level":6, "emoji":"🏖", "text":"We are going on a <holiday>!", "class":["lax:o", "di:ay"]},
-{"level":6, "emoji":"🐵", "text":"<monkey>", "class":["lax:o"]},
-{"level":4, "emoji":"🍫", "text":"<chocolate>", "class":["lax:o"]},
-{"level":5, "emoji":"💥", "text":"<Something> went horribly wrong", "class":["cons:th", "lax:o"]},
+"2|@📦|<box>|lax:o",
+"0|@🔥|<hot>|lax:o",
+"0|@🙅🏼‍♀️|<not>|lax:o",
+"2|fox|<fox>|lax:o",
+"0|@🐶|<dog>|lax:o",
+"0|@🛑|<stop>|lax:o",
+"6|@🏖|We are going on a <holiday>!|lax:o,di:ay",
+"6|@🐵|<monkey>|lax:o,end:ey",
+"4|@🍫|<chocolate>|lax:o",
+"5|@💥|<Something> went horribly wrong|cons:th,lax:o",
 
 
 // a=ae lax:a
-{"level":0, "emoji":"🐈‍", "ref":"cat", "text":"<cat>", "class":["lax:a"]},
-{"level":0, "emoji":"👜", "text":"<bag>", "class":["lax:a"]},
-{"level":10, "ref":"badomen", "text":"<bad> omen", "class":["lax:a"]},
-{"level":1, "emoji":"🖐️", "text":"<hand>", "class":["lax:a"]},
-{"level":1, "emoji":"🏦", "text":"<bank>", "class":["lax:a"]},
-{"level":1, "emoji":"🪤", "text":"Careful! It is a <trap>!", "class":["lax:a"]},
-{"level":7, "ref":"hangingsign", "text":"<hanging> sign", "class":["lax:a"]},
-{"level":0, "ref":"cat", "text":"You can make a Minecraft cat sit or <stand>", "class":["lax:a"]},
-{"level":5, "emoji":"👨🏻‍🎤", "text":"He is a <rapper>", "class":["lax:a", "lax:dbl"]},
+"0|cat@🐈‍|<cat>|lax:a",
+"0|@👜|<bag>|lax:a",
+"10|badomen|<bad> omen|lax:a",
+"1|@🖐️|<hand>|lax:a",
+"1|@🏦|<bank>|lax:a",
+"1|@🪤|Careful! It is a <trap>!|lax:a",
+"7|hangingsign|<hanging> sign|lax:a",
+"0|cat|You can make a Minecraft cat sit or <stand>|lax:a",
+"5|@👨🏻‍🎤|He is a <rapper>|lax:a,lax:dbl",
 
-{"level":4, "emoji":"🎃", "text":"<scary> pumpkin", "class":["lax:a"]},
-{"level":7, "emoji":"🪤", "text":"<Careful>! It is a trap!", "class":["lax:a"]},
+"4|@🎃|<scary> pumpkin|lax:a",
+"7|@🪤|<Careful>! It is a trap!|lax:a",
 
 
 // u=^ lax:u
-{"level":0, "emoji":"🥁", "text":"<drum>", "class":["lax:u"]},
-{"level":0, "emoji":"🏃🏻‍♂️‍➡️", "text":"<run>", "class":["lax:u"]},
-{"level":0, "emoji":"🌞", "text":"The <sun> shines.", "class":["lax:u"]},
-{"level":1, "emoji":"🦆", "text":"<duck>", "class":["lax:u", "cons:ck"]},
-{"level":1, "emoji":"🕰️", "text":"<Just> a bit of time, please", "class":["lax:u"]},
-{"level":2, "emoji":"👨‍👦", "text":"<Adult>s are boring", "class":["lax:u"]},
-{"level":4, "emoji":"🎃", "text":"scary <pumpkin>", "class":["lax:u"]},
-{"level":3, "emoji":"🏃‍♂️‍➡️", "text":"He is <running>.", "class":["lax:u", "lax:dbl"]},
-{"level":6, "emoji":"🍄", "ref":"mushroom", "text":"<mushroom>", "class":["lax:u"]},
-{"level":7, "emoji":"🍟", "text":"I want chips with <ketchup>!", "class":["lax:u"]},
-{"level":8, "ref":"cat", "text":"I <instruct> the cat to sit", "class":["lax:u"]},
+"0|@🥁|<drum>|lax:u",
+"0|@🏃🏻‍♂️‍➡️|<run>|lax:u",
+"0|@🌞|The <sun> shines.|lax:u",
+"1|@🦆|<duck>|lax:u,cons:ck",
+"1|@🕰️|<Just> a bit of time, please|lax:u",
+"2|@👨‍👦|<Adult>s are boring|lax:u",
+"4|@🎃|scary <pumpkin>|lax:u",
+"3|@🏃‍♂️‍➡️|He is <running>.|lax:u,lax:dbl",
+"6|mushroom@🍄|<mushroom>|lax:u",
+"7|@🍟|I want chips with <ketchup>!|lax:u",
+"8|cat|I <instruct> the cat to sit|lax:u",
 
-{"level":4, "ref":"skeletonskull", "text":"skeleton <skull>", "class":["lax:u"]},
+"4|skeletonskull|skeleton <skull>|lax:u",
 
-{"level":5, "emoji":"👮", "text":"You're under <arrest>!", "class":["lax:dbl"]},
+"5|@👮|You're under <arrest>!|lax:dbl",
 
 // --- digraph ---
 
 // ee=i: di:ee
-{"level":0, "emoji":"🌳", "text":"<tree>", "class":["di:ee"]},
-{"level":0, "emoji":"🏨", "text":"<Sleep> in a hotel", "class":["di:ee"]},
-{"level":0, "emoji":"🐑", "ref":"sheep", "text":"<sheep>", "class":["di:ee"]},
-{"level":0, "emoji":"🟩", "text":"<green>", "class":["di:ee"]},
-{"level":2, "emoji":"🐭", "text":"The mouse likes <cheese>", "class":["di:ee"]},
-{"level":2, "emoji":"🐭", "text":"Mice like <cheese>", "class":["di:ee"]},
-{"level":4, "emoji":"🦶🏽", "text":"<heel>", "class":["di:ee"]},
-{"level":3, "emoji":"⚙️", "text":"<steel>", "class":["di:ee"]},
-{"level":3, "emoji":"💇🏾‍♂️", "text":"Adam <needs> a haircut.", "class":["di:ee"]},
-{"level":3, "emoji":"🥵", "text":"I <need> a towel", "class":["di:ee"]},
-{"level":0, "emoji":"🤫", "text":"<Keep> it a secret!", "class":["di:ee"]},
-{"level":3, "emoji":"🤫", "text":"We must <meet> secretly", "class":["di:ee"]},
-{"level":6, "emoji":"👨🏻‍🍼", "text":"<feeding> the baby", "class":["di:ee"]},
-{"level":5, "ref":"bee", "text":"busy <bee>", "class":["di:ee"]},
+"0|@🌳|<tree>|di:ee",
+"0|@🏨|<Sleep> in a hotel|di:ee",
+"0|sheep@🐑|<sheep>|di:ee",
+"0|@🟩|<green>|di:ee",
+"2|@🐭|The mouse likes <cheese>|di:ee",
+"2|@🐭|Mice like <cheese>|di:ee",
+"4|@🦶🏽|<heel>|di:ee",
+"3|@⚙️|<steel>|di:ee",
+"3|@💇🏾‍♂️|Adam <needs> a haircut.|di:ee",
+"3|@🥵|I <need> a towel|di:ee",
+"0|@🤫|<Keep> it a secret!|di:ee",
+"3|@🤫|We must <meet> secretly|di:ee",
+"6|@👨🏻‍🍼|<feeding> the baby|di:ee",
+"5|bee|busy <bee>|di:ee",
 
 // oo=u: di:oo
-{"level":1, "emoji":"🥄", "text":"<spoon>", "class":["di:oo"]},
-{"level":3, "emoji":"🌜", "text":"<moon>", "class":["di:oo"]},
-{"level":3, "emoji":"🍱", "text":"<food>", "class":["di:oo"]},
-{"level":4, "emoji":"🏫", "text":"<school>", "class":["di:oo"]},
-{"level":8, "ref":"boots", "text":"<boots>", "class":["di:oo"]},
-{"level":9, "ref":"bamboo", "text":"<bamboo>", "class":["di:oo"]},
-{"level":9, "emoji":"🦘", "text":"<kangaroo>", "class":["di:oo"]},
+"1|@🥄|<spoon>|di:oo",
+"3|@🌜|<moon>|di:oo",
+"3|@🍱|<food>|di:oo",
+"4|@🏫|<school>|di:oo",
+"8|boots|<boots>|di:oo",
+"9|bamboo|<bamboo>|di:oo",
+"9|@🦘|<kangaroo>|di:oo",
 
 
 // oo=U   di:ooU
-{"level":1, "emoji":"🦶", "text":"smelly <foot>", "class":["di:ooU"]},
-{"level":1, "ref":"enchantedbook", "text":"enchanted <book>", "class":["di:ooU"]},
-{"level":1, "ref":"quill", "text":"write <a book>", "class":["di:ooU"]},
-{"level":10, "ref":"bookshelf", "text":"<bookshelf>", "class":["di:ooU"]},
-{"level":4, "emoji":"🍪", "text":"<cookie>", "class":["di:ooU", "end:ie"]},
-{"level":7, "ref":"cporkc", "text":"<cooked> porkchop", "class":["di:ooU"]},
-{"level":4, "emoji":"👩🏾‍🍳", "text":"<cook>", "class":["di:ooU"]},
-{"level":1, "emoji":"👍", "text":"<good>", "class":["di:ooU"]},
-{"level":1, "ref":"wood", "text":"<wood>", "class":["di:ooU"]},
-{"level":9, "ref":"hook", "text":"<hook>", "class":["di:ooU"]},
-{"level":5, "emoji":"👀", "text":"<Look> where you're going!", "class":["di:ooU"]},
+"1|@🦶|smelly <foot>|di:ooU",
+"1|enchantedbook|enchanted <book>|di:ooU",
+"1|quill|write <a book>|di:ooU",
+"10|bookshelf|<bookshelf>|di:ooU",
+"4|@🍪|<cookie>|di:ooU,end:ie",
+"7|cporkc|<cooked> porkchop|di:ooU",
+"4|@👩🏾‍🍳|<cook>|di:ooU",
+"1|@👍|<good>|di:ooU",
+"1|wood|<wood>|di:ooU",
+"9|hook|<hook>|di:ooU",
+"5|@👀|<Look> where you're going!|di:ooU",
 
 // ai=eI di:ai
-{"level":2, "emoji":"🚂", "text":"<train>", "class":["di:ai"]},
-{"level":4, "emoji":"☔️", "text":"It is <raining>.", "class":["di:ai"]},
-{"level":3, "emoji":"☔️", "text":"It is <rain>ing.", "class":["di:ai"]},
-{"level":3, "emoji":"☔️", "text":"<rain> falls", "class":["di:ai"]},
-{"level":3, "emoji":"📨", "text":"<mail>", "class":["di:ai"]},
-{"level":6, "emoji":"🌈", "text":"<rainbow>", "class":["di:ai", "di:ow@"]},
-{"level":2, "emoji":"✋", "text":"<Wait>!", "class":["di:ai"]},
+"2|@🚂|<train>|di:ai",
+"4|@☔️|It is <raining>.|di:ai",
+"3|@☔️|It is <rain>ing.|di:ai",
+"3|@☔️|<rain> falls|di:ai",
+"3|@📨|<mail>|di:ai",
+"6|@🌈|<rainbow>|di:ai,di:ow@",
+"2|@✋|<Wait>!|di:ai",
 
 // ay=eI  di:ay
-{"level":1, "emoji":"⛳️", "text":"<play> golf", "class":["di:ay"]},
-{"level":3, "emoji":"▶️", "text":"<play>", "class":["di:ay"]},
-{"level":3, "emoji":"📥", "text":"There was nothing in the <tray>.", "class":["di:ay"]},
-{"level":4, "ref":"fox", "text":"A fox <hunts> small animals, and can <carry> items in its mouth. It runs <away> if you are not sneaking.", "class":["di:ay", "lax:dbl"]},
-{"level":7, "ref":"sign", "text":"If you <wax> a sign, no <player> can change the text on it. Use dyes and glow ink to change <how> the text looks.", "class":["di:ay", "di:ow"]},
-{"level":3, "emoji":"☔️", "text":"Bad weather <today>", "class":["di:ay"]},
-{"level":2, "emoji":"🤔", "text":"Which <way>?", "class":["di:ay"]},
-{"level":1, "emoji":"💳", "text":"<pay> by card", "class":["di:ay"]},
+"1|@⛳️|<play> golf|di:ay",
+"3|@▶️|<play>|di:ay",
+"3|@📥|There was nothing in the <tray>.|di:ay",
+"4|fox|A fox <hunts> small animals, and can <carry> items in its mouth. It runs <away> if you are not sneaking.|di:ay,lax:dbl",
+"7|sign|If you <wax> a sign, no <player> can change the text on it. Use dyes and glow ink to change <how> the text looks.|di:ay,di:ow",
+"3|@☔️|Bad weather <today>|di:ay",
+"2|@🤔|Which <way>?|di:ay",
+"1|@💳|<pay> by card|di:ay",
 
 
 // oi=oI di:oi
-{"level":4, "emoji":"🪙", "text":"gold <coin>", "class":["di:oi"]},
-{"level":8, "ref":"poison", "text":"<poison>", "class":["di:oi"]},
-{"level":6, "emoji":"🚻", "text":"Where is the <toilet>?", "class":["di:oi", "end:et"]},
-{"level":4, "emoji":"🥁", "text":"<noise>", "class":["di:oi"]},
-{"level":7, "ref":"pufferfish", "text":"Pufferfish <live> in oceans and use <poison> to defend themselves. They <inflate> if you <get> too close.", "class":["di:oi", "tense:a", "lax:i"]},
+"4|@🪙|gold <coin>|di:oi",
+"8|poison|<poison>|di:oi",
+"6|@🚻|Where is the <toilet>?|di:oi,end:et",
+"4|@🥁|<noise>|di:oi",
+"7|pufferfish|Pufferfish <live> in oceans and use <poison> to defend themselves. They <inflate> if you <get> too close.|di:oi,tense:a,lax:i",
 // oy=oI di:oy
-{"level":6, "emoji":"🤣", "text":"<enjoy>", "class":["di:oy"]},
-{"level":0, "emoji":"🪆", "text":"<toy>", "class":["di:oy"]},
-{"level":0, "emoji":"🧑", "text":"<boy>", "class":["di:oy"]},
-{"level":9, "emoji":"😡", "text":"This is so <annoying>!",  "class":["di:oy"]},
-{"level":9, "emoji":"🤠", "text":"<cowboy>",  "class":["di:oy", "di:ow"]},
+"6|@🤣|<enjoy>|di:oy",
+"0|@🪆|<toy>|di:oy",
+"0|@🧑|<boy>|di:oy",
+"9|@😡|This is so <annoying>!|di:oy",
+"9|@🤠|<cowboy>|di:oy,di:ow",
 
 
 // ea=i: di:ea
-{"level":1, "emoji":"😸", "text":"Finally the cat had enough to <eat>", "class":["di:ea"]},
-{"level":3, "emoji":"🥕", "ref":"carrot", "text":"I would like a carrot, <please>.", "class":["di:ea"]},
-{"level":4, "emoji":"🥩", "text":"Eat <meat>", "class":["di:ea"]},
-{"level":3, "emoji":"🥩", "text":"<Eat> meat", "class":["di:ea"]},
-{"level":4, "emoji":"👨🏾‍⚕️", "text":"<heal>", "class":["di:ea"]},
-{"level":5, "emoji":"🙄", "text":"Oh <really>?", "class":["di:ea", "end:ly"]},
-{"level":5, "emoji":"🦄", "text":"Unicorns are <real>?", "class":["di:ea"]},
-{"level":6, "emoji":"🧑‍🏫", "text":"<teacher>", "class":["di:ea", "end:er"]},
-{"level":3, "emoji":"🕰️", "text":"A bit of time, <please>", "class":["di:ea"]},
-{"level":7, "ref":"cherry", "text":"<cherry leaves>", "class":["di:ea", "lax:dbl"]},
-{"level":8, "ref":"frog", "text":"<Frogs> live <in> swamps. They use their long <tongues> to <eat> small slimes and small magma cubes.", "class":["di:ea"]},
-{"level":7, "ref":"frog", "text":"When a frog <eats> a magma cube, you get a froglight. Different frog <types> make <different> coloured lights.", "class":["di:ea", "lax:dbl", "tense:y"]},
-{"level":5, "emoji":"🧜🏼‍♂️", "text":"I like the <sea>", "class":["di:ea"]},
+"1|@😸|Finally the cat had enough to <eat>|di:ea",
+"3|carrot@🥕|I would like a carrot, <please>.|di:ea",
+"4|@🥩|Eat <meat>|di:ea",
+"3|@🥩|<Eat> meat|di:ea",
+"4|@👨🏾‍⚕️|<heal>|di:ea",
+"5|@🙄|Oh <really>?|di:ea,end:ly",
+"5|@🦄|Unicorns are <real>?|di:ea",
+"6|@🧑‍🏫|<teacher>|di:ea,end:er",
+"3|@🕰️|A bit of time, <please>|di:ea",
+"7|cherry|<cherry leaves>|di:ea,lax:dbl",
+"8|frog|<Frogs> live <in> swamps. They use their long <tongues> to <eat> small slimes and small magma cubes.|di:ea",
+"7|frog|When a frog <eats> a magma cube, you get a froglight. Different frog <types> make <different> coloured lights.|di:ea,lax:dbl,tense:y",
+"5|@🧜🏼‍♂️|I like the <sea>|di:ea",
+"10|@⚓|Don't <steal> the anchor! It's heavy and made of <steel>.|di:ea,di:ee",
+"10|@⚓|Don't steal the <anchor>! It's <heavy> and made of steel.|lax:a,di:eae,end:y@,o@",
 
-{"level":8, "emoji":"🧚‍♂️", "text":"<appear>", "class":["di:ea"]},
+"8|@🧚‍♂️|<appear>|di:ea",
 
 
 // ea=e  di:eae
-{"level":2, "ref":"bread", "text":"slice of <bread>", "class":["di:eae"]},
-{"level":2, "ref":"zombiehead", "text":"zombie <head>", "class":["di:eae"]},
-{"level":2, "ref":"zombiehead", "text":"zombies are <already> dead", "class":["di:eae"]},
-{"level":2, "ref":"zombiehead", "text":"zombies are already <dead>", "class":["di:eae"]},
-{"level":8, "ref":"zombiehead", "text":"<zombie head>", "class":["di:eae", "end:ie"]},
-{"level":8, "emoji":"🦻", "text":"Dogs can help <deaf> people", "class":["di:eae"]},
-{"level":5, "emoji":"☔️", "text":"Bad <weather> today", "class":["di:eae"]},
-{"level":4, "ref":"furnace", "text":"The food is <ready>", "class":["di:eae"]},
-{"level":7, "emoji":"↔️", "text":"<instead>", "class":["di:eae"]},
-{"level":4, "ref":"feather", "text":"You can get <a feather> as a morning gift from your cat <when> you wake <up>.", "class":["di:eae", "cons:th"]},
-{"level":9, "emoji":"🌬️", "text":"take a <breath>", "class":["di:eae", "cons:th"]},
+"2|bread|slice of <bread>|di:eae",
+"2|zombiehead|zombie <head>|di:eae",
+"2|zombiehead|zombies are <already> dead|di:eae",
+"2|zombiehead|zombies are already <dead>|di:eae",
+"8|zombiehead|<zombie head>|di:eae,end:ie",
+"8|@🦻|Dogs can help <deaf> people|di:eae",
+"5|@☔️|Bad <weather> today|di:eae",
+"4|furnace|The food is <ready>|di:eae",
+"7|@↔️|<instead>|di:eae",
+"4|feather|You can get <a feather> as a morning gift from your cat <when> you wake <up>.|di:eae,cons:th",
+"9|@🌬️|take a <breath>|di:eae,cons:th",
 
-{"level":8, "ref":"polarbear", "text":"<polar bear>", "class":["di:eae", "tense:o"]},
-{"level":4, "emoji":"🧸", "text":"teddy <bear>", "class":["di:eae"]},
+"8|polarbear|<polar bear>|di:eae,tense:o",
+"4|@🧸|teddy <bear>|di:eae",
 
 
 // ow=^U di:ow
-{"level":0, "emoji":"🏂", "text":"He bravely slid <down>", "class":["di:ow"]},
-{"level":3, "emoji":"🐄", "text":"<cow>", "class":["di:ow"]},
-{"level":3, "emoji":"👑", "text":"The king's <crown>", "class":["di:ow"]},
-{"level":3, "emoji":"📉", "text":"<going down>", "class":["di:ow"]},
-{"level":3, "emoji":"👋🏾", "text":"<How> are you?", "class":["di:ow"]},
-{"level":7, "emoji":"🏙️", "text":"going to <town>", "class":["di:ow"]},
-{"level":9, "emoji":"🥵", "text":"I need a <towel>", "class":["di:ow"]},
-{"level":7, "ref":"fire", "text":"You can <put out> fire by <powder> snow, rain, water, <or> a cauldron.", "class":["di:ow"]},
-{"level":4, "ref":"magmac", "text":"Magma cubes <are> fireproof and <jump> like slime blocks. They can <swim> in water, but can also <drown>.", "class":["di:ow"]},
+"0|@🏂|He bravely slid <down>|di:ow",
+"3|@🐄|<cow>|di:ow",
+"3|@👑|The king's <crown>|di:ow",
+"3|@📉|<going down>|di:ow",
+"3|@👋🏾|<How> are you?|di:ow",
+"7|@🏙️|going to <town>|di:ow",
+"9|@🥵|I need a <towel>|di:ow",
+"7|fire|You can <put out> fire by <powder> snow, rain, water, <or> a cauldron.|di:ow",
+"4|magmac|Magma cubes <are> fireproof and <jump> like slime blocks. They can <swim> in water, but can also <drown>.|di:ow",
 
 
 // ou=^U di:ou
-{"level":3, "emoji":"🐭", "text":"The <mouse> likes cheese", "class":["di:ou"]},
-{"level":0, "emoji":"🏠", "text":"<house>", "class":["di:ou"]},
-{"level":0, "emoji":"☁️", "text":"<cloud>", "class":["di:ou"]},
-{"level":6, "ref":"horn", "text":"It's way <too loud>", "class":["di:ou"]},
-{"level":7, "ref":"cave", "text":"<underground>", "class":["di:ou"]},
-{"level":4, "emoji":"🪫", "text":"The machine <ran out> of battery", "class":["di:ou"]},
-{"level":7, "ref":"egg", "text":"Foxes may <appear> with an egg in their <mouth>. If you drop some food, the fox <will drop> the egg.", "class":["di:ou", "cons:th", "lax:o"]},
+"3|@🐭|The <mouse> likes cheese|di:ou",
+"0|@🏠|<house>|di:ou",
+"0|@☁️|<cloud>|di:ou",
+"6|horn|It's way <too loud>|di:ou",
+"7|cave|<underground>|di:ou",
+"4|@🪫|The machine <ran out> of battery|di:ou",
+"7|egg|Foxes may <appear> with an egg in their <mouth>. If you drop some food, the fox <will drop> the egg.|di:ou,cons:th,lax:o",
 
 
 // oa
-{"level":3, "emoji":"🧥", "text":"<coat>", "class":["di:oa"]},
-{"level":3, "emoji":"🛣", "text":"<road>", "class":["di:oa"]},
-{"level":5, "emoji":"⚽️", "text":"<Goal>! shouted everyone.", "class":["di:oa"]},
-{"level":9, "ref":"boat", "text":"<boat>", "class":["di:oa"]},
-{"level":9, "ref":"coalore", "text":"<coal>", "class":["di:oa"]},
-{"level":9, "ref":"goat", "text":"<goat>", "class":["di:oa"]},
-{"level":9, "emoji":"🍞", "text":"<toast>", "class":["di:oa"]},
+"3|@🧥|<coat>|di:oa",
+"3|@🛣|<road>|di:oa",
+"5|@⚽️|<Goal>! shouted everyone.|di:oa",
+"9|boat|<boat>|di:oa",
+"9|coalore|<coal>|di:oa",
+"9|goat|<goat>|di:oa",
+"9|@🍞|<toast>|di:oa",
 
 
 // ow=o@ di:ow@
-{"level":4, "emoji":"❄️", "text":"<snow>", "class":["di:ow@"]},
-{"level":2, "ref":"bow", "text":"<bow>", "class":["di:ow@"]},
-{"level":6, "emoji":"⛄️", "text":"<snowman>", "class":["di:ow@"]},
-{"level":4, "ref":"frog", "text":"Frogs will <follow> you if you hold a slime ball, and you are closer to them than <six> blocks. You can <feed> them.", "class":["di:ow@"]},
-{"level":5, "ref":"carrot", "text":"<Carrots> can heal horses, <donkeys> and mules, and can also make them <grow>, but carrots cannot breed them.", "class":["di:ow@", "lax:o"]},
+"4|@❄️|<snow>|di:ow@",
+"2|bow|<bow>|di:ow@",
+"6|@⛄️|<snowman>|di:ow@",
+"4|frog|Frogs will <follow> you if you hold a slime ball, and you are closer to them than <six> blocks. You can <feed> them.|di:ow@",
+"5|carrot|<Carrots> can heal horses, <donkeys> and mules, and can also make them <grow>, but carrots cannot breed them.|di:ow@,lax:o",
 
 
 // ew=(j)u: di:ew
-{"level":5, "emoji":"🔩", "text":"<screw>", "class":["di:ew"]},
-{"level":1, "emoji":"📰", "text":"good <news>", "class":["di:ew"]},
-{"level":1, "emoji":"👟", "text":"<new> shoes", "class":["di:ew"]},
-{"level":3, "emoji":"📚", "text":"a <few> books", "class":["di:ew"]},
-{"level":9, "emoji":"😁", "text":"I <knew> you could do it!", "class":["di:ew"]},
-{"level":9, "emoji":"🏞️", "text":"What a nice <view>!",  "class":["di:ew"]},
+"5|@🔩|<screw>|di:ew",
+"1|@📰|good <news>|di:ew",
+"1|@👟|<new> shoes|di:ew",
+"3|@📚|a <few> books|di:ew",
+"9|@😁|I <knew> you could do it!|di:ew",
+"9|@🏞️|What a nice <view>!|di:ew",
 
 // au=):  di:au
-{"level":7, "emoji":"🎞️", "text":"Let's <pause> the video", "class":["di:au"]},
-{"level":10, "emoji":"🦕", "text":"<dinosaur>", "class":["di:au"]},
-{"level":10, "emoji":"😾", "text":"Just <because>!", "class":["di:au"]},
-{"level":9, "ref":"fire", "text":"<Fire is> extinguished by <powder> snow, rain, water, or a <cauldron>.", "class":["di:au", "di:ow"]},
-{"level":7, "ref":"fire", "text":"Fire is <caused by> lightning, lava, <flint> and steel, or <a> fire charge.", "class":["di:au"]},
+"7|@🎞️|Let's <pause> the video|di:au",
+"10|@🦕|<dinosaur>|di:au",
+"10|@😾|Just <because>!|di:au",
+"9|fire|<Fire is> extinguished by <powder> snow, rain, water, or a <cauldron>.|di:au,di:ow",
+"7|fire|Fire is <caused by> lightning, lava, <flint> and steel, or <a> fire charge.|di:au",
 
 //      di:aw
-{"level":4, "ref":"slime", "text":"Slimes can <spawn> in swamps when there <is> not much light. They spawn most often on a <full> moon.", "class":["di:aw"]},
-{"level":5, "emoji":"✏️", "text":"<draw>",  "class":["di:aw"]},
-{"level":5, "ref":"raw", "text":"<raw>",  "class":["di:aw"]},
+"4|slime|Slimes can <spawn> in swamps when there <is> not much light. They spawn most often on a <full> moon.|di:aw",
+"5|@✏️|<draw>|di:aw",
+"5|raw|<raw>|di:aw",
 
 // igh t:igh
-{"level":1, "emoji":"🪶", "ref":"feather", "text":"<light> as a feather", "class":["t:igh"]},
-{"level":3, "emoji":"🌃", "text":"Good <night>!", "class":["t:igh"]},
-{"level":8, "ref":"frog", "text":"When a <frog> eats a magma cube, you get a <froglight>. Different frog types make different coloured <lights>.", "class":["t:igh"]},
-{"level":6, "emoji":"➡️", "text":"turn <right>", "class":["t:igh"]},
-{"level":9, "emoji":"↕️", "text":"<height>", "class":["t:igh"]},
-{"level":7, "emoji":"➡️", "text":"turn <right>", "class":["t:igh"]},
-{"level":7, "emoji":"🗼", "text":"This is way too <high>", "class":["t:igh"]},
-{"level":5, "emoji":"8️⃣", "text":"<eight>", "class":["t:igh"]},
+"1|feather@🪶|<light> as a feather|t:igh",
+"3|@🌃|Good <night>!|t:igh",
+"8|frog|When a <frog> eats a magma cube, you get a <froglight>. Different frog types make different coloured <lights>.|t:igh",
+"6|@➡️|turn <right>|t:igh",
+"9|@↕️|<height>|t:igh",
+"7|@➡️|turn <right>|t:igh",
+"7|@🗼|This is way too <high>|t:igh",
+"5|@8️⃣|<eight>|t:igh",
 
 
 // --- tense monograph ---
 
 // a=eI tense:a
-{"level":0, "emoji":"🐍", "text":"<snake>", "class":["tense:a"]},
-{"level":0, "emoji":"✈️", "text":"<plane>", "class":["tense:a"]},
-{"level":4, "emoji":"👨‍🦱", "text":"<male>", "class":["tense:a"]},
-{"level":5, "ref":"blaze", "text":"<blaze>", "class":["tense:a"]},
-{"level":5, "ref":"cake", "text":"<bake> a cake", "class":["tense:a"]},
-{"level":5, "ref":"cake", "text":"bake a <cake>", "class":["tense:a"]},
-{"level":4, "emoji":"🌊", "text":"<wave>", "class":["tense:a"]},
-{"level":7, "emoji":"🏷", "text":"<nametag>", "class":["tense:a"]},
-{"level":8, "ref":"chestplate", "text":"<chestplate>", "class":["tense:a", "lax:e"]},
-{"level":7, "ref":"arcade", "text":"<arcade> machine", "class":["tense:a"]},
+"0|@🐍|<snake>|tense:a",
+"0|@✈️|<plane>|tense:a",
+"4|@👨‍🦱|<male>|tense:a",
+"5|blaze|<blaze>|tense:a",
+"5|cake|<bake> a cake|tense:a",
+"5|cake|bake a <cake>|tense:a",
+"4|@🌊|<wave>|tense:a",
+"7|@🏷|<nametag>|tense:a",
+"8|chestplate|<chestplate>|tense:a,lax:e",
+"7|arcade|<arcade> machine|tense:a",
 
 
 // a=(I:  tense:aa
-{"level":1, "emoji":"🛀🏾", "text":"I am having a <bath>.", "class":["tense:aa"]},
-{"level":3, "ref":"grass", "text":"<grass>", "class":["tense:aa"]},
-{"level":4, "emoji":"🍝", "text":"<pasta>", "class":["a@", "tense:aa"]},
-{"level":3, "emoji":"🍌", "text":"<banana>", "class":["a@", "tense:aa"]},
-{"level":2, "emoji":"🌋", "text":"<lava> is hot", "class":["a@", "tense:aa"]},
-{"level":6, "ref":"crafting", "text":"<crafting> table", "class":["tense:aa"]},
-{"level":9, "ref":"enchant", "text":"<enchanting> table", "class":["tense:aa"]},
-{"level":0, "ref":"fire", "text":"Fire <is> caused by lightning, <lava>, flint and <steel>, or a fire charge.", "class":["tense:aa", "di:ee"]},
-{"level":8, "ref":"command", "text":"<command> block", "class":["tense:aa", "lax:dbl"]},
-{"level":7, "ref":"slime", "text":"<Slimes> can spawn in <swamps> when there is not much light. They spawn most <often> on a full <moon>.", "class":["tense:aa", "di:oo", "tense:i"]},
-{"level":6, "emoji":"🧺", "text":"<basket>", "class":["tense:aa", "end:et"]},
-{"level":8, "ref":"magmac", "text":"<Magma> cubes are <fireproof> and jump like slime blocks. They can swim <in water>, but can also drown.", "class":["tense:aa", "tense:i", "a@"]},
+"1|@🛀🏾|I am having a <bath>.|tense:aa",
+"3|grass|<grass>|tense:aa",
+"4|@🍝|<pasta>|a@,tense:aa",
+"3|@🍌|<banana>|a@,tense:aa",
+"2|@🌋|<lava> is hot|a@,tense:aa",
+"6|crafting|<crafting> table|tense:aa",
+"9|enchant|<enchanting> table|tense:aa",
+"0|fire|Fire <is> caused by lightning, <lava>, flint and <steel>, or a fire charge.|tense:aa,di:ee",
+"8|command|<command> block|tense:aa,lax:dbl",
+"7|slime|<Slimes> can spawn in <swamps> when there is not much light. They spawn most <often> on a full <moon>.|tense:aa,di:oo,tense:i",
+"6|@🧺|<basket>|tense:aa,end:et",
+"8|magmac|<Magma> cubes are <fireproof> and jump like slime blocks. They can swim <in water>, but can also drown.|tense:aa,tense:i,a@",
 
 // tense:e
-{"level":8, "emoji":"🇪🇬", "text":"<Egypt>", "class":["tense:e"]},
-{"level":3, "ref":"steve", "text":"I am <Steve>", "class":["tense:e"]},
-{"level":0, "emoji":"👨🏻‍🎤", "text":"<He> is a rapper", "class":["tense:e", "common"]},
-{"level":0, "emoji":"👩‍🔧", "text":"<She> works in a factory.", "class":["tense:e", "common"]},
-{"level":7, "emoji":"🎞️", "text":"Let's pause the <video>", "class":["tense:e"]},
-{"level":9, "emoji":"🏗", "text":"Almost <complete>", "class":["tense:e"]},
+"8|@🇪🇬|<Egypt>|tense:e",
+"3|steve|I am <Steve>|tense:e",
+"0|@👨🏻‍🎤|<He> is a rapper|tense:e,common",
+"0|@👩‍🔧|<She> works in a factory.|tense:e,common",
+"7|@🎞️|Let's pause the <video>|tense:e",
+"9|@🏗|Almost <complete>|tense:e",
 
 // i=aI tense:i
-{"level":1, "emoji":"🌞", "text":"The sun <shines>.", "class":["tense:i"]},
-{"level":1, "emoji":"🐭", "text":"The mouse <likes> cheese", "class":["tense:i"]},
-{"level":0, "emoji":"🌽", "text":"I <like> corn", "class":["tense:i"]},
-{"level":0, "emoji":"🥕", "ref":"carrot", "text":"I would <like> a carrot.", "class":["tense:i"]},
-{"level":2, "emoji":"🕰️", "text":"A bit of <time>, please", "class":["tense:i"]},
-{"level":4, "emoji":"🛝", "text":"<slide>", "class":["tense:i"]},
-{"level":6, "emoji":"🧊", "text":"cold <ice>", "class":["tense:i", "cons:cs"]},
-{"level":8, "ref":"itemframe", "text":"<item frame>", "class":["tense:i", "tense:a"]},
-{"level":6, "emoji":"📦", "text":"A package <arrived>.", "class":["tense:i"]},
-{"level":10, "ref":"jungle", "text":"jungle <biome>", "class":["tense:i"]},
-{"level":0, "emoji":"🍟", "text":"<I> want chips with ketchup!", "class":["tense:i", "common"]},
-{"level":6, "emoji":"🧗", "text":"<climb> up", "class":["tense:i"]},
-{"level":6, "emoji":"🪜", "text":"<climb up> the ladder", "class":["tense:i", "lax:u"]},
-{"level":9, "emoji":"🏆", "text":"first <prize>", "class":["tense:i"]},
-{"level":9, "ref":"dripstone", "text":"<spike>", "class":["tense:i"]},
-{"level":9, "ref":"pipe", "text":"<pipe>", "class":["tense:i"]},
+"1|@🌞|The sun <shines>.|tense:i",
+"1|@🐭|The mouse <likes> cheese|tense:i",
+"0|@🌽|I <like> corn|tense:i",
+"0|carrot@🥕|I would <like> a carrot.|tense:i",
+"2|@🕰️|A bit of <time>, please|tense:i",
+"4|@🛝|<slide>|tense:i",
+"6|@🧊|cold <ice>|tense:i,cons:cs",
+"8|itemframe|<item frame>|tense:i,tense:a",
+"6|@📦|A package <arrived>.|tense:i",
+"10|jungle|jungle <biome>|tense:i",
+"0|@🍟|<I> want chips with ketchup!|tense:i,common",
+"6|@🧗|<climb> up|tense:i",
+"6|@🪜|<climb up> the ladder|tense:i,lax:u",
+"9|@🏆|first <prize>|tense:i",
+"9|dripstone|<spike>|tense:i",
+"9|pipe|<pipe>|tense:i",
+"10|@🕵️‍♀️|'Please <continue>!' said the detective, and the witness <described> the thief.|tense:u,tense:i",
+"10|@🕵️‍♀️|'Please continue!' said the <detective>, and the witness described the <thief>.|lax:e,cons:th",
 // y=aI tense:y
-{"level":0, "emoji":"😢", "text":"<cry>", "class":["tense:y"]},
-{"level":0, "emoji":"🪰", "text":"<fly>", "class":["tense:y"]},
-{"level":0, "emoji":"🏜️", "text":"too <dry>", "class":["tense:y"]},
+"0|@😢|<cry>|tense:y",
+"0|@🪰|<fly>|tense:y",
+"0|@🏜️|too <dry>|tense:y",
 
-{"level":1, "emoji":"🔥", "ref":"fire", "text":"<Fire> is hot", "class":["tense:i"]},
+"1|fire@🔥|<Fire> is hot|tense:i",
 
 
 // o=oU tense:o
-{"level":0, "emoji":"🌹", "text":"red <rose>", "class":["tense:o"]},
-{"level":0, "emoji":"🏨", "text":"Sleep in a <hotel>", "class":["tense:o"]},
-{"level":0, "emoji":"🏡", "text":"<home>", "class":["tense:o"]},
-{"level":3, "emoji":"👃🏻", "text":"<nose>", "class":["tense:o"]},
-{"level":3, "emoji":"⛏", "text":"It can break <stone>", "class":["tense:o"]},
-{"level":3, "emoji":"🦴", "text":"<bone>", "class":["tense:o"]},
-{"level":4, "emoji":"🤨", "text":"The car <broke> down again. Typical.", "class":["tense:o"]},
-{"level":8, "ref":"cocoa", "text":"<cocoa>", "class":["tense:o", "di:oa"]},
-{"level":7, "emoji":"🏤", "text":"<post office>", "class":["tense:o", "cons:cs"]},
-{"level":10, "ref":"badomen", "text":"<bad omen>", "class":["tense:o"]},
-{"level":8, "emoji":"🛣", "text":"<motorway>", "class":["tense:o", "di:ay"]},
-{"level":5, "emoji":"🤖", "text":"<robot>", "class":["tense:o"]},
-{"level":5, "emoji":"🤏", "text":"It was this <close>!", "class":["tense:o"]},
+"0|@🌹|red <rose>|tense:o",
+"0|@🏨|Sleep in a <hotel>|tense:o",
+"0|@🏡|<home>|tense:o",
+"3|@👃🏻|<nose>|tense:o",
+"3|@⛏|It can break <stone>|tense:o",
+"3|@🦴|<bone>|tense:o",
+"4|@🤨|The car <broke> down again. Typical.|tense:o",
+"8|cocoa|<cocoa>|tense:o,di:oa",
+"7|@🏤|<post office>|tense:o,cons:cs",
+"10|badomen|<bad omen>|tense:o",
+"8|@🛣|<motorway>|tense:o,di:ay",
+"5|@🤖|<robot>|tense:o",
+"5|@🤏|It was this <close>!|tense:o",
+"10|@🔬|You <need> a <microsope> to see things that are <very> small.|tense:o,di:ee",
+"10|@🔭|You can <see> the other <planets> in the Solar System with a <telescope>.|tense:o,di:ee,lax:a",
+"10|@🫏|Today he <rides> a horse. Yesterday he <rode> a <donkey>.|tense:o,tense:i,lax:o,end:ey",
 
 // u=ju:  tense:u
-{"level":4, "ref":"grass", "text":"<cube>", "class":["tense:u"]},
-{"level":7, "ref":"frog", "text":"Frogs live <in swamps>. They use their <long> tongues to eat small slimes and <small> magma <cubes>.", "class":["dark:al", "tense:u"]},
-{"level":7, "emoji":"📏", "text":"<ruler>", "class":["end:er", "tense:u"]},
-{"level":8, "ref":"cat", "text":"Cats are <good> to <chase> away phantoms and creepers. Black cats are only born <during> full moon.", "class":["tense:a", "tense:u"]},
-{"level":4, "emoji":"📏", "text":"one <unit>", "class":["tense:u"]},
-{"level":8, "emoji":"🇬🇧", "text":"<United> Kingdom", "class":["tense:u"]},
-{"level":9, "ref":"chick", "text":"So <cute>!", "class":["tense:u"]},
-{"level":9, "emoji":"🔇", "text":"The television is <muted>", "class":["tense:u"]},
+"4|grass|<cube>|tense:u",
+"7|frog|Frogs live <in swamps>. They use their <long> tongues to eat small slimes and <small> magma <cubes>.|dark:al,tense:u",
+"7|@📏|<ruler>|end:er,tense:u",
+"8|cat|Cats are <good> to <chase> away phantoms and creepers. Black cats are only born <during> full moon.|tense:a,tense:u",
+"4|@📏|one <unit>|tense:u",
+"8|@🇬🇧|<United> Kingdom|tense:u",
+"9|chick|So <cute>!|tense:u",
+"9|@🔇|The television is <muted>|tense:u",
 
 // ---- breaking, darkening ------
 
 // al  dark:al
-{"level":0, "emoji":"📱", "text":"<Call> the phone", "class":["dark:al"]},
-{"level":0, "emoji":"🦒", "text":"The giraffe is <tall>.", "class":["dark:al"]},
-{"level":3, "emoji":"🧱", "text":"<wall>", "class":["dark:al"]},
-{"level":2, "ref":"trapdoor", "text":"Mobs <think> all trapdoors are closed, and <fall> through open trapdoors. You can use this to <make> a trap.", "class":["cons:th", "dark:al"]},
-{"level":4, "ref":"trapdoor", "text":"Mobs think all trapdoors are closed, and <fall> through open <trapdoors>. You can use this <to make> a trap.", "class":["dark:al"]},
-{"level":4, "emoji":"🚶‍♀️‍➡️", "text":"She is <walking>.", "class":["dark:al"]},
+"0|@📱|<Call> the phone|dark:al",
+"0|@🦒|The giraffe is <tall>.|dark:al",
+"3|@🧱|<wall>|dark:al",
+"2|trapdoor|Mobs <think> all trapdoors are closed, and <fall> through open trapdoors. You can use this to <make> a trap.|cons:th,dark:al",
+"4|trapdoor|Mobs think all trapdoors are closed, and <fall> through open <trapdoors>. You can use this <to make> a trap.|dark:al",
+"4|@🚶‍♀️‍➡️|She is <walking>.|dark:al",
+"9|@🔐|My date of birth is <personal>|dark:al,br:er3",
+"9|@🇫🇷|Paris is the <capital> for France.|dark:al,lax:a",
+"9|@🇩🇪|Berlin is the <capital> for Germany.|dark:al,lax:a",
 
 // ol  dark:ol
-{"level":1, "emoji":"⛳️", "text":"play <golf>", "class":["dark:ol"]},
-{"level":0, "emoji":"🥶", "text":"<cold>", "class":["dark:ol"]},
-{"level":0, "emoji":"🪙", "text":"<gold> coin", "class":["dark:ol"]},
-{"level":3, "emoji":"🧊", "text":"<cold> ice", "class":["dark:ol"]},
+"1|@⛳️|play <golf>|dark:ol",
+"0|@🥶|<cold>|dark:ol",
+"0|@🪙|<gold> coin|dark:ol",
+"3|@🧊|<cold> ice|dark:ol",
 
 // or=):  br:or
-{"level":1, "emoji":"🐴", "text":"<horse>", "class":["br:or"]},
-{"level":1, "emoji":"🌽", "text":"I like <corn>", "class":["br:or"]},
-{"level":6, "emoji":"🌅", "text":"early <morning>", "class":["br:or"]},
-{"level":3, "emoji":"🚪", "ref":"door", "text":"<door>", "class":["br:or"]},
-{"level":8, "ref":"trapdoor", "text":"Mobs think all <trapdoors> are closed, and fall <through> open trapdoors. You can use this to make a <trap>.", "class":["br:or", "cons:th"]},
-{"level":7, "emoji":"🍿", "text":"<popcorn>", "class":["br:or"]},
-{"level":8, "ref":"copperore", "text":"copper <ore>", "class":["br:or"]},
-{"level":1, "emoji":"🙅🏼‍♂️", "text":"I don't want any <more>!", "class":["br:or"]},
-{"level":8, "ref":"cporkc", "text":"cooked <porkchop>", "class":["br:or"]},
-{"level":5, "ref":"carrot", "text":"Carrots can heal <horses>, donkeys and mules, and can also <make> them grow, but carrots <cannot> breed them.", "class":["br:or"]},
-{"level":1, "ref":"feather", "text":"You can get a feather as a <morning> gift from your <cat> when you <wake> up.", "class":["br:or"]},
-{"level":6, "ref":"netherportal", "text":"nether <portal>", "class":["br:or", "end:al@"]},
-{"level":1, "ref":"carrot", "text":"In the Java version of Minecraft, there is a <bug>, and skeleton <horses> can also eat carrots.", "class":["lax:u", "br:or"]},
+"1|@🐴|<horse>|br:or",
+"1|@🌽|I like <corn>|br:or",
+"6|@🌅|early <morning>|br:or",
+"3|door@🚪|<door>|br:or",
+"8|trapdoor|Mobs think all <trapdoors> are closed, and fall <through> open trapdoors. You can use this to make a <trap>.|br:or,cons:th",
+"7|@🍿|<popcorn>|br:or",
+"8|copperore|copper <ore>|br:or",
+"1|@🙅🏼‍♂️|I don't want any <more>!|br:or",
+"8|cporkc|cooked <porkchop>|br:or",
+"5|carrot|Carrots can heal <horses>, donkeys and mules, and can also <make> them grow, but carrots <cannot> breed them.|br:or",
+"1|feather|You can get a feather as a <morning> gift from your <cat> when you <wake> up.|br:or",
+"6|netherportal|nether <portal>|br:or,end:al@",
+"1|carrot|In the Java version of Minecraft, there is a <bug>, and skeleton <horses> can also eat carrots.|lax:u,br:or",
 
 // ar=(]:  br:ar
-{"level":1, "emoji":"🦈", "text":"<shark>", "class":["br:ar"]},
-{"level":1, "emoji":"💳", "text":"pay by <card>", "class":["br:ar"]},
-{"level":1, "emoji":"🚗", "text":"<car>", "class":["br:ar"]},
-{"level":4, "emoji":"🧣", "text":"warm <scarf>", "class":["br:ar"]},
-{"level":1, "emoji":"🚓", "text":"police <car>", "class":["br:ar"]},
-{"level":1, "ref":"mushroom", "text":"If you <put> a small mushroom on <top> of a full block where it is <dark>, it can <grow> into a huge mushroom.", "class":["br:ar", "di:ow@"]},
+"1|@🦈|<shark>|br:ar",
+"1|@💳|pay by <card>|br:ar",
+"1|@🚗|<car>|br:ar",
+"4|@🧣|warm <scarf>|br:ar",
+"1|@🚓|police <car>|br:ar",
+"1|mushroom|If you <put> a small mushroom on <top> of a full block where it is <dark>, it can <grow> into a huge mushroom.|br:ar,di:ow@",
 
 // ir=3:  br:ir
-{"level":3, "emoji":"👕", "text":"<shirt>", "class":["br:ir"]},
-{"level":6, "emoji":"🎂", "text":"It is my <birthday>!", "class":["br:ir", "di:ay"]},
+"3|@👕|<shirt>|br:ir",
+"6|@🎂|It is my <birthday>!|br:ir,di:ay",
 
 // or=3:  br:or3
-{"level":3, "emoji":"🧑‍🍳", "text":"The chef <works> in the kitchen", "class":["br:or3"]},
-{"level":3, "emoji":"🌍", "text":"the whole <world>", "class":["br:or3"]},
+"3|@🧑‍🍳|The chef <works> in the kitchen|br:or3",
+"3|@🌍|the whole <world>|br:or3",
 
 // ur=3:   br:ur3
-{"level":3, "emoji":"🛞", "text":"The wheel <turns>.", "class":["br:ur3"]},
-{"level":4, "ref":"cat", "text":"<Cats> do not get <hurt> by falling, <and> they can <see> you even if you are invisible.", "class":["br:ur3", "di:ee"]},
-{"level":6, "emoji":"🖼", "text":"<picture>", "class":["br:ur3"]},
-{"level":6, "emoji":"➡️", "text":"<turn> right", "class":["br:ur3"]},
-{"level":7, "ref":"fire", "text":"The fire <burns>", "class":["br:ur3"]},
-{"level":8, "emoji":"🗼", "text":"Is this the tallest <structure>?", "class":["br:ur3", "lax:u"]},
+"3|@🛞|The wheel <turns>.|br:ur3",
+"4|cat|<Cats> do not get <hurt> by falling, <and> they can <see> you even if you are invisible.|br:ur3,di:ee",
+"6|@🖼|<picture>|br:ur3,cons:tur:tS",
+"6|@➡️|<turn> right|br:ur3",
+"7|fire|The fire <burns>|br:ur3",
+"8|@🗼|Is this the tallest <structure>?|br:ur3,lax:u,cons:tur:tS",
 
 //   br:ea:i@
-{"level":3, "emoji":"👂", "text":"<ear>", "class":["br:ea:i@"]},
-{"level":3, "emoji":"🦻🏽", "text":"I <hear> you", "class":["br:ea:i@"]},
-{"level":3, "emoji":"🗓️", "text":"A <year> later", "class":["br:ea:i@"]},
+"3|@👂|<ear>|br:ea:i@",
+"3|@🦻🏽|I <hear> you|br:ea:i@",
+"3|@🗓️|A <year> later|br:ea:i@",
 
 // air = e@   br:ai:e@
-{"level":7, "emoji":"💇🏾‍♂️", "text":"Adam needs a <haircut>.", "class":["br:ai:e@", "lax:u"]},
-{"level":6, "emoji":"☴", "text":"<air>", "class":["br:ai:e@"]},
-{"level":6, "emoji":"👱‍♀️", "text":"long <hair>", "class":["br:ai:e@"]},
-{"level":6, "emoji":"😡", "text":"It's not <fair>!", "class":["br:ai:e@"]},
-{"level":6, "emoji":"🧑🏽‍🐰‍🧑🏼", "text":"<pair>", "class":["br:ai:e@"]},
+"7|@💇🏾‍♂️|Adam needs a <haircut>.|br:ai:e@,lax:u",
+"6|@☴|<air>|br:ai:e@",
+"6|@👱‍♀️|long <hair>|br:ai:e@",
+"6|@😡|It's not <fair>!|br:ai:e@",
+"6|@🧑🏽‍🐰‍🧑🏼|<pair>|br:ai:e@",
 
 // --------- schwa -------------------
 
 // er$  end:er
-{"level":3, "emoji":"🏞️", "text":"<river>", "class":["end:er", "lax:i"]},
-{"level":7, "emoji":"🪜", "text":"climb up the <ladder>", "class":["end:er", "lax:dbl", "lax:a"]},
-{"level":6, "emoji":"🕷", "text":"<spider>", "class":["end:er", "tense:i"]},
-{"level":0, "ref":"pillager", "text":"The village is <under> attack!", "class":["end:er", "lax:u"]},
-{"level":0, "ref":"trial", "text":"There's something <under> me!", "class":["end:er"]},
-{"level":5, "ref":"trial", "text":"There's <something> under me!", "class":["cons:th"]},
-{"level":8, "emoji":"😯", "text":"<beginner>", "class":["end:er", "lax:dbl"]},
-{"level":8, "emoji":"🚁", "text":"<helicopter>", "class":["end:er"]},
-{"level":3, "emoji":"📎", "text":"<paper> clip", "class":["end:er", "tense:a"]},
-{"level":7, "emoji":"🪶", "text":"light as a <feather>", "class":["end:er", "cons:th", "di:eae"]},
+"3|@🏞️|<river>|end:er,lax:i",
+"7|@🪜|climb up the <ladder>|end:er,lax:dbl,lax:a",
+"6|@🕷|<spider>|end:er,tense:i",
+"0|pillager|The village is <under> attack!|end:er,lax:u",
+"0|trial|There's something <under> me!|end:er",
+"5|trial|There's <something> under me!|cons:th",
+"8|@😯|<beginner>|end:er,lax:dbl",
+"8|@🚁|<helicopter>|end:er",
+"3|@📎|<paper> clip|end:er,tense:a",
+"7|@🪶|light as a <feather>|end:er,cons:th,di:eae",
 
 // breaking er=3:  br:er3
-{"level":7, "emoji":"🏜️", "text":"<desert>", "class":["br:er3"]},
-{"level":8, "emoji":"😎", "text":"He is an <expert>.", "class":["br:er3"]},
-{"level":8, "emoji":"🌠", "text":"<universe>", "class":["br:er3", "tense:u"]},
-{"level":9, "emoji":"🎓", "text":"He goes to <university>", "class":["br:er3", "tense:u", "end:y@"]},
+"7|@🏜️|<desert>|br:er3",
+"8|@😎|He is an <expert>.|br:er3",
+"8|@🌠|<universe>|br:er3,tense:u",
+"9|@🎓|He goes to <university>|br:er3,tense:u,end:y@",
 
 // y  end:y@
-{"level":3, "emoji":"👶", "text":"<baby>", "class":["end:y@", "tense:a"]},
-{"level":3, "emoji":"👨🏻‍🍼", "text":"feeding the <baby>", "class":["end:y@"]},
-{"level":8, "emoji":"🕵️", "text":"<mystery>", "class":["end:y@", "lax:y"]},
-{"level":8, "emoji":"🕵️", "text":"It's a <mystery>", "class":["end:y@", "lax:y"]},
-{"level":8, "emoji":"🏭", "text":"She works in a <factory>.", "class":["end:y@", "lax:a"]},
-{"level":1, "emoji":"🍬", "text":"sweet <candy>", "class":["end:y@", "lax:a"]},
-{"level":7, "emoji":"🪫", "text":"The machine ran out of <battery>", "class":["end:y@", "lax:a", "lax:dbl"]},
+"3|@👶|<baby>|end:y@,tense:a",
+"3|@👨🏻‍🍼|feeding the <baby>|end:y@",
+"8|@🕵️|<mystery>|end:y@,lax:y",
+"8|@🕵️|It's a <mystery>|end:y@,lax:y",
+"8|@🏭|She works in a <factory>.|end:y@,lax:a",
+"1|@🍬|sweet <candy>|end:y@,lax:a",
+"7|@🪫|The machine ran out of <battery>|end:y@,lax:a,lax:dbl",
 
 // end:ie
-{"level":7, "emoji":"🛡", "text":"<shield>", "class":["end:ie"]},
+"7|@🛡|<shield>|end:ie",
 
 // end:et
-{"level":7, "emoji":"🎺", "text":"<trumpet>", "class":["lax:u", "end:et"]},
-{"level":6, "emoji":"🤫", "text":"Keep it a <secret>!", "class":["lax:u", "end:et"]},
-{"level":2, "ref":"waterbucket", "text":"<water bucket>", "class":["lax:u", "end:et", "end:er"]},
-{"level":2, "ref":"waterbucket", "text":"water <bucket>", "class":["lax:u", "end:et"]},
-{"level":8, "ref":"axolotl", "text":"An axolotl is an aquatic mob <found in> lush caves and sometimes in <buckets>. It can assist you in <combat>.", "class":["lax:u", "end:et", "di:ou"]},
+"7|@🎺|<trumpet>|lax:u,end:et",
+"6|@🤫|Keep it a <secret>!|lax:u,end:et",
+"2|waterbucket|<water bucket>|lax:u,end:et,end:er",
+"2|waterbucket|water <bucket>|lax:u,end:et",
+"8|axolotl|An axolotl is an aquatic mob <found in> lush caves and sometimes in <buckets>. It can assist you in <combat>.|lax:u,end:et,di:ou",
 
 
 // end:ot
-{"level":6, "emoji":"🦜", "text":"<parrot>", "class":["end:ot"]},
-{"level":6, "emoji":"👩‍✈️", "text":"<pilot>", "class":["end:ot"]},
+"6|@🦜|<parrot>|end:ot",
+"6|@👩‍✈️|<pilot>|end:ot",
 
 //   end:al@
-{"level":8, "emoji":"🤨", "text":"The car broke down again. <Typical>.", "class":["end:al@"]},
-{"level":7, "ref":"fox", "text":"A fox hunts small <animals>, and can carry items in its <mouth>. It runs away if you are not <sneaking>.", "class":["end:al@", "di:ou", "di:ea"]},
-{"level":6, "emoji":"🏥", "text":"<hospital>", "class":["end:al@"]},
+"8|@🤨|The car broke down again. <Typical>.|end:al@",
+"7|fox|A fox hunts small <animals>, and can carry items in its <mouth>. It runs away if you are not <sneaking>.|end:al@,di:ou,di:ea",
+"6|@🏥|<hospital>|end:al@",
 
 
 // o  o@
-{"level":5, "emoji":"🖍", "text":"<crayon>", "class":["lax:a", "o@"]},
-{"level":8, "ref":"poison", "text":"<poison>", "class":["di:oi", "o@"]},
-{"level":2, "emoji":"🍋", "text":"<lemon>", "class":["o@", "lax:e"]},
-{"level":6, "ref":"skeletonskull", "text":"<skeleton> skull", "class":["o@", "lax:e"]},
-{"level":7, "ref":"trapdoor", "text":"Trapdoors <can> be moved by <pistons>. They also block flowing water and <lava>.", "class":["a@", "o@", "tense:aa"]},
-{"level":6, "ref":"melons", "text":"<melon slice>", "class":["o@", "cons:cs"]},
-{"level":4, "emoji":"🎹", "text":"play the <piano>", "class":["o@"]},
-{"level":6, "ref":"cat", "text":"You can make <a cat> sit or stand <by> pressing the use <button> on it. Then the cat does not teleport.", "class":["lax:u", "lax:a", "lax:dbl", "o@"]},
-{"level":8, "ref":"carrot", "text":"In the Java <version> of <Minecraft>, there is a bug, and <skeleton> horses can also eat carrots.", "class":["o@", "end:er"]},
-{"level":7, "emoji":"💎", "ref":"diamond", "text":"<diamond>", "class":["o@", "tense:i"]},
-{"level":6, "emoji":"🐇", "text":"Rabbits like <carrots>.", "class":["o@", "lax:dbl"]},
-{"level":8, "emoji":"🇪🇺", "text":"European <Union>", "class":["o@", "tense:u"]},
+"5|@🖍|<crayon>|lax:a,o@",
+"8|poison|<poison>|di:oi,o@",
+"2|@🍋|<lemon>|o@,lax:e",
+"6|skeletonskull|<skeleton> skull|o@,lax:e",
+"7|trapdoor|Trapdoors <can> be moved by <pistons>. They also block flowing water and <lava>.|a@,o@,tense:aa",
+"6|melons|<melon slice>|o@,cons:cs",
+"4|@🎹|play the <piano>|o@",
+"6|cat|You can make <a cat> sit or stand <by> pressing the use <button> on it. Then the cat does not teleport.|lax:u,lax:a,lax:dbl,o@",
+"8|carrot|In the Java <version> of <Minecraft>, there is a bug, and <skeleton> horses can also eat carrots.|o@,end:er",
+"7|diamond@💎|<diamond>|o@,tense:i",
+"6|@🐇|Rabbits like <carrots>.|o@,lax:dbl",
+"8|@🇪🇺|European <Union>|o@,tense:u",
 
-{"level":6, "emoji":"🪞", "text":"<mirror>", "class":["o@"]},
-{"level":6, "emoji":"🚜", "text":"<tractor>", "class":["o@", "lax:a"]},
-{"level":7, "emoji":"🖥", "text":"system <error>", "class":["o@", "lax:dbl"]},
-{"level":8, "emoji":"👩🏽‍🏫", "text":"<instructor>", "class":["o@", "lax:u"]},
+"6|@🪞|<mirror>|o@",
+"6|@🚜|<tractor>|o@,lax:a",
+"7|@🖥|system <error>|o@,lax:dbl",
+"8|@👩🏽‍🏫|<instructor>|o@,lax:u",
 
-{"level":8, "emoji":"🔣", "text":"<symbol>", "class":["o@"]},
+"8|@🔣|<symbol>|o@",
 
 // a  a@
-{"level":4, "emoji":"🍕", "text":"I love <pizza>", "class":["a@", "lax:dbl", "lax:i"]},
+"4|@🍕|I love <pizza>|a@,lax:dbl,lax:i",
 
 //  end:le
-{"level":0, "ref":"crafting", "text":"crafting <table>", "class":["end:le", "tense:a"]},
-{"level":5, "emoji":"👨🏾‍💼", "text":"His father's brother is his <uncle>", "class":["end:le", "lax:u"]},
-{"level":8, "ref":"jungle", "text":"<jungle> biome", "class":["end:le"]},
-{"level":7, "ref":"turtle", "text":"<turtle>", "class":["end:le", "br:ur3"]},
-{"level":7, "ref":"cat", "text":"Cats do not <get hurt> by falling, and they can see you <even> if you are <invisible>.", "class":["end:le", "br:ur3"]},
+"0|crafting|crafting <table>|end:le,tense:a",
+"5|@👨🏾‍💼|His father's brother is his <uncle>|end:le,lax:u",
+"8|jungle|<jungle> biome|end:le",
+"7|turtle|<turtle>|end:le,br:ur3",
+"7|cat|Cats do not <get hurt> by falling, and they can see you <even> if you are <invisible>.|end:le,br:ur3",
 
 
 // ------- consonants -------------------
 
 // g=dZ  cons:gZ
-{"level":5, "ref":"pillager", "text":"The <village> is under attack!", "class":["cons:dZ", "lax:dbl"]},
-{"level":5, "ref":"pillager", "text":"<pillager>", "class":["cons:dZ"]},
-{"level":6, "emoji":"📦", "text":"A <package> arrived.", "class":["cons:dZ"]},
-{"level":8, "emoji":"🦒", "text":"The <giraffe> is tall.", "class":["cons:dZ"]},
-{"level":4, "ref":"mushroom", "text":"If you put a <small> mushroom on top of a full block <where> it is dark, it can grow into a <huge> mushroom.", "class":["dark:al", "cons:gZ", "tense:u"]},
-{"level":6, "ref":"diamond", "text":"You need diamonds to make <fireworks> and smithing templates to decorate the <edges> of your armour.", "class":["cons:gZ", "tense:i"]},
-{"level":6, "ref":"sign", "text":"If you wax a <sign>, no player can <change> the text on it. Use dyes and <glow> ink to change how the text looks.", "class":["tense:a", "cons:gZ", "di:ow@"]},
+"5|pillager|The <village> is under attack!|cons:dZ,lax:dbl",
+"5|pillager|<pillager>|cons:dZ",
+"6|@📦|A <package> arrived.|cons:dZ",
+"8|@🦒|The <giraffe> is tall.|cons:dZ",
+"4|mushroom|If you put a <small> mushroom on top of a full block <where> it is dark, it can grow into a <huge> mushroom.|dark:al,cons:gZ,tense:u",
+"6|diamond|You need diamonds to make <fireworks> and smithing templates to decorate the <edges> of your armour.|cons:gZ,tense:i",
+"6|sign|If you wax a <sign>, no player can <change> the text on it. Use dyes and <glow> ink to change how the text looks.|tense:a,cons:gZ,di:ow@",
 
 // ck cons:ck
-{"level":2, "emoji":"🪨", "text":"<rock>", "class":["cons:ck"]},
-{"level":2, "emoji":"🔒", "text":"<lock>", "class":["cons:ck"]},
-{"level":2, "emoji":"🧦", "text":"<socks>", "class":["cons:ck"]},
-{"level":3, "emoji":"⬛️", "text":"<black>", "class":["cons:ck"]},
-{"level":3, "emoji":"🐤", "ref":"chick", "text":"<chick>", "class":["cons:ck"]},
-{"level":8, "ref":"command", "text":"command <block>", "class":["cons:ck"]},
-{"level":4, "ref":"pillager", "text":"The village is under <attack>!", "class":["lax:dbl", "cons:ck"]},
+"2|@🪨|<rock>|cons:ck",
+"2|@🔒|<lock>|cons:ck",
+"2|@🧦|<socks>|cons:ck",
+"3|@⬛️|<black>|cons:ck",
+"3|chick@🐤|<chick>|cons:ck",
+"8|command|command <block>|cons:ck",
+"4|pillager|The village is under <attack>!|lax:dbl,cons:ck",
 
 // th  cons:th
-{"level":1, "emoji":"📦", "text":"It's a <thing>", "class":["cons:th"]},
-{"level":1, "emoji":"💥", "text":"Some<thing> went horribly wrong", "class":["cons:th"]},
-{"level":5, "emoji":"👍🏿", "text":"<thumb>", "class":["cons:th"]},
-{"level":3, "emoji":"👄", "text":"<mouth>", "class":["cons:th"]},
-{"level":8, "emoji":"🪥", "text":"<toothbrush>", "class":["cons:th", "di:oo"]},
-{"level":1, "ref":"trial", "text":"<There>'s something under me!", "class":["cons:th"]},
-{"level":6, "ref":"trial", "text":"<There's> something under me!", "class":["cons:th"]},
-{"level":0, "emoji":"👦", "text":"my <brother>", "class":["cons:th", "end:er"]},
-{"level":6, "emoji":"📥", "text":"There was <nothing> in the tray.", "class":["cons:th"]},
+"1|@📦|It's a <thing>|cons:th",
+"1|@💥|Some<thing> went horribly wrong|cons:th",
+"5|@👍🏿|<thumb>|cons:th",
+"3|@👄|<mouth>|cons:th",
+"8|@🪥|<toothbrush>|cons:th,di:oo",
+"1|trial|<There>'s something under me!|cons:th",
+"6|trial|<There's> something under me!|cons:th",
+"0|@👦|my <brother>|cons:th,end:er",
+"6|@📥|There was <nothing> in the tray.|cons:th",
 
 // ph  cons:ph
-{"level":2, "emoji":"📱", "text":"Call the <phone>", "class":["cons:ph"]},
-{"level":9, "ref":"phantom", "text":"<phantom>", "class":["cons:ph"]},
-{"level":6, "emoji":"🐬", "text":"The <dolphin> likes fish.", "class":["cons:ph"]},
-{"level":10, "ref":"sulphurc", "text":"<sulphur> cube", "class":["cons:ph"]},
-{"level":10, "ref":"cat", "text":"Cats are good <to chase> away <phantoms> and creepers. Black cats are only born during <full moon>.", "class":["cons:ph"]},
+"2|@📱|Call the <phone>|cons:ph",
+"9|phantom|<phantom>|cons:ph",
+"6|@🐬|The <dolphin> likes fish.|cons:ph",
+"10|sulphurc|<sulphur> cube|cons:ph",
+"10|cat|Cats are good <to chase> away <phantoms> and creepers. Black cats are only born during <full moon>.|cons:ph",
 
 
 // wh  cons:wh
-{"level":4, "emoji":"🛞", "text":"The <wheel> turns.", "class":["cons:wh"]},
-{"level":2, "emoji":"🚻", "text":"<Where> is the toilet?", "class":["cons:wh"]},
-{"level":2, "emoji":"🗺", "text":"<Where> are we?", "class":["cons:wh"]},
-{"level":3, "emoji":"⬜️", "text":"<white>", "class":["cons:wh", "tense:i"]},
+"4|@🛞|The <wheel> turns.|cons:wh",
+"2|@🚻|<Where> is the toilet?|cons:wh",
+"2|@🗺|<Where> are we?|cons:wh",
+"3|@⬜️|<white>|cons:wh,tense:i",
 
 // c=s  cons:cs
-{"level":6, "emoji":"🚓", "text":"<police> car", "class":["cons:cs"]},
-{"level":8, "ref":"sign", "text":"You can <burn> overworld signs in a <furnace>. Nether signs (crimson and warped) <cannot be> used as fuel.", "class":["cons:cs", "br:ur3"]},
-{"level":0, "ref":"bread", "text":"<slice> of bread", "class":["cons:cs", "tense:i"]},
-{"level":9, "emoji":"🏞️", "text":"What a <nice> view!",  "class":["cons:cs", "tense:i"]},
+"6|@🚓|<police> car|cons:cs",
+"8|sign|You can <burn> overworld signs in a <furnace>. Nether signs (crimson and warped) <cannot be> used as fuel.|cons:cs,br:ur3",
+"0|bread|<slice> of bread|cons:cs,tense:i",
+"9|@🏞️|What a <nice> view!|cons:cs,tense:i",
 
 
 // $kn  beg:kn
-{"level":4, "emoji":"🪢", "text":"<knot>", "class":["beg:kn"]},
-{"level":3, "emoji":"🤷🏼", "text":"I don't <know>", "class":["beg:kn", "di:ow@"]},
-{"level":3, "emoji":"♞", "text":"<knight>", "class":["beg:kn", "t:igh"]},
-{"level":5, "ref":"bookshelf", "text":"<knowledge> is power", "class":["beg:kn", "cons:gZ"]},
+"4|@🪢|<knot>|beg:kn",
+"3|@🤷🏼|I don't <know>|beg:kn,di:ow@",
+"3|@♞|<knight>|beg:kn,t:igh",
+"5|bookshelf|<knowledge> is power|beg:kn,cons:gZ",
 
 // $wr  beg:wr
-{"level":4, "emoji":"💥", "text":"Something went horribly <wrong>", "class":["beg:wr"]},
-{"level":10, "ref":"quill", "text":"<write> a book", "class":["beg:wr", "tense:i"]},
+"4|@💥|Something went horribly <wrong>|beg:wr",
+"10|quill|<write> a book|beg:wr,tense:i",
 
 // ch=S   cons:chS
-{"level":6, "emoji":"🧑‍🍳", "text":"The <chef> works in the kitchen", "class":["cons:chS"]},
-{"level":6, "emoji":"🪫", "text":"The <machine> ran out of battery", "class":["cons:chS"]},
-{"level":6, "ref":"arcade", "text":"arcade <machine>", "class":["cons:chS"]},
-{"level":6, "emoji":"🤖", "text":"Silly <machine>!", "class":["cons:chS"]},
-{"level":9, "emoji":"🥸", "text":"fake <moustache>", "class":["cons:chS"]},
+"6|@🧑‍🍳|The <chef> works in the kitchen|cons:chS",
+"6|@🪫|The <machine> ran out of battery|cons:chS",
+"6|arcade|arcade <machine>|cons:chS",
+"6|@🤖|Silly <machine>!|cons:chS",
+"9|@🥸|fake <moustache>|cons:chS",
 
 // ti=S  cons:ti
-{"level":8, "ref":"potion", "text":"<potion>", "class":["cons:ti"]},
-{"level":10, "ref":"levitation", "text":"<levitation>", "class":["cons:ti"]},
-{"level":8, "emoji":"🏃🏾‍♂️‍➡️", "text":"<competition>", "class":["cons:ti"]},
-{"level":9, "ref":"tnt", "text":"<destruction>", "class":["cons:ti"]},
-{"level":8, "emoji":"🏗️", "text":"He works in <construction> building houses.", "class":["cons:ti", "lax:u"]},
-{"level":8, "emoji":"🖥️", "text":"The computer received an <instruction>", "class":["cons:ti", "lax:u"]},
-{"level":9, "emoji":"💌", "text":"<invitation>", "class":["cons:ti"]},
+"8|potion|<potion>|cons:ti",
+"10|levitation|<levitation>|cons:ti",
+"8|@🏃🏾‍♂️‍➡️|<competition>|cons:ti",
+"9|tnt|<destruction>|cons:ti",
+"8|@🏗️|He works in <construction> building houses.|cons:ti,lax:u",
+"8|@🖥️|The computer received an <instruction>|cons:ti,lax:u",
+"9|@💌|<invitation>|cons:ti",
 
 
 // ly$   end:ly
-{"level":8, "emoji":"🏂", "text":"He <bravely> slid down", "class":["end:ly"]},
-{"level":8, "emoji":"😸", "text":"<Finally> the cat had enough to eat", "class":["end:ly", "tense:i"]},
-{"level":9, "emoji":"🤫", "text":"We must meet <secretly>", "class":["end:ly"]},
-{"level":8, "emoji":"🌤", "text":"Summers are <usually> sometimes hot", "class":["end:ly"]},
-{"level":6, "emoji":"🤸🏾‍♀️", "text":"She can do it <easily>", "class":["end:ly"]},
-{"level":9, "emoji":"💥", "text":"Something went <horribly> wrong", "class":["end:ly"]},
+"8|@🏂|He <bravely> slid down|end:ly",
+"8|@😸|<Finally> the cat had enough to eat|end:ly,tense:i",
+"9|@🤫|We must meet <secretly>|end:ly",
+"8|@🌤|Summers are <usually> sometimes hot|end:ly",
+"6|@🤸🏾‍♀️|She can do it <easily>|end:ly",
+"9|@💥|Something went <horribly> wrong|end:ly",
 
 
 // double (closed)  lax:dbl
-{"level":3, "emoji":"🤖", "text":"<Silly> machine!", "class":["lax:dbl"]},
-{"level":3, "emoji":"🧸", "text":"<teddy>", "class":["lax:dbl", "end:y@"]},
-{"level":0, "emoji":"😀", "text":"I am <happy>", "class":["lax:dbl", "end:y@"]},
-{"level":0, "emoji":"🎾", "text":"play <tennis>", "class":["lax:dbl"]},
-{"level":4, "emoji":"🌤", "text":"<Summer>s are usually sometimes hot", "class":["lax:dbl", "lax:u"]},
-{"level":6, "emoji":"🐇", "text":"<Rabbits> like carrots.", "class":["lax:dbl"]},
-{"level":4, "emoji":"🥕", "ref":"carrot", "text":"I would like a <carrot>.", "class":["lax:dbl"]},
-{"level":8, "emoji":"🤔", "text":"<forgetting>", "class":["lax:dbl"]},
-{"level":6, "ref":"copperore", "text":"<copper> ore", "class":["lax:dbl"]},
-{"level":9, "emoji":"⛔️", "text":"Smoking is <forbidden>", "class":["lax:dbl"]},
+"3|@🤖|<Silly> machine!|lax:dbl",
+"3|@🧸|<teddy>|lax:dbl,end:y@",
+"0|@😀|I am <happy>|lax:dbl,end:y@",
+"0|@🎾|play <tennis>|lax:dbl",
+"4|@🌤|<Summer>s are usually sometimes hot|lax:dbl,lax:u",
+"6|@🐇|<Rabbits> like carrots.|lax:dbl",
+"4|carrot@🥕|I would like a <carrot>.|lax:dbl",
+"8|@🤔|<forgetting>|lax:dbl",
+"6|copperore|<copper> ore|lax:dbl",
+"9|@⛔️|Smoking is <forbidden>|lax:dbl",
 
 
 // Common words  common
-{"level":0, "emoji":"🦻🏽", "text":"I hear <you>", "class":["common"]},
-{"level":0, "emoji":"🙅🏼‍♂️", "text":"I don't want <any> more!", "class":["common"]},
-{"level":5, "emoji":"🙅🏼‍♂️", "text":"I <don't> want any more!", "class":["common"]},
-{"level":3, "emoji":"🙅🏼‍♂️", "text":"I don't <want> any more!", "class":["common"]},
-{"level":0, "emoji":"🤷🏼", "text":"<I> don't know", "class":["common"]},
-{"level":5, "emoji":"🤷🏼", "text":"I <don't> know", "class":["common"]},
-{"level":0, "ref":"trial", "text":"There's something under <me>!", "class":["common"]},
-{"level":0, "emoji":"🪶", "ref":"feather", "text":"light <as a> feather", "class":["common"]},
-{"level":4, "emoji":"🏖", "text":"<We are> going on a holiday!", "class":["tense:e", "common"]},
-{"level":3, "emoji":"🚶‍♀️‍➡️", "text":"<She is> walking.", "class":["tense:e", "common"]},
-{"level":4, "emoji":"🗺", "text":"Where <are we>?", "class":["common"]},
-{"level":4, "emoji":"🥕", "ref":"carrot", "text":"I <would> like a carrot.", "class":["common"]},
-{"level":3, "emoji":"🗺️", "text":"We are <here>.", "class":["common"]},
-{"level":4, "emoji":"🕰️", "text":"<A bit of> time, please", "class":["common"]},
-{"level":3, "emoji":"🛀🏾", "text":"I am <having> a bath.", "class":["common"]},
-{"level":3, "emoji":"🎂", "text":"<It is my> birthday!", "class":["common"]},
-{"level":3, "emoji":"🫂", "text":"I love <you>", "class":["common"]},
-{"level":3, "emoji":"🤸🏾‍♀️", "text":"She <can do it> easily", "class":["common"]},
-{"level":3, "emoji":"🤫", "text":"<We must> meet secretly", "class":["common"]},
-{"level":0, "emoji":"👦", "text":"<my> brother", "class":["tense:y"]},
-{"level":2, "emoji":"🎂", "text":"It is <my> birthday!", "class":["tense:y"]},
-{"level":0, "emoji":"💥", "text":"<Some>thing went horribly wrong", "class":["common"]},
-{"level":2, "emoji":"🎮", "text":"<Come> on, let's play!", "class":["common"]},
-{"level":2, "emoji":"🎮", "text":"<Come on>, let's play!", "class":["common"]},
-{"level":3, "emoji":"🍟", "text":"<I want> chips!", "class":["common"]},
-{"level":3, "emoji":"🏖", "text":"We are <going> on a holiday!", "class":["common"]},
-{"level":2, "emoji":"💥", "text":"Something <went> horribly wrong", "class":["lax:e"]},
+"0|@🦻🏽|I hear <you>|common",
+"0|@🙅🏼‍♂️|I don't want <any> more!|common",
+"5|@🙅🏼‍♂️|I <don't> want any more!|common",
+"3|@🙅🏼‍♂️|I don't <want> any more!|common",
+"0|@🤷🏼|<I> don't know|common",
+"5|@🤷🏼|I <don't> know|common",
+"0|trial|There's something under <me>!|common",
+"0|feather@🪶|light <as a> feather|common",
+"4|@🏖|<We are> going on a holiday!|tense:e,common",
+"3|@🚶‍♀️‍➡️|<She is> walking.|tense:e,common",
+"4|@🗺|Where <are we>?|common",
+"4|carrot@🥕|I <would> like a carrot.|common",
+"3|@🗺️|We are <here>.|common",
+"4|@🕰️|<A bit of> time, please|common",
+"3|@🛀🏾|I am <having> a bath.|common",
+"3|@🎂|<It is my> birthday!|common",
+"3|@🫂|I love <you>|common",
+"3|@🤸🏾‍♀️|She <can do it> easily|common",
+"3|@🤫|<We must> meet secretly|common",
+"0|@👦|<my> brother|tense:y",
+"2|@🎂|It is <my> birthday!|tense:y",
+"0|@💥|<Some>thing went horribly wrong|common",
+"2|@🎮|<Come> on, let's play!|common",
+"2|@🎮|<Come on>, let's play!|common",
+"3|@🍟|<I want> chips!|common",
+"3|@🏖|We are <going> on a holiday!|common",
+"2|@💥|Something <went> horribly wrong|lax:e",
 
-{"level":6, "ref":"pillager", "text":"<The> village is under attack!", "class":["common", "cons:th"]},
-{"level":3, "emoji":"📥", "text":"There was nothing <in the> tray.", "class":["common", "cons:th"]},
-{"level":6, "emoji":"📥", "text":"<There was> nothing in the tray.", "class":["common", "cons:th"]},
-{"level":4, "emoji":"🚻", "text":"Where <is the> toilet?", "class":["common", "cons:th"]},
-{"level":5, "ref":"frog", "text":"Frogs will follow you if you hold a slime ball, and <you are> closer to them <than> six blocks. You <can feed> them.", "class":["common", "di:ee"]},
+"6|pillager|<The> village is under attack!|common,cons:th",
+"3|@📥|There was nothing <in the> tray.|common,cons:th",
+"6|@📥|<There was> nothing in the tray.|common,cons:th",
+"4|@🚻|Where <is the> toilet?|common,cons:th",
+"5|frog|Frogs will follow you if you hold a slime ball, and <you are> closer to them <than> six blocks. You <can feed> them.|common,di:ee",
 
 
 
-{"level":1, "ref":"trapdoor", "text":"Trapdoors <can> be moved <by> pistons. <They> also block flowing water and lava.", "class":["common"]},
-{"level":1, "ref":"frog", "text":"Frogs <will> follow you if <you> hold a slime ball, and you are closer to them than six blocks. You can <feed> them.", "class":["common", "di:ee"]},
-{"level":4, "ref":"carrot", "text":"In the Java version of Minecraft, <there is> a bug, and skeleton horses <can also> eat carrots.", "class":["common", "cons:th"]},
-{"level":2, "ref":"egg", "text":"Foxes may appear with <an> egg in <their> mouth. If you drop <some> food, the fox will drop the egg.", "class":["common"]},
-{"level":1, "ref":"egg", "text":"Foxes may appear <with> an egg in their mouth. If <you> drop some food, the fox <will> drop the egg.", "class":["common", "lax:i"]},
+"1|trapdoor|Trapdoors <can> be moved <by> pistons. <They> also block flowing water and lava.|common",
+"1|frog|Frogs <will> follow you if <you> hold a slime ball, and you are closer to them than six blocks. You can <feed> them.|common,di:ee",
+"4|carrot|In the Java version of Minecraft, <there is> a bug, and skeleton horses <can also> eat carrots.|common,cons:th",
+"2|egg|Foxes may appear with <an> egg in <their> mouth. If you drop <some> food, the fox will drop the egg.|common",
+"1|egg|Foxes may appear <with> an egg in their mouth. If <you> drop some food, the fox <will> drop the egg.|common,lax:i",
 
 
 // Tricky words  tricky
-{"level":3, "emoji":"📏", "text":"<one> unit", "class":["tricky"]},
-{"level":3, "emoji":"🍕", "text":"<I love> pizza", "class":["tricky"]},
-{"level":3, "emoji":"🫂", "text":"I <love> you", "class":["tricky"]},
-{"level":6, "emoji":"👁", "text":"<eye>", "class":["tricky"]},
-{"level":4, "emoji":"👩‍🦰", "text":"one <woman>", "class":["tricky"]},
-{"level":6, "emoji":"👭", "text":"two <women>", "class":["tricky"]},
-{"level":6, "emoji":"💧", "text":"<water>", "class":["tricky", "end:er"]},
-{"level":6, "emoji":"🍉", "text":"<watermelon>", "class":["tricky", "end:er"]},
-{"level":2, "ref":"waterbucket", "text":"<water> bucket", "class":["end:er", "tricky"]},
-{"level":8, "emoji":"😸", "text":"Finally the cat had <enough> to eat", "class":["tricky"]},
-{"level":4, "emoji":"🤨", "text":"The car broke down <again>.", "class":["tricky"]},
-{"level":5, "emoji":"🪧", "ref":"sign", "text":"<sign>", "class":["tricky"]},
-{"level":5, "ref":"hangingsign", "text":"hanging <sign>", "class":["tricky"]},
-{"level":3, "emoji":"🧴", "text":"Let's <wash> hands", "class":["tricky"]},
+"3|@📏|<one> unit|tricky",
+"3|@🍕|<I love> pizza|tricky",
+"3|@🫂|I <love> you|tricky",
+"6|@👁|<eye>|tricky",
+"4|@👩‍🦰|one <woman>|tricky",
+"6|@👭|two <women>|tricky",
+"6|@💧|<water>|tricky,end:er",
+"6|@🍉|<watermelon>|tricky,end:er",
+"2|waterbucket|<water> bucket|end:er,tricky",
+"8|@😸|Finally the cat had <enough> to eat|tricky",
+"4|@🤨|The car broke down <again>.|tricky",
+"5|sign@🪧|<sign>|tricky",
+"5|hangingsign|hanging <sign>|tricky",
+"3|@🧴|Let's <wash> hands|tricky",
 // ear=(]:
-{"level":6, "emoji":"❤️", "text":"<heart>", "class":["tricky"]},
-{"level":2, "emoji":"👞", "text":"<shoe>", "class":["tricky"]},
-{"level":5, "ref":"witch", "text":"<witch>", "class":["tricky"]},
+"6|@❤️|<heart>|tricky",
+"2|@👞|<shoe>|tricky",
+"5|witch|<witch>|tricky",
 // ea=eI .....
-{"level":4, "emoji":"⛏", "ref":"pickaxe", "text":"It can <break> stone", "class":["tricky"]},
+"4|pickaxe@⛏|It can <break> stone|tricky",
 // ou ......
-{"level":5, "emoji":"👯‍♀️", "text":"a <group> of people", "class":["tricky"]},
+"5|@👯‍♀️|a <group> of people|tricky",
 // ey=i: di:eyi
-{"level":4, "emoji":"🔑", "text":"<key>", "class":["tricky"]},
+"4|@🔑|<key>|tricky,end:ey",
 
-{"level":4, "emoji":"😾", "text":"This cat <is angry>.", "class":["end:y@", "lax:a"]},
-{"level":4, "ref":"cat", "text":"<Cats are> good to chase away phantoms and creepers. <Black> cats are <only> born during full moon.", "class":["cons:ck", "end:y@"]},
-{"level":8, "ref":"cat", "text":"You can make a cat sit <or> stand by <pressing> the use button on it. Then the cat does not <teleport>.", "class":["br:or"]},
-{"level":9, "ref":"axolotl", "text":"An axolotl is an <aquatic> mob found in <lush caves> and sometimes in buckets. It can <assist> you in combat.", "class":["lax:u", "lax:dbl", "tense:a"]},
-{"level":5, "ref":"cat", "text":"You can make a cat sit or <stand> by pressing the use button on it. Then the cat <does not> teleport.", "class":["common", "lax:a"]},
-{"level":4, "ref":"egg", "text":"Foxes may appear with an egg <in their> mouth. If you drop <some> food, <the fox> will drop the egg.", "class":["cons:th", "common", "lax:o"]},
-{"level":1, "ref":"fire", "text":"You can put out <fire> by powder <snow>, rain, <water>, or a cauldron.", "class":["tricky", "di:ow@", "tense:i"]},
+"4|@😾|This cat <is angry>.|end:y@,lax:a",
+"4|cat|<Cats are> good to chase away phantoms and creepers. <Black> cats are <only> born during full moon.|cons:ck,end:y@",
+"8|cat|You can make a cat sit <or> stand by <pressing> the use button on it. Then the cat does not <teleport>.|br:or",
+"9|axolotl|An axolotl is an <aquatic> mob found in <lush caves> and sometimes in buckets. It can <assist> you in combat.|lax:u,lax:dbl,tense:a",
+"5|cat|You can make a cat sit or <stand> by pressing the use button on it. Then the cat <does not> teleport.|common,lax:a",
+"4|egg|Foxes may appear with an egg <in their> mouth. If you drop <some> food, <the fox> will drop the egg.|cons:th,common,lax:o",
+"1|fire|You can put out <fire> by powder <snow>, rain, <water>, or a cauldron.|tricky,di:ow@,tense:i",
 
 // calendar
-{"level":6, "emoji":"🗓️", "text":"The weekend is <Saturday> and <Sunday>", "class":["calendar", "lax:u", "di:ay", "lax:a"]},
-{"level":6, "emoji":"🗓️", "text":"Friday, <Saturday>, <Sunday>", "class":["calendar", "lax:u", "di:ay", "lax:a"]},
-{"level":6, "emoji":"🗓️", "text":"The workweek starts with <Monday>, then it's <Tuesday>", "class":["calendar", "lax:o", "di:ay"]},
-{"level":6, "emoji":"🗓️", "text":"<Thursday>, <Friday>, then it's the weekend", "class":["calendar", "tense:i", "br:ur3", "di:ay"]},
-{"level":6, "emoji":"🗓️", "text":"<Monday>, <Tuesday>, Wednesday, Thursday, Friday", "class":["calendar", "lax:o", "di:ay"]},
-{"level":6, "emoji":"🗓️", "text":"Monday, <Tuesday>, <Wednesday>, Thursday, Friday", "class":["calendar", "di:ay"]},
-{"level":6, "emoji":"🗓️", "text":"Monday, Tuesday, Wendesday, <Thursday>, <Friday>", "class":["calendar", "tense:i", "br:ur3", "di:ay"]},
-{"level":3, "emoji":"🗓️", "text":"There are seven days in a <week>", "class":["calendar", "di:ee"]},
-{"level":6, "emoji":"🗓️", "text":"<Sunday>", "class":["lax:u", "di:ay"]},
+"6|@🗓️|The weekend is <Saturday> and <Sunday>|calendar,lax:u,di:ay,lax:a",
+"6|@🗓️|Friday, <Saturday>, <Sunday>|calendar,lax:u,di:ay,lax:a",
+"6|@🗓️|The workweek starts with <Monday>, then it's <Tuesday>|calendar,lax:o,di:ay",
+"6|@🗓️|<Thursday>, <Friday>, then it's the weekend|calendar,tense:i,br:ur3,di:ay",
+"6|@🗓️|<Monday>, <Tuesday>, Wednesday, Thursday, Friday|calendar,lax:o,di:ay",
+"6|@🗓️|Monday, <Tuesday>, <Wednesday>, Thursday, Friday|calendar,di:ay",
+"6|@🗓️|Monday, Tuesday, Wendesday, <Thursday>, <Friday>|calendar,tense:i,br:ur3,di:ay",
+"3|@🗓️|There are seven days in a <week>|calendar,di:ee",
+"6|@🗓️|<Sunday>|lax:u,di:ay",
 
 
 
 // unclassified
-{"level":8, "ref":"pufferfish", "text":"Pufferfish live in <oceans> and use poison to <defend> themselves. They inflate <if> you get too close."},
-{"level":8, "ref":"diamond", "text":"You need <diamonds> to make fireworks and smithing templates to <decorate> the edges <of> your armour."},
+"8|pufferfish|Pufferfish live in <oceans> and use poison to <defend> themselves. They inflate <if> you get too close.|",
+"8|diamond|You need <diamonds> to make fireworks and smithing templates to <decorate> the edges <of> your armour.|",
 
-{"level":9, "emoji":"☑️", "text":"<preferred>", "mp3":1},
-{"level":9, "ref":"enderpearl", "text":"<ender pearl>"},
-{"level":9, "ref":"nquartz", "text":"nether <quartz>"},
+"9|@☑️|<preferred>|",
+"9|enderpearl|<ender pearl>|",
+"9|nquartz|nether <quartz>|",
 
-{"level":10, "ref":"diamond", "text":"You need diamonds to <make> fireworks and smithing <templates> to decorate the edges of your <armour>."},
-{"level":10, "ref":"sign", "text":"You can burn overworld <signs> in a furnace. Nether signs (<crimson> and warped) cannot be used as <fuel>."},
+"10|diamond|You need diamonds to <make> fireworks and smithing <templates> to decorate the edges of your <armour>.|",
+"10|sign|You can burn overworld <signs> in a furnace. Nether signs (<crimson> and warped) cannot be used as <fuel>.|",
 
 
 
@@ -1082,7 +1096,7 @@
 
 
     </script>
-    <script src="assets/common.js?388"></script>
+    <script src="assets/common.js?392"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1092,22 +1106,6 @@
             const pstore = bee.storage.players[bee.player];
             let version = pstore.data_version;
             if(version === undefined) { version = 0; }
-            
-            // [1] Migrate known_words[to_type] to known_questions[question text]
-            if(version < 4 && bee.words.length > 0) {
-                version = 4;
-                if(pstore.known_questions === undefined) { pstore.known_questions = {}; }
-                if(pstore.known_words !== undefined) {
-                    for(let i=0; i<bee.words.length; i++) {
-                        const word = get_processed_word(i).to_type;
-                        const k = pstore.known_words[word];
-                        if(k !== undefined && k != 0) {
-                            pstore.known_questions[bee.words[i].text] = k;
-                        }
-                    }
-                }
-                // alert("Migrated datastore to version "+version);
-            }
             
             // [2] Add further migrations here
             
@@ -1909,6 +1907,23 @@
             start_question2(problem); // the first word
         }
 
+        // Parse word data into a data structure
+        // <level>|<ref>@<emoji>|<text>|<class>,<class>,...
+        // <level>|<ref>|<text>|<class>,<class>,...
+        // <level>|@<emoji>|<text>|<class>,<class>,...
+        function process_word_data(datastr) {
+            const data = datastr.split('|');
+            if(data.length != 4) { console.error("Malformed word entry", datastr, data); }
+            const img = data[1].split('@');
+            const out = {
+                'level': data[0],
+                'text': data[2],
+                'class': (data[3] === undefined || data[3].length == 0 ? [] : data[3].split(','))
+            };
+            if(img[0].length) { out.ref = img[0]; }
+            if(img[1] !== undefined && img[1].length) { out.emoji = img[1]; }
+            return out;
+        }
         
         function init_wordlist_impl(min_level, max_level) {
             const out = {};
@@ -1916,9 +1931,10 @@
             out.words = [];
             out.level_counts = [];
             for(let i=0; i<word_repository.length; i++) {
-                const wlevel = word_repository[i].level;
+                const wrdata = process_word_data(word_repository[i]);
+                const wlevel = wrdata.level;
                 if(wlevel >= min_level && wlevel <= max_level) {
-                    out.words.push(word_repository[i]);
+                    out.words.push(wrdata);
                     
                     if(typeof(out.level_counts[wlevel]) == 'undefined') { out.level_counts[wlevel] = 0; }
                     out.level_counts[wlevel]++;
