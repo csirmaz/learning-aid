@@ -1,5 +1,5 @@
 /* ===========================================================================
- * aquarium.js  --  A lightweight, static, dependency-free 2D aquarium widget.
+ * aquarium.js  --  A lightweight, static 2D aquarium widget.
  *
  * Public API (see README.md):
  *   var game = AquariumGame.init(divOrId [, options]);
@@ -10,53 +10,63 @@
  *
  * options: { basePath, storageKey, startEmpty }
  * ========================================================================= */
-/* `global` is the IIFE parameter bound to `window` by the call at the foot of
- * this file. Using a parameter (rather than referring to `window` directly)
- * keeps the global object in a single named place and lets a bundler or test
- * harness substitute its own environment if ever needed. */
+
+/* `global` is bound to `window` by the call at the foot of this file.  */
 (function (global) {
   'use strict';
 
-  var CFG = global.AQ_CONFIG;
-  if (!CFG) { console.error('[Aquarium] config.js must be loaded before aquarium.js'); return; }
-  var T = CFG.tuning;
+  var Config = global.AQ_CONFIG;
+  if (!Config) { console.error('[Aquarium] config.js must be loaded before aquarium.js'); return; }
 
   /* ---------- small helpers ---------------------------------------------- */
+
   function clamp(v, a, b) { return v < a ? a : (v > b ? b : v); }
+  
   function rand(a, b) { return a + Math.random() * (b - a); }
-  function pickKey(obj) { var k = Object.keys(obj); return k[(Math.random() * k.length) | 0]; }
-  function elem(tag, cls) { var e = document.createElement(tag); if (cls) e.className = cls; return e; }
-  /* Monotonic millisecond clock. `global.performance` is the High Resolution
-   * Time API (window.performance); `performance.now()` returns a steadily
-   * increasing timestamp unaffected by wall-clock changes, which is what an
-   * animation loop needs. Where it is unavailable we fall back to Date.now(). */
+  
+  function pickKey(obj) { 
+    var k = Object.keys(obj);
+    return k[(Math.random() * k.length) | 0];
+  }
+  
+  function elem(tag, cls) { // Create DOM element
+    var e = document.createElement(tag); 
+    if (cls) e.className = cls; 
+    return e;
+  }
+
+  /* Monotonic millisecond clock. `performance.now()` returns a steadily
+   * increasing timestamp unaffected by wall-clock changes */
   var now = (global.performance && performance.now)
     ? function () { return performance.now(); }
     : function () { return Date.now(); };
 
   /* `seq` is a process-wide counter; `uid(prefix)` increments it and returns a
-   * short unique id such as "f3" or "i7". Ids only need to be unique within a
-   * run (they are not persisted), so a simple counter is sufficient. */
+   * short unique id such as "f3" or "i7". */
   var seq = 0;
   function uid(p) { return p + (++seq); }
 
-  /* ======================================================================= *
-   *  Aquarium instance
-   * ======================================================================= */
+  /* ---------- Aquarium instance ---------------------------------------------- */
+
   function Aquarium(container, options) {
     if (!container) throw new Error('[Aquarium] a container element or id is required');
     this.container = container;
     this.opts = options || {};
     this.key = this.opts.storageKey || container.id || 'default';
-    this.storeKey = CFG.storagePrefix + '.' + this.key;
+    this.storeKey = Config.storagePrefix + '.' + this.key;
 
-    this.fish = []; this.items = []; this.food = [];
+    this.fish = []; 
+    this.items = []; 
+    this.food = [];
     this.attractors = [];
-    this.worldW = 0; this.worldH = 0;
+    this.worldW = 0; 
+    this.worldH = 0;
     this._drag = null;
-    this._dirty = false; this._lastSave = 0;
+    this._dirty = false; 
+    this._lastSave = 0;
     this._lastScroll = 0;
-    this._last = now(); this._running = false;
+    this._last = now(); 
+    this._running = false;
 
     this._buildDOM();
     this._relayout();
@@ -101,11 +111,15 @@
     var fadeR = elem('div', 'aq-fade aq-fade-r');
     var hintL = elem('div', 'aq-hint aq-hint-l'); hintL.textContent = '\u2039';
     var hintR = elem('div', 'aq-hint aq-hint-r'); hintR.textContent = '\u203A';
-    root.appendChild(fadeL); root.appendChild(fadeR);
-    root.appendChild(hintL); root.appendChild(hintR);
+    root.appendChild(fadeL); 
+    root.appendChild(fadeR);
+    root.appendChild(hintL); 
+    root.appendChild(hintR);
     c.appendChild(root);
 
-    this.root = root; this.tank = tank; this.world = world;
+    this.root = root; 
+    this.tank = tank; 
+    this.world = world;
   };
 
   P._asset = function (src) {
@@ -115,17 +129,18 @@
   };
 
   /* ---------- sizing / responsive layout --------------------------------- */
+  
   P._relayout = function () {
     var W = this.container.clientWidth, H = this.container.clientHeight;
     if (!W || !H) return;
-    this.worldW = W * CFG.worldWidthFactor;
+    this.worldW = W * Config.worldWidthFactor;
     this.worldH = H;
     this.world.style.width = this.worldW + 'px';
 
     var self = this;
     this.items.forEach(function (it) { self._placeFromNorm(it); self._sizeEntity(it, it.def); });
     this.fish.forEach(function (f)  { self._placeFromNorm(f);  self._sizeEntity(f, f.def); });
-    this.food.forEach(function (p)  { self._placeFromNorm(p);  self._sizeEntity(p, CFG.food); });
+    this.food.forEach(function (p)  { self._placeFromNorm(p);  self._sizeEntity(p, Config.food); });
     this._updateHints();
   };
 
@@ -151,21 +166,39 @@
   };
 
   /* ---------- spawning ---------------------------------------------------- */
+  
   P._spawnFish = function (type, nx, ny, dir) {
-    var def = CFG.fish[type];
+    var def = Config.fish[type];
     var el = elem('div', 'aq-fish');
     var inner = elem('div', 'aq-fish-inner');
     var img = new Image();
-    img.src = this._asset(def.src); img.alt = type; img.draggable = false;
+    img.src = this._asset(def.src);
+    img.draggable = false;
     inner.style.animationDuration = rand(1.4, 2.6).toFixed(2) + 's';
     inner.appendChild(img);
     el.appendChild(inner);
     this.world.appendChild(el);
 
     var f = {
-      kind: 'fish', id: uid('f'), type: type, def: def, el: el, img: img,
-      nx: nx, ny: ny, x: 0, y: 0, vx: 0, vy: 0,
-      dir: dir || 1, tnx: 0, tny: 0, phase: rand(0, 6.28), wiggle: 0, _w: 0, _h: 0
+      kind: 'fish', 
+      id: uid('f'), 
+      type: type, 
+      def: def, 
+      el: el, 
+      img: img,
+      nx: nx, 
+      ny: ny, 
+      x: 0, 
+      y: 0, 
+      vx: 0, 
+      vy: 0,
+      dir: dir || 1, 
+      tnx: 0, 
+      tny: 0, 
+      phase: rand(0, 6.28), 
+      wiggle: 0, 
+      _w: 0, 
+      _h: 0
     };
     this._newWander(f);
     this._placeFromNorm(f);
@@ -173,21 +206,33 @@
     this.fish.push(f);
 
     var self = this;
-    el.addEventListener('click', function (ev) { ev.stopPropagation(); self._pokeFish(f, ev); });
+    el.addEventListener('click', function(ev) { ev.stopPropagation(); self._pokeFish(f, ev); });
     return f;
   };
 
-  P._spawnItem = function (type, nx, ny) {
-    var def = CFG.items[type];
+  P._spawnItem = function(type, nx, ny) {
+    var def = Config.items[type];
     var el = elem('div', 'aq-item ' + (def.draggable ? 'aq-draggable' : 'aq-fixed'));
     var img = new Image();
-    img.src = this._asset(def.src); img.alt = type; img.draggable = false;
+    img.src = this._asset(def.src); 
+    img.draggable = false;
     el.appendChild(img);
     this.world.appendChild(el);
 
     var it = {
-      kind: 'item', id: uid('i'), type: type, def: def, el: el, img: img,
-      nx: nx, ny: ny, x: 0, y: 0, drag: false, _w: 0, _h: 0
+      kind: 'item', 
+      id: uid('i'), 
+      type: type, 
+      def: def, 
+      el: el, 
+      img: img,
+      nx: nx, 
+      ny: ny, 
+      x: 0, 
+      y: 0, 
+      drag: false, 
+      _w: 0, 
+      _h: 0
     };
     this._placeFromNorm(it);
     this._sizeEntity(it, def);
@@ -197,44 +242,52 @@
     return it;
   };
 
-  P._spawnFood = function (nx, ny) {
+  P._spawnFood = function(nx, ny) {
     var el = elem('div', 'aq-food');
     var img = new Image();
-    img.src = this._asset(CFG.food.src); img.draggable = false;
+    img.src = this._asset(Config.food.src); img.draggable = false;
     el.appendChild(img);
     this.world.appendChild(el);
 
     var p = {
-      kind: 'food', id: uid('p'), def: CFG.food, el: el, img: img,
-      nx: nx, ny: ny, x: 0, y: 0, rest: 0, _w: 0, _h: 0
+      kind: 'food', 
+      id: uid('p'), 
+      def: Config.food, 
+      el: el, 
+      img: img,
+      nx: nx, 
+      ny: ny, 
+      x: 0, 
+      y: 0, 
+      rest: 0, 
+      _w: 0, 
+      _h: 0
     };
     this._placeFromNorm(p);
-    this._sizeEntity(p, CFG.food);
+    this._sizeEntity(p, Config.food);
     this.food.push(p);
     return p;
   };
 
-  P._newWander = function (f) {
+  P._newWander = function(f) {
     var nx = (typeof f.nx === 'number') ? f.nx : 0.5, t = 0.5;
     for (var k = 0; k < 6; k++) {            /* pick a target worth travelling to */
       t = rand(0.06, 0.94);
       if (Math.abs(t - nx) >= 0.22) break;
     }
     f.tnx = t;
-    f.tny = rand(T.fishCeil + 0.04, T.fishFloor - 0.04);
+    f.tny = rand(Config.tuning.fishCeil + 0.04, Config.tuning.fishFloor - 0.04);
   };
 
   P._seed = function () {
-    this._spawnItem('rock',    0.16, T.itemRest);
-    this._spawnItem('seaweed', 0.46, T.itemRest);
-    this._spawnItem('coral',   0.78, T.itemRest);
+    this._spawnItem('rock',    0.16, Config.tuning.itemRest);
+    this._spawnItem('seaweed', 0.46, Config.tuning.itemRest);
+    this._spawnItem('coral',   0.78, Config.tuning.itemRest);
     this._spawnFish('goldfish',  0.25, 0.40);
-    this._spawnFish('clownfish', 0.55, 0.55);
-    this._spawnFish('bluetang',  0.82, 0.34);
   };
 
   /* ---------- persistence ------------------------------------------------- */
-  P._loadState = function () {
+  P._loadState = function() {
     var raw;
     try { raw = global.localStorage.getItem(this.storeKey); } catch (e) { return false; }
     if (!raw) return false;
@@ -244,16 +297,16 @@
 
     var self = this;
     data.items.forEach(function (s) {
-      if (CFG.items[s.type]) self._spawnItem(s.type, s.nx, s.ny);
+      if (Config.items[s.type]) self._spawnItem(s.type, s.nx, s.ny);
     });
     data.fish.forEach(function (s) {
-      if (CFG.fish[s.type]) self._spawnFish(s.type, s.nx, s.ny, s.dir);
+      if (Config.fish[s.type]) self._spawnFish(s.type, s.nx, s.ny, s.dir);
     });
     (data.food || []).forEach(function (s) { self._spawnFood(s.nx, s.ny); });
     return true;
   };
 
-  P._saveState = function () {
+  P._saveState = function() {
     var data = {
       items: this.items.map(function (it) { return { type: it.type, nx: it.nx, ny: it.ny }; }),
       fish:  this.fish.map(function (f)  { return { type: f.type, nx: f.nx, ny: f.ny, dir: f.dir }; }),
@@ -267,26 +320,27 @@
   P._queueSave = function () { this._dirty = true; };
 
   /* ---------- public-ish grant API --------------------------------------- */
-  P.grantFish = function (type) {
-    type = (type && CFG.fish[type]) ? type : pickKey(CFG.fish);
-    var f = this._spawnFish(type, rand(0.12, 0.88), rand(T.fishCeil + 0.06, 0.62));
+
+  P.grantFish = function(type) {
+    type = (type && Config.fish[type]) ? type : pickKey(Config.fish);
+    var f = this._spawnFish(type, rand(0.12, 0.88), rand(Config.tuning.fishCeil + 0.06, 0.62));
     f.wiggle = now() / 1000 + 0.85;
-    this.attractors.push({ x: f.x, y: f.y, until: now() / 1000 + T.lureTtl });
+    this.attractors.push({ x: f.x, y: f.y, until: now() / 1000 + Config.tuning.lureTtl }); // others attracted to new
     this._saveState();
     return type;
   };
 
-  P.grantItem = function (type) {
-    type = (type && CFG.items[type]) ? type : pickKey(CFG.items);
+  P.grantItem = function(type) {
+    type = (type && Config.items[type]) ? type : pickKey(Config.items);
     var viewX = this.tank.scrollLeft + this.container.clientWidth * rand(0.2, 0.8);
     var nx = clamp(viewX / this.worldW, 0.06, 0.94);
     var it = this._spawnItem(type, nx, 0.12);   // spawns high, then settles down
-    this.attractors.push({ x: it.x, y: this.worldH * 0.72, until: now() / 1000 + T.itemTtl });
+    this.attractors.push({ x: it.x, y: this.worldH * 0.72, until: now() / 1000 + Config.tuning.itemTtl }); // fish attracted to new item
     this._saveState();
     return type;
   };
 
-  P.feed = function (count) {
+  P.feed = function(count) {
     count = clamp((count | 0) || 6, 1, 30);
     var cw = this.container.clientWidth;
     var base = this.tank.scrollLeft + cw * 0.5;
@@ -298,9 +352,7 @@
     return count;
   };
 
-  P.grantFood = function (count) { return this.feed(count); };  /* alias */
-
-  P.reset = function () {
+  P.reset = function() {
     try { global.localStorage.removeItem(this.storeKey); } catch (e) {}
     var rm = function (e) { if (e.el && e.el.parentNode) e.el.parentNode.removeChild(e.el); };
     this.fish.forEach(rm); this.items.forEach(rm); this.food.forEach(rm);
@@ -310,30 +362,32 @@
   };
 
   /* ---------- drag & drop (pointer events, touch friendly) --------------- */
-  P._makeDraggable = function (it) {
+
+  P._makeDraggable = function(it) {
     var self = this;
-    it.el.addEventListener('pointerdown', function (ev) {
+    it.el.addEventListener('pointerdown', function(ev) {
       if (ev.pointerType === 'mouse' && ev.button !== 0) return;
       ev.preventDefault();
       self._beginDrag(it, ev);
     });
   };
 
-  P._beginDrag = function (it, ev) {
+  P._beginDrag = function(it, ev) {
     if (this._drag) return;
     var wr = this.world.getBoundingClientRect();
     it.drag = true;
     it.el.classList.add('aq-dragging');
-    try { it.el.setPointerCapture(ev.pointerId); } catch (e) {}
+    try { it.el.setPointerCapture(ev.pointerId); } catch (er) {}
 
     var self = this;
     var d = {
-      it: it, pid: ev.pointerId,
+      it: it, 
+      pid: ev.pointerId,
       offx: it.x - (ev.clientX - wr.left),
       offy: it.y - (ev.clientY - wr.top),
       cx: ev.clientX,
-      move: function (e) { if (e.pointerId === d.pid) self._dragMove(e); },
-      up:   function (e) { if (e.pointerId === d.pid) self._endDrag(e); }
+      move: function(ev2) { if(ev2.pointerId === d.pid) self._dragMove(ev2); },
+      up:   function(ev2) { if(ev2.pointerId === d.pid) self._endDrag(ev2); }
     };
     d.scrollTimer = setInterval(function () { self._dragEdgeScroll(); }, 40);
     this._drag = d;
@@ -343,21 +397,22 @@
     it.el.addEventListener('pointercancel', d.up);
   };
 
-  P._dragMove = function (ev) {
+  P._dragMove = function(ev) {
     var d = this._drag, it = d.it;
     d.cx = ev.clientX;
     var wr = this.world.getBoundingClientRect();
     var x = (ev.clientX - wr.left) + d.offx;
     var y = (ev.clientY - wr.top) + d.offy;
     it.x = clamp(x, it._w / 2, this.worldW - it._w / 2);
-    it.y = clamp(y, it._h, this.worldH * T.dragFloor);
+    it.y = clamp(y, it._h, this.worldH * Config.tuning.dragFloor);
     it.nx = it.x / this.worldW;
     it.ny = it.y / this.worldH;
   };
 
   /* keeps a held item scrolling when the finger rests against an edge */
   P._dragEdgeScroll = function () {
-    var d = this._drag; if (!d || d.cx == null) return;
+    var d = this._drag; 
+    if (!d || d.cx == null) return;
     var tr = this.tank.getBoundingClientRect(), step = 0;
     if (d.cx < tr.left + 36)  step = -9;
     else if (d.cx > tr.right - 36) step = 9;
@@ -372,8 +427,9 @@
     }
   };
 
-  P._endDrag = function (ev) {
-    var d = this._drag; if (!d) return;
+  P._endDrag = function(ev) {
+    var d = this._drag; 
+    if (!d) return;
     var it = d.it;
     it.el.removeEventListener('pointermove', d.move);
     it.el.removeEventListener('pointerup', d.up);
@@ -384,10 +440,10 @@
     it.drag = false;
     this._drag = null;
 
-    /* a moved item draws curious fish */
+    /* a moved item draws fish */
     this.attractors.push({
       x: it.x, y: Math.min(it.y, this.worldH * 0.78),
-      until: now() / 1000 + T.itemTtl
+      until: now() / 1000 + Config.tuning.itemTtl
     });
     this._saveState();
   };
@@ -395,8 +451,9 @@
   /* ---------- stacking / settling ---------------------------------------- */
   /* Returns the surface an item should rest its base on: the highest
      overlapping item that sits strictly below it, else the sand.        */
-  P._supportOf = function (it) {
-    var best = this.worldH * T.itemRest, who = null;
+
+  P._supportOf = function(it) {
+    var best = this.worldH * Config.tuning.itemRest, who = null;
     for (var i = 0; i < this.items.length; i++) {
       var c = this.items[i];
       if (c === it || c.drag) continue;
@@ -408,11 +465,11 @@
     return { y: best, item: who };
   };
 
-  P._stepItems = function (dt) {
-    var fall = T.itemFall * this.worldH * dt;
+  P._stepItems = function(dt) {
+    var fall = Config.tuning.itemFall * this.worldH * dt;
     for (var i = 0; i < this.items.length; i++) {
       var it = this.items[i];
-      if (it.drag || !it.def.draggable) continue;     /* seaweed is planted */
+      if (it.drag || !it.def.draggable) continue;
       var sy = this._supportOf(it).y;
       if (it.y < sy) it.y = Math.min(sy, it.y + fall);
       else if (it.y > sy) it.y = sy;
@@ -421,16 +478,17 @@
   };
 
   /* ---------- food ------------------------------------------------------- */
+  
   P._stepFood = function (dt) {
-    var H = this.worldH, sink = T.foodSink * H * dt;
-    var restY = H * T.itemRest, t = now() / 1000;
+    var H = this.worldH, sink = Config.tuning.foodSink * H * dt;
+    var restY = H * Config.tuning.itemRest, t = now() / 1000;
     for (var i = this.food.length - 1; i >= 0; i--) {
       var p = this.food[i];
       if (p.y < restY) { p.y += sink; }
       else {
         p.y = restY;
         if (!p.rest) p.rest = t;
-        if (t - p.rest > T.foodRestLife) { this._removeFood(i); continue; }
+        if (t - p.rest > Config.tuning.foodRestLife) { this._removeFood(i); continue; }
       }
       p.ny = p.y / H;
     }
@@ -444,7 +502,8 @@
     setTimeout(function () { if (p.el.parentNode) p.el.parentNode.removeChild(p.el); }, 260);
   };
 
-  /* ---------- fish AI ---------------------------------------------------- */
+  /* ---------- fish control ---------------------------------------------------- */
+
   P._nearestFood = function (x, y, maxd) {
     var best = null, bd = maxd * maxd;
     for (var i = 0; i < this.food.length; i++) {
@@ -465,16 +524,16 @@
 
   P._stepFish = function (dt, t) {
     var W = this.worldW, H = this.worldH;
-    var ceil = H * T.fishCeil, floor = H * T.fishFloor;
+    var ceil = H * Config.tuning.fishCeil, floor = H * Config.tuning.fishFloor;
 
     for (var i = 0; i < this.fish.length; i++) {
-      var f = this.fish[i], base = f.def.speed * W, spd = base;
+      var f = this.fish[i], base = f.def.speed * Config.tuning.fishSpeedBase, spd = base;
       var gx, gy, chasing = false;
 
-      var fp = this._nearestFood(f.x, f.y, T.foodRange * W);
+      var fp = this._nearestFood(f.x, f.y, Config.tuning.foodRange * W);
       if (fp) { gx = fp.x; gy = fp.y; chasing = true; }
       else {
-        var at = this._nearestAttractor(f.x, f.y, T.attractRange * W);
+        var at = this._nearestAttractor(f.x, f.y, Config.tuning.attractRange * W);
         if (at) { gx = at.x; gy = at.y; chasing = true; }
         else {
           if (Math.abs(f.x - f.tnx * W) < W * 0.03 &&
@@ -482,15 +541,15 @@
           gx = f.tnx * W; gy = f.tny * H;
         }
       }
-      if (chasing) spd *= T.seekBoost;
+      if (chasing) spd *= Config.tuning.seekBoost;
 
       var ang = Math.atan2(gy - f.y, gx - f.x);
-      var turn = Math.min(1, T.turnRate * dt);
+      var turn = Math.min(1, Config.tuning.turnRate * dt);
       f.vx += (Math.cos(ang) * spd - f.vx) * turn;
       f.vy += (Math.sin(ang) * spd - f.vy) * turn;
 
       f.x += f.vx * dt;
-      f.y += f.vy * dt + Math.sin(t * 2.3 + f.phase) * T.bob * H * dt;
+      f.y += f.vy * dt + Math.sin(t * 2.3 + f.phase) * Config.tuning.bob * H * dt;
 
       /* Personal space: nudge away from any fish that is too close, so a crowd
          gathering on one attractor spreads into a loose shoal instead of all
@@ -509,7 +568,7 @@
           sx += ox * push; sy += oy * push;
         }
       }
-      var sep = base * T.sepGain * dt;
+      var sep = base * Config.tuning.sepGain * dt;
       f.x += sx * sep;
       f.y += sy * sep;
 
@@ -526,7 +585,7 @@
       else if (f.vx < -flip) f.dir = -1;
 
       if (fp) {
-        var dx = fp.x - f.x, dy = fp.y - f.y, ed = T.eatDist * H;
+        var dx = fp.x - f.x, dy = fp.y - f.y, ed = Config.tuning.eatDist * H;
         if (dx * dx + dy * dy < ed * ed) {
           var idx = this.food.indexOf(fp);
           if (idx >= 0) this._removeFood(idx);
@@ -540,18 +599,19 @@
   };
 
   /* ---------- taps: lure fish / poke a fish ------------------------------ */
+  
   P._onTap = function (ev) {
     if (now() - this._lastScroll < 160) return;          /* ignore the tail of a scroll */
     var wr = this.world.getBoundingClientRect();
     var x = ev.clientX - wr.left;
     var y = clamp(ev.clientY - wr.top, this.worldH * 0.12, this.worldH * 0.8);
-    this.attractors.push({ x: x, y: y, until: now() / 1000 + T.lureTtl });
+    this.attractors.push({ x: x, y: y, until: now() / 1000 + Config.tuning.lureTtl });
     this._ripple(x, y);
   };
 
   P._pokeFish = function (f, ev) {
     f.wiggle = now() / 1000 + 0.85;
-    this.attractors.push({ x: f.x, y: f.y, until: now() / 1000 + T.lureTtl });
+    // this.attractors.push({ x: f.x, y: f.y, until: now() / 1000 + Config.tuning.lureTtl });
     var wr = this.world.getBoundingClientRect();
     this._ripple(ev.clientX - wr.left, ev.clientY - wr.top);
   };
@@ -602,7 +662,7 @@
       this._stepFish(dt, t);
       this._stepItems(dt);
       this._render(t);
-      if (this._dirty && t - this._lastSave > T.saveEvery) this._saveState();
+      if (this._dirty && t - this._lastSave > Config.tuning.saveEvery) this._saveState();
     } else {
       /* The container reported no size at init (a layout race seen on some
          mobile browsers). Keep retrying so the game appears as soon as the
@@ -651,34 +711,20 @@
    *  Public namespace
    * ======================================================================= */
   var instances = {};
-  var primary = null;
 
   var API = {
     version: '1.0.0',
 
     init: function (container, options) {
-      if (global.location && global.location.protocol === 'file:') {
-        console.warn('[Aquarium] Loaded from a file:// URL. Chrome and Vivaldi ' +
-          'on Android will not render local files — serve the folder over HTTP ' +
-          '(e.g. "python3 -m http.server") and open it via http:// instead.');
-      }
       var el = (typeof container === 'string')
         ? document.getElementById(container) : container;
       if (!el) throw new Error('[Aquarium] container "' + container + '" not found');
       var inst = new Aquarium(el, options || {});
       instances[inst.key] = inst;
-      primary = inst;
       return inst;
     },
 
-    get: function (key) { return key ? instances[key] : primary; },
-
-    /* convenience wrappers operating on the most recently initialised game */
-    grantFish: function (type)  { return primary && primary.grantFish(type); },
-    grantItem: function (type)  { return primary && primary.grantItem(type); },
-    feed:      function (count) { return primary && primary.feed(count); },
-    grantFood: function (count) { return primary && primary.feed(count); },
-    reset:     function ()      { return primary && primary.reset(); }
+    get: function (key) { return key ? instances[key] : primary; }
   };
 
   global.AquariumGame = API;

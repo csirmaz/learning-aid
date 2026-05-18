@@ -3,15 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
-<title>Reefy Room &mdash; Aquarium Widget Demo</title>
+<title>Aquarium Widget Demo</title>
 
 <!-- the game's own stylesheet -->
-<link rel="stylesheet" href="css/aquarium.css">
+<link rel="stylesheet" href="css/aquarium.css?2">
 
-<!-- a playful display font for THIS demo page only (the game itself needs no font) -->
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
   /* ---- demo-page chrome (kept separate from the reusable game CSS) ---- */
@@ -23,48 +19,7 @@
   }
   * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
   html, body { margin: 0; }
-  body {
-    font-family: 'Baloo 2', 'Trebuchet MS', system-ui, sans-serif;
-    color: var(--ink);
-    background:
-      radial-gradient(circle at 18% 0%, #d3f1f8 0%, transparent 55%),
-      radial-gradient(circle at 92% 14%, #ffe6cf 0%, transparent 45%),
-      #f3fbfd;
-    min-height: 100vh;
-  }
-  .phone {
-    max-width: 430px;
-    margin: 0 auto;
-    padding: 18px 16px 40px;
-  }
 
-  /* header */
-  .topbar { display: flex; align-items: center; gap: 10px; margin-bottom: 14px; }
-  .logo {
-    width: 44px; height: 44px; flex: none;
-    border-radius: 14px;
-    background: linear-gradient(150deg, var(--reef2), var(--reef));
-    display: grid; place-items: center;
-    font-size: 24px;
-    box-shadow: 0 6px 14px rgba(255,122,89,.4);
-  }
-  .topbar h1 { font-size: 21px; font-weight: 800; margin: 0; line-height: 1; }
-  .topbar p  { margin: 3px 0 0; font-size: 12.5px; font-weight: 600; color: #5b7d8a; }
-
-  /* the widget card */
-  .tank-card {
-    background: #fff;
-    border-radius: 24px;
-    padding: 12px;
-    box-shadow: 0 14px 30px rgba(13,59,78,.13);
-    border: 2px solid #fff;
-  }
-  .tank-card .caption {
-    display: flex; justify-content: space-between; align-items: baseline;
-    padding: 2px 6px 9px;
-  }
-  .caption b { font-size: 14px; font-weight: 700; }
-  .caption span { font-size: 11.5px; font-weight: 600; color: #8aa3ad; }
 
   /* >>> the game container: full width, about a quarter of the screen <<< */
   #tank {
@@ -113,39 +68,16 @@
   }
   .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
-  /* filler so the page reads like a real app the widget is embedded in */
-  .panel {
-    margin-top: 22px;
-    background: #fff;
-    border-radius: 20px;
-    padding: 16px 18px;
-    box-shadow: 0 8px 20px rgba(13,59,78,.08);
-  }
-  .panel h2 { margin: 0 0 10px; font-size: 15px; font-weight: 800; }
-  .task { display: flex; align-items: center; gap: 11px; padding: 9px 0; font-weight: 600; font-size: 13.5px; }
-  .task + .task { border-top: 1px dashed #e3eef2; }
-  .dot { width: 26px; height: 26px; flex: none; border-radius: 9px; display: grid; place-items: center; font-size: 15px; background: var(--foam); }
-  .hint-line { margin-top: 16px; font-size: 12px; font-weight: 600; color: #7e98a2; text-align: center; }
 </style>
 </head>
 <body>
 
 <div class="phone">
 
-  <div class="topbar">
-    <div class="logo">&#x1F420;</div>
-    <div>
-      <h1>Reefy Room</h1>
-      <p>Your cosy corner of the ocean</p>
-    </div>
-  </div>
+  <h1>Reefy Room</h1>
 
   <!-- ===== the aquarium widget, embedded like any other component ===== -->
   <div class="tank-card">
-    <div class="caption">
-      <b>My Aquarium</b>
-      <span>tap the water &middot; drag the decor &middot; swipe across &rarr;</span>
-    </div>
     <div id="tank"></div>
     <div class="controls">
       <button id="btn-fish" class="primary"><span class="ico">&#x1F41F;</span>Add Fish</button>
@@ -156,21 +88,14 @@
   </div>
   <!-- ================================================================= -->
 
-  <div class="panel">
-    <h2>Today at the reef</h2>
-    <div class="task"><span class="dot">&#x2600;</span> Morning light &mdash; the fish are lively</div>
-    <div class="task"><span class="dot">&#x1F9FC;</span> Water is sparkling clean</div>
-    <div class="task"><span class="dot">&#x1F37D;</span> Next feeding whenever you like</div>
-    <p class="hint-line">Add a few items, stack them into a tower, then refresh the page &mdash; everything stays put.</p>
-  </div>
 
 </div>
 
 <div id="toast" class="toast"></div>
 
 <!-- the game: catalogue first, then the engine. No build step, no server. -->
-<script src="js/config.js"></script>
-<script src="js/aquarium.js"></script>
+<script src="js/config.js?2"></script>
+<script src="js/aquarium.js?2"></script>
 <script>
   document.addEventListener('DOMContentLoaded', function () {
 
@@ -189,17 +114,17 @@
 
     /* --- wire the buttons to the exported API --- */
     document.getElementById('btn-fish').addEventListener('click', function () {
-      say('New friend: ' + nice(AquariumGame.grantFish()) + '!');
+      say('New friend: ' + nice(game.grantFish()) + '!');
     });
     document.getElementById('btn-item').addEventListener('click', function () {
-      say('You received a ' + nice(AquariumGame.grantItem()) + '!');
+      say('You received a ' + nice(game.grantItem()) + '!');
     });
     document.getElementById('btn-feed').addEventListener('click', function () {
-      AquariumGame.feed(8);
+      game.feed(8);
       say('Yum! Food dropped in.');
     });
     document.getElementById('btn-reset').addEventListener('click', function () {
-      AquariumGame.reset();
+      game.reset();
       say('Aquarium reset.');
     });
   });

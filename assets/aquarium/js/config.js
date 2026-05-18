@@ -4,7 +4,6 @@
  * To add a new fish or item:
  *   1. Drop an SVG (facing RIGHT for fish) into assets/.
  *   2. Add an entry below.
- * No engine code needs to change.
  *
  *   h       fraction of the tank HEIGHT the sprite occupies
  *   aspect  sprite width / height (so width is derived from h)
@@ -34,6 +33,7 @@ window.AQ_CONFIG = {
 
   /* Behaviour tuning. Fractions are of world width (x) or height (y). */
   tuning: {
+    fishSpeedBase: 800,
     fishCeil:    0.10,   // fish do not swim above this
     fishFloor:   0.80,   // ... nor below this
     itemRest:    0.90,   // an item's base settles here on the sand
@@ -50,6 +50,6 @@ window.AQ_CONFIG = {
     foodSink:    0.14,   // pellet sink speed
     foodRestLife:8,      // seconds a settled pellet lingers before fading
     itemFall:    1.3,    // item settle/fall speed
-    saveEvery:   1.0     // throttle (s) for background fish-position saves
+    saveEvery:   5.0     // throttle (s) for background fish-position saves
   }
 };
