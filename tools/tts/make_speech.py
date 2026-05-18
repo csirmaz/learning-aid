@@ -56,6 +56,10 @@ def avoid_tts(text):
         'hook',
         'thief',
         'heavy',
+        'busy bee',
+        'cats',
+        'will',
+        'cocoa'
     ]
 
 seen = set()
