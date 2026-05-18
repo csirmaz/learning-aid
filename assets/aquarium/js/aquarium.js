@@ -323,7 +323,9 @@
 
   P.grantFish = function(type) {
     type = (type && Config.fish[type]) ? type : pickKey(Config.fish);
-    var f = this._spawnFish(type, rand(0.12, 0.88), rand(Config.tuning.fishCeil + 0.06, 0.62));
+    var viewX = this.tank.scrollLeft + this.container.clientWidth * rand(0.2, 0.8);
+    var nx = clamp(viewX / this.worldW, 0.12, 0.88);
+    var f = this._spawnFish(type, nx, rand(Config.tuning.fishCeil + 0.06, 0.62));
     f.wiggle = now() / 1000 + 0.85;
     this.attractors.push({ x: f.x, y: f.y, until: now() / 1000 + Config.tuning.lureTtl }); // others attracted to new
     this._saveState();

@@ -1,7 +1,8 @@
 /* ===========================================================================
  * aquarium.css  --  Visual styles for the aquarium widget.
- * Everything is scoped under .aq-root so it will not leak into the host page.
  * ========================================================================= */
+
+.aq-host, .aq-host * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 
 .aq-host { position: relative; }
 

@@ -26,7 +26,7 @@ window.AQ_CONFIG = {
     chest:   { src: 'assets/items/chest.svg',   h: 0.22, aspect: 1.160, draggable: true  },
     castle:  { src: 'assets/items/castle.svg',  h: 0.36, aspect: 1.364, draggable: true  },
     coral:   { src: 'assets/items/coral.svg',   h: 0.30, aspect: 0.897, draggable: true  },
-    seaweed: { src: 'assets/items/seaweed.svg', h: 0.46, aspect: 0.600, draggable: false }
+    seaweed: { src: 'assets/items/seaweed.svg', h: 0.46, aspect: 0.600, draggable: true }
   },
 
   food: { src: 'assets/misc/food.svg', h: 0.055, aspect: 1 },
