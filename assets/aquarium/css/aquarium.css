@@ -1,0 +1,185 @@
+/* ===========================================================================
+ * aquarium.css  --  Visual styles for the aquarium widget.
+ * Everything is scoped under .aq-root so it will not leak into the host page.
+ * ========================================================================= */
+
+.aq-host { position: relative; }
+
+.aq-root {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  border-radius: 18px;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* --- scroll viewport ------------------------------------------------------ */
+.aq-tank {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  touch-action: pan-x;                 /* only horizontal panning */
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: none;
+}
+.aq-tank::-webkit-scrollbar { width: 0; height: 0; }
+
+/* --- the aquarium world (wider than the viewport) ------------------------- */
+.aq-world {
+  position: relative;
+  height: 100%;
+  min-width: 100%;
+  background: linear-gradient(180deg,
+              #cdf3ff 0%, #7fd6f0 38%, #36a9d8 72%, #1f7fb0 100%);
+  overflow: hidden;
+}
+.aq-world::before {                    /* soft diagonal light rays */
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+              115deg,
+              rgba(255,255,255,.16) 0 26px,
+              rgba(255,255,255,0)  26px 92px);
+  pointer-events: none;
+}
+
+/* --- sand ----------------------------------------------------------------- */
+.aq-sand {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  height: 18%;
+  background: linear-gradient(180deg, #f4d9a0 0%, #e6c184 100%);
+  border-radius: 46% 38% 0 0 / 26px 22px 0 0;
+  box-shadow: inset 0 6px 0 rgba(255,255,255,.35);
+  pointer-events: none;
+}
+
+/* --- decorative bubbles --------------------------------------------------- */
+.aq-bubbles { position: absolute; inset: 0; pointer-events: none; }
+.aq-bubble {
+  position: absolute;
+  bottom: -22px;
+  width: var(--s, 8px);
+  height: var(--s, 8px);
+  border-radius: 50%;
+  background: rgba(255,255,255,.5);
+  border: 1px solid rgba(255,255,255,.85);
+  animation: aq-rise linear infinite;
+}
+@keyframes aq-rise {
+  0%   { transform: translateY(0) scale(.6);      opacity: 0; }
+  14%  { opacity: .9; }
+  100% { transform: translateY(-1100%) scale(1);  opacity: 0; }
+}
+
+/* --- fish ----------------------------------------------------------------- */
+.aq-fish {
+  position: absolute; left: 0; top: 0;
+  will-change: transform;
+  cursor: pointer;
+}
+.aq-fish-inner {
+  width: 100%; height: 100%;
+  transform-origin: 62% 50%;
+  animation: aq-swim ease-in-out infinite;   /* tail wiggle, set per-fish */
+}
+@keyframes aq-swim {
+  0%   { transform: rotate(-3.5deg) scaleY(1);   }
+  50%  { transform: rotate( 3.5deg) scaleY(.95); }
+  100% { transform: rotate(-3.5deg) scaleY(1);   }
+}
+
+/* --- items ---------------------------------------------------------------- */
+.aq-item {
+  position: absolute; left: 0; top: 0;
+  will-change: transform;
+  filter: drop-shadow(0 4px 3px rgba(8,40,60,.28));
+}
+.aq-draggable { cursor: grab; touch-action: none; }
+.aq-draggable:active { cursor: grabbing; }
+.aq-dragging {
+  z-index: 2000 !important;
+  filter: drop-shadow(0 12px 9px rgba(8,40,60,.4));
+}
+.aq-fixed { pointer-events: none; }      /* planted decor: taps fall through */
+
+/* --- food ----------------------------------------------------------------- */
+.aq-food {
+  position: absolute; left: 0; top: 0;
+  z-index: 550;
+  transition: opacity .25s ease;
+}
+.aq-food.aq-gone { opacity: 0; }
+
+/* shared image rules */
+.aq-fish img, .aq-item img, .aq-food img {
+  width: 100%; height: 100%;
+  display: block;
+  pointer-events: none;
+  -webkit-user-drag: none;
+}
+
+/* --- tap ripple ----------------------------------------------------------- */
+.aq-ripple {
+  position: absolute;
+  width: 14px; height: 14px;
+  margin: -7px 0 0 -7px;
+  border-radius: 50%;
+  border: 3px solid rgba(255,255,255,.85);
+  pointer-events: none;
+  z-index: 1500;
+  animation: aq-ripple .6s ease-out forwards;
+}
+@keyframes aq-ripple {
+  0%   { transform: scale(.3); opacity: .9; }
+  100% { transform: scale(4.2); opacity: 0; }
+}
+
+/* --- scroll affordances --------------------------------------------------- */
+.aq-fade {
+  position: absolute; top: 0;
+  width: 42px; height: 100%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .4s ease;
+}
+.aq-fade-r {
+  right: 0;
+  background: linear-gradient(90deg, rgba(31,127,176,0), rgba(31,127,176,.4));
+}
+.aq-fade-l {
+  left: 0;
+  background: linear-gradient(270deg, rgba(31,127,176,0), rgba(31,127,176,.4));
+}
+.aq-hint {
+  position: absolute; top: 50%;
+  margin-top: -16px;
+  width: 32px; height: 32px;
+  line-height: 30px; text-align: center;
+  font-size: 24px; font-weight: 700;
+  color: #fff;
+  background: rgba(15,90,130,.55);
+  border-radius: 50%;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .3s ease;
+}
+.aq-hint-r { right: 10px; animation: aq-hint-r 1.3s ease-in-out infinite; }
+.aq-hint-l { left: 10px;  animation: aq-hint-l 1.3s ease-in-out infinite; }
+@keyframes aq-hint-r {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(5px); }
+}
+@keyframes aq-hint-l {
+  0%, 100% { transform: translateX(0); }
+  50%      { transform: translateX(-5px); }
+}
+/* an arrow + fade is shown for each direction the tank can still scroll */
+.aq-can-right .aq-hint-r, .aq-can-right .aq-fade-r { opacity: 1; }
+.aq-can-left  .aq-hint-l, .aq-can-left  .aq-fade-l { opacity: 1; }

@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 80">
+  <defs><clipPath id="cbody"><ellipse cx="68" cy="42" rx="41" ry="26"/></clipPath></defs>
+  <g stroke="#9a3412" stroke-width="3.5" stroke-linejoin="round">
+    <path d="M44 41 L11 16 Q23 41 11 66 Z" fill="#f97316"/>
+    <path d="M56 23 Q68 7 82 21 Q70 26 62 33 Z" fill="#fb923c"/>
+    <path d="M58 59 Q68 73 80 60 Q70 56 62 50 Z" fill="#fb923c"/>
+    <ellipse cx="68" cy="42" rx="41" ry="26" fill="#fb7a3c"/>
+  </g>
+  <g clip-path="url(#cbody)">
+    <path d="M46 6 q11 36 2 70 l17 0 q9 -34 -2 -70 Z" fill="#fff"/>
+    <path d="M84 9 q-8 33 1 64 l18 -8 q-7 -28 1 -54 Z" fill="#fff"/>
+  </g>
+  <ellipse cx="68" cy="42" rx="41" ry="26" fill="none" stroke="#9a3412" stroke-width="3.5"/>
+  <circle cx="95" cy="37" r="8" fill="#fff" stroke="#9a3412" stroke-width="2.5"/>
+  <circle cx="97" cy="38" r="3.8" fill="#1f2937"/>
+  <path d="M105 47 q-8 6 -15 1" fill="none" stroke="#9a3412" stroke-width="3" stroke-linecap="round"/>
+</svg>
