@@ -159,7 +159,8 @@
   };
 
   P._sizeEntity = function (e, def) {
-    e._h = def.h * this.worldH;
+    e._h = def.h * this.worldH * Config.worldHeightFactor;
+    e.collideHeight = (def.collideHeight === undefined ? def.h : def.collideHeight) * this.worldH * Config.worldHeightFactor;
     e._w = e._h * def.aspect;
     e.el.style.width  = e._w + 'px';
     e.el.style.height = e._h + 'px';
@@ -336,7 +337,8 @@
     type = (type && Config.items[type]) ? type : pickKey(Config.items);
     var viewX = this.tank.scrollLeft + this.container.clientWidth * rand(0.2, 0.8);
     var nx = clamp(viewX / this.worldW, 0.06, 0.94);
-    var it = this._spawnItem(type, nx, 0.12);   // spawns high, then settles down
+    var ny = Config.items[type].draggable ? 0.12 : T.itemRest;
+    var it = this._spawnItem(type, nx, ny);   // spawns high, then settles down
     this.attractors.push({ x: it.x, y: this.worldH * 0.72, until: now() / 1000 + Config.tuning.itemTtl }); // fish attracted to new item
     this._saveState();
     return type;
@@ -461,7 +463,7 @@
       if (c === it || c.drag) continue;
       if (Math.abs(it.x - c.x) > (it._w + c._w) * 0.34) continue;  /* must overlap in x */
       if (c.y <= it.y + 2) continue;                               /* c must be below us */
-      var top = c.y - c._h;
+      var top = c.y - c.collideHeight;
       if (top < best) { best = top; who = c; }
     }
     return { y: best, item: who };
