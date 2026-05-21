@@ -14,9 +14,12 @@ sub procfile {
                 $newver = $1 + 1;
                 print "New version: $newver\n";
             }
-            s/common.css\?([0-9]+)"/common.css?$newver"/g;
-            s/common.js\?([0-9]+)"/common.js?$newver"/g;
-            s/beelocal.js\?([0-9]+)"/beelocal.js?$newver"/g;
+            s/common\.css\?([0-9]+)"/common.css?$newver"/g;
+            s/common\.js\?([0-9]+)"/common.js?$newver"/g;
+            s/beelocal\.js\?([0-9]+)"/beelocal.js?$newver"/g;
+            s!assets/aquarium/js/aquarium\.js\?([0-9]+)"!assets/aquarium/js/aquarium.js?$newver"!g;
+            s!assets/aquarium/css/aquarium\.css\?([0-9]+)"!assets/aquarium/css/aquarium.css?$newver"!g;
+            s!assets/aquarium/js/config\.js\?([0-9]+)"!assets/aquarium/js/config.js?$newver"!g;
         }
         if($type eq 'JS') {
             die "no existing version found ($filename)" unless $newver;

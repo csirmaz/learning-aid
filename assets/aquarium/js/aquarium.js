@@ -1,13 +1,5 @@
 /* ===========================================================================
  * aquarium.js  --  A lightweight, static 2D aquarium widget.
- *
- * Public API (see README.md):
- *   var game = AquariumGame.init(divOrId [, options]);
- *   AquariumGame.grantFish([type]);   game.grantFish([type]);
- *   AquariumGame.grantItem([type]);   game.grantItem([type]);
- *   AquariumGame.feed([count]);       game.feed([count]);
- *   AquariumGame.reset();             game.reset();
- *
  * options: { basePath, storageKey, startEmpty }
  * ========================================================================= */
 
@@ -728,7 +720,7 @@
       return inst;
     },
 
-    get: function (key) { return key ? instances[key] : primary; }
+    get: function (key) { return instances[key]; }
   };
 
   global.AquariumGame = API;
