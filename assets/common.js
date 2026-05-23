@@ -1,5 +1,5 @@
 
-const bee_app_version = 407;
+const bee_app_version = 408;
 
 call_local_hook('check_version', []);
 
@@ -62,7 +62,7 @@ const audio = {
         {file: 'assets/sounds/success/arcade-ui-14-229514.mp3', 'volume': .5, 'object': false},
         {file: 'assets/sounds/success/arcade-ui-29-229501.mp3', 'volume': .5, 'object': false},
         {file: 'assets/sounds/success/rising-funny-game-effect-132474.mp3', 'volume': .25, 'object': false},
-        {file: 'assets/sounds/success/11l-victory-1749704552668-358772.mp3', 'volume': .4, 'object': false},
+        // {file: 'assets/sounds/success/11l-victory-1749704552668-358772.mp3', 'volume': .4, 'object': false},
         {file: 'assets/sounds/success/11l-victory_sound_with_t-1749487409696-357609.mp3', 'volume': .4, 'object': false},
         {file: 'assets/sounds/success/11l-game_complete_notifi-1749489486836-360350.mp3', 'volume': .4, 'object': false},
     ],

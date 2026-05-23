@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?407">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?408">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -32,7 +32,6 @@
         
         .prompt .infield {
             display: block;
-            border-radius: 1rem;
             background: #fffae4;
             margin: 0;
             font-size: 2rem;
@@ -40,21 +39,23 @@
             padding: 1rem;
             min-width: 20rem;
             min-height: 7rem;
-            letter-spacing: .2rem;
+            letter-spacing: .18rem;
         }
         
         body .prompt .infield.infield_story,
         .prompt .addwords {
-            font-weight: bold;
-            font-size: 1.1rem;
-            line-height: 1.8rem;
+            font-size: 1rem;
+            line-height: 1.6rem;
             padding: .5rem;
-            letter-spacing: .1rem;
+            letter-spacing: .08rem;
+            border-radius: 0;
+        }
+        body .prompt .infield.infield_story {
+            padding-bottom: 0;
         }
         .prompt .addwords {
-            border-radius: 1rem;
             background: #fffae4;
-            margin: 1rem 0;
+            padding-top: 0;
         }
         .prompt .addwords .word {
             display: inline-block;
@@ -62,7 +63,7 @@
             color: #05b;
             border-radius: .5rem;
             margin: 0 .5rem;
-            padding: .1rem .2rem;
+            padding: 0 .2rem;
         }
         
         .prompt .infield .help,
@@ -164,10 +165,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?407">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?408">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?407"></script>
+    <script src="assets/local/beelocal.js?408"></script>
 </head>
 <body>
     <div class="container">
@@ -1115,7 +1116,7 @@
 
 
     </script>
-    <script src="assets/common.js?407"></script>
+    <script src="assets/common.js?408"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -2192,8 +2193,8 @@
         }, 200);
         
     </script>
-    <script src="assets/aquarium/js/config.js?407"></script>
-    <script src="assets/aquarium/js/aquarium.js?407"></script>
+    <script src="assets/aquarium/js/config.js?408"></script>
+    <script src="assets/aquarium/js/aquarium.js?408"></script>
     <div class="footercontent"></div>
 
 </body>
