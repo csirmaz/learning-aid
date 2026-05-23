@@ -11,8 +11,7 @@
  *   speed   (fish only) cruising speed as a fraction of world width / second
  *   draggable (items only) whether the player may drag it
  * ========================================================================= */
-window.AQ_CONFIG = {
-  storagePrefix: 'aquariumGame.v1',
+window.AQUARIUM_CONFIG = {
   worldHeightFactor: 0.8,
   worldWidthFactor: 2.6,          // aquarium is this many container-widths wide
 
@@ -65,7 +64,7 @@ window.AQ_CONFIG = {
 
   /* Behaviour tuning. Fractions are of world width (x) or height (y). */
   tuning: {
-    fishSpeedBase: 800,
+    fishSpeedBase: 500,
     fishCeil:    0.10,   // fish do not swim above this
     fishFloor:   0.80,   // ... nor below this
     itemRest:    0.90,   // an item's base settles here on the sand
@@ -85,3 +84,14 @@ window.AQ_CONFIG = {
     saveEvery:   5.0     // throttle (s) for background fish-position saves
   }
 };
+
+try {
+  if(local_hook_has('aquarium_fish')) {
+    Object.assign(window.AQUARIUM_CONFIG.fish, bee_local.aquarium_fish);
+  }
+  if(local_hook_has('aquarium_items')) {
+    Object.assign(window.AQUARIUM_CONFIG.items, bee_local.aquarium_items);
+  }
+} catch(e) {
+  console.error("Aquarium config", e);
+}

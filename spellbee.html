@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?395">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?401">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -34,20 +34,20 @@
             display: block;
             border-radius: 1rem;
             background: #fffae4;
-            margin: 1rem 0;
+            margin: 0;
             font-size: 2rem;
-            line-height: 3rem;
+            line-height: 2.5rem;
             padding: 1rem;
             min-width: 20rem;
-            min-height: 9rem;
+            min-height: 7rem;
             letter-spacing: .2rem;
         }
         
         body .prompt .infield.infield_story,
         .prompt .addwords {
             font-weight: bold;
-            font-size: 1.2rem;
-            line-height: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.8rem;
             padding: .5rem;
             letter-spacing: .1rem;
         }
@@ -106,7 +106,6 @@
         .infield_story .wrongchar { text-underline-offset: .3rem; }
 
         .kbdiv { 
-            margin-top: 1rem; 
             width: 24rem;
         }
         .kbrow0 { text-align: right; }
@@ -149,10 +148,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?395">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?401">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?395"></script>
+    <script src="assets/local/beelocal.js?401"></script>
 </head>
 <body>
     <div class="container">
@@ -199,8 +198,8 @@
     <p class="smallprint">
     v<span class="d_version"></span>
     Player: <span class="d_player"></span>
-    | Word sets: <span class="d_wordsets"></span>
-    | <a href="#" class="handle">Tools &amp; Licences</a>
+    | Words: <span class="d_wordsets"></span>
+    | <a href="#" class="handle">T</a>ools &amp; Licences
         <span class="expand_tools">
             | <a href="#" onclick="bee_tts.test(); return false">TTS</a>
             <span class="localfunctions"></span>
@@ -210,11 +209,11 @@
             | <a href="#" onclick="reset_known_words(); return false">Reset known words</a>
             | <a href="#" onclick="delete_user(); return false">Delete user</a>
         </span>
-        | <span class="d_queue"></span>
-        | Icons by <a href="https://icons8.com">I</a>cons8
-        | <a href="https://codeberg.org/csirmaz/learning-aid">C</a>odebase
+        | <a href="https://icons8.com">I</a>cons8
+        | <a href="https://codeberg.org/csirmaz/learning-aid">C</a>ode
         <span class="expand"></span> 
     </p>
+    <div id="aquarium"></div>
     
     <script>
     
@@ -1094,7 +1093,7 @@
 
 
     </script>
-    <script src="assets/common.js?395"></script>
+    <script src="assets/common.js?401"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1995,8 +1994,7 @@
             bee.level_counts = r.level_counts;
             
             $('.d_wordsets').html(
-                esc_html(min_wordset) + " to " + 
-                esc_html(max_wordset) + " (" + bee.words.length + " words)"
+                esc_html(min_wordset) + " to " + esc_html(max_wordset)
             );
         }
         
@@ -2031,7 +2029,6 @@
                     o += 'ERROR';
                 }
             }
-            $('.d_queue').html('['+o+'] '+get_stats_of_known_words());
         }
         
         // Store problem on queue, filling up undefineds first
@@ -2109,6 +2106,12 @@
             update_score_ui(false);
             $('.d_player').html(esc_html(bee.player));
             init_wordlist();
+            
+            bee.aquarium = new Aquarium(document.getElementById('aquarium'), {
+                'storageKey': 'Aquarium:' + bee.app_name + ':' + bee.player,
+                'basePath': 'assets/aquarium'
+            });
+            
             new_question('main');
         }
         
@@ -2157,8 +2160,8 @@
         }, 200);
         
     </script>
-    <script src="assets/aquarium/js/config.js?395"></script>
-    <script src="assets/aquarium/js/aquarium.js?395"></script>
+    <script src="assets/aquarium/js/config.js?401"></script>
+    <script src="assets/aquarium/js/aquarium.js?401"></script>
     <div class="footercontent"></div>
 
 </body>

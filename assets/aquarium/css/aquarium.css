@@ -171,16 +171,8 @@
   opacity: 0;
   transition: opacity .3s ease;
 }
-.aq-hint-r { right: 10px; animation: aq-hint-r 1.3s ease-in-out infinite; }
-.aq-hint-l { left: 10px;  animation: aq-hint-l 1.3s ease-in-out infinite; }
-@keyframes aq-hint-r {
-  0%, 100% { transform: translateX(0); }
-  50%      { transform: translateX(5px); }
-}
-@keyframes aq-hint-l {
-  0%, 100% { transform: translateX(0); }
-  50%      { transform: translateX(-5px); }
-}
+.aq-hint-r { right: 10px; }
+.aq-hint-l { left: 10px;  }
 /* an arrow + fade is shown for each direction the tank can still scroll */
 .aq-can-right .aq-hint-r, .aq-can-right .aq-fade-r { opacity: 1; }
 .aq-can-left  .aq-hint-l, .aq-can-left  .aq-fade-l { opacity: 1; }

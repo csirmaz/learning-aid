@@ -7,7 +7,7 @@
 (function (global) {
   'use strict';
 
-  var Config = global.AQ_CONFIG;
+  var Config = global.AQUARIUM_CONFIG;
   if (!Config) { console.error('[Aquarium] config.js must be loaded before aquarium.js'); return; }
 
   /* ---------- small helpers ---------------------------------------------- */
@@ -29,9 +29,7 @@
 
   /* Monotonic millisecond clock. `performance.now()` returns a steadily
    * increasing timestamp unaffected by wall-clock changes */
-  var now = (global.performance && performance.now)
-    ? function () { return performance.now(); }
-    : function () { return Date.now(); };
+  var now = (global.performance && global.performance.now) ? function() { return global.performance.now(); } : function() { return Date.now(); };
 
   /* `seq` is a process-wide counter; `uid(prefix)` increments it and returns a
    * short unique id such as "f3" or "i7". */
@@ -41,11 +39,10 @@
   /* ---------- Aquarium instance ---------------------------------------------- */
 
   function Aquarium(container, options) {
-    if (!container) throw new Error('[Aquarium] a container element or id is required');
+    if(!container) throw new Error('[Aquarium] a container element is required');
     this.container = container;
     this.opts = options || {};
-    this.key = this.opts.storageKey || container.id || 'default';
-    this.storeKey = Config.storagePrefix + '.' + this.key;
+    this.storeKey = this.opts.storageKey || 'aquarium_default';
 
     this.fish = []; 
     this.items = []; 
@@ -114,7 +111,7 @@
     this.world = world;
   };
 
-  P._asset = function (src) {
+  P._asset = function(src) {
     var b = this.opts.basePath || '';
     if (b && b.charAt(b.length - 1) !== '/') b += '/';
     return b + src;
@@ -706,23 +703,7 @@
   /* ======================================================================= *
    *  Public namespace
    * ======================================================================= */
-  var instances = {};
 
-  var API = {
-    version: '1.0.0',
-
-    init: function (container, options) {
-      var el = (typeof container === 'string')
-        ? document.getElementById(container) : container;
-      if (!el) throw new Error('[Aquarium] container "' + container + '" not found');
-      var inst = new Aquarium(el, options || {});
-      instances[inst.key] = inst;
-      return inst;
-    },
-
-    get: function (key) { return instances[key]; }
-  };
-
-  global.AquariumGame = API;
+  global.Aquarium = Aquarium;
 
 })(window);

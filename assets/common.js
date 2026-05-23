@@ -1,5 +1,5 @@
 
-const bee_app_version = 395;
+const bee_app_version = 401;
 
 call_local_hook('check_version', []);
 
@@ -30,185 +30,185 @@ $('.giftannounce span').html('🎁'+"\ufe0f");
 $('.timeoutwarn').html('⏰'+"\ufe0f");
 
 
-        const audio = {
-            click: {'file':'assets/sounds/click.ogg', 'volume':.3, 'object':false},
-            notavail: {'file':'assets/sounds/wronganswer-37702.mp3', 'volume':1, 'object':false},
-            level_complete: [
-                {file: 'assets/sounds/success/congrats1.mp3', volume: 1, object: false},
-                {file: 'assets/sounds/success/congrats2.mp3', volume: 1, object: false}
-            ],
-            success: [
-                {file: 'assets/sounds/success/good1.mp3', volume: 1, object: false},
-                {file: 'assets/sounds/success/good2.mp3', volume: 1, object: false},
-                {file: 'assets/sounds/success/well_done.mp3', volume: 1, object: false},
-                {file: 'assets/sounds/success/well_done2.mp3', volume: 1, object: false},
-                {file: 'assets/sounds/success/well_done3.mp3', volume: 1, object: false},
-                {file: 'assets/sounds/success/correct1.mp3', volume: 1, object: false},
-                {file: 'assets/sounds/success/correct2.mp3', volume: 1, object: false},
-                {file: 'assets/sounds/success/goodresult-82807.mp3', 'volume': .25, 'object': false},
-                {file: 'assets/sounds/success/success-340660.mp3', 'volume': .4, 'object': false},
-                {file: 'assets/sounds/success/sample_confirm_success02_kofi_by_miraclei-360154.mp3', 'volume': .8, 'object': false},
-                {file: 'assets/sounds/success/yipee-45360.mp3', 'volume': .8, 'object': false},
-                {file: 'assets/sounds/success/purchase-succesful-ingame-230550.mp3', 'volume': .4, 'object': false},
-                {file: 'assets/sounds/success/success-fanfare-trumpets-6185.mp3', 'volume': .5, 'object': false},
-                {file: 'assets/sounds/success/11l-victory_sound_with_t-1749487402950-357606.mp3', 'volume': .3, 'object': false},
-                {file: 'assets/sounds/success/level-up-05-326133.mp3', 'volume': .6, 'object': false},
-                {file: 'assets/sounds/success/bonus-points-190035.mp3', 'volume': .6, 'object': false},
-                {file: 'assets/sounds/success/correct-356013.mp3', 'volume': .4, 'object': false},
-                {file: 'assets/sounds/success/get-coin-351945.mp3', 'volume': .4, 'object': false},
-                {file: 'assets/sounds/success/11l-triumphant_orchestra-1749487505211-360357.mp3', 'volume': .4, 'object': false},
-                {file: 'assets/sounds/success/classic-game-action-positive-30-224562.mp3', 'volume': .4, 'object': false},
-                {file: 'assets/sounds/success/classic-game-action-positive-27-224558.mp3', 'volume': .4, 'object': false},
-                {file: 'assets/sounds/success/arcade-ui-14-229514.mp3', 'volume': .5, 'object': false},
-                {file: 'assets/sounds/success/arcade-ui-29-229501.mp3', 'volume': .5, 'object': false},
-                {file: 'assets/sounds/success/rising-funny-game-effect-132474.mp3', 'volume': .25, 'object': false},
-                {file: 'assets/sounds/success/11l-victory-1749704552668-358772.mp3', 'volume': .4, 'object': false},
-                {file: 'assets/sounds/success/11l-victory_sound_with_t-1749487409696-357609.mp3', 'volume': .4, 'object': false},
-                {file: 'assets/sounds/success/11l-game_complete_notifi-1749489486836-360350.mp3', 'volume': .4, 'object': false},
-            ],
-            music: [
-                {file: 'assets/music/satisfying-lofi-for-focus-study-amp-working-242103.mp3', volume: .1, object: false}
-            ]
+const audio = {
+    click: {'file':'assets/sounds/click.ogg', 'volume':.3, 'object':false},
+    notavail: {'file':'assets/sounds/wronganswer-37702.mp3', 'volume':1, 'object':false},
+    level_complete: [
+        {file: 'assets/sounds/success/congrats1.mp3', volume: 1, object: false},
+        {file: 'assets/sounds/success/congrats2.mp3', volume: 1, object: false}
+    ],
+    success: [
+        {file: 'assets/sounds/success/good1.mp3', volume: 1, object: false},
+        {file: 'assets/sounds/success/good2.mp3', volume: 1, object: false},
+        {file: 'assets/sounds/success/well_done.mp3', volume: 1, object: false},
+        {file: 'assets/sounds/success/well_done2.mp3', volume: 1, object: false},
+        {file: 'assets/sounds/success/well_done3.mp3', volume: 1, object: false},
+        {file: 'assets/sounds/success/correct1.mp3', volume: 1, object: false},
+        {file: 'assets/sounds/success/correct2.mp3', volume: 1, object: false},
+        {file: 'assets/sounds/success/goodresult-82807.mp3', 'volume': .25, 'object': false},
+        {file: 'assets/sounds/success/success-340660.mp3', 'volume': .4, 'object': false},
+        {file: 'assets/sounds/success/sample_confirm_success02_kofi_by_miraclei-360154.mp3', 'volume': .8, 'object': false},
+        {file: 'assets/sounds/success/yipee-45360.mp3', 'volume': .8, 'object': false},
+        {file: 'assets/sounds/success/purchase-succesful-ingame-230550.mp3', 'volume': .4, 'object': false},
+        {file: 'assets/sounds/success/success-fanfare-trumpets-6185.mp3', 'volume': .5, 'object': false},
+        {file: 'assets/sounds/success/11l-victory_sound_with_t-1749487402950-357606.mp3', 'volume': .3, 'object': false},
+        {file: 'assets/sounds/success/level-up-05-326133.mp3', 'volume': .6, 'object': false},
+        {file: 'assets/sounds/success/bonus-points-190035.mp3', 'volume': .6, 'object': false},
+        {file: 'assets/sounds/success/correct-356013.mp3', 'volume': .4, 'object': false},
+        {file: 'assets/sounds/success/get-coin-351945.mp3', 'volume': .4, 'object': false},
+        {file: 'assets/sounds/success/11l-triumphant_orchestra-1749487505211-360357.mp3', 'volume': .4, 'object': false},
+        {file: 'assets/sounds/success/classic-game-action-positive-30-224562.mp3', 'volume': .4, 'object': false},
+        {file: 'assets/sounds/success/classic-game-action-positive-27-224558.mp3', 'volume': .4, 'object': false},
+        {file: 'assets/sounds/success/arcade-ui-14-229514.mp3', 'volume': .5, 'object': false},
+        {file: 'assets/sounds/success/arcade-ui-29-229501.mp3', 'volume': .5, 'object': false},
+        {file: 'assets/sounds/success/rising-funny-game-effect-132474.mp3', 'volume': .25, 'object': false},
+        {file: 'assets/sounds/success/11l-victory-1749704552668-358772.mp3', 'volume': .4, 'object': false},
+        {file: 'assets/sounds/success/11l-victory_sound_with_t-1749487409696-357609.mp3', 'volume': .4, 'object': false},
+        {file: 'assets/sounds/success/11l-game_complete_notifi-1749489486836-360350.mp3', 'volume': .4, 'object': false},
+    ],
+    music: [
+        {file: 'assets/music/satisfying-lofi-for-focus-study-amp-working-242103.mp3', volume: .1, object: false}
+    ]
+};
+        
+        
+const giftelements = [ // Order matters - what gifts a player has is recorded using the index
+    'assets/images/gifts/ai-generated-8658573_640.png',
+    'assets/images/gifts/animal-6987017_640.jpg',
+    'assets/images/gifts/avocado-3651037_640.png',
+    'assets/images/gifts/banana-2850841_640.png',
+    'assets/images/gifts/cat-4475583_640.png',
+    'assets/images/gifts/cat-5773481_640.jpg',
+    'assets/images/gifts/cat-5781057_640.jpg',
+    'assets/images/gifts/cat-7928232_640.png',
+    'assets/images/gifts/cat-8266486_640.jpg',
+    'assets/images/gifts/cat-8863536_640.png',
+    'assets/images/gifts/chicken-159496_640.png',
+    'assets/images/gifts/dog-3431913_640.jpg',
+    'assets/images/gifts/ghost-8250317_640.png',
+    'assets/images/gifts/lion-5487377_640.png',
+    'assets/images/gifts/robot-8449206_640.jpg',
+    'assets/images/gifts/sheep-35599_640.png',
+];
+
+        
+// Videos played at times as a reward
+let videos = [
+];
+if(local_hook_has('local_videos')) {
+    videos = videos.concat(bee_local.local_videos);
+}
+        
+        
+const bee_confetti = new JSConfetti();
+        
+        
+// Check if the page should be refreshed to bring in new versions
+function page_update() {
+    if(Date.now() - bee.load_time > 4*60*60*1000) {
+        window.location.reload(true);
+        return;
+    }
+    call_local_hook('check_version', []);
+}
+        
+        
+// Show a reward animation (confetti)
+function show_animation(callback) {
+    const r = Math.random();
+    if(r > .8) {
+        bee_confetti.addConfetti({confettiColors: ['#00f', '#0c0', '#0ff', '#50f', '#0f0']}).then(callback);
+    } else if(r > .6) {
+        bee_confetti.addConfetti({confettiColors: ['#f00', '#f99', '#f5c', '#ff0', '#f90']}).then(callback);
+    } else if(r > .4) {
+        bee_confetti.addConfetti({emojis: ['🍭'+"\ufe0f", '🍥'+"\ufe0f", '🍬'+"\ufe0f"]}).then(callback);
+    } else if(r > .2) {                
+        bee_confetti.addConfetti({emojis: ['🌼'+"\ufe0f", '🌸'+"\ufe0f", '🍀'+"\ufe0f"]}).then(callback);
+    } else {                
+        bee_confetti.addConfetti({emojis: ['😀'+"\ufe0f", '🥳'+"\ufe0f", '😎'+"\ufe0f"]}).then(callback);
+    }
+}
+        
+        
+// Play a video as a reward. Return if an alternative reward should be shown.
+function play_video(callback) {
+    let video_file = undefined;
+    if(local_hook_has('choose_video')) { video_file = bee_local.choose_video(); }
+    if(video_file === undefined) {
+        if(videos.length == 0) { return true; } // true: show default reward
+        // Choose unseen video
+        if(bee.storage.players[bee.player].videos_seen === undefined) {
+            bee.storage.players[bee.player].videos_seen = [];
+        }
+        const videos_seen = bee.storage.players[bee.player].videos_seen;
+        let videos_remaining;
+        while(true) {
+            videos_remaining = videos.filter((v) => videos_seen.indexOf(v) == -1);
+            if(videos_remaining.length == 0) {
+                for(let i=0; i<8; i++) { videos_seen.shift(); }
+                continue;
+            }
+            break;
+        }
+        const video_ix = Math.floor(Math.random() * videos_remaining.length);
+        video_file = videos_remaining[video_ix];
+        videos_seen.push(video_file);
+    }
+    save_storage('videos_seen', true); // true == skip hook
+
+    const $wrap = $('<div class="video_w2"><div class="videoclose">X</div></div>');
+    $('body').append($wrap);
+    setTimeout(function() {
+        console.log("Playing video", video_file);
+        const $v = $('<video src="'+video_file+'" playsinline class="video_v" autoplay></video>');
+        const $inwrap = $('<div class="video_w1"></div>');
+        let ended = false;
+        const ending = function(curtain_delay) {
+            return function() {
+                if(ended) { return; }
+                ended = true;
+                $v.remove();
+                setTimeout(function() {
+                    $wrap.remove();
+                    if(callback) { callback(); }
+                }, curtain_delay);
+            };
         };
-        
-        
-        const giftelements = [ // Order matters - what gifts a player has is recorded using the index
-            'assets/images/gifts/ai-generated-8658573_640.png',
-            'assets/images/gifts/animal-6987017_640.jpg',
-            'assets/images/gifts/avocado-3651037_640.png',
-            'assets/images/gifts/banana-2850841_640.png',
-            'assets/images/gifts/cat-4475583_640.png',
-            'assets/images/gifts/cat-5773481_640.jpg',
-            'assets/images/gifts/cat-5781057_640.jpg',
-            'assets/images/gifts/cat-7928232_640.png',
-            'assets/images/gifts/cat-8266486_640.jpg',
-            'assets/images/gifts/cat-8863536_640.png',
-            'assets/images/gifts/chicken-159496_640.png',
-            'assets/images/gifts/dog-3431913_640.jpg',
-            'assets/images/gifts/ghost-8250317_640.png',
-            'assets/images/gifts/lion-5487377_640.png',
-            'assets/images/gifts/robot-8449206_640.jpg',
-            'assets/images/gifts/sheep-35599_640.png',
-        ];
-
-        
-        // Videos played at times as a reward
-        let videos = [
-        ];
-        if(local_hook_has('local_videos')) {
-            videos = videos.concat(bee_local.local_videos);
-        }
-        
-        
-        const bee_confetti = new JSConfetti();
-        
-        
-        // Check if the page should be refreshed to bring in new versions
-        function page_update() {
-            if(Date.now() - bee.load_time > 4*60*60*1000) {
-                window.location.reload(true);
-                return;
-            }
-            call_local_hook('check_version', []);
-        }
-        
-        
-        // Show a reward animation (confetti)
-        function show_animation(callback) {
-            const r = Math.random();
-            if(r > .8) {
-                bee_confetti.addConfetti({confettiColors: ['#00f', '#0c0', '#0ff', '#50f', '#0f0']}).then(callback);
-            } else if(r > .6) {
-                bee_confetti.addConfetti({confettiColors: ['#f00', '#f99', '#f5c', '#ff0', '#f90']}).then(callback);
-            } else if(r > .4) {
-                bee_confetti.addConfetti({emojis: ['🍭'+"\ufe0f", '🍥'+"\ufe0f", '🍬'+"\ufe0f"]}).then(callback);
-            } else if(r > .2) {                
-                bee_confetti.addConfetti({emojis: ['🌼'+"\ufe0f", '🌸'+"\ufe0f", '🍀'+"\ufe0f"]}).then(callback);
-            } else {                
-                bee_confetti.addConfetti({emojis: ['😀'+"\ufe0f", '🥳'+"\ufe0f", '😎'+"\ufe0f"]}).then(callback);
-            }
-        }
-        
-        
-        // Play a video as a reward. Return if an alternative reward should be shown.
-        function play_video(callback) {
-            let video_file = undefined;
-            if(local_hook_has('choose_video')) { video_file = bee_local.choose_video(); }
-            if(video_file === undefined) {
-                if(videos.length == 0) { return true; } // true: show default reward
-                // Choose unseen video
-                if(bee.storage.players[bee.player].videos_seen === undefined) {
-                    bee.storage.players[bee.player].videos_seen = [];
-                }
-                const videos_seen = bee.storage.players[bee.player].videos_seen;
-                let videos_remaining;
-                while(true) {
-                    videos_remaining = videos.filter((v) => videos_seen.indexOf(v) == -1);
-                    if(videos_remaining.length == 0) {
-                        for(let i=0; i<8; i++) { videos_seen.shift(); }
-                        continue;
-                    }
-                    break;
-                }
-                const video_ix = Math.floor(Math.random() * videos_remaining.length);
-                video_file = videos_remaining[video_ix];
-                videos_seen.push(video_file);
-            }
-            save_storage('videos_seen', true); // true == skip hook
-
-            const $wrap = $('<div class="video_w2"><div class="videoclose">X</div></div>');
-            $('body').append($wrap);
-            setTimeout(function() {
-                console.log("Playing video", video_file);
-                const $v = $('<video src="'+video_file+'" playsinline class="video_v" autoplay></video>');
-                const $inwrap = $('<div class="video_w1"></div>');
-                let ended = false;
-                const ending = function(curtain_delay) {
-                    return function() {
-                        if(ended) { return; }
-                        ended = true;
-                        $v.remove();
-                        setTimeout(function() {
-                            $wrap.remove();
-                            if(callback) { callback(); }
-                        }, curtain_delay);
-                    };
-                };
-                $('.video_w2 .videoclose').on('click', ending(200));
-                $v.on('ended', function() { setTimeout(ending(3000), 700); });
-                $v.on('stalled', ending);
-                $v.on('error', ending);
-                $inwrap.append($v);
-                $wrap.append($inwrap);
-            }, 1000);
-            return false; // false: do now show default reward animation
-        }
+        $('.video_w2 .videoclose').on('click', ending(200));
+        $v.on('ended', function() { setTimeout(ending(3000), 700); });
+        $v.on('stalled', ending);
+        $v.on('error', ending);
+        $inwrap.append($v);
+        $wrap.append($inwrap);
+    }, 1000);
+    return false; // false: do now show default reward animation
+}
 
 
-        function esc_html(s) {
-            s = String(s);
-            return s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
-        }
-        
-        
-        // Return bool
-        function arrays_intersect(a1, a2) {
-            for(let i=0; i<a1.length; i++) {
-                if(a2.includes(a1[i])) { return true; }
-            }
-            return false;
-        }
-        
-        
-        function check_url(url, callback) {
-            $.ajax({
-                type: 'HEAD',
-                url: url,
-                success: function(){ callback(true); },
-                error: function(){ callback(false); },
-                timeout: 1000
-            });
-        }
+function esc_html(s) {
+    s = String(s);
+    return s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+}
+
+
+// Return bool
+function arrays_intersect(a1, a2) {
+    for(let i=0; i<a1.length; i++) {
+        if(a2.includes(a1[i])) { return true; }
+    }
+    return false;
+}
+
+
+function check_url(url, callback) {
+    $.ajax({
+        type: 'HEAD',
+        url: url,
+        success: function(){ callback(true); },
+        error: function(){ callback(false); },
+        timeout: 1000
+    });
+}
 
 
         // update UI & animate to update score
@@ -572,95 +572,95 @@ $('.timeoutwarn').html('⏰'+"\ufe0f");
             save_storage('delete_user', true);
         }
         
-        // text-to-speech support
+// text-to-speech support
         
-        const bee_tts = {
-            status: 'init', // 'init' | 'ready' | 'fail'
-            voice: false,  // selected voice
-            voice_points: -1,  // scoring to select voice
-            synth: window.speechSynthesis,
-            init_trials: 6,
-            available_voices: []
-        };
+const bee_tts = {
+    status: 'init', // 'init' | 'ready' | 'fail'
+    voice: false,  // selected voice
+    voice_points: -1,  // scoring to select voice
+    synth: window.speechSynthesis,
+    init_trials: 6,
+    available_voices: []
+};
         
-        bee_tts.test = function() {
-            bee_tts.speak('This is what text to speach sounds like: '+Math.floor(Math.random()*100), function(){ 
-                alert(bee_tts.voice.name+' '+bee_tts.voice.lang+' '+bee_tts.voice.localService);
-                alert(bee_tts.available_voices.join("\n"));
-            });
-        };
+bee_tts.test = function() {
+    bee_tts.speak('This is what text to speach sounds like: '+Math.floor(Math.random()*100), function(){ 
+        alert(bee_tts.voice.name+' '+bee_tts.voice.lang+' '+bee_tts.voice.localService);
+        alert(bee_tts.available_voices.join("\n"));
+    });
+};
         
-        bee_tts.initialize = function() {
-            if(!bee_tts.synth) {
-                console.log("TTS failed (not available)");
-                bee_tts.status = 'fail';
-                return;
-            }
-            bee_tts.init_trials--;
-            if(bee_tts.init_trials <= 0) {
-                console.log("TTS init failed (after tries)");
-                bee_tts.status = 'fail';
-                return;
-            }
-            console.log("TTS init, trial=", bee_tts.init_trials);
-            try {
-                const voices = bee_tts.synth.getVoices();
-                if(!voices.length) {
-                    setTimeout(bee_tts.initialize, 1000);
-                    return;
-                }
-                for (const voice of voices) {
-                    let p = 0;
-                    if(voice.lang.startsWith('en')) { p += 100; bee_tts.available_voices.push("["+voice.name+"]"); }
-                    if(voice.lang.toLowerCase().endsWith('gb')) { p += 2; }
-                    if(voice.name.indexOf('female') == -1) { p += 1; }
-                    if(voice.localService) { p += 5; }
-                    if(p > bee_tts.voice_points) { bee_tts.voice_points = p; bee_tts.voice = voice; }
-                }
-                if(bee_tts.voice_points < 100) {
-                    console.log("TTS init failed (no English voice)");
-                    bee_tts.status = 'fail';
-                    return;
-                }
-                console.log("TTS ready - selected voice", bee_tts.voice);
-                bee_tts.status = 'ready';
-                return;
-            } catch(e) {
-                console.log("TTS init: error", e);
-                bee_tts.status = 'fail';
-                return;                
-            }
-        };
+bee_tts.initialize = function() {
+    if(!bee_tts.synth) {
+        console.log("TTS failed (not available)");
+        bee_tts.status = 'fail';
+        return;
+    }
+    bee_tts.init_trials--;
+    if(bee_tts.init_trials <= 0) {
+        console.log("TTS init failed (after tries)");
+        bee_tts.status = 'fail';
+        return;
+    }
+    console.log("TTS init, trial=", bee_tts.init_trials);
+    try {
+        const voices = bee_tts.synth.getVoices();
+        if(!voices.length) {
+            setTimeout(bee_tts.initialize, 1000);
+            return;
+        }
+        for (const voice of voices) {
+            let p = 0;
+            if(voice.lang.startsWith('en')) { p += 100; bee_tts.available_voices.push("["+voice.name+"]"); }
+            if(voice.lang.toLowerCase().endsWith('gb')) { p += 2; }
+            if(voice.name.indexOf('female') == -1) { p += 1; }
+            if(voice.localService) { p += 5; }
+            if(p > bee_tts.voice_points) { bee_tts.voice_points = p; bee_tts.voice = voice; }
+        }
+        if(bee_tts.voice_points < 100) {
+            console.log("TTS init failed (no English voice)");
+            bee_tts.status = 'fail';
+            return;
+        }
+        console.log("TTS ready - selected voice", bee_tts.voice);
+        bee_tts.status = 'ready';
+        return;
+    } catch(e) {
+        console.log("TTS init: error", e);
+        bee_tts.status = 'fail';
+        return;                
+    }
+};
         
-        // Speak an utterance. Returns true if utterance is being spoken; then callback() will be called on end.
-        bee_tts.speak = function(s, callback) {
-            if(bee_tts.status != 'ready') {
-                console.log("TTS speak: not ready");
-                setTimeout(callback, 1000);
-                return false;
-            }
-            try {
-                const utterThis = new SpeechSynthesisUtterance(s);
-                utterThis.voice = bee_tts.voice;
-                // utterThis.pitch = 1.; // default
-                //utterThis.rate = rate.value;
-                if(callback) {
-                    utterThis.addEventListener('end', callback);
-                    utterThis.addEventListener('error', callback);
-                }
-                bee_tts.synth.speak(utterThis);
-                return true;
-            } catch(e) {
-                console.log("TTS speak error", e);
-                if(callback) { setTimeout(callback, 1000); }
-                return false;
-            }
-        };
-        
-        setTimeout(bee_tts.initialize, 500);
+// Speak an utterance. Returns true if utterance is being spoken; then callback() will be called on end.
+bee_tts.speak = function(s, callback) {
+    if(bee_tts.status != 'ready') {
+        console.log("TTS speak: not ready");
+        setTimeout(callback, 1000);
+        return false;
+    }
+    try {
+        const utterThis = new SpeechSynthesisUtterance(s);
+        utterThis.voice = bee_tts.voice;
+        // utterThis.pitch = 1.; // default
+        //utterThis.rate = rate.value;
+        if(callback) {
+            utterThis.addEventListener('end', callback);
+            utterThis.addEventListener('error', callback);
+        }
+        bee_tts.synth.speak(utterThis);
+        return true;
+    } catch(e) {
+        console.log("TTS speak error", e);
+        if(callback) { setTimeout(callback, 1000); }
+        return false;
+    }
+};
+
+setTimeout(bee_tts.initialize, 500);
         
 
-        const licences = `
+const licences = `
 | Fireworks module from https://github.com/crashmax-dev/fireworks-js/tree/v1 (MIT)
 | Confetti module from https://github.com/loonywizard/js-confetti (MIT)
 | 
@@ -697,93 +697,95 @@ Music by <a href="https://pixabay.com/users/fassounds-3433550/?utm_source=link-a
 `;
 
 
-        let smallprint_expanded = false;
-        $('.smallprint .handle').on('click', function() {
-            if(!smallprint_expanded) {
-                if(prompt("Age verification: What is the capital of Finland?").toLowerCase() != 'helsinki') {
-                    return false;
-                }
-            }
-            $('.smallprint .expand').html(licences).toggle();
-            $('.smallprint .expand_tools').toggle();
-            smallprint_expanded = !smallprint_expanded;
+let smallprint_expanded = false;
+$('.smallprint .handle').on('click', function() {
+    if(!smallprint_expanded) {
+        if(prompt("Age verification: What is the capital of Finland?").toLowerCase() != 'helsinki') {
             return false;
-        });
+        }
+    }
+    $('.smallprint .expand').html(licences).toggle();
+    $('.smallprint .expand_tools').toggle();
+    smallprint_expanded = !smallprint_expanded;
+    return false;
+});
         
         
-        $('.smallprint .d_version').html(esc_html(bee_app_version));
+$('.smallprint .d_version').html(esc_html(bee_app_version));
 
-        
-        // Display gift list
-        $('.gifts').on('click', function() {
-            if(bee.giftlist == -1) { // gift list index
-                bee.giftlist = 0;
-                $('.game').hide();
-                $('.scorewrap').show();
-                $('.score').hide();
-                $('.giftlist').show();
-                $('.gifts').addClass('opened');
-                
-                const giftarray = bee.storage.players[bee.player].gifts;
-                if(giftarray !== undefined && giftarray.length != 0) {
-                    $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
-                }
-            } else {
-                bee.giftlist = -1;
-                $('.giftlist').hide();
-                $('.game').show();
-                $('.score').show();
-                $('.gifts').removeClass('opened');
-            }
-            return false;
-        });
-        
-        // Go to next gift in list
-        $('.giftlist .list .next, .giftlist .list img').on('click', function() {
-            if(bee.giftlist == -1) { return false; }
-            const giftarray = bee.storage.players[bee.player].gifts;
-            if(giftarray === undefined || giftarray.length == 0) { return false; }
-            bee.giftlist++;
-            if(bee.giftlist >= giftarray.length) { bee.giftlist = 0; }
-            $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
-            $('.d_queue').html(giftarray[bee.giftlist]);
-            return false;
-        });
-        
-        // Go to previous gift
-        $('.giftlist .list .prev').on('click', function() {
-            if(bee.giftlist == -1) { return false; }
-            const giftarray = bee.storage.players[bee.player].gifts;
-            if(giftarray === undefined || giftarray.length == 0) { return false; }
-            bee.giftlist--;
-            if(bee.giftlist <= 0) { bee.giftlist = giftarray.length - 1; }
-            $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
-            $('.d_queue').html(giftarray[bee.giftlist]);
-            return false;
-        });
-        
-        // Exchange gift
-        $('.giftlist .list .exchange').on('click', function() {
-            console.log("Exchanging gift");
-            if(bee.giftlist == -1) { return false; }
-            const giftarray = bee.storage.players[bee.player].gifts;
-            if(giftarray === undefined || giftarray.length == 0) { return false; }
-            
-            const diff = 2;
-            
-            if(!confirm("This will cost "+diff+" coins. Are you sure?")) { return false; }
-            
-            if(bee.storage.players[bee.player].score < diff) { playme('notavail'); return false; }
-            bee.storage.players[bee.player].score -= diff;
-            save_storage('gift exchange cost');
-            update_score_ui();
+// ------------------- Gift display -------------------------
 
-            const gix = give_gift(undefined, true);
-            giftarray[bee.giftlist] = gix;
-            save_storage('gift exchange');
-            $('.giftlist .list img').fadeOut({duration: 2000, complete: function() {
-                $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist])).fadeIn();
-            }});
-            
-            return false;
-        });
+// Display gift list
+$('.gifts').on('click', function() {
+    if(bee.giftlist == -1) { // gift list index
+        bee.giftlist = 0;
+        $('.game').hide();
+        $('.scorewrap').show();
+        $('.score').hide();
+        $('.giftlist').show();
+        $('.gifts').addClass('opened');
+        
+        const giftarray = bee.storage.players[bee.player].gifts;
+        if(giftarray !== undefined && giftarray.length != 0) {
+            $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
+        }
+    } else {
+        bee.giftlist = -1;
+        $('.giftlist').hide();
+        $('.game').show();
+        $('.score').show();
+        $('.gifts').removeClass('opened');
+    }
+    return false;
+});
+        
+// Go to next gift in list
+$('.giftlist .list .next, .giftlist .list img').on('click', function() {
+    if(bee.giftlist == -1) { return false; }
+    const giftarray = bee.storage.players[bee.player].gifts;
+    if(giftarray === undefined || giftarray.length == 0) { return false; }
+    bee.giftlist++;
+    if(bee.giftlist >= giftarray.length) { bee.giftlist = 0; }
+    $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
+    $('.d_queue').html(giftarray[bee.giftlist]);
+    return false;
+});
+
+// Go to previous gift
+$('.giftlist .list .prev').on('click', function() {
+    if(bee.giftlist == -1) { return false; }
+    const giftarray = bee.storage.players[bee.player].gifts;
+    if(giftarray === undefined || giftarray.length == 0) { return false; }
+    bee.giftlist--;
+    if(bee.giftlist <= 0) { bee.giftlist = giftarray.length - 1; }
+    $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
+    $('.d_queue').html(giftarray[bee.giftlist]);
+    return false;
+});
+
+// Exchange gift
+$('.giftlist .list .exchange').on('click', function() {
+    console.log("Exchanging gift");
+    if(bee.giftlist == -1) { return false; }
+    const giftarray = bee.storage.players[bee.player].gifts;
+    if(giftarray === undefined || giftarray.length == 0) { return false; }
+    
+    const diff = 2;
+    
+    if(!confirm("This will cost "+diff+" coins. Are you sure?")) { return false; }
+    
+    if(bee.storage.players[bee.player].score < diff) { playme('notavail'); return false; }
+    bee.storage.players[bee.player].score -= diff;
+    save_storage('gift exchange cost');
+    update_score_ui();
+
+    const gix = give_gift(undefined, true);
+    giftarray[bee.giftlist] = gix;
+    save_storage('gift exchange');
+    $('.giftlist .list img').fadeOut({duration: 2000, complete: function() {
+        $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist])).fadeIn();
+    }});
+    
+    return false;
+});
+

@@ -95,7 +95,7 @@
   document.addEventListener('DOMContentLoaded', function () {
 
     /* Launch the game inside the supplied DIV. */
-    var game = AquariumGame.init('tank');
+    var game = new Aquarium(document.getElementById('tank'));
 
     /* --- tiny toast helper --- */
     var toast = document.getElementById('toast'), toastTimer;
