@@ -30,7 +30,9 @@ window.AQUARIUM_CONFIG = {
     babyoctopus:   { src: 'assets/fish/babyoctopus.svg',   h: 0.30, aspect: 0.930, speed: 0.060 },
     babysquid:     { src: 'assets/fish/babysquid.svg',     h: 0.30, aspect: 0.750, speed: 0.085 },
     dragonfish:    { src: 'assets/fish/dragonfish.svg',    h: 0.26, aspect: 1.558, speed: 0.100 },
-    crab:          { src: 'assets/fish/crab.svg',          h: 0.22, aspect: 1.404, speed: 0.055 }
+    crab:          { src: 'assets/fish/crab.svg',          h: 0.22, aspect: 1.404, speed: 0.055 },
+    seahorse:      { src: 'assets/fish/seahorse.png', h:0.24, aspect: 400/228, speed: 0.065 },
+    axolotl:       { src: 'assets/fish/axolotl.png', h:0.28, aspect: 400/207, speed: 0.080 }
   },
 
   items: {
