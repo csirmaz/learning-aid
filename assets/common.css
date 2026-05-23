@@ -229,7 +229,8 @@ body.condense .prompt { padding-top: 3rem; }
 
 .giftannounce span { font-size: 20rem; }
 .giftannounce img { 
-    height: 20rem;
+    max-height: 20rem;
+    max-width: 20rem;
     margin-top: 5rem;
 }
 

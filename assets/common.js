@@ -1,5 +1,5 @@
 
-const bee_app_version = 404;
+const bee_app_version = 407;
 
 call_local_hook('check_version', []);
 
@@ -315,158 +315,184 @@ function check_url(url, callback) {
         }
 
 
-        function play_success_sound() { play_rnd_sound('success'); }
+function play_success_sound() { play_rnd_sound('success'); }
         
         
-        // Play the `ix`th music
-        function toggle_play_music(ix) {
-            const d = audio.music[ix];
-            if(d.object === false) { 
-                console.log("Audio: setting up", d['file']);
-                d.object = new Audio(d['file']); 
-                d.object.volume = d['volume'];
-                d.object.loop = true;
-                d.object.play();
-                return;
-            }
-            if(d.object.paused) { d.object.play(); return; }
-            d.object.pause();
-        }
+// Play the `ix`th music
+function toggle_play_music(ix) {
+    const d = audio.music[ix];
+    if(d.object === false) { 
+        console.log("Audio: setting up", d['file']);
+        d.object = new Audio(d['file']); 
+        d.object.volume = d['volume'];
+        d.object.loop = true;
+        d.object.play();
+        return;
+    }
+    if(d.object.paused) { d.object.play(); return; }
+    d.object.pause();
+}
 
 
-        // Call this to zero the score of the current player
-        function clear_score() {
-            if(bee.player === false) { alert("Choose a player first"); return; }
-            bee.storage.players[bee.player].score = 0;
-            save_storage('clear_score');
-            update_score_ui();
-        }
+// Call this to zero the score of the current player
+function clear_score() {
+    if(bee.player === false) { alert("Choose a player first"); return; }
+    bee.storage.players[bee.player].score = 0;
+    save_storage('clear_score');
+    update_score_ui();
+}
         
         
-        // Interactively reduce the score
-        function reduce_score() {
-            if(bee.player === false) { alert("Choose a player first"); return; }
-            const diff = prompt("Reduce score by") - 0;
-            if(isNaN(diff)) { return; }
-            bee.storage.players[bee.player].score -= diff;
-            save_storage('reduce_score');
-            update_score_ui();
-        }
+// Interactively reduce the score
+function reduce_score() {
+    if(bee.player === false) { alert("Choose a player first"); return; }
+    const diff = prompt("Reduce score by") - 0;
+    if(isNaN(diff)) { return; }
+    bee.storage.players[bee.player].score -= diff;
+    save_storage('reduce_score');
+    update_score_ui();
+}
         
 
-        // Decide whether to give player a gift. One gift per twice the score goal
-        // Give the gift when the "lifetime score" (unaffected by reductions) reaches
-        // next_gift_at, which is set to a random position in every 2nd goal stretch
-        function decide_gift() {
-            init_lifetime_score();
-            const ls = bee.storage.players[bee.player].lifetime_score;
-            
-            bee_aquarium.decide_award_food(ls);
-            
-            if(bee.storage.players[bee.player].next_gift_at === undefined) {
-                const completed_goals = Math.floor(ls / bee.score_goal);
-                const completed_two_goals = Math.floor(completed_goals / 2) * 2;
-                const offset = Math.floor((Math.random() + 1) * bee.score_goal) + 1;
-                const n = completed_two_goals * bee.score_goal + offset;
-                console.log("Gift: Next gift init", completed_goals, completed_two_goals, offset, n);
-                bee.storage.players[bee.player].next_gift_at = n;
-                save_storage('decide_gift');
-                return false;
-            } 
+// Decide whether to give player a gift. One gift per twice the score goal
+// Give the gift when the "lifetime score" (unaffected by reductions) reaches
+// next_gift_at, which is set to a random position in every 2nd goal stretch
+function decide_gift() {
+    init_lifetime_score();
+    const ls = bee.storage.players[bee.player].lifetime_score;
+    
+    bee_aquarium.decide_award_food(ls);
+    
+    if(bee.storage.players[bee.player].next_gift_at === undefined) {
+        const completed_goals = Math.floor(ls / bee.score_goal);
+        const completed_two_goals = Math.floor(completed_goals / 2) * 2;
+        const offset = Math.floor((Math.random() + 1) * bee.score_goal) + 1;
+        const n = completed_two_goals * bee.score_goal + offset;
+        console.log("Gift: Next gift init", completed_goals, completed_two_goals, offset, n);
+        bee.storage.players[bee.player].next_gift_at = n;
+        save_storage('decide_gift');
+        return false;
+    } 
 
-            if(ls >= bee.storage.players[bee.player].next_gift_at) {
-                do_give_gift = true;
-                const completed_goals = Math.floor(ls / bee.score_goal);
-                const completed_two_goals = Math.floor(completed_goals / 2) * 2;
-                const offset = Math.floor((Math.random() + 1) * bee.score_goal) + 1;
-                const n = (completed_two_goals+2) * bee.score_goal + offset;
-                console.log("Gift: Next gift update", completed_goals, completed_two_goals, offset, n);
-                return n; // returns next_gift_at
-            }
-            
-            return false;
+    if(ls >= bee.storage.players[bee.player].next_gift_at) {
+        if(bee_aquarium.initial_stage()) {
+            return ls + Math.floor((1 + Math.random()*.5) * bee.score_goal); // speed up gifts while populating aquarium
         }
+        const completed_goals = Math.floor(ls / bee.score_goal);
+        const completed_two_goals = Math.floor(completed_goals / 2) * 2;
+        const offset = Math.floor((Math.random() + 1) * bee.score_goal) + 1;
+        const n = (completed_two_goals+2) * bee.score_goal + offset;
+        console.log("Gift: Next gift update", completed_goals, completed_two_goals, offset, n);
+        return n; // returns next_gift_at
+    }
+    
+    return false;
+}
         
         
-        // Number: normal gift, L+number: local gift
-        function gift_label_to_img(l) {
-            if(String(l)[0] == 'L') {
-                l = l.substring(1, l.length) - 0;
-                if(local_hook_has('local_gifts')) {
-                    return bee_local.local_gifts[l];
-                }
-                return 'assets/images/unknown_gift.png';
-            }
-            return giftelements[l];
+// Number: normal gift, L+number: local gift
+function gift_label_to_img(l) {
+    if(String(l)[0] == 'L') {
+        l = l.substring(1, l.length) - 0;
+        if(local_hook_has('local_gifts')) {
+            return bee_local.local_gifts[l];
         }
+        return 'assets/images/unknown_gift.png';
+    }
+    return giftelements[l];
+}
         
         
-        // Give the player a gift
-        function give_gift(callback, return_gift_only) {
-            // Gifts the player already has
-            if(bee.storage.players[bee.player].gifts === undefined) {
-                bee.storage.players[bee.player].gifts = [];
-            }
-            bee.storage.players[bee.player].gifts = remove_duplicates(bee.storage.players[bee.player].gifts);
-            const giftarray = bee.storage.players[bee.player].gifts;
-            
-            // Load list of available gifts
-            let local_gifts = [];
-            if(local_hook_has('local_gifts')) {
-                local_gifts = bee_local.local_gifts;
-            }
-            
-            const max_gifts = giftelements.length + local_gifts.length;
-            if(giftarray.length >= max_gifts) { 
-                console.log("No more gifts to give");
-                return;
-            }
-            
-            // Choose gift we can give. Number: normal gift, L+number: local gift
-            let gix = false;
-            if(local_hook_has('choose_gift_hook')) {
-                gix = bee_local.choose_gift_hook(giftarray);
-            }
-            if(gix === false) {
-                let trials = 0;
-                while(true) {
-                    let i = Math.floor(Math.random() * max_gifts);
-                    gix = (i < giftelements.length ? i : 'L' + (i - giftelements.length));
-                    if(giftarray.includes(gix)) { 
-                        trials++;
-                        if(trials > max_gifts * 10) {
-                            console.log("Could not find gift to give");
-                            return;
-                        }
-                        continue; 
-                    }
-                    break;
-                }
-            }
-            console.log("Gift chosen", gix, gift_label_to_img(gix));
-            if(return_gift_only) { return gix; }
-            giftarray.push(gix);
+// Give the player a gift
+function give_gift(callback, return_gift_only) {
+    // Decide between aquarium and traditional gifts
+    if(bee_aquarium.is_active() && !return_gift_only) {
+        
+        if(bee.storage.players[bee.player].gift_seq_ix === undefined) {
+            bee.storage.players[bee.player].gift_seq_ix = 0;
+        }
+        // g=traditional gift i=aquarium item f=aquarium fish
+        const gift_sequence = ['i','f','g'];
+        const gift_type = gift_sequence[bee.storage.players[bee.player].gift_seq_ix];
+        bee.storage.players[bee.player].gift_seq_ix++;
+        if(bee.storage.players[bee.player].gift_seq_ix >= gift_sequence.length) { bee.storage.players[bee.player].gift_seq_ix = 0; }
+
+        if(gift_type == 'f' || gift_type == 'i') {
+            const r = (gift_type == 'f' ? bee_aquarium.grant_fish() :  bee_aquarium.grant_item() );
             save_storage('give_gift');
-            
-            $('.giftannounce img').hide().attr('src', gift_label_to_img(gix));
-            $('.giftannounce span').show();
-            $('.giftannounce').fadeIn(1500);
-            setTimeout(function() {
-                $('.giftannounce span').hide();
-                $('.giftannounce img').show();
-                show_animation();
-                setTimeout(function() {
-                    $('.giftannounce').fadeOut(1500);
-                    $('.gifts').addClass('goldpulse');
-                    setTimeout(function() {
-                        $('.gifts').removeClass('goldpulse');
-                        if(callback) { callback(); }
-                    }, 1500);
-                }, 4000); // showing gift
-            }, 4000); // showing gift box
+            present_gift(r.img_src, callback);
+            return;
         }
-        
-        
+    }
+    
+    // Gifts the player already has
+    if(bee.storage.players[bee.player].gifts === undefined) {
+        bee.storage.players[bee.player].gifts = [];
+    }
+    bee.storage.players[bee.player].gifts = remove_duplicates(bee.storage.players[bee.player].gifts);
+    const giftarray = bee.storage.players[bee.player].gifts;
+    
+    // Load list of available gifts
+    let local_gifts = [];
+    if(local_hook_has('local_gifts')) {
+        local_gifts = bee_local.local_gifts;
+    }
+    
+    const max_gifts = giftelements.length + local_gifts.length;
+    if(giftarray.length >= max_gifts) { 
+        console.log("No more gifts to give");
+        return;
+    }
+    
+    // Choose gift we can give. Number: normal gift, L+number: local gift
+    let gix = false;
+    if(local_hook_has('choose_gift_hook')) {
+        gix = bee_local.choose_gift_hook(giftarray);
+    }
+    if(gix === false) {
+        let trials = 0;
+        while(true) {
+            let i = Math.floor(Math.random() * max_gifts);
+            gix = (i < giftelements.length ? i : 'L' + (i - giftelements.length));
+            if(giftarray.includes(gix)) { 
+                trials++;
+                if(trials > max_gifts * 10) {
+                    console.log("Could not find gift to give");
+                    return;
+                }
+                continue; 
+            }
+            break;
+        }
+    }
+    console.log("Gift chosen", gix, gift_label_to_img(gix));
+    if(return_gift_only) { return gix; }
+    giftarray.push(gix);
+    save_storage('give_gift');
+    present_gift(gift_label_to_img(gix), callback);
+}
+
+
+function present_gift(img_src, callback) {
+    $('.giftannounce img').hide().attr('src', img_src);
+    $('.giftannounce span').show();
+    $('.giftannounce').fadeIn(1500);
+    setTimeout(function() {
+        $('.giftannounce span').hide();
+        $('.giftannounce img').show();
+        show_animation();
+        setTimeout(function() {
+            $('.giftannounce').fadeOut(1500);
+            $('.gifts').addClass('goldpulse');
+            setTimeout(function() {
+                $('.gifts').removeClass('goldpulse');
+                if(callback) { callback(); }
+            }, 1500);
+        }, 4000); // showing gift
+    }, 4000); // showing gift box
+}
+
+
         // Implements common operations when a task is solved
         // Return values: 'level_complete' | 'gift' | 'period_negative' | 'period'
         // Note: there are two ways to skip adding a score. Either add 'skip_this_score':true to options, or increment the negative score
@@ -836,4 +862,27 @@ bee_aquarium.feed = function() {
     d.food--;
     bee_aquarium.food_counter.html(d.food);
     bee_aquarium.game.feed(8);
+};
+
+bee_aquarium.initial_stage = function() { // Whether we're early in populating
+    if(!bee_aquarium.is_active()) { return false; }
+    const d = bee_aquarium.get_data();
+    if(d.fish.length + d.items.length < 9) { return true; }
+    return false;
+};
+
+bee_aquarium.grant_fish = function() {
+    if(!bee_aquarium.is_active()) { return false; }
+    const d = bee_aquarium.get_data();
+    const typ = bee_aquarium.game.grantFish();
+    d.fish.push(typ);
+    return {'type': typ, 'img_src': 'assets/aquarium/' + AQUARIUM_CONFIG.fish[typ].src};
+};
+
+bee_aquarium.grant_item = function() {
+    if(!bee_aquarium.is_active()) { return false; }
+    const d = bee_aquarium.get_data();
+    const typ = bee_aquarium.game.grantItem();
+    d.items.push(typ);
+    return {'type': typ, 'img_src': 'assets/aquarium/' + AQUARIUM_CONFIG.items[typ].src};
 };
