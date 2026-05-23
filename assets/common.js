@@ -1,5 +1,5 @@
 
-const bee_app_version = 401;
+const bee_app_version = 404;
 
 call_local_hook('check_version', []);
 
@@ -360,6 +360,8 @@ function check_url(url, callback) {
         function decide_gift() {
             init_lifetime_score();
             const ls = bee.storage.players[bee.player].lifetime_score;
+            
+            bee_aquarium.decide_award_food(ls);
             
             if(bee.storage.players[bee.player].next_gift_at === undefined) {
                 const completed_goals = Math.floor(ls / bee.score_goal);
@@ -789,3 +791,49 @@ $('.giftlist .list .exchange').on('click', function() {
     return false;
 });
 
+// ---------------- Aquarium -----------------
+
+const bee_aquarium = {};
+// Usage: 
+//    set bee_aquarium.food_counter to a jQuery element
+//    set bee_aquarium.game = new Aquarium(...)
+
+bee_aquarium.is_active = function() {
+    return (bee.app_name == 'spellbee');
+};
+
+bee_aquarium.get_data = function() {
+    if(bee.storage.players[bee.player].aquarium_data === undefined) {
+        bee.storage.players[bee.player].aquarium_data = {'food': 0, 'fish': [], 'items': []};
+    }
+    return bee.storage.players[bee.player].aquarium_data;
+};
+
+bee_aquarium.init_food = function() {
+    const d = bee_aquarium.get_data();
+    bee_aquarium.food_counter.html(d.food);
+};
+
+bee_aquarium.decide_award_food = function(lifetime_score) {
+    if(!bee_aquarium.is_active()) { return; }
+    const d = bee_aquarium.get_data();
+    if(d.next_food_at === undefined || d.next_food_at <= lifetime_score) {
+        d.next_food_at = lifetime_score + 6;
+        bee_aquarium.award_food();
+    }
+};
+
+bee_aquarium.award_food = function() {
+    if(!bee_aquarium.is_active()) { return; }
+    const d = bee_aquarium.get_data();
+    d.food++;
+    bee_aquarium.food_counter.html(d.food);
+};
+
+bee_aquarium.feed = function() {
+    const d = bee_aquarium.get_data();
+    if(d.food <= 0) { return; }
+    d.food--;
+    bee_aquarium.food_counter.html(d.food);
+    bee_aquarium.game.feed(8);
+};

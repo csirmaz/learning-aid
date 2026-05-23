@@ -21,14 +21,12 @@ window.AQUARIUM_CONFIG = {
     bluetang:      { src: 'assets/fish/bluetang.svg',      h: 0.26, aspect: 1.500, speed: 0.095 },
     pufferfish:    { src: 'assets/fish/pufferfish.svg',    h: 0.30, aspect: 1.500, speed: 0.055 },
     babyshark:     { src: 'assets/fish/babyshark.svg',     h: 0.30, aspect: 1.625, speed: 0.125 },
-    seahorse:      { src: 'assets/fish/seahorse.svg',      h: 0.34, aspect: 0.621, speed: 0.050 },
     starfish:      { src: 'assets/fish/starfish.svg',      h: 0.24, aspect: 1.058, speed: 0.045 },
     yellowfish:    { src: 'assets/fish/yellowfish.svg',    h: 0.24, aspect: 1.500, speed: 0.100 },
     anglerfish:    { src: 'assets/fish/anglerfish.svg',    h: 0.28, aspect: 1.326, speed: 0.060 },
     jellyfishpink: { src: 'assets/fish/jellyfishpink.svg', h: 0.34, aspect: 0.754, speed: 0.050 },
     jellyfishblue: { src: 'assets/fish/jellyfishblue.svg', h: 0.33, aspect: 0.800, speed: 0.055 },
     babydolphin:   { src: 'assets/fish/babydolphin.svg',   h: 0.28, aspect: 1.512, speed: 0.120 },
-    axolotl:       { src: 'assets/fish/axolotl.svg',       h: 0.24, aspect: 1.537, speed: 0.070 },
     babyoctopus:   { src: 'assets/fish/babyoctopus.svg',   h: 0.30, aspect: 0.930, speed: 0.060 },
     babysquid:     { src: 'assets/fish/babysquid.svg',     h: 0.30, aspect: 0.750, speed: 0.085 },
     dragonfish:    { src: 'assets/fish/dragonfish.svg',    h: 0.26, aspect: 1.558, speed: 0.100 },
@@ -42,8 +40,6 @@ window.AQUARIUM_CONFIG = {
     coral:         { src: 'assets/items/coral.svg',         h: 0.30, aspect: 0.897, draggable: true  },
     seaweed:       { src: 'assets/items/seaweed.svg',       h: 0.46, aspect: 0.600, draggable: true },
     chestopen:     { src: 'assets/items/chestopen.svg',     h: 0.26, aspect: 1.089, draggable: true  },
-    blocksquare:   { src: 'assets/items/blocksquare.svg',   h: 0.17, aspect: 1.000, draggable: true  },
-    blocktriangle: { src: 'assets/items/blocktriangle.svg', h: 0.17, aspect: 1.087, draggable: true  },
     blockarch:     { src: 'assets/items/blockarch.svg',     h: 0.4, aspect: 1.146, draggable: true  },
     shipwreck:     { src: 'assets/items/shipwreck.svg',     h: 0.48, aspect: 1.357, draggable: true  },
     coralfan:      { src: 'assets/items/coralfan.svg',      h: 0.34, aspect: 0.918, draggable: true  },
@@ -66,7 +62,7 @@ window.AQUARIUM_CONFIG = {
   tuning: {
     fishSpeedBase: 500,
     fishCeil:    0.10,   // fish do not swim above this
-    fishFloor:   0.80,   // ... nor below this
+    fishFloor:   0.90,   // ... nor below this
     itemRest:    0.90,   // an item's base settles here on the sand
     dragFloor:   0.87,   // lowest an item's base may be dragged
     turnRate:    3.2,    // how briskly a fish swings towards its goal

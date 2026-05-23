@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?401">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?404">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -112,7 +112,6 @@
         .kbrow1 { margin-left: .2rem; }
         .kbrow2 { margin-left: .4rem; }
         .kbrow3 { margin-left: 1.4rem; }
-        .kbrow4 { margin-left: 5rem; }
         
         .kbdiv .kbkey {
             display: inline-block;
@@ -128,6 +127,23 @@
             margin: .1rem;
             text-align: center;
             line-height: 3rem;
+        }
+        .kbdiv .kb-aq-feed {
+            background: #7ce;
+            margin-right: 3rem;
+            position: relative;
+        }
+        .kbdiv .kb-aq-feed .count {
+            position:absolute;
+            width: 100%;
+            left: 0;
+            top: -0.5rem;
+        }
+        .kbdiv .kb-aq-feed img {
+            position: absolute;
+            top: 1.8rem;
+            left: 0.5rem;
+            width: 1rem;
         }
         .kbdiv .kbspace { width: 11rem; background:#309; margin-right: 3rem; }
         .kbdiv .kbbksp { width: 4rem; background:#b22; }
@@ -148,10 +164,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?401">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?404">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?401"></script>
+    <script src="assets/local/beelocal.js?404"></script>
 </head>
 <body>
     <div class="container">
@@ -174,7 +190,7 @@
             <div class="kbrow kbrow1"></div>
             <div class="kbrow kbrow2"></div>
             <div class="kbrow kbrow3"></div>
-            <div class="kbrow kbrow4"><span class="kbkey kbspace" data-key=" ">&nbsp;</span><span class="kbkey kbhelp" data-key="HELP">?</span><span class="kbkey kbhelp" data-key="PLAY_WORD">💬</span></div>
+            <div class="kbrow kbrow4"><span class="kbkey kb-aq-feed" data-key="AQUARIUM_FEED">&nbsp;<span class="count">0</span><img src="assets/aquarium/assets/misc/food.svg"></span><span class="kbkey kbspace" data-key=" ">&nbsp;</span><span class="kbkey kbhelp" data-key="HELP">?</span><span class="kbkey kbhelp" data-key="PLAY_WORD">💬</span></div>
         </div>
         
         <div class="startmenu"></div>
@@ -492,6 +508,7 @@
 "5|@🧜🏼‍♂️|I like the <sea>|di:ea",
 "10|@⚓|Don't <steal> the anchor! It's heavy and made of <steel>.|di:ea,di:ee",
 "10|@⚓|Don't steal the <anchor>! It's <heavy> and made of steel.|lax:a,di:eae,end:y@,o@",
+"10|@🌊|Do not <breathe> under <water>|di:ea,cons:th",
 
 "8|@🧚‍♂️|<appear>|di:ea",
 
@@ -883,27 +900,32 @@
 "4|@🪢|<knot>|beg:kn",
 "3|@🤷🏼|I don't <know>|beg:kn,di:ow@",
 "3|@♞|<knight>|beg:kn,t:igh",
-"5|bookshelf|<knowledge> is power|beg:kn,cons:gZ",
+"5|bookshelf|<knowledge> is <power>|beg:kn,cons:gZ",
 
 // $wr  beg:wr
 "4|@💥|Something went horribly <wrong>|beg:wr",
 "10|quill|<write> a book|beg:wr,tense:i",
 
 // ch=S   cons:chS
-"6|@🧑‍🍳|The <chef> works in the kitchen|cons:chS",
+"6|@🧑‍🍳|The <chef> works in the <kitchen>|cons:chS",
+//"6|@🧑‍🍳|The <chef> works in the kitchen|cons:chS",
 "6|@🪫|The <machine> ran out of battery|cons:chS",
 "6|arcade|arcade <machine>|cons:chS",
 "6|@🤖|Silly <machine>!|cons:chS",
-"9|@🥸|fake <moustache>|cons:chS",
+//"9|@🥸|fake <moustache>|cons:chS",
+"9|@🥸|The <spy> put on a fake <moustache>|cons:chS",
 
 // ti=S  cons:ti
 "8|potion|<potion>|cons:ti",
-"10|levitation|<levitation>|cons:ti",
-"8|@🏃🏾‍♂️‍➡️|<competition>|cons:ti",
+//"10|levitation|<levitation>|cons:ti",
+"10|levitation|The <wizard> tried <levitation> and bumped his <head> in a cloud|cons:ti",
+//"8|@🏃🏾‍♂️‍➡️|<competition>|cons:ti",
+"8|@🏃🏾‍♂️‍➡️|He <won> the <competition>|cons:ti",
 "9|tnt|<destruction>|cons:ti",
-"8|@🏗️|He works in <construction> building houses.|cons:ti,lax:u",
-"8|@🖥️|The computer received an <instruction>|cons:ti,lax:u",
-"9|@💌|<invitation>|cons:ti",
+"8|@🏗️|He works in <construction> building <houses>.|cons:ti,lax:u",
+"8|@🖥️|The <computer> received an <instruction>|cons:ti,lax:u",
+//"9|@💌|<invitation>|cons:ti",
+"9|@💌|I <received> an <invitation> to the party|cons:ti",
 
 
 // ly$   end:ly
@@ -1093,10 +1115,13 @@
 
 
     </script>
-    <script src="assets/common.js?401"></script>
+    <script src="assets/common.js?404"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
+        try {
+            bee_aquarium.food_counter = $('.kbdiv .kb-aq-feed .count');
+        }catch(e){}
         
         function data_migration() {
             if(bee.player === false) { console.warn('no player to migrate'); return; }
@@ -1603,6 +1628,12 @@
                     play_word();
                     return;
                 }
+                
+                if(typed_key == 'AQUARIUM_FEED') {
+                    highlight_key('.kbdiv .kbkey[data-key="'+typed_key+'"]');
+                    bee_aquarium.feed();
+                    return;
+                }
 
                 if(bee.typed.length < bee.processed_word.to_type.length) {
                     
@@ -2107,10 +2138,11 @@
             $('.d_player').html(esc_html(bee.player));
             init_wordlist();
             
-            bee.aquarium = new Aquarium(document.getElementById('aquarium'), {
+            bee_aquarium.game = new Aquarium(document.getElementById('aquarium'), {
                 'storageKey': 'Aquarium:' + bee.app_name + ':' + bee.player,
                 'basePath': 'assets/aquarium'
             });
+            bee_aquarium.init_food();
             
             new_question('main');
         }
@@ -2160,8 +2192,8 @@
         }, 200);
         
     </script>
-    <script src="assets/aquarium/js/config.js?401"></script>
-    <script src="assets/aquarium/js/aquarium.js?401"></script>
+    <script src="assets/aquarium/js/config.js?404"></script>
+    <script src="assets/aquarium/js/aquarium.js?404"></script>
     <div class="footercontent"></div>
 
 </body>
