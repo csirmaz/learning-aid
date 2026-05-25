@@ -274,3 +274,70 @@ body.condense .prompt { padding-top: 3rem; }
     min-height: 168px;
     border-radius: 16px;
 }
+
+body .prompt .infield.aged-paper .inp {
+  color: #541;
+}
+body .prompt .infield.aged-paper {
+  background-color: #ffeecc;
+  background-image:
+    radial-gradient(ellipse at 18% 28%, rgba(150, 110, 55, 0.18), transparent 45%),
+    radial-gradient(ellipse at 82% 72%, rgba(120, 80, 40, 0.14), transparent 50%),
+    radial-gradient(ellipse at 50% 50%, rgba(190, 150, 90, 0.08), transparent 70%);
+  box-shadow:
+    inset 0 0 40px rgba(120, 80, 40, 0.25),
+    0 6px 14px rgba(0, 0, 0, 0.25);
+  padding: 2rem;
+  color: #5a3a1a;
+  clip-path: polygon(
+    1% 3%, 
+    6% 1%, 
+    13% 2%, 
+    21% 0%, 
+    29% 2%, 
+    37% 1%, 
+    46% 0%, 
+    54% 2%,
+    63% 0%, 
+    71% 2%, 
+    79% 1%, 
+    87% 0%, 
+    94% 2%, 
+    99% 4%,
+    98.5% 11%, 
+    100% 19%, 
+    99% 27%, 
+    100% 36%, 
+    98.5% 44%, 
+    100% 53%,
+    99.5% 61%, 
+    100% 70%, 
+    98.5% 78%, 
+    100% 86%, 
+    99% 94%, 
+    97% 99%,
+    91% 98%, 
+    83% 100%, 
+    75% 99%, 
+    67% 100%,
+    58% 98%, 
+    50% 100%,
+    42% 99%, 
+    34% 100%, 
+    26% 98%, 
+    18% 100%, 
+    10% 99%, 
+    1.5% 97%,
+    1% 91%, 
+    0% 83%, 
+    1.5% 75%, 
+    0.5% 66%, 
+    1% 58%, 
+    0% 49%,
+    0.5% 41%, 
+    0% 32%, 
+    0.5% 24%, 
+    0% 15%, 
+    1% 7%
+  );
+}

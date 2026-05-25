@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?408">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?411">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -55,7 +55,7 @@
         }
         .prompt .addwords {
             background: #fffae4;
-            padding-top: 0;
+            padding: 0.25rem 0.5rem 0.25rem 0.5rem;
         }
         .prompt .addwords .word {
             display: inline-block;
@@ -165,10 +165,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?408">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?411">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?408"></script>
+    <script src="assets/local/beelocal.js?411"></script>
 </head>
 <body>
     <div class="container">
@@ -975,7 +975,6 @@
 "2|@🎂|It is <my> birthday!|tense:y",
 "0|@💥|<Some>thing went horribly wrong|common",
 "2|@🎮|<Come> on, let's play!|common",
-"2|@🎮|<Come on>, let's play!|common",
 "3|@🍟|<I want> chips!|common",
 "3|@🏖|We are <going> on a holiday!|common",
 "2|@💥|Something <went> horribly wrong|lax:e",
@@ -985,8 +984,6 @@
 "6|@📥|<There was> nothing in the tray.|common,cons:th",
 "4|@🚻|Where <is the> toilet?|common,cons:th",
 "5|frog|Frogs will follow you if you hold a slime ball, and <you are> closer to them <than> six blocks. You <can feed> them.|common,di:ee",
-
-
 
 "1|trapdoor|Trapdoors <can> be moved <by> pistons. <They> also block flowing water and lava.|common",
 "1|frog|Frogs <will> follow you if <you> hold a slime ball, and you are closer to them than six blocks. You can <feed> them.|common,di:ee",
@@ -1116,7 +1113,7 @@
 
 
     </script>
-    <script src="assets/common.js?408"></script>
+    <script src="assets/common.js?411"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1710,9 +1707,9 @@
                             queue_success();
                             add_known_word();
                         } else if(outcome == 'ASK_ONCE') {
-                            reschedule_question2(bee.problem, false);
+                            reschedule_question(bee.problem, false);
                         } else if(outcome == 'ASK_ALL') {
-                            reschedule_question2(bee.problem, true);
+                            reschedule_question(bee.problem, true);
                         } else { // 'OK'
                             queue_success();
                         }
@@ -1768,7 +1765,7 @@
 
         
         // Initialize a question
-        function start_question2(problem) {
+        function start_question14(problem) {
             bee.problem = problem; // {word_ix:, word_class:, is_repeat:, is_reveal:}
             if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); bee.help_timeout = false; }
 
@@ -1814,7 +1811,8 @@
         
         
         // Returns whether to use this item (true) or choose another one (false)
-        function known_score_to_choice(score) {
+        // based on the user's success history
+        function known_score_to_choice20(score) {
             let limit = 0;
             if(score < 2) { return true; }
             if(score == 2) { limit = .8; }
@@ -1825,7 +1823,7 @@
         }
         
         
-        function try_get_new_word(word_class) {
+        function try_get_new_word10(word_class) {
             let trials = 50;
             
             let word_ix = undefined;
@@ -1842,7 +1840,7 @@
                     if(ixs === undefined) { log += ' class_not_found'; break; }
                     if(ixs.length == 0) { log += ' class_empty'; break; }
                     // Choose using levels
-                    word_ix = choose_using_levels(ixs);
+                    word_ix = choose_using_levels20(ixs);
                     log += ' wix:'+word_ix+" lev:"+bee.words[word_ix].level;
                     // ensure we choose a new word (check the queue)
                     if(trials > 0) {
@@ -1855,13 +1853,13 @@
                     // Avoid already known words (typed without help)
                     const known_count = is_known_word(word_ix);
                     log += " known:"+known_count;
-                    if(!known_score_to_choice(known_count)) { log += ' no'; continue; }
+                    if(!known_score_to_choice20(known_count)) { log += ' no'; continue; }
                     break;
                 }
                 
                 if(word_class === undefined) { // first word
                     // Choose using levels
-                    word_ix = choose_using_levels(undefined); // undefined:from all words
+                    word_ix = choose_using_levels20(undefined); // undefined:from all words
                     log += " wix:"+word_ix+" lev:"+bee.words[word_ix].level;
                     // ensure we choose a new word (check the queue)
                     if(bee.words.length > 1 && trials > 0) {
@@ -1874,10 +1872,9 @@
                     // Avoid already known words (typed without help)
                     const known_count = is_known_word(word_ix);
                     log += " known:"+known_count;
-                    if(!known_score_to_choice(known_count)) { log += ' no'; continue; }
+                    if(!known_score_to_choice20(known_count)) { log += ' no'; continue; }
                     break;
                 }
-                    
                 
             }
             console.log('try_get_new_word: '+log);
@@ -1886,8 +1883,8 @@
         }
         
         
-        function new_question(reason) {
-            console.log('#new_question() caller=', reason);
+        function new_question(reason) {  // also called from common.js on successfully answering a question
+            console.log('#new_question05() caller=', reason);
             page_update();
             
             try{ document.activeElement.blur(); }catch(e){}
@@ -1898,11 +1895,11 @@
                 log += ' from queue';
                 if(problem.word_ix >= bee.words.length) { log += ' invalid'; problem = undefined; }
             }
-            if(problem === undefined) { // Get some new words
+            if(problem === undefined) { // Get a new word/problem
             
                 let word_ix = undefined;
                 while(true) {
-                    word_ix = try_get_new_word(undefined); // first word in class group
+                    word_ix = try_get_new_word10(undefined); // first word in class group
                     if(word_ix === undefined) { alert('No first word found, trying again'); continue; }
                     break;
                 }
@@ -1910,32 +1907,32 @@
                 // Word class group
                 let word_class = bee.words[word_ix].class;
                 if(word_class === undefined || word_class.length == 0) { word_class = ['noclass:']; }
-                word_class = word_class[Math.floor(Math.random() * word_class.length)];
+                word_class = word_class[Math.floor(Math.random() * word_class.length)]; // choose random class
                 log += ' group_class:'+word_class;
 
                 log += ' first_word:'+word_ix;
                 problem = {'word_ix':word_ix, 'is_repeat':false, 'word_class':word_class};
-                store_question2(problem);
+                store_question11(problem);
 
                 const word_ixs = bee.class_to_ix[word_class];
                 if(word_ixs !== undefined && word_ixs.length > 0) {
                     const desired_number_of_words = Math.min(6, word_ixs.length); // Aim for groups of 7
                     log += ' desired:'+desired_number_of_words;
                     for(let j=0; j<desired_number_of_words; j++) {
-                        const group_word = try_get_new_word(word_class);
+                        const group_word = try_get_new_word10(word_class);
                         log += ' group_word:'+group_word;
                         if(group_word !== undefined) {
-                            store_question2({'word_ix':group_word, 'is_repeat':false, 'word_class':word_class});
+                            store_question11({'word_ix':group_word, 'is_repeat':false, 'word_class':word_class});
                         }
                     }
                 }
-
+                
             }
             console.log("Selecting new word:", log);
-            render_question_queue();
-            start_question2(problem); // the first word
+            start_question14(problem); // the first word
         }
 
+        
         // Parse word data into a data structure
         // <level>|<ref>@<emoji>|<text>|<class>,<class>,...
         // <level>|<ref>|<text>|<class>,<class>,...
@@ -1953,6 +1950,7 @@
             if(img[1] !== undefined && img[1].length) { out.emoji = img[1]; }
             return out;
         }
+
         
         function init_wordlist_impl(min_level, max_level) {
             const out = {};
@@ -1989,7 +1987,7 @@
         
 
         // Choose an item using the levels from the list of word indices or all words if undefined
-        function choose_using_levels(list_of_wordix) {
+        function choose_using_levels20(list_of_wordix) {
             const word_weights_cumulative = [];
             let word_weight_sum = 0;
 
@@ -2010,7 +2008,7 @@
             if(ix_chosen === undefined) { ix_chosen = loop_limit - 1; }
             
             const word_ix_chosen = (list_of_wordix === undefined ? ix_chosen : list_of_wordix[ix_chosen]);
-            if(word_ix_chosen === undefined) { console.error("choose_using_levels", list_of_wordix, weight_point, ix_chosen); }
+            if(word_ix_chosen === undefined) { console.error("choose_using_levels20", list_of_wordix, weight_point, ix_chosen); }
             return word_ix_chosen;
         }
         
@@ -2039,38 +2037,33 @@
             return bee.storage.players[bee.player].scheduled_questions;
         }
         
+        
+        function get_longstory_data() {
+            if(bee.storage.players[bee.player].longstory_data === undefined) {
+                bee.storage.players[bee.player].longstory_data = {
+                    choose_longstory_next: true,
+                    story_index: {}
+                };
+            }
+            return bee.storage.players[bee.player].longstory_data;            
+        }
+        
+        
         function purge_question_queue() {
             bee.storage.players[bee.player].scheduled_questions = [];
         }
-        
-        function render_question_queue() {
-            // Html rendering for debugging
-            const s = get_question_queue();
-            let o='';
-            for(let i=0; i<s.length; i++) {
-                if(o.length) { o += ','; }
-                try {
-                    if(s[i] === undefined) { o += 'u'; }
-                    else if(s[i] === null) { o += 'n'; }
-                    else { 
-                        o += s[i].word_ix;
-                        if(s[i].is_repeat) { o += 'R'; }
-                        if(s[i].is_reveal) { o += 'V'; }
-                    }
-                } catch(e) {
-                    o += 'ERROR';
-                }
-            }
-        }
+
         
         // Store problem on queue, filling up undefineds first
         // Queue is also used to prevent getting a new problem when the page is refreshed
-        function store_question2(problem) {
+        function store_question11(problem) {
             const s = get_question_queue();
             let added = false;
             for(let i=0; i<s.length; i++) {
                 if(s[i] === undefined || s[i] === null) {
-                    s[i] = problem; added = true; break;
+                    s[i] = problem;
+                    added = true;
+                    break;
                 }
             }
             if(!added) { s.push(problem); }
@@ -2084,7 +2077,7 @@
         }
         
         // Schedule question to be shown N questions later
-        function reschedule_question2(problem, add_reveal) {
+        function reschedule_question(problem, add_reveal) {
             const s = get_question_queue();
             s.shift(); // remove this question
             while(s.length < 3) { s.push(undefined); }
@@ -2193,8 +2186,8 @@
         }, 200);
         
     </script>
-    <script src="assets/aquarium/js/config.js?408"></script>
-    <script src="assets/aquarium/js/aquarium.js?408"></script>
+    <script src="assets/aquarium/js/config.js?411"></script>
+    <script src="assets/aquarium/js/aquarium.js?411"></script>
     <div class="footercontent"></div>
 
 </body>
