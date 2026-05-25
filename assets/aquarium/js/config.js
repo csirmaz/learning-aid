@@ -12,7 +12,7 @@
  *   draggable (items only) whether the player may drag it
  * ========================================================================= */
 window.AQUARIUM_CONFIG = {
-  worldHeightFactor: 0.8,
+  worldHeightFactor: 0.5,
   worldWidthFactor: 2.6,          // aquarium is this many container-widths wide
 
   fish: {

@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?411">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?414">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -33,7 +33,7 @@
         .prompt .infield {
             display: block;
             background: #fffae4;
-            margin: 0;
+            margin: 1rem 0;
             font-size: 2rem;
             line-height: 2.5rem;
             padding: 1rem;
@@ -55,7 +55,7 @@
         }
         .prompt .addwords {
             background: #fffae4;
-            padding: 0.25rem 0.5rem 0.25rem 0.5rem;
+            padding: 0.5rem;
         }
         .prompt .addwords .word {
             display: inline-block;
@@ -63,7 +63,7 @@
             color: #05b;
             border-radius: .5rem;
             margin: 0 .5rem;
-            padding: 0 .2rem;
+            padding: 0 .5rem;
         }
         
         .prompt .infield .help,
@@ -108,11 +108,13 @@
 
         .kbdiv { 
             width: 24rem;
+            margin: 1rem;
         }
         .kbrow0 { text-align: right; }
         .kbrow1 { margin-left: .2rem; }
         .kbrow2 { margin-left: .4rem; }
         .kbrow3 { margin-left: 1.4rem; }
+        .kbrow4 { margin-left: 5rem; }
         
         .kbdiv .kbkey {
             display: inline-block;
@@ -128,23 +130,6 @@
             margin: .1rem;
             text-align: center;
             line-height: 3rem;
-        }
-        .kbdiv .kb-aq-feed {
-            background: #7ce;
-            margin-right: 3rem;
-            position: relative;
-        }
-        .kbdiv .kb-aq-feed .count {
-            position:absolute;
-            width: 100%;
-            left: 0;
-            top: -0.5rem;
-        }
-        .kbdiv .kb-aq-feed img {
-            position: absolute;
-            top: 1.8rem;
-            left: 0.5rem;
-            width: 1rem;
         }
         .kbdiv .kbspace { width: 11rem; background:#309; margin-right: 3rem; }
         .kbdiv .kbbksp { width: 4rem; background:#b22; }
@@ -165,10 +150,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?411">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?414">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?411"></script>
+    <script src="assets/local/beelocal.js?414"></script>
 </head>
 <body>
     <div class="container">
@@ -178,25 +163,35 @@
                 <span class="icon">🪙</span><span class="icontext"></span> <span class="value">0</span>
                 <div class="bar"><span class="barfill"></span></div>
                 <span class="needed">-</span>
-            </div><div class="gifts"><span class="open">🎁</span><span class="close">X</span><span class="needed">-</span></div>
+            </div><div class="headerbutton gifts"><span class="open">🎁</span><span class="close">X</span><span class="needed">-</span></div><div class="headerbutton aquarium-btn"><span class="open">🐟</span><span class="close">X</span></div>
         </div>
-        <div class="game prompt">
-            <span class="img"></span>
-            <span class="infield"><span class="help"></span><img class="helpwait" src="assets/images/loader.gif"><span class="inp"></span></span>
-            <div class="addwords"></div>
-        </div>
-        
-        <div class="game kbdiv">
-            <div class="kbrow kbrow0"><span class="kbkey kbbksp" data-key="BACKSPACE">⌫</span></div>
-            <div class="kbrow kbrow1"></div>
-            <div class="kbrow kbrow2"></div>
-            <div class="kbrow kbrow3"></div>
-            <div class="kbrow kbrow4"><span class="kbkey kb-aq-feed" data-key="AQUARIUM_FEED">&nbsp;<span class="count">0</span><img src="assets/aquarium/assets/misc/food.svg"></span><span class="kbkey kbspace" data-key=" ">&nbsp;</span><span class="kbkey kbhelp" data-key="HELP">?</span><span class="kbkey kbhelp" data-key="PLAY_WORD">💬</span></div>
-        </div>
-        
-        <div class="startmenu"></div>
 
-        <div class="giftlist">
+        <div class="game tab-panel tab-panel-game">
+            <div class="prompt">
+                <span class="img"></span>
+                <span class="infield"><span class="help"></span><img class="helpwait" src="assets/images/loader.gif"><span class="inp"></span></span>
+                <div class="addwords"></div>
+            </div>
+
+            <div class="kbdiv">
+                <div class="kbrow kbrow0"><span class="kbkey kbbksp" data-key="BACKSPACE">⌫</span></div>
+                <div class="kbrow kbrow1"></div>
+                <div class="kbrow kbrow2"></div>
+                <div class="kbrow kbrow3"></div>
+                <div class="kbrow kbrow4"><span class="kbkey kbspace" data-key=" ">&nbsp;</span><span class="kbkey kbhelp" data-key="HELP">?</span><span class="kbkey kbhelp" data-key="PLAY_WORD">💬</span></div>
+            </div>
+        </div>
+
+        <div class="game tab-panel tab-panel-aquarium">
+            <div class="aq-controls">
+                <div class="aq-feed-btn">
+                    <img src="assets/aquarium/assets/misc/food.svg"><span class="count">0</span>
+                </div>
+            </div>
+            <div id="aquarium"></div>
+        </div>
+
+        <div class="game tab-panel tab-panel-gifts giftlist">
             <span class="title">Gifts collected</span>
             <div class="list">
                 <img src="assets/images/nogift.png">
@@ -205,7 +200,9 @@
                 <span class="exchange">Exchange<br>🪙🪙</span>
             </div>
         </div>
-        
+
+        <div class="startmenu"></div>
+
         <div class="giftannounce">
             <span></span>
             <img src="assets/images/nogift.png">
@@ -230,10 +227,8 @@
         | <a href="https://codeberg.org/csirmaz/learning-aid">C</a>ode
         <span class="expand"></span> 
     </p>
-    <div id="aquarium"></div>
-    
     <script>
-    
+
         // Words, split into sets
         /*
             Object properties:
@@ -1113,14 +1108,11 @@
 
 
     </script>
-    <script src="assets/common.js?411"></script>
+    <script src="assets/common.js?414"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
-        try {
-            bee_aquarium.food_counter = $('.kbdiv .kb-aq-feed .count');
-        }catch(e){}
-        
+
         function data_migration() {
             if(bee.player === false) { console.warn('no player to migrate'); return; }
             const pstore = bee.storage.players[bee.player];
@@ -2131,13 +2123,16 @@
             update_score_ui(false);
             $('.d_player').html(esc_html(bee.player));
             init_wordlist();
-            
+
             bee_aquarium.game = new Aquarium(document.getElementById('aquarium'), {
                 'storageKey': 'Aquarium:' + bee.app_name + ':' + bee.player,
                 'basePath': 'assets/aquarium'
             });
             bee_aquarium.init_food();
-            
+            // Switch to aquarium tab automatically after a fish/item gift animation
+            bee_aquarium.on_aquarium_gift = function() { switch_to_tab('aquarium'); };
+
+            switch_to_tab('game');
             new_question('main');
         }
         
@@ -2186,8 +2181,8 @@
         }, 200);
         
     </script>
-    <script src="assets/aquarium/js/config.js?411"></script>
-    <script src="assets/aquarium/js/aquarium.js?411"></script>
+    <script src="assets/aquarium/js/config.js?414"></script>
+    <script src="assets/aquarium/js/aquarium.js?414"></script>
     <div class="footercontent"></div>
 
 </body>

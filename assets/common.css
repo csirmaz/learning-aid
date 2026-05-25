@@ -23,7 +23,7 @@ body {
 
 body.condense .scorewrap { zoom: 70%; }
 
-.score, .gifts, .timeoutwarn {
+.score, .headerbutton, .timeoutwarn {
     display: inline-block;
     height: 3.5rem;
     background: #309;
@@ -38,27 +38,27 @@ body.condense .scorewrap { zoom: 70%; }
     visibility: hidden;
 }
 
-.gifts { 
+.headerbutton { 
     margin-left: .2rem;
     cursor: pointer;
     position: relative;
 }
 
-.gifts span {
+.headerbutton span {
     display: inline-block;
-    font-size: 2rem;
+    font-size: 1.5rem;
     line-height: 3.5rem;
 }
-.gifts.opened .open { display: none; }
+.headerbutton.opened .open { display: none; }
 
-.gifts .close {
+.headerbutton .close {
     display: none;
     color: #fff;
-    padding: 0 1rem;
+    padding: 0 0.4rem;
 }
-.gifts.opened .close { display: inline-block; }
+.headerbutton.opened .close { display: inline-block; }
 
-.gifts .needed,
+.headerbutton .needed,
 .score .needed {
     z-index: 1;
     display: inline-block;
@@ -171,6 +171,7 @@ body.condense .prompt { padding-top: 3rem; }
 
 .giftlist {
     display: none;
+    padding-top: 5rem;
 }
 
 .giftlist .title {
@@ -194,7 +195,7 @@ body.condense .prompt { padding-top: 3rem; }
     vertical-align: bottom;
     display: block;
     position: absolute;
-    top: 5rem;
+    top: 10rem;
     background:rgba(255,255,255,.3);
 }
 
@@ -210,7 +211,7 @@ body.condense .prompt { padding-top: 3rem; }
 }
 
 .giftlist .list .exchange {
-    top: 24rem;
+    top: 29rem;
     font-size: .8rem;
 }
 
@@ -270,9 +271,38 @@ body.condense .prompt { padding-top: 3rem; }
 
 #aquarium {
     width: 100%;
-    height: 12rem;
+    height: 20rem;
     min-height: 168px;
     border-radius: 16px;
+}
+
+/* ---- Aquarium panel controls ---- */
+
+.aq-controls {
+    padding: 5rem 0.5rem 1rem 0.5rem;
+    text-align: right;
+}
+.aq-feed-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    background: linear-gradient(180deg, #7de 0%, #07a 100%);
+    border-radius: 1rem;
+    padding: 0.3rem 1.1rem 0.3rem 0.7rem;
+    cursor: pointer;
+    user-select: none;
+}
+.aq-feed-btn img {
+    height: 2rem;
+    width: auto;
+}
+.aq-feed-btn .count {
+    font-size: 1.8rem;
+    font-weight: bold;
+    color: #cef;
+    min-width: 1.5rem;
+    text-align: right;
+    text-shadow: 0 0 .3rem #004;
 }
 
 body .prompt .infield.aged-paper .inp {
@@ -341,3 +371,4 @@ body .prompt .infield.aged-paper {
     1% 7%
   );
 }
+
