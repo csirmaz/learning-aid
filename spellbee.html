@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?414">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?415">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -70,12 +70,19 @@
         .prompt .infield .inp {
             display: inline-block;
         }
+        
+        .prompt .infield .help .help_totype,
+        .prompt .infield_story .story_totype,
+        .prompt .infield .reveal_totype {
+            background: #fffaf0; /* must match .prompt .infield_story .story_totype color */
+            text-decoration: underline solid rgba(119,238,0,.6) .2rem;
+            text-underline-offset: .6rem;
+        }
 
         .prompt .infield .help { color: #05b; }
-        .prompt .infield .help .help_totype  { background: #fff; text-decoration: underline solid #cfa .2rem; text-underline-offset: .6rem; }
         .prompt .infield .help .help_totype.help_classhighlight { color: #b38; }
-        .prompt .infield_story .story_totype { background: #fff; text-decoration: underline solid #cfa .2rem; text-underline-offset: .3rem; color: #fff; }
-        .prompt .infield .reveal_totype      { background: #fff; text-decoration: underline solid #cfa .2rem; text-underline-offset: .6rem; color: #ccc; }
+        .prompt .infield_story .story_totype { text-underline-offset: .3rem; color: #fffaf0; }
+        .prompt .infield .reveal_totype      { color: #ccc; }
         .prompt .infield .reveal_totype.help_classhighlight { color: #fac; }
         .prompt .infield_story .reveal_totype  { text-underline-offset: .3rem; }
         
@@ -94,7 +101,7 @@
             position: absolute;
             top: 0;
             left: 0;
-            border: 2px solid #f77;
+            border: 2px solid #000;
             width: .2rem;
             height: 1.5rem;
             margin-left: -1px;
@@ -120,10 +127,11 @@
             display: inline-block;
             font-size: 1rem;
             font-weight: bold;
-            background: #b38;
+            /* background: #b38; */
+            background: #444;
+            text-shadow: 0 0 .2rem black;
             transition: color 0.3s ease;
             color: #fff;
-            text-shadow: 0 0 .2rem black;
             width: 2.1rem;
             height: 3rem;
             border-radius: .5rem;
@@ -131,29 +139,30 @@
             text-align: center;
             line-height: 3rem;
         }
-        .kbdiv .kbspace { width: 11rem; background:#309; margin-right: 3rem; }
-        .kbdiv .kbbksp { width: 4rem; background:#b22; }
+        .kbdiv .kbspace { width: 11rem; /* background:#309; */ margin-right: 3rem; }
+        .kbdiv .kbbksp { width: 4rem; /* background:#b22; */ color: #e00; font-size: 150%; }
         .kbdiv .kbhelp { background: #999; }
-        .kbdiv .kbkey[data-key="'"] { background:#309; }
+        .kbdiv .kbkey[data-key="'"] { /* background:#309; */ }
         .kbdiv .kbkey[data-key="a"],
         .kbdiv .kbkey[data-key="e"],
         .kbdiv .kbkey[data-key="i"],
         .kbdiv .kbkey[data-key="o"],
-        .kbdiv .kbkey[data-key="u"] { background: #3b2; }
+        .kbdiv .kbkey[data-key="u"] { /* background: #3b2; */ color: #7e0; }
         .kbdiv .kbkey[data-key="y"],
-        .kbdiv .kbkey[data-key="w"] { background: #ca2; }
+        .kbdiv .kbkey[data-key="w"] { /* background: #ca2; */ color: #e90; }
         
         .kbdiv .kbkey.kbactive {
-            box-shadow: 0 0 .8rem black  inset;
-            outline: .3rem solid #ca2;
+            /* box-shadow: 0 0 .8rem black inset; */
+            box-shadow: 0 0 .8rem #ccc inset;
+            outline: .3rem solid #e90;
         }
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?414">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?415">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?414"></script>
+    <script src="assets/local/beelocal.js?415"></script>
 </head>
 <body>
     <div class="container">
@@ -169,7 +178,7 @@
         <div class="game tab-panel tab-panel-game">
             <div class="prompt">
                 <span class="img"></span>
-                <span class="infield"><span class="help"></span><img class="helpwait" src="assets/images/loader.gif"><span class="inp"></span></span>
+                <span class="infield aged-paper"><span class="help"></span><img class="helpwait" src="assets/images/loader.gif"><span class="inp"></span></span>
                 <div class="addwords"></div>
             </div>
 
@@ -314,9 +323,16 @@
             "cons:tur:tS": "tur"
         };
         
+        const MIN_LONGSTORY_LEVEL = 100;
+        
         // For the format, see process_word_data()
         // [WORDS START]
         const word_repository = [
+        
+// --- long-format stories ---
+// level >= MIN_LONGSTORY_LEVEL = 100 represent long-format stories
+// Each story is a series of "words" (typing questions) identified by having the same level number.
+// They are asked consecutively.
 
 // --- lax monograph ---
 
@@ -1108,7 +1124,7 @@
 
 
     </script>
-    <script src="assets/common.js?414"></script>
+    <script src="assets/common.js?415"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1246,6 +1262,7 @@
                 'is_story': (add_words.length > 1), 
                 'emoji': word_data.emoji,
                 'ref': word_data.ref,
+                'imgref': word_data.imgref,
                 'add_words': add_words
             };
             word_data.proc_cache = proc;
@@ -1767,15 +1784,17 @@
             if(bee.processed_word.ref !== undefined && local_hook_has('emoji_ref')) {
                 bee.$image.html(bee_local.emoji_ref(bee.processed_word.ref));
             }
+            else if(bee.processed_word.imgref !== undefined) {
+                bee.$image.html('<img src="assets/images/words/'+bee.processed_word.imgref+'">');
+            }
+            else if(bee.processed_word.emoji === undefined) {
+                bee.$image.html('?');
+            } 
             else {
-                if(bee.processed_word.emoji === undefined) {
-                    bee.$image.html('?');
-                } else {
-                    let emoji = bee.processed_word.emoji;
-                    // Ensure emoji code ends in picture modifier
-                    if(emoji[emoji.lenght-1] != "\ufe0f") { emoji += "\ufe0f"; }
-                    bee.$image.html(esc_html(emoji));
-                }
+                let emoji = bee.processed_word.emoji;
+                // Ensure emoji code ends in picture modifier
+                if(emoji[emoji.length-1] != "\ufe0f") { emoji += "\ufe0f"; }
+                bee.$image.html(esc_html(emoji));
             }
             
             // Add help & input
@@ -1850,16 +1869,25 @@
                 }
                 
                 if(word_class === undefined) { // first word
-                    // Choose using levels
-                    word_ix = choose_using_levels20(undefined); // undefined:from all words
-                    log += " wix:"+word_ix+" lev:"+bee.words[word_ix].level;
-                    // ensure we choose a new word (check the queue)
-                    if(bee.words.length > 1 && trials > 0) {
-                        let dupl = false;
-                        for(let i=0; i<queue.length; i++) {
-                            if(queue[i] !== undefined && queue[i] !== null && queue[i].word_ix == word_ix) { dupl = true; break; }
+                    const longstory_ids = Object.keys(bee.longstory_beginnings);
+                    if(longstory_ids.length) { // see MIN_LONGSTORY_LEVEL
+                        // Long story mode
+                        const longstory_id = longstory_ids[Math.floor(Math.random() * longstory_ids.length)];
+                        word_ix = bee.longstory_beginnings[longstory_id];
+                    }
+                    else {
+                        // Normal mode:            
+                        // Choose using levels
+                        word_ix = choose_using_levels20(undefined); // undefined: from all words
+                        log += " wix:"+word_ix+" lev:"+bee.words[word_ix].level;
+                        // ensure we choose a new word (check the queue)
+                        if(bee.words.length > 1 && trials > 0) {
+                            let dupl = false;
+                            for(let i=0; i<queue.length; i++) {
+                                if(queue[i] !== undefined && queue[i] !== null && queue[i].word_ix == word_ix) { dupl = true; break; }
+                            }
+                            if(dupl) { log += ' norep'; continue; }
                         }
-                        if(dupl) { log += ' norep'; continue; }
                     }
                     // Avoid already known words (typed without help)
                     const known_count = is_known_word(word_ix);
@@ -1896,28 +1924,49 @@
                     break;
                 }
                 
-                // Word class group
-                let word_class = bee.words[word_ix].class;
-                if(word_class === undefined || word_class.length == 0) { word_class = ['noclass:']; }
-                word_class = word_class[Math.floor(Math.random() * word_class.length)]; // choose random class
-                log += ' group_class:'+word_class;
+                // Longstory mode
+                if(bee.words[word_ix].level >= MIN_LONGSTORY_LEVEL) {
+                
+                    log += ' first_word:'+word_ix;
+                    problem = {'word_ix':word_ix, 'is_repeat':false, 'word_class':undefined};
+                    store_question11(problem);
+                    const story_id = bee.words[word_ix].level;
+                    log += ' story_id:'+story_id;
+                    // Queue the rest of the story (consecutive runs of the same level)
+                    while(true) {
+                        word_ix++;
+                        if(word_ix >= bee.words.length || bee.words[word_ix].level != story_id) { break; }
+                        store_question11({'word_ix':word_ix, 'is_repeat':false, 'word_class':undefined});
+                    }
+                
+                }
+                else {
+                    // Normal mode: choose more words from one of the same word group(s)
+                
+                    // Word class group
+                    let word_class = bee.words[word_ix].class;
+                    if(word_class === undefined || word_class.length == 0) { word_class = ['noclass:']; }
+                    word_class = word_class[Math.floor(Math.random() * word_class.length)]; // choose random class
+                    log += ' group_class:'+word_class;
 
-                log += ' first_word:'+word_ix;
-                problem = {'word_ix':word_ix, 'is_repeat':false, 'word_class':word_class};
-                store_question11(problem);
+                    log += ' first_word:'+word_ix;
+                    problem = {'word_ix':word_ix, 'is_repeat':false, 'word_class':word_class};
+                    store_question11(problem);
 
-                const word_ixs = bee.class_to_ix[word_class];
-                if(word_ixs !== undefined && word_ixs.length > 0) {
-                    const desired_number_of_words = Math.min(6, word_ixs.length); // Aim for groups of 7
-                    log += ' desired:'+desired_number_of_words;
-                    for(let j=0; j<desired_number_of_words; j++) {
-                        const group_word = try_get_new_word10(word_class);
-                        log += ' group_word:'+group_word;
-                        if(group_word !== undefined) {
-                            store_question11({'word_ix':group_word, 'is_repeat':false, 'word_class':word_class});
+                    const word_ixs = bee.class_to_ix[word_class];
+                    if(word_ixs !== undefined && word_ixs.length > 0) {
+                        const desired_number_of_words = Math.min(6, word_ixs.length); // Aim for groups of 7
+                        log += ' desired:'+desired_number_of_words;
+                        for(let j=0; j<desired_number_of_words; j++) {
+                            const group_word = try_get_new_word10(word_class);
+                            log += ' group_word:'+group_word;
+                            if(group_word !== undefined) {
+                                store_question11({'word_ix':group_word, 'is_repeat':false, 'word_class':word_class});
+                            }
                         }
                     }
-                }
+                    
+                } // end if mode
                 
             }
             console.log("Selecting new word:", log);
@@ -1926,9 +1975,13 @@
 
         
         // Parse word data into a data structure
-        // <level>|<ref>@<emoji>|<text>|<class>,<class>,...
-        // <level>|<ref>|<text>|<class>,<class>,...
+        // <level>|<image_ref>@<emoji>|<text>|<class>,<class>,...
+        // <level>|<image_ref>|<text>|<class>,<class>,...
         // <level>|@<emoji>|<text>|<class>,<class>,...
+        //
+        // <image_ref> is by default local, but is nonlocal if it starts with ~
+        //
+        // Output: {'level':, 'text':, 'class'} and the keys 'imgref' or 'ref', and/or 'emoji'
         function process_word_data(datastr) {
             const data = datastr.split('|');
             if(data.length != 4) { console.error("Malformed word entry", datastr, data); }
@@ -1938,7 +1991,13 @@
                 'text': data[2],
                 'class': (data[3] === undefined || data[3].length == 0 ? [] : data[3].split(','))
             };
-            if(img[0].length) { out.ref = img[0]; }
+            if(img[0].length) {
+                if(img[0].startsWith('~')) {
+                   out.imgref = img[0].slice(1);
+                } else {
+                    out.ref = img[0];
+                }
+            }
             if(img[1] !== undefined && img[1].length) { out.emoji = img[1]; }
             return out;
         }
@@ -1947,16 +2006,23 @@
         function init_wordlist_impl(min_level, max_level) {
             const out = {};
             
-            out.words = [];
-            out.level_counts = [];
+            out.words = []; // word index -> word data
+            out.level_counts = []; // level (<MIN_LONGSTORY_LEVEL) -> count
+            out.longstory_beginnings = {}; // level (>=MIN_LONGSTORY_LEVEL) -> word_ix
             for(let i=0; i<word_repository.length; i++) {
                 const wrdata = process_word_data(word_repository[i]);
                 const wlevel = wrdata.level;
                 if(wlevel >= min_level && wlevel <= max_level) {
                     out.words.push(wrdata);
                     
-                    if(typeof(out.level_counts[wlevel]) == 'undefined') { out.level_counts[wlevel] = 0; }
-                    out.level_counts[wlevel]++;
+                    if(wlevel < MIN_LONGSTORY_LEVEL) {
+                        if(typeof(out.level_counts[wlevel]) == 'undefined') { out.level_counts[wlevel] = 0; }
+                        out.level_counts[wlevel]++;
+                    } else  {
+                        if(out.longstory_beginnings[wlevel] === undefined) {
+                            out.longstory_beginnings[wlevel] = out.words.length - 1;
+                        }
+                    }
                 }
             }
             console.log("NUMBER OF WORDS PER LEVEL", out.level_counts);
@@ -2014,6 +2080,7 @@
             bee.words = r.words;
             bee.class_to_ix = r.class_to_ix;
             bee.level_counts = r.level_counts;
+            bee.longstory_beginnings = r.longstory_beginnings;
             
             $('.d_wordsets').html(
                 esc_html(min_wordset) + " to " + esc_html(max_wordset)
@@ -2028,18 +2095,7 @@
             }
             return bee.storage.players[bee.player].scheduled_questions;
         }
-        
-        
-        function get_longstory_data() {
-            if(bee.storage.players[bee.player].longstory_data === undefined) {
-                bee.storage.players[bee.player].longstory_data = {
-                    choose_longstory_next: true,
-                    story_index: {}
-                };
-            }
-            return bee.storage.players[bee.player].longstory_data;            
-        }
-        
+
         
         function purge_question_queue() {
             bee.storage.players[bee.player].scheduled_questions = [];
@@ -2181,8 +2237,8 @@
         }, 200);
         
     </script>
-    <script src="assets/aquarium/js/config.js?414"></script>
-    <script src="assets/aquarium/js/aquarium.js?414"></script>
+    <script src="assets/aquarium/js/config.js?415"></script>
+    <script src="assets/aquarium/js/aquarium.js?415"></script>
     <div class="footercontent"></div>
 
 </body>
