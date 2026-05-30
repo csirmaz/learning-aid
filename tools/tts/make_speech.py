@@ -65,10 +65,17 @@ def avoid_tts(text):
         'up',
         'again',
         'we',
+        'noise',
+        'thick',
+        'the',
+        'that',
+        'them',
+        'now',
+        "don't",
     ]
 
 seen = set()
-def check_text(phrase, force=False):
+def check_text(phrase, avoid_alice=False, force=False):
     # print(f"{phrase} checking...")
     filename = phrase.lower().replace(' ', '_')
     filename = re.sub(r'[^a-z_]', '', filename)
@@ -88,7 +95,10 @@ def check_text(phrase, force=False):
         return
     
     print(f"Need to generate: {phrase} -> {filename}")
-    voice_ix = np.random.randint(3)
+    if avoid_alice:
+        voice_ix = np.random.randint(2) + 1
+    else:
+        voice_ix = np.random.randint(3)
     generate_tts(phrase, filename, voice_ix)
 
 
@@ -109,12 +119,14 @@ def scan_words():
                 phrase = match.group(2)
                 phrase = phrase.replace(r"\'", "'")
                 phrase = phrase.replace(r'\"', '"')
-                check_text(phrase.replace('<','').replace('>',''))
+                # Alice is not great with multiple sentences
+                check_text(phrase.replace('<','').replace('>',''), avoid_alice=(level >= 100))
                 
                 parts = list(re.findall(r'<([^>]+)>', phrase))
                 if len(parts) > 1:
                     for p in parts:
-                        check_text(p)
+                        # Alice is usually not great with individual words
+                        check_text(p, avoid_alice=True)
 
 scan_words()
 # generate_tts("Eight is a feather", "test0.mp3", 0)

@@ -1,5 +1,5 @@
 
-const bee_app_version = 417;
+const bee_app_version = 418;
 
 call_local_hook('check_version', []);
 
@@ -323,7 +323,7 @@ function play_success_sound() {
         return;
     }
     
-    const i = Math.floor(Math.random() * (audio['success'].length + audio['success_speech'].length);
+    const i = Math.floor(Math.random() * (audio['success'].length + audio['success_speech'].length));
     if(i < audio['success'].length) {
         play_rnd_sound('success'); 
     } else {
