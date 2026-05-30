@@ -1,5 +1,5 @@
 
-const bee_app_version = 415;
+const bee_app_version = 417;
 
 call_local_hook('check_version', []);
 
@@ -63,7 +63,7 @@ const audio = {
         {file: 'assets/sounds/success/congrats1.mp3', volume: 1, object: false},
         {file: 'assets/sounds/success/congrats2.mp3', volume: 1, object: false}
     ],
-    success: [
+    success_speech: [
         {file: 'assets/sounds/success/good1.mp3', volume: 1, object: false},
         {file: 'assets/sounds/success/good2.mp3', volume: 1, object: false},
         {file: 'assets/sounds/success/well_done.mp3', volume: 1, object: false},
@@ -71,6 +71,8 @@ const audio = {
         {file: 'assets/sounds/success/well_done3.mp3', volume: 1, object: false},
         {file: 'assets/sounds/success/correct1.mp3', volume: 1, object: false},
         {file: 'assets/sounds/success/correct2.mp3', volume: 1, object: false},
+    ],
+    success: [
         {file: 'assets/sounds/success/goodresult-82807.mp3', 'volume': .25, 'object': false},
         {file: 'assets/sounds/success/success-340660.mp3', 'volume': .4, 'object': false},
         {file: 'assets/sounds/success/sample_confirm_success02_kofi_by_miraclei-360154.mp3', 'volume': .8, 'object': false},
@@ -314,7 +316,20 @@ function play_rnd_sound(f) {
 }
 
 
-function play_success_sound() { play_rnd_sound('success'); }
+function play_success_sound() {
+    // Do not use speech-based reward sound in spellbee
+    if(bee.app_name == 'spellbee') {
+        play_rnd_sound('success');
+        return;
+    }
+    
+    const i = Math.floor(Math.random() * (audio['success'].length + audio['success_speech'].length);
+    if(i < audio['success'].length) {
+        play_rnd_sound('success'); 
+    } else {
+        play_rnd_sound('success_speech'); 
+    }
+}
         
         
 // Play the `ix`th music

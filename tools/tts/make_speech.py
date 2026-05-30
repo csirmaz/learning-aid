@@ -28,7 +28,7 @@ html_file = '../../spellbee.html'
 mp3_dir = '../../assets/sounds/words/'
 
 def generate_tts(text, outfile, voice_ix):
-    pipe = KPipeline(lang_code="b", repo_id="hexgrad/Kokoro-82M")
+    pipe = KPipeline(lang_code="b", repo_id="hexgrad/Kokoro-82M", device="cpu")
     voices = ['bf_alice', 'bm_lewis', 'bm_george']
     audio = []
     for _, _, chunk in pipe(text, voice=voices[voice_ix]):
@@ -57,26 +57,31 @@ def avoid_tts(text):
         'thief',
         'heavy',
         'busy bee',
+        'Cats',
         'cats',
         'will',
         'cocoa',
-        'So cute'
+        'So cute!',
+        'up',
+        'again',
+        'we',
     ]
 
 seen = set()
-def check_text(phrase):
+def check_text(phrase, force=False):
     # print(f"{phrase} checking...")
     filename = phrase.lower().replace(' ', '_')
     filename = re.sub(r'[^a-z_]', '', filename)
     filename = mp3_dir + filename + '.mp3'
     
-    if filename in seen:
-        return
-    seen.add(filename)
-    
-    if os.path.exists(filename):
-        print(f"{phrase} OK")
-        return
+    if not force:
+        if filename in seen:
+            return
+        seen.add(filename)
+        
+        if os.path.exists(filename):
+            print(f"{phrase} OK")
+            return
     
     if avoid_tts(phrase):
         print(f"Avoiding generating for {phrase}")
@@ -98,10 +103,12 @@ def scan_words():
             continue
         if word_area:
             # print(line)
-            match = re.search(r'^\s*"[0-9]+\|[^\|]+\|([^\|]+)\|', line)
+            match = re.search(r'^\s*"([0-9]+)\|[^\|]+\|([^\|]+)\|', line)
             if match:
-                phrase = match.group(1)
+                level = int(match.group(1))
+                phrase = match.group(2)
                 phrase = phrase.replace(r"\'", "'")
+                phrase = phrase.replace(r'\"', '"')
                 check_text(phrase.replace('<','').replace('>',''))
                 
                 parts = list(re.findall(r'<([^>]+)>', phrase))
