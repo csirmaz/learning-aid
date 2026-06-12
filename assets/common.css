@@ -229,10 +229,32 @@ body.condense .prompt { padding-top: 3rem; }
 }
 
 .giftannounce span { font-size: 20rem; }
-.giftannounce img { 
+.giftannounce img {
     max-height: 20rem;
     max-width: 20rem;
     margin-top: 5rem;
+}
+
+/* "Code" gifts render their code instead of an image */
+.codegift {
+    display: none;
+    text-align: center;
+}
+.giftlist .list .codegift {
+    height: 20rem;
+}
+.giftannounce .codegift {
+    margin-top: 5rem;
+}
+.codegift-header {
+    font-size: 2rem;
+    margin-bottom: 1.5rem;
+}
+.codegift-code {
+    font-size: 4rem;
+    font-weight: bold;
+    letter-spacing: .3rem;
+    word-break: break-word;
 }
 
 .video_v {

@@ -409,11 +409,54 @@ function gift_label_to_img(l) {
     if(String(l)[0] == 'L') {
         l = l.substring(1, l.length) - 0;
         if(local_hook_has('local_gifts')) {
-            return bee_local.local_gifts[l];
+            const g = bee_local.local_gifts[l];
+            // A "code" gift is an object {user, code}, not an image path
+            if(g && typeof g === 'object') { return 'assets/images/unknown_gift.png'; }
+            return g;
         }
         return 'assets/images/unknown_gift.png';
     }
     return giftelements[l];
+}
+
+
+// If the gift label refers to a "code" gift (a local_gifts entry shaped like
+// {user, code}) return that object, otherwise false. Code gifts render their code
+// instead of an image.
+function gift_code_data(l) {
+    if(String(l)[0] != 'L') { return false; }
+    if(!local_hook_has('local_gifts')) { return false; }
+    const g = bee_local.local_gifts[String(l).substring(1) - 0];
+    if(g && typeof g === 'object' && g.code !== undefined) { return g; }
+    return false;
+}
+
+
+// Inner HTML for a code gift: a header with the code in bigger letters underneath
+function gift_code_html(code_data) {
+    return '<div class="codegift-header">Farm game code</div>'
+        + '<div class="codegift-code">' + esc_html(code_data.code) + '</div>';
+}
+
+
+// Render a gift (by label) into a container that holds both an <img> and a .codegift
+// element, showing whichever fits the gift. Pass fade_in=true to fade the shown one in.
+function render_gift($container, label, fade_in) {
+    const code_data = gift_code_data(label);
+    let $show, $hide;
+    if(code_data) {
+        $container.find('.codegift').html(gift_code_html(code_data));
+        $show = $container.find('.codegift');
+        $hide = $container.find('img');
+    } else {
+        $container.find('img').attr('src', gift_label_to_img(label));
+        $show = $container.find('img');
+        $hide = $container.find('.codegift');
+    }
+    $hide.stop(true, true).hide();
+    $show.stop(true, true);
+    if(fade_in) { $show.hide().fadeIn(); }
+    else { $show.css('opacity', 1).show(); }
 }
         
         
@@ -472,13 +515,14 @@ function give_gift(callback, return_gift_only) {
         while(true) {
             let i = Math.floor(Math.random() * max_gifts);
             gix = (i < giftelements.length ? i : 'L' + (i - giftelements.length));
-            if(giftarray.includes(gix)) { 
+            // Code gifts are user-specific; they are only handed out via choose_gift_hook
+            if(giftarray.includes(gix) || gift_code_data(gix) !== false) {
                 trials++;
                 if(trials > max_gifts * 10) {
                     console.log("Could not find gift to give");
                     return;
                 }
-                continue; 
+                continue;
             }
             break;
         }
@@ -487,17 +531,25 @@ function give_gift(callback, return_gift_only) {
     if(return_gift_only) { return gix; }
     giftarray.push(gix);
     save_storage('give_gift');
-    present_gift(gift_label_to_img(gix), callback);
+    const code_data = gift_code_data(gix);
+    present_gift(code_data ? false : gift_label_to_img(gix), callback, code_data);
 }
 
 
-function present_gift(img_src, callback) {
-    $('.giftannounce img').hide().attr('src', img_src);
+function present_gift(img_src, callback, code_data) {
+    if(code_data) {
+        $('.giftannounce img').hide();
+        $('.giftannounce .codegift').html(gift_code_html(code_data)).hide();
+    } else {
+        $('.giftannounce .codegift').hide();
+        $('.giftannounce img').hide().attr('src', img_src);
+    }
     $('.giftannounce span').show();
     $('.giftannounce').fadeIn(1500);
     setTimeout(function() {
         $('.giftannounce span').hide();
-        $('.giftannounce img').show();
+        if(code_data) { $('.giftannounce .codegift').show(); }
+        else { $('.giftannounce img').show(); }
         show_animation();
         setTimeout(function() {
             $('.giftannounce').fadeOut(1500);
@@ -782,7 +834,7 @@ function switch_to_tab(tabname) {
         if (bee.player !== false) {
             const giftarray = bee.storage.players[bee.player].gifts;
             if (giftarray !== undefined && giftarray.length !== 0) {
-                $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
+                render_gift($('.giftlist .list'), giftarray[bee.giftlist]);
             }
         }
     }
@@ -797,13 +849,13 @@ $('.gifts').on('click', function() {
 });
         
 // Go to next gift in list
-$('.giftlist .list .next, .giftlist .list img').on('click', function() {
+$('.giftlist .list .next, .giftlist .list img, .giftlist .list .codegift').on('click', function() {
     if(bee.giftlist == -1) { return false; }
     const giftarray = bee.storage.players[bee.player].gifts;
     if(giftarray === undefined || giftarray.length == 0) { return false; }
     bee.giftlist++;
     if(bee.giftlist >= giftarray.length) { bee.giftlist = 0; }
-    $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
+    render_gift($('.giftlist .list'), giftarray[bee.giftlist]);
     $('.d_queue').html(giftarray[bee.giftlist]);
     return false;
 });
@@ -815,7 +867,7 @@ $('.giftlist .list .prev').on('click', function() {
     if(giftarray === undefined || giftarray.length == 0) { return false; }
     bee.giftlist--;
     if(bee.giftlist <= 0) { bee.giftlist = giftarray.length - 1; }
-    $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist]));
+    render_gift($('.giftlist .list'), giftarray[bee.giftlist]);
     $('.d_queue').html(giftarray[bee.giftlist]);
     return false;
 });
@@ -839,8 +891,8 @@ $('.giftlist .list .exchange').on('click', function() {
     const gix = give_gift(undefined, true);
     giftarray[bee.giftlist] = gix;
     save_storage('gift exchange');
-    $('.giftlist .list img').fadeOut({duration: 2000, complete: function() {
-        $('.giftlist .list img').attr('src', gift_label_to_img(giftarray[bee.giftlist])).fadeIn();
+    $('.giftlist .list img:visible, .giftlist .list .codegift:visible').fadeOut({duration: 2000, complete: function() {
+        render_gift($('.giftlist .list'), giftarray[bee.giftlist], true);
     }});
     
     return false;
