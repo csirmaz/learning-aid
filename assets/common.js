@@ -1,5 +1,59 @@
 
-const bee_app_version = 418;
+
+function local_hook_has(hook_name) {
+    return (typeof(bee_local) !== 'undefined' && bee_local[hook_name]);
+}
+
+
+function call_local_hook(hook_name, args) {
+    if(local_hook_has(hook_name)) {
+        return bee_local[hook_name].apply(null, args);
+    }
+    return undefined;
+}
+
+
+// If we are called via the puzzle alerter, dismiss the window
+function dismiss_puzzle_alert() {
+    if(window.PuzzleAlerter && typeof window.PuzzleAlerter.solved === 'function'){
+        window.PuzzleAlerter.solved();
+        return;
+    }
+}
+
+
+// The player name may be specified in the URL. Returns null if not available
+function get_player_from_url() {
+    const urlString = window.document.location.href;
+    const paramString = urlString.split('?')[1];
+    const queryString = new URLSearchParams(paramString);
+    const player_name = queryString.get('player');
+    return player_name;
+}
+
+        // Try to load data
+        // TODO
+        if(localStorage[bee.app_name]) {
+            bee.storage = JSON.parse(localStorage[bee.app_name]);
+            call_local_hook('loaded_hook', [bee.app_name]);
+        }
+
+
+function save_storage(msg, callback) {
+    // console.log("  Saving storage", msg);
+    const s = JSON.stringify(bee.storage);
+    localStorage[bee.app_name] = s;
+    
+    if(!local_hook_has('save_hook')) {
+        if(callback) { callback(); }
+        return;
+    }
+
+    call_local_hook('save_hook', [msg, callback]);
+}
+
+
+const bee_app_version = 425;
 
 call_local_hook('check_version', []);
 
@@ -28,6 +82,7 @@ function remove_duplicates(array) {
     }
     return o;
 }
+
 
 // Return bool
 function arrays_intersect(a1, a2) {
@@ -181,7 +236,7 @@ function play_video(callback) {
         video_file = videos_remaining[video_ix];
         videos_seen.push(video_file);
     }
-    save_storage('videos_seen', true); // true == skip hook
+    save_storage('videos_seen');
 
     const $wrap = $('<div class="video_w2"><div class="videoclose">X</div></div>');
     $('body').append($wrap);
@@ -265,7 +320,7 @@ function add_negative_score(v, is_absolute) {
         bee.storage.players[bee.player].negative_score = neg_max;
     }
     console.log("negative score: set to", bee.storage.players[bee.player].negative_score);
-    save_storage('add_negative_score', true); // true == skip hook
+    save_storage('add_negative_score');
 }
         
         
@@ -667,7 +722,7 @@ function delete_user() {
     const conf = prompt("Type 'delete' to delete the user: " + bee.player);
     if(conf != 'delete') { alert("Not deleting"); return; }
     delete bee.storage.players[bee.player];
-    save_storage('delete_user', true);
+    save_storage('delete_user');
 }
         
 // text-to-speech support
@@ -901,6 +956,7 @@ $('.giftlist .list .exchange').on('click', function() {
 // ---------------- Aquarium -----------------
 
 const bee_aquarium = {
+    storage_key: undefined,
     game: undefined,
     food_counter: $('.aq-feed-btn .count')
 };

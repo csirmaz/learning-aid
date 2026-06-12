@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?418">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?425">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -159,10 +159,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?418">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?425">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?418"></script>
+    <script src="assets/local/beelocal.js?425"></script>
 </head>
 <body>
     <div class="container">
@@ -1217,36 +1217,9 @@
             $helpwait: $('.prompt .infield .helpwait'),
             word_audio_timeout: false
         };
-        
-        function local_hook_has(hook_name) {
-            return (typeof(bee_local) !== 'undefined' && bee_local[hook_name]);
-        }
-        
-        function call_local_hook(hook_name, args) {
-            if(local_hook_has(hook_name)) {
-                return bee_local[hook_name].apply(null, args);
-            }
-            return undefined;
-        }
-
-        // Try to load data
-        if(localStorage[bee.app_name]) {
-            bee.storage = JSON.parse(localStorage[bee.app_name]);
-            call_local_hook('loaded_hook', [bee.app_name]);
-        }
-
-        function save_storage(msg, skip_hook) {
-            console.log("  Saving storage", msg, skip_hook);
-            const s = JSON.stringify(bee.storage);
-            localStorage[bee.app_name] = s;
-            if(!skip_hook) { 
-                call_local_hook('save_hook', [s]);
-            }            
-        }
-
 
     </script>
-    <script src="assets/common.js?418"></script>
+    <script src="assets/common.js?425"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1758,12 +1731,6 @@
                     return;
                 }
                 
-                if(typed_key == 'AQUARIUM_FEED') {
-                    highlight_key('.kbdiv .kbkey[data-key="'+typed_key+'"]');
-                    bee_aquarium.feed();
-                    return;
-                }
-
                 if(bee.typed.length < bee.processed_word.to_type.length) {
                     
                     // If we're in a story, check if we have just finished a word to type
@@ -2302,8 +2269,9 @@
             $('.d_player').html(esc_html(bee.player));
             init_wordlist();
 
+            bee_aquarium.storage_key = 'Aquarium:' + bee.app_name + ':' + bee.player;
             bee_aquarium.game = new Aquarium(document.getElementById('aquarium'), {
-                'storageKey': 'Aquarium:' + bee.app_name + ':' + bee.player,
+                'storageKey': bee_aquarium.storage_key,
                 'basePath': 'assets/aquarium'
             });
             bee_aquarium.init_food();
@@ -2317,8 +2285,8 @@
 
         // Start menu - render
         // Audio can only be played after a user event on the page, so we require a click
-        menu = "<p>Choose player</p>";
-        for (const [key, value] of Object.entries(bee.storage.players)) {
+        let menu = "<p>Choose player</p>";
+        for(const [key, value] of Object.entries(bee.storage.players)) {
             menu += '<div class="startbutton" data-player="'+esc_html(key)+'">'+esc_html(key)+'</div>';
         }
         menu += '<div class="startbutton" data-playernew="1">New user<br><span style="font-size:60%">All player data is stored in the browser only</span></div>';
@@ -2359,8 +2327,8 @@
         }, 200);
         
     </script>
-    <script src="assets/aquarium/js/config.js?418"></script>
-    <script src="assets/aquarium/js/aquarium.js?418"></script>
+    <script src="assets/aquarium/js/config.js?425"></script>
+    <script src="assets/aquarium/js/aquarium.js?425"></script>
     <div class="footercontent"></div>
 
 </body>

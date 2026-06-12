@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?418">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?425">
     <style>
         body {
             /* Disables pull-to-refresh but allows overscroll glow effects. */
@@ -160,10 +160,10 @@
         }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?418">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?425">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?418"></script>
+    <script src="assets/local/beelocal.js?425"></script>
 </head>
 <body>
     <div class="container">
@@ -757,6 +757,17 @@
             ]
         };
 
+        
+        // Fix emojis
+        $('.prompticon').html('👉'+"\ufe0f");
+        $('.prompticonsuccess').html('✅'+"\ufe0f");
+        $('.prompticonfailed').html('🤔'+"\ufe0f");
+        // $('.keypad [data-i="ent"]').html('🆗'+"\ufe0f");
+        $('.keypad [data-i="help"]').html('❓'+"\ufe0f");
+        
+        $('.hintloader').hide();
+
+        
         // Application data
         const bee = {
             // Configuration
@@ -786,43 +797,8 @@
             }
         };
 
-        function local_hook_has(hook_name) {
-            return (typeof(bee_local) !== 'undefined' && bee_local[hook_name]);
-        }
-        
-        function call_local_hook(hook_name, args) {
-            if(local_hook_has(hook_name)) {
-                return bee_local[hook_name].apply(null, args);
-            }
-            return undefined;
-        }
-
-        // Try to load data
-        if(localStorage[bee.app_name]) {
-            bee.storage = JSON.parse(localStorage[bee.app_name]);
-            call_local_hook('loaded_hook', [bee.app_name]);
-        }
-
-        function save_storage(msg, skip_hook) {
-            console.log("  Saving storage", msg, skip_hook);
-            const s = JSON.stringify(bee.storage);
-            localStorage[bee.app_name] = s;
-            if(!skip_hook) { 
-                call_local_hook('save_hook', [s]);
-            }            
-        }
-
-        // Fix emojis
-        $('.prompticon').html('👉'+"\ufe0f");
-        $('.prompticonsuccess').html('✅'+"\ufe0f");
-        $('.prompticonfailed').html('🤔'+"\ufe0f");
-        // $('.keypad [data-i="ent"]').html('🆗'+"\ufe0f");
-        $('.keypad [data-i="help"]').html('❓'+"\ufe0f");
-        
-        $('.hintloader').hide();
-
     </script>
-    <script src="assets/common.js?418"></script>
+    <script src="assets/common.js?425"></script>
     <script>
 
         
@@ -1022,7 +998,6 @@
                 type_action('help');
                 return;
             }
-            // console.log("key", event);
         }
         
         
@@ -1157,7 +1132,7 @@
                 penalty_delay(false, 'reload page'); 
             }
             bee.storage.players[bee.player].current_question_time = Date.now();
-            save_storage('set_question_qtime', true); // true = skip hook
+            save_storage('set_question_qtime');
             
             // We call this after possibly calling penalty_delay so penalty_timeout_ongoing would already be set
             manage_question_timeout(true); // true = at new question
@@ -1245,7 +1220,7 @@
             
             // For anti-cheat system
             bee.storage.players[bee.player].current_question_time = undefined;
-            save_storage('clear_qtime', true); // true = skip hook
+            save_storage('clear_qtime');
 
             const old_question = bee.queued_problems.shift();
             if(reason == 'failed' || reason == 'timeout') {
@@ -1335,7 +1310,7 @@
         
         // Start menu - render
         // Audio can only be played after a user event on the page, so we require a click
-        menu = "<p>Choose player</p>";
+        let menu = "<p>Choose player</p>";
         for (const [key, value] of Object.entries(bee.storage.players)) {
             menu += '<div class="startbutton" data-player="'+esc_html(key)+'">'+esc_html(key)+'</div>';
         }
@@ -1372,8 +1347,8 @@
         
         
     </script>
-    <script src="assets/aquarium/js/config.js?418"></script>
-    <script src="assets/aquarium/js/aquarium.js?418"></script>
+    <script src="assets/aquarium/js/config.js?425"></script>
+    <script src="assets/aquarium/js/aquarium.js?425"></script>
     <div class="footercontent"></div>
 
 </body>
