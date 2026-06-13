@@ -233,7 +233,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 439;
+const bee_app_version = 442;
 
 call_local_hook('check_version', []);
 
@@ -1114,6 +1114,30 @@ $('.smallprint .handle').on('click', function() {
         
 $('.smallprint .d_version').html(esc_html(bee_app_version));
 
+
+// Confirm before leaving page - cannot dismiss webview if we do
+$(function() {
+    $(document).on('click', 'a', function(e) {
+        // Use the attribute, not this.href: the DOM property is already resolved to an
+        // absolute URL, so it would start with "http" even for a relative link.
+        const href = $(this).attr('href') || '';
+        if(href.startsWith('http')) {
+            e.preventDefault();
+            if(bee.is_puzzle) {
+                bee_prompt("Copy this URL and visit it in a broswer", function(v) { return; }, href);
+            } else {
+                bee_prompt("Are you sure you want to leave this page?", function(v) {
+                    if(v === null) { return; }
+                    window.location.href = href;
+                }, 'Yes');
+            }
+            return false;
+        }
+        return true;
+    });
+});
+
+
 // ------------------- Tab / screen switching -------------------------
 
 // Switch the visible panel.
@@ -1184,21 +1208,22 @@ $('.giftlist .list .exchange').on('click', function() {
     
     const diff = 2;
     
-    if(!confirm("This will cost "+diff+" coins. Are you sure?")) { return false; }
-    
-    if(bee.storage.players[bee.player].score < diff) { playme('notavail'); return false; }
-    bee.storage.players[bee.player].score -= diff;
-    save_storage('gift exchange cost');
-    update_score_ui();
+    bee_prompt("This will cost "+diff+" coins.", function(v) {
+        if(v === null) { return; }
+        
+        if(bee.storage.players[bee.player].score < diff) { playme('notavail'); return false; }
+        bee.storage.players[bee.player].score -= diff;
+        save_storage('gift exchange cost');
+        update_score_ui();
 
-    const gix = give_gift(undefined, true);
-    giftarray[bee.giftlist] = gix;
-    save_storage('gift exchange');
-    $('.giftlist .list img:visible, .giftlist .list .codegift:visible').fadeOut({duration: 2000, complete: function() {
-        render_gift($('.giftlist .list'), giftarray[bee.giftlist], true);
-    }});
-    
-    return false;
+        const gix = give_gift(undefined, true);
+        giftarray[bee.giftlist] = gix;
+        save_storage('gift exchange');
+        $('.giftlist .list img:visible, .giftlist .list .codegift:visible').fadeOut({duration: 2000, complete: function() {
+            render_gift($('.giftlist .list'), giftarray[bee.giftlist], true);
+        }});
+    }, "Are you sure?");
+    return false;    
 });
 
 // ---------------- Aquarium -----------------
