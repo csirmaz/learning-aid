@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?438">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?439">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -159,10 +159,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?438">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?439">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?438"></script>
+    <script src="assets/local/beelocal.js?439"></script>
 </head>
 <body>
     <div class="container">
@@ -1222,7 +1222,7 @@
         };
 
     </script>
-    <script src="assets/common.js?438"></script>
+    <script src="assets/common.js?439"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1592,7 +1592,7 @@
             if(pstore.known_words) { pstore.known_words = {}; }
             if(pstore.known_questions) { pstore.known_questions = {}; }
             save_storage('reset_known_words');
-            alert('List of known words reset');
+            bee_alert('List of known words reset');
         }
         
         
@@ -2010,9 +2010,13 @@
             if(problem === undefined) { // Get a new word/problem
             
                 let word_ix = undefined;
+                let warned_no_word = false; // bee_alert() is non-blocking, so only warn once (no modal stacking)
                 while(true) {
                     word_ix = try_get_new_word10(undefined); // first word in class group
-                    if(word_ix === undefined) { alert('No first word found, trying again'); continue; }
+                    if(word_ix === undefined) {
+                        if(!warned_no_word) { bee_alert('No first word found, trying again'); warned_no_word = true; }
+                        continue;
+                    }
                     break;
                 }
                 
@@ -2242,26 +2246,31 @@
         }
 
 
-        // Choose a range of word sets to show words from
-        function choose_wordsets() {
-            let min_wordset = prompt("What range of levels sets should we use?\nType a number for the bottom end of the range") - 0;
-            if(isNaN(min_wordset)) { min_wordset = 0; }
-            let max_wordset = prompt("Type a number from "+min_wordset+" for the top end of the range") - 0;
-            if(isNaN(max_wordset)) { max_wordset = 0; }
-            return [min_wordset, max_wordset];
+        // Choose a range of word sets to show words from; result is delivered to callback([min, max])
+        function choose_wordsets(callback) {
+            bee_prompt("What range of levels sets should we use?\nType a number for the bottom end of the range", function(min_value) {
+                let min_wordset = min_value - 0;
+                if(isNaN(min_wordset)) { min_wordset = 0; }
+                bee_prompt("Type a number from "+min_wordset+" for the top end of the range", function(max_value) {
+                    let max_wordset = max_value - 0;
+                    if(isNaN(max_wordset)) { max_wordset = 0; }
+                    callback([min_wordset, max_wordset]);
+                });
+            });
         }
 
         
         function modify_wordlist() {
-            if(bee.player === false) { alert("Choose a player first"); return; }
-            const wordsets = choose_wordsets();
-            bee.storage.players[bee.player].min_wordset = wordsets[0];
-            bee.storage.players[bee.player].wordsets = wordsets[1];
-            call_local_hook('problemset_hook', [String(wordsets)]);
-            purge_question_queue();
-            save_storage('modify_wordlist');
-            init_wordlist();
-            new_question('modify_wordlist');
+            if(bee.player === false) { bee_alert("Choose a player first"); return; }
+            choose_wordsets(function(wordsets) {
+                bee.storage.players[bee.player].min_wordset = wordsets[0];
+                bee.storage.players[bee.player].wordsets = wordsets[1];
+                call_local_hook('problemset_hook', [String(wordsets)]);
+                purge_question_queue();
+                save_storage('modify_wordlist');
+                init_wordlist();
+                new_question('modify_wordlist');
+            });
         }
         
         
@@ -2282,19 +2291,22 @@
             new_question('main');
         }
         
-        function init_player_data() {
-            const wordsets = choose_wordsets();
-            bee.storage.players[bee.player] = {
-                'data_version': bee_current_data_version,
-                'score': 0, 
-                'min_wordset': wordsets[0], 
-                'wordsets': wordsets[1]
-            };
+        // Asynchronous: choose_wordsets() prompts the user. callback() (optional) fires once done.
+        function init_player_data(callback) {
+            choose_wordsets(function(wordsets) {
+                bee.storage.players[bee.player] = {
+                    'data_version': bee_current_data_version,
+                    'score': 0,
+                    'min_wordset': wordsets[0],
+                    'wordsets': wordsets[1]
+                };
+                if(callback) { callback(); }
+            });
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?438"></script>
-    <script src="assets/aquarium/js/aquarium.js?438"></script>
+    <script src="assets/aquarium/js/config.js?439"></script>
+    <script src="assets/aquarium/js/aquarium.js?439"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

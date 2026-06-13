@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?438">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?439">
     <style>
         body {
             /* Disables pull-to-refresh but allows overscroll glow effects. */
@@ -160,10 +160,10 @@
         }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?438">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?439">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?438"></script>
+    <script src="assets/local/beelocal.js?439"></script>
 </head>
 <body>
     <div class="container">
@@ -801,7 +801,7 @@
         };
 
     </script>
-    <script src="assets/common.js?438"></script>
+    <script src="assets/common.js?439"></script>
     <script>
 
         
@@ -1258,11 +1258,13 @@
         }
         
         
-        // Choose a range of word sets to show words from
-        function choose_problemset() {
-            let p = prompt("What set of problems should we use?\nType a number from 0 to "+max_problemset+" (simple to difficult);\nor 101 for the 1-time table, 102 for the 2-time table etc.;\nor for mixed 12-times tables, use 113/213 (big), 114/214 (big+small), 115/215 (small),\n116/216 (all), where the 200 ones use timeout") - 0;
-            if(isNaN(p)) { p = 0; }
-            return p;
+        // Choose a range of word sets to show words from; result is delivered to callback(p)
+        function choose_problemset(callback) {
+            bee_prompt("What set of problems should we use?\nType a number from 0 to "+max_problemset+" (simple to difficult);\nor 101 for the 1-time table, 102 for the 2-time table etc.;\nor for mixed 12-times tables, use 113/213 (big), 114/214 (big+small), 115/215 (small),\n116/216 (all), where the 200 ones use timeout", function(value) {
+                let p = value - 0;
+                if(isNaN(p)) { p = 0; }
+                callback(p);
+            });
         }
         
         
@@ -1275,25 +1277,26 @@
 
         
         function modify_problemset() {
-            if(bee.player === false) { alert("Choose a player first"); return; }
-            const p = choose_problemset();
-            bee.storage.players[bee.player].problemset = p;
+            if(bee.player === false) { bee_alert("Choose a player first"); return; }
+            choose_problemset(function(p) {
+                bee.storage.players[bee.player].problemset = p;
 
-            call_local_hook('problemset_hook', [p]);
-            
-            bee.queued_problems = [];
-            store_question(bee.queued_problems);
-            bee.storage.players[bee.player].current_question_time = undefined;
-            add_negative_score(0, true); // true = absolute score
+                call_local_hook('problemset_hook', [p]);
 
-            save_storage();
-            init_problemset();
-            new_question('modify_problemset');
+                bee.queued_problems = [];
+                store_question(bee.queued_problems);
+                bee.storage.players[bee.player].current_question_time = undefined;
+                add_negative_score(0, true); // true = absolute score
+
+                save_storage();
+                init_problemset();
+                new_question('modify_problemset');
+            });
         }
         
         
         function toggle_click() {
-            if(bee.player === false) { alert("Choose a player first"); return; }
+            if(bee.player === false) { bee_alert("Choose a player first"); return; }
             bee.storage.players[bee.player].key_click = !bee.storage.players[bee.player].key_click;
             save_storage();
         }
@@ -1310,14 +1313,17 @@
             new_question('main');
         }
         
-        function init_player_data() {
-            const p = choose_problemset();
-            bee.storage.players[bee.player] = {'score': 0, 'problemset': p};
+        // Asynchronous: choose_problemset() prompts the user. callback() (optional) fires once done.
+        function init_player_data(callback) {
+            choose_problemset(function(p) {
+                bee.storage.players[bee.player] = {'score': 0, 'problemset': p};
+                if(callback) { callback(); }
+            });
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?438"></script>
-    <script src="assets/aquarium/js/aquarium.js?438"></script>
+    <script src="assets/aquarium/js/config.js?439"></script>
+    <script src="assets/aquarium/js/aquarium.js?439"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

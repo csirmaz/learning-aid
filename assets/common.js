@@ -13,6 +13,79 @@ function call_local_hook(hook_name, args) {
 }
 
 
+// In-page replacement for window.alert(). The native dialog is unavailable in
+// some embedded webviews, so we build our own modal entirely here (no markup or
+// styling lives in the HTML/CSS files). It is asynchronous - a modal cannot
+// block JS - so an optional callback() fires once the box is dismissed.
+function bee_alert(message, callback) {
+    const $overlay = $('<div></div>').css({
+        position: 'fixed', left: 0, top: 0, right: 0, bottom: 0,
+        background: 'rgba(0,0,0,.4)', zIndex: 999999
+    });
+    const $box = $('<div></div>').css({
+        position: 'absolute', left: '8px', top: '8px',
+        maxWidth: 'calc(100vw - 24px)', maxHeight: 'calc(100vh - 24px)', overflow: 'auto',
+        padding: '12px', background: '#fff', color: '#000',
+        border: '1px solid #444', borderRadius: '4px',
+        font: '16px sans-serif', boxShadow: '0 2px 8px rgba(0,0,0,.4)'
+    });
+    const $msg = $('<div></div>').css({marginBottom: '10px', whiteSpace: 'pre-wrap'}).text(message);
+    const $ok = $('<button>OK</button>').css({font: 'inherit', padding: '4px 16px'});
+    $box.append($msg).append($ok);
+    $overlay.append($box);
+    $('body').append($overlay);
+    $ok.on('click', function() {
+        $overlay.remove();
+        if(callback) { callback(); }
+    });
+    $ok.focus();
+}
+
+
+// In-page replacement for window.prompt(). Like bee_alert() this is built and
+// styled entirely here and is asynchronous: the result is delivered to
+// callback(value) rather than returned. value is the entered string on OK, or
+// null on Cancel - matching the native prompt() contract. default_value
+// pre-fills the field.
+function bee_prompt(message, callback, default_value) {
+    const $overlay = $('<div></div>').css({
+        position: 'fixed', left: 0, top: 0, right: 0, bottom: 0,
+        background: 'rgba(0,0,0,.4)', zIndex: 999999
+    });
+    const $box = $('<div></div>').css({
+        position: 'absolute', left: '8px', top: '8px',
+        maxWidth: 'calc(100vw - 24px)', maxHeight: 'calc(100vh - 24px)', overflow: 'auto',
+        padding: '12px', background: '#fff', color: '#000',
+        border: '1px solid #444', borderRadius: '4px',
+        font: '16px sans-serif', boxShadow: '0 2px 8px rgba(0,0,0,.4)'
+    });
+    const $msg = $('<div></div>').css({marginBottom: '10px', whiteSpace: 'pre-wrap'}).text(message);
+    const $input = $('<input type="text">').css({
+        display: 'block', width: '100%', boxSizing: 'border-box',
+        marginBottom: '10px', padding: '4px', font: 'inherit'
+    });
+    if(default_value !== undefined) { $input.val(default_value); }
+    const $ok = $('<button>OK</button>').css({font: 'inherit', padding: '4px 16px', marginRight: '8px'});
+    const $cancel = $('<button>Cancel</button>').css({font: 'inherit', padding: '4px 16px'});
+    $box.append($msg).append($input).append($ok).append($cancel);
+    $overlay.append($box);
+    $('body').append($overlay);
+    // Deliver the result once, then tear the box down
+    const close = function(value) {
+        $overlay.remove();
+        if(callback) { callback(value); }
+    };
+    $ok.on('click', function() { close($input.val()); });
+    $cancel.on('click', function() { close(null); });
+    // Enter confirms, Escape cancels - mirrors the native dialog
+    $input.on('keydown', function(e) {
+        if(e.key == 'Enter') { close($input.val()); }
+        else if(e.key == 'Escape') { close(null); }
+    });
+    $input.focus();
+}
+
+
 // If we are called via the puzzle alerter, dismiss the window
 function dismiss_puzzle_alert() {
     if(window.PuzzleAlerter && typeof window.PuzzleAlerter.solved === 'function') {
@@ -20,7 +93,7 @@ function dismiss_puzzle_alert() {
         return;
     }
     else {
-        alert('Cannot dismiss puzzle');
+        bee_alert('Cannot dismiss puzzle');
     }
 }
 
@@ -59,11 +132,12 @@ function bootstrap() {
         // Load data from server
         // If the server is down, we get stuck here, for safety
         bee_local.load_data(bee.app_name, pre_chosen_player, function(success) {
-            if(!success) {
-                if(!bee.storage.players[pre_chosen_player]) {
-                    alert("Player data not found (remote or local), starting new");
+            if(!success && !bee.storage.players[pre_chosen_player]) {
+                // init_player_data() is asynchronous (it may prompt the user); the
+                // start menu below renders meanwhile, kept covered by the modal
+                bee_alert("Player data not found (remote or local), starting new", function() {
                     init_player_data();
-                }
+                });
             }
             // Render stub menu
             // We could likely play audio even before a user event, but let's keep this
@@ -96,38 +170,48 @@ function bootstrap() {
     // Start menu - logic
     setTimeout(function() {  // allow time for rendering
         $('.startbutton').on('click', function() {
-            
-            if($(this).data('playernew')) {
-                bee.player = prompt("What is the name of the player?");
-                if(bee.player === null || bee.player === '') { return false; }
 
-                // Initialize
-                if(!bee.storage.players[bee.player]) {
-                    init_player_data();
-                    save_storage('init');
-                } else {
-                    alert("That player already exists. Loading player data");
+            const is_new = $(this).data('playernew');
+            const chosen = $(this).data('player');
+
+            // Once a player is settled, refresh from the server (if available) and start
+            const proceed = function() {
+                if(local_hook_has('load_data')) {
+                    $('.startmenu').html('Loading...');
+                    // Refresh player data from the server
+                    // If the server is down, we get stuck here, for safety
+                    bee_local.load_data(bee.app_name, bee.player, function(success) {
+                        $('.startmenu').hide();
+                        $('.game').show();
+                        main();
+                    });
                 }
-            } else {
-                bee.player = $(this).data('player');
-            }
-            
-            if(local_hook_has('load_data')) {
-                $('.startmenu').html('Loading...');
-                // Refresh player data from the server
-                // If the server is down, we get stuck here, for safety
-                bee_local.load_data(bee.app_name, bee.player, function(success) {
+                else {
                     $('.startmenu').hide();
                     $('.game').show();
                     main();
+                }
+            };
+
+            if(is_new) {
+                bee_prompt("What is the name of the player?", function(name) {
+                    if(name === null || name === '') { return; }
+                    bee.player = name;
+                    // Initialize
+                    if(!bee.storage.players[bee.player]) {
+                        init_player_data(function() {
+                            save_storage('init');
+                            proceed();
+                        });
+                    } else {
+                        bee_alert("That player already exists. Loading player data", proceed);
+                    }
                 });
+            } else {
+                bee.player = chosen;
+                proceed();
             }
-            else {
-                $('.startmenu').hide();
-                $('.game').show();
-                main();
-            }
-            
+
             return false;
         });
     }, 200);
@@ -149,7 +233,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 438;
+const bee_app_version = 439;
 
 call_local_hook('check_version', []);
 
@@ -523,21 +607,23 @@ function toggle_play_music(ix) {
 
 // Call this to zero the score of the current player
 function clear_score() {
-    if(bee.player === false) { alert("Choose a player first"); return; }
+    if(bee.player === false) { bee_alert("Choose a player first"); return; }
     bee.storage.players[bee.player].score = 0;
     save_storage('clear_score');
     update_score_ui();
 }
-        
-        
+
+
 // Interactively reduce the score
 function reduce_score() {
-    if(bee.player === false) { alert("Choose a player first"); return; }
-    const diff = prompt("Reduce score by") - 0;
-    if(isNaN(diff)) { return; }
-    bee.storage.players[bee.player].score -= diff;
-    save_storage('reduce_score');
-    update_score_ui();
+    if(bee.player === false) { bee_alert("Choose a player first"); return; }
+    bee_prompt("Reduce score by", function(value) {
+        const diff = value - 0;
+        if(isNaN(diff)) { return; }
+        bee.storage.players[bee.player].score -= diff;
+        save_storage('reduce_score');
+        update_score_ui();
+    });
 }
         
 
@@ -836,11 +922,12 @@ function success_common(options) {
 
 
 function delete_user() {
-    if(bee.player === false) { alert("Choose a player first"); return; }
-    const conf = prompt("Type 'delete' to delete the user: " + bee.player);
-    if(conf != 'delete') { alert("Not deleting"); return; }
-    delete bee.storage.players[bee.player];
-    save_storage('delete_user');
+    if(bee.player === false) { bee_alert("Choose a player first"); return; }
+    bee_prompt("Type 'delete' to delete the user: " + bee.player, function(conf) {
+        if(conf != 'delete') { bee_alert("Not deleting"); return; }
+        delete bee.storage.players[bee.player];
+        save_storage('delete_user');
+    });
 }
         
 // text-to-speech support
@@ -855,9 +942,10 @@ const bee_tts = {
 };
         
 bee_tts.test = function() {
-    bee_tts.speak('This is what text to speach sounds like: '+Math.floor(Math.random()*100), function(){ 
-        alert(bee_tts.voice.name+' '+bee_tts.voice.lang+' '+bee_tts.voice.localService);
-        alert(bee_tts.available_voices.join("\n"));
+    bee_tts.speak('This is what text to speach sounds like: '+Math.floor(Math.random()*100), function(){
+        bee_alert(bee_tts.voice.name+' '+bee_tts.voice.lang+' '+bee_tts.voice.localService, function() {
+            bee_alert(bee_tts.available_voices.join("\n"));
+        });
     });
 };
         
@@ -1006,14 +1094,20 @@ Music by <a href="https://pixabay.com/users/fassounds-3433550/?utm_source=link-a
 
 let smallprint_expanded = false;
 $('.smallprint .handle').on('click', function() {
+    // Toggle the licences / tools panel open or closed
+    const toggle_smallprint = function() {
+        $('.smallprint .expand').html(licences).toggle();
+        $('.smallprint .expand_tools').toggle();
+        smallprint_expanded = !smallprint_expanded;
+    };
     if(!smallprint_expanded) {
-        if(prompt("Age verification: What is the capital of Finland?").toLowerCase() != 'helsinki') {
-            return false;
-        }
+        bee_prompt("Age verification: What is the capital of Finland?", function(answer) {
+            if(answer === null || answer.toLowerCase() != 'helsinki') { return; }
+            toggle_smallprint();
+        });
+        return false;
     }
-    $('.smallprint .expand').html(licences).toggle();
-    $('.smallprint .expand_tools').toggle();
-    smallprint_expanded = !smallprint_expanded;
+    toggle_smallprint();
     return false;
 });
         
@@ -1121,8 +1215,8 @@ bee_aquarium.is_active = function() {
 
 bee_aquarium.get_storage_key = function(player_name) {
     if(player_name === undefined) {
-        if(bee.player === false) { 
-            alert("Aquarium: No player chosen yet");
+        if(bee.player === false) {
+            bee_alert("Aquarium: No player chosen yet");
             player_name = 'DEFAULT';
         } else {
             player_name = bee.player;
