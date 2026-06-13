@@ -31,12 +31,105 @@ function get_player_from_url() {
     return player_name;
 }
 
-        // Try to load data
-        // TODO
-        if(localStorage[bee.app_name]) {
-            bee.storage = JSON.parse(localStorage[bee.app_name]);
-            call_local_hook('loaded_hook', [bee.app_name]);
-        }
+
+function load_local_data() {
+    console.log("Loading local data...");
+    if(localStorage[bee.app_name]) {
+        bee.storage = JSON.parse(localStorage[bee.app_name]);
+        call_local_hook('loaded_hook', [bee.app_name]);
+    }
+}
+
+
+// Initial function
+function bootstrap() {
+    
+    const pre_chosen_player = get_player_from_url();
+    if(pre_chosen_player && local_hook_has('load_data')) {
+        bee.player = pre_chosen_player;
+        bee.is_puzzle = {needs: bee.puzzle_needs};
+        
+        // Load player data
+        $('.game').hide();
+        $('.startmenu').html('Loading...');
+        load_local_data(); // if we don't populate the full list of users, they get lost
+        // Load data from server
+        // If the server is down, we get stuck here, for safety
+        bee_local.load_data(bee.app_name, pre_chosen_player, function(success) {
+            if(!success) {
+                alert("Player data not found, trying local data");
+                load_local_data();
+                if(!bee.storage.players[pre_chosen_player]) {
+                    alert("Player data still not found, starting new");
+                    init_player_data();
+                }
+            }
+            // Render stub menu
+            // Audio can only be played after a user event on the page, so we require a click
+            $('.startmenu').html('<div class="startbutton">Let\'s go!</div>');
+            setTimeout(function() {  // allow time for rendering
+                $('.startbutton').on('click', function() {
+                    $('.startmenu').hide();
+                    $('.game').show();
+                    main();
+                    return false;
+                });
+            }, 200);
+        });
+        return;
+    }
+    
+    // Regular menu with choice of users
+    // Audio can only be played after a user event on the page, so we require a click
+    load_local_data(); // only the local data has a list of users
+    let menu = "<p>Choose player</p>";
+    for (const [key, value] of Object.entries(bee.storage.players)) {
+        menu += '<div class="startbutton" data-player="'+esc_html(key)+'">'+esc_html(key)+'</div>';
+    }
+    menu += '<div class="startbutton" data-playernew="1">New user<br><span style="font-size:60%">All player data is stored in the browser only</span></div>';
+    $('.game').hide();
+    $('.startmenu').html(menu);
+
+    // Start menu - logic
+    setTimeout(function() {  // allow time for rendering
+        $('.startbutton').on('click', function() {
+            
+            if($(this).data('playernew')) {
+                bee.player = prompt("What is the name of the player?");
+                if(bee.player === null || bee.player === '') { return false; }
+
+                // Initialize
+                if(!bee.storage.players[bee.player]) {
+                    init_player_data();
+                    save_storage('init');
+                } else {
+                    alert("That player already exists. Loading player data");
+                }
+            } else {
+                bee.player = $(this).data('player');
+            }
+            
+            if(local_hook_has('load_data')) {
+                $('.startmenu').html('Loading...');
+                // Refresh player data from the server
+                // If the server is down, we get stuck here, for safety
+                bee_local.load_data(bee.app_name, bee.player, function(success) {
+                    $('.startmenu').hide();
+                    $('.game').show();
+                    main();
+                });
+            }
+            else {
+                $('.startmenu').hide();
+                $('.game').show();
+                main();
+            }
+            
+            return false;
+        });
+    }, 200);
+
+}
 
 
 function save_storage(msg, callback) {
@@ -45,7 +138,7 @@ function save_storage(msg, callback) {
     localStorage[bee.app_name] = s;
     
     if(!local_hook_has('save_hook')) {
-        if(callback) { callback(); }
+        if(callback) { callback(true); }
         return;
     }
 
@@ -53,7 +146,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 425;
+const bee_app_version = 431;
 
 call_local_hook('check_version', []);
 
@@ -340,7 +433,16 @@ function add_score(skip_this_score) {
         bee.storage.players[bee.player].score++;
     }
     bee.storage.players[bee.player].lifetime_score++;
-    save_storage('add_score');
+    save_storage('add_score', function(saved) {
+        // If !saved, the state may not have been saved on the server, but there's not much we can do
+        if(skipped_score) { return; }
+        if(bee.is_puzzle) {
+            bee.is_puzzle.needs--;
+            if(bee.is_puzzle.needs <= 0) {
+                dismiss_puzzle_alert();
+            }
+        }
+    });
     return (skipped_score ? '_SKIPPED_' : bee.storage.players[bee.player].score);
 }
 

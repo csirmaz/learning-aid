@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?425">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?431">
     <style>
         body {
             /* Disables pull-to-refresh but allows overscroll glow effects. */
@@ -160,10 +160,10 @@
         }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?425">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?431">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?425"></script>
+    <script src="assets/local/beelocal.js?431"></script>
 </head>
 <body>
     <div class="container">
@@ -775,6 +775,7 @@
             score_goal: 30,        // controls the bar under the score and gifts
             max_negative_score: 4, // maximum "negative" score where question doesn't give point
             question_timeout_value: 6, // the timeout (if the problem specifies) in seconds
+            puzzle_needs: 2, // how many successes before puzzle is dismissed
             // State (common)
             storage: {'players': {}},  // storage data that's saved into local storage
             load_time: Date.now(),
@@ -785,6 +786,7 @@
             score_anim_timeout: false,
             player: false,  // state: name of the player - scores are saved to browser under this name
             giftlist: -1,  // state: which gift is shown when viewing them
+            is_puzzle: false,
             // State (count)
             problemset: false, // index (int)
             problem: false, // state: output of a problem generator, {problem:HTML, solution:STR, hint:OBJ}
@@ -798,7 +800,7 @@
         };
 
     </script>
-    <script src="assets/common.js?425"></script>
+    <script src="assets/common.js?431"></script>
     <script>
 
         
@@ -1307,50 +1309,17 @@
             new_question('main');
         }
         
-        
-        // Start menu - render
-        // Audio can only be played after a user event on the page, so we require a click
-        let menu = "<p>Choose player</p>";
-        for (const [key, value] of Object.entries(bee.storage.players)) {
-            menu += '<div class="startbutton" data-player="'+esc_html(key)+'">'+esc_html(key)+'</div>';
+        function init_player_data() {
+            const p = choose_problemset();
+            bee.storage.players[bee.player] = {'score': 0, 'problemset': p};
         }
-        menu += '<div class="startbutton" data-playernew="1">New user<br><span style="font-size:60%">All player data is stored in the browser only</span></div>';
-        $('.game').hide();
-        $('.startmenu').html(menu);
-        
-        // Start menu - logic
-        setTimeout(function() {  // allow time for rendering
-            $('.startbutton').on('click', function() {
-                
-                if($(this).data('playernew')) {
-                    bee.player = prompt("What is the name of the player?");
-                    if(bee.player === null || bee.player === '') { return false; }
 
-                    // Initialize
-                    if(!bee.storage.players[bee.player]) {
-                        const p = choose_problemset();
-                        bee.storage.players[bee.player] = {'score': 0, 'problemset': p};
-                        save_storage();
-                    } else {
-                        alert("That player already exists. Loading player data");
-                    }
-                } else {
-                    bee.player = $(this).data('player');
-                }
-                
-                $('.startmenu').hide();
-                $('.game').show();
-                main();
-                return false;
-            });
-        }, 200);
-        
-        
     </script>
-    <script src="assets/aquarium/js/config.js?425"></script>
-    <script src="assets/aquarium/js/aquarium.js?425"></script>
+    <script src="assets/aquarium/js/config.js?431"></script>
+    <script src="assets/aquarium/js/aquarium.js?431"></script>
     <div class="footercontent"></div>
 
+    <script> bootstrap(); </script>
 </body>
 </html>
 
