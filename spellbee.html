@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?431">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?433">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -159,10 +159,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?431">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?433">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?431"></script>
+    <script src="assets/local/beelocal.js?433"></script>
 </head>
 <body>
     <div class="container">
@@ -1221,7 +1221,7 @@
         };
 
     </script>
-    <script src="assets/common.js?431"></script>
+    <script src="assets/common.js?433"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -2272,11 +2272,7 @@
             $('.d_player').html(esc_html(bee.player));
             init_wordlist();
 
-            bee_aquarium.storage_key = 'Aquarium:' + bee.app_name + ':' + bee.player;
-            bee_aquarium.game = new Aquarium(document.getElementById('aquarium'), {
-                'storageKey': bee_aquarium.storage_key,
-                'basePath': 'assets/aquarium'
-            });
+            bee_aquarium.init_game();
             bee_aquarium.init_food();
             // Switch to aquarium tab automatically after a fish/item gift animation
             bee_aquarium.on_aquarium_gift = function() { switch_to_tab('aquarium'); };
@@ -2296,8 +2292,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?431"></script>
-    <script src="assets/aquarium/js/aquarium.js?431"></script>
+    <script src="assets/aquarium/js/config.js?433"></script>
+    <script src="assets/aquarium/js/aquarium.js?433"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

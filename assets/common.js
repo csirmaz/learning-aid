@@ -57,10 +57,8 @@ function bootstrap() {
         // If the server is down, we get stuck here, for safety
         bee_local.load_data(bee.app_name, pre_chosen_player, function(success) {
             if(!success) {
-                alert("Player data not found, trying local data");
-                load_local_data();
                 if(!bee.storage.players[pre_chosen_player]) {
-                    alert("Player data still not found, starting new");
+                    alert("Player data not found (remote or local), starting new");
                     init_player_data();
                 }
             }
@@ -146,7 +144,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 431;
+const bee_app_version = 433;
 
 call_local_hook('check_version', []);
 
@@ -420,7 +418,7 @@ function add_negative_score(v, is_absolute) {
 // Add one to the score. Returns the new score or
 // '_SKIPPED_' if we're working through the negative scores or skip_this_score is set
 function add_score(skip_this_score) {
-    skipped_score = false;
+    let skipped_score = false;
     init_lifetime_score();
     if(bee.storage.players[bee.player].negative_score !== undefined && bee.storage.players[bee.player].negative_score >= 1) {
         // "negative score" is used to lengthen a level as a penalty; we skip adding a score
@@ -1058,15 +1056,34 @@ $('.giftlist .list .exchange').on('click', function() {
 // ---------------- Aquarium -----------------
 
 const bee_aquarium = {
-    storage_key: undefined,
     game: undefined,
     food_counter: $('.aq-feed-btn .count')
 };
-// Usage:
-//    set bee_aquarium.game = new Aquarium(...)
+// Usage: bee_aquarium.init_game()
 
 bee_aquarium.is_active = function() {
     return (bee.app_name == 'spellbee');
+};
+
+bee_aquarium.get_storage_key = function(player_name) {
+    if(player_name === undefined) {
+        if(bee.player === false) { 
+            alert("Aquarium: No player chosen yet");
+            player_name = 'DEFAULT';
+        } else {
+            player_name = bee.player;
+        }
+    }
+    return 'Aquarium:' + bee.app_name + ':' + player_name;
+};
+
+bee_aquarium.init_game = function() {
+    if(bee_aquarium.is_active()) {
+        bee_aquarium.game = new Aquarium(document.getElementById('aquarium'), {
+            'storageKey': bee_aquarium.get_storage_key(),
+            'basePath': 'assets/aquarium'
+        });
+    }
 };
 
 bee_aquarium.get_data = function() {
