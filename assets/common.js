@@ -15,9 +15,12 @@ function call_local_hook(hook_name, args) {
 
 // If we are called via the puzzle alerter, dismiss the window
 function dismiss_puzzle_alert() {
-    if(window.PuzzleAlerter && typeof window.PuzzleAlerter.solved === 'function'){
+    if(window.PuzzleAlerter && typeof window.PuzzleAlerter.solved === 'function') {
         window.PuzzleAlerter.solved();
         return;
+    }
+    else {
+        alert('Cannot dismiss puzzle');
     }
 }
 
@@ -63,9 +66,12 @@ function bootstrap() {
                 }
             }
             // Render stub menu
-            // Audio can only be played after a user event on the page, so we require a click
-            $('.startmenu').html('<div class="startbutton">Let\'s go!</div>');
+            // We could likely play audio even before a user event, but let's keep this
+            $('.startmenu').html('<div class="startbutton" style="padding:1rem">'+'🪙'+"\ufe0f"+' Let\'s earn<br>some coins!</div>');
             setTimeout(function() {  // allow time for rendering
+                try {
+                    bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 40});
+                } catch(e) {}
                 $('.startbutton').on('click', function() {
                     $('.startmenu').hide();
                     $('.game').show();
@@ -144,7 +150,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 433;
+const bee_app_version = 436;
 
 call_local_hook('check_version', []);
 
@@ -828,7 +834,7 @@ function delete_user() {
 // text-to-speech support
         
 const bee_tts = {
-    status: 'init', // 'init' | 'ready' | 'fail'
+    status: 'init', // 'init' | 'ready' | 'fail' | 'bridge'
     voice: false,  // selected voice
     voice_points: -1,  // scoring to select voice
     synth: window.speechSynthesis,
@@ -844,6 +850,10 @@ bee_tts.test = function() {
 };
         
 bee_tts.initialize = function() {
+    if(window.PuzzleAlerter && typeof window.PuzzleAlerter.speak === 'function') {
+        bee_tts.status = 'bridge';
+        return;
+    }
     if(!bee_tts.synth) {
         console.log("TTS failed (not available)");
         bee_tts.status = 'fail';
@@ -887,6 +897,19 @@ bee_tts.initialize = function() {
         
 // Speak an utterance. Returns true if utterance is being spoken; then callback() will be called on end.
 bee_tts.speak = function(s, callback) {
+    if(bee_tts.status == 'bridge') {
+        try {
+            window.PuzzleAlerter.speak(s);
+            if(callback) {
+                setTimeout(callback, 80*s.lentgth+250);
+            }
+            return true;
+        } catch(e) {
+            if(callback) { setTimeout(callback, 1000); }
+            return false;
+        }
+    }
+    
     if(bee_tts.status != 'ready') {
         console.log("TTS speak: not ready");
         setTimeout(callback, 1000);
