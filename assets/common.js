@@ -69,15 +69,14 @@ function bootstrap() {
             // We could likely play audio even before a user event, but let's keep this
             $('.startmenu').html('<div class="startbutton" style="padding:1rem">'+'🪙'+"\ufe0f"+' Let\'s earn<br>some coins!</div>');
             setTimeout(function() {  // allow time for rendering
-                try {
-                    bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 40});
-                } catch(e) {}
                 $('.startbutton').on('click', function() {
                     $('.startmenu').hide();
                     $('.game').show();
                     main();
                     return false;
                 });
+                try { bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 40}); } catch(e) {}
+                try { play_rnd_sound('session'); } catch(e) {}
             }, 200);
         });
         return;
@@ -150,7 +149,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 436;
+const bee_app_version = 437;
 
 call_local_hook('check_version', []);
 
@@ -231,20 +230,33 @@ const audio = {
         {file: 'assets/sounds/success/yipee-45360.mp3', 'volume': .8, 'object': false},
         {file: 'assets/sounds/success/purchase-succesful-ingame-230550.mp3', 'volume': .4, 'object': false},
         {file: 'assets/sounds/success/success-fanfare-trumpets-6185.mp3', 'volume': .5, 'object': false},
-        {file: 'assets/sounds/success/11l-victory_sound_with_t-1749487402950-357606.mp3', 'volume': .3, 'object': false},
+        // {file: 'assets/sounds/success/11l-victory_sound_with_t-1749487402950-357606.mp3', 'volume': .3, 'object': false},
+        // {file: 'assets/sounds/success/11l-victory_sound_with_t-1749487409696-357609.mp3', 'volume': .4, 'object': false},
+        {file: 'assets/sounds/success/11l-game_complete_notifi-1749489486836-360350.mp3', 'volume': .4, 'object': false},
+        {file: 'assets/sounds/success/11l-triumphant_orchestra-1749487505211-360357.mp3', 'volume': .4, 'object': false},
+        {file: 'assets/sounds/success/11l-victory-1749704552668-358772.mp3', 'volume': .4, 'object': false},
         {file: 'assets/sounds/success/level-up-05-326133.mp3', 'volume': .6, 'object': false},
         {file: 'assets/sounds/success/bonus-points-190035.mp3', 'volume': .6, 'object': false},
         {file: 'assets/sounds/success/correct-356013.mp3', 'volume': .4, 'object': false},
         {file: 'assets/sounds/success/get-coin-351945.mp3', 'volume': .4, 'object': false},
-        {file: 'assets/sounds/success/11l-triumphant_orchestra-1749487505211-360357.mp3', 'volume': .4, 'object': false},
         {file: 'assets/sounds/success/classic-game-action-positive-30-224562.mp3', 'volume': .4, 'object': false},
         {file: 'assets/sounds/success/classic-game-action-positive-27-224558.mp3', 'volume': .4, 'object': false},
         {file: 'assets/sounds/success/arcade-ui-14-229514.mp3', 'volume': .5, 'object': false},
         {file: 'assets/sounds/success/arcade-ui-29-229501.mp3', 'volume': .5, 'object': false},
         {file: 'assets/sounds/success/rising-funny-game-effect-132474.mp3', 'volume': .25, 'object': false},
-        // {file: 'assets/sounds/success/11l-victory-1749704552668-358772.mp3', 'volume': .4, 'object': false},
-        {file: 'assets/sounds/success/11l-victory_sound_with_t-1749487409696-357609.mp3', 'volume': .4, 'object': false},
-        {file: 'assets/sounds/success/11l-game_complete_notifi-1749489486836-360350.mp3', 'volume': .4, 'object': false},
+        {file: 'assets/sounds/success/puyopuyomegafan1234-winner-game-sound-404167.mp3', 'volume': .5, 'object': false},
+        {file: 'assets/sounds/success/universfield-game-bonus-03-487857.mp3', 'volume': .5, 'object': false},
+        {file: 'assets/sounds/success/freesound_community-good-6081.mp3', 'volume': .5, 'object': false},
+        {file: 'assets/sounds/success/liecio-collect-points-190037.mp3', 'volume': .5, 'object': false},
+        {file: 'assets/sounds/success/universfield-video-game-bonus-323603.mp3', 'volume': .5, 'object': false},
+        {file: 'assets/sounds/success/dragon-studio-correct-472358.mp3', 'volume': .5, 'object': false},
+        {file: 'assets/sounds/success/latent-rick-achievement-badge-pop-sound-2-547865.mp3', 'volume': .5, 'object': false},
+        {file: 'assets/sounds/success/floraphonic-cute-level-up-1-189852.mp3', 'volume': .5, 'object': false},
+        {file: 'assets/sounds/success/astralsynthesizer-11l-victory_beat-1749704521130-358766.mp3', 'volume': .5, 'object': false},
+    ],
+    session: [
+        {file: 'assets/sounds/session/floraphonic-playful-casino-slot-machine-jackpot-3-183921.mp3', volume: .7, object: false},
+        {file: 'assets/sounds/session/pw23check-winning-218995.mp3', volume: .7, object: false},
     ],
     music: [
         {file: 'assets/music/satisfying-lofi-for-focus-study-amp-working-242103.mp3', volume: .1, object: false}
@@ -941,16 +953,35 @@ const licences = `
 | Confetti module from https://github.com/loonywizard/js-confetti (MIT)
 | 
 Sound Effect by <a href="https://pixabay.com/users/u_2gxydaiwcd-46893983/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=340660">u_2gxydaiwcd</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=340660">Pixabay</a>
+
+Sound Effect by <a href="https://pixabay.com/users/puyopuyomegafan1234-45913026/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=404167">Sophia Conçeição</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=404167">Pixabay</a>
+
 Sound Effect by <a href="https://pixabay.com/users/freesound_community-46691455/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=6185">freesound_community</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=6185">Pixabay</a>
+
 Sound Effect by <a href="https://pixabay.com/users/miraclei-45186201/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360154">MiraclEI</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360154">Pixabay</a>
+
 Sound Effect by <a href="https://pixabay.com/users/ribhavagrawal-39286533/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=230550">Ribhav Agrawal</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=230550">Pixabay</a>
+
 Sound Effect by <a href="https://pixabay.com/users/peekaboolabcreative-22100005/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=357606">Nussaraporn Haleebut</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=357606">Pixabay</a>
+
 Sound Effect by <a href="https://pixabay.com/users/universfield-28281460/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=326133">Universfield</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=326133">Pixabay</a>
+
 Sound Effect by <a href="https://pixabay.com/users/liecio-3298866/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=190035">LIECIO</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=190035">Pixabay</a>
+
 Sound Effect by <a href="https://pixabay.com/users/koiroylers-44305058/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=356013">Koi Roylers</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=356013">Pixabay</a>
+
 Sound Effect by <a href="https://pixabay.com/users/doubleducks-45864631/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360357">Phurisarah H</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=360357">Pixabay</a>
+
 Sound Effect by <a href="https://pixabay.com/users/matthewvakaliuk73627-48347364/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=290204">Matthew Vakalyuk</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=290204">Pixabay</a>
+
 Sound Effect by <a href="https://pixabay.com/users/floraphonic-38928062/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=224562">floraphonic</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=224562">Pixabay</a>
+
+Sound Effect by <a href="https://pixabay.com/users/pw23check-44527802/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=218995">PW23CHECK</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=218995">Pixabay</a>
+
+Sound Effect by <a href="https://pixabay.com/users/dragon-studio-38165424/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=472358">DRAGON-STUDIO</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=472358">Pixabay</a>
+
+Sound Effect by <a href="https://pixabay.com/users/latent-rick-54823268/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=547865">Latent Rick</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=547865">Pixabay</a>
+
 Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=358772">Sarah H</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=358772">Pixabay</a>
 | Words TTS by https://ttsmp3.com/ (No restrictions on use)        
 |
