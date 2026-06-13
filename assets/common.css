@@ -18,7 +18,7 @@ body {
 
 .scorewrap {
     position: absolute;
-    right: 1rem;
+    right: .2rem;
 }
 
 body.condense .scorewrap { zoom: 70%; }
@@ -103,7 +103,7 @@ body.condense .scorewrap { zoom: 70%; }
 
 .score .value {
     display: inline-block;
-    min-width: 5rem;
+    min-width: 4rem;
     color: #fff;
     font-weight: bold;
     text-align: right;

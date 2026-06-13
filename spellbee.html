@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?442">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?443">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -74,14 +74,14 @@
         .prompt .infield .help .help_totype,
         .prompt .infield_story .story_totype,
         .prompt .infield .reveal_totype {
-            background: #fffaf0; /* must match .prompt .infield_story .story_totype color */
+            background: #fff; /* #fffaf0; */ /* must match .prompt .infield_story .story_totype color */
             text-decoration: underline solid rgba(119,238,0,.6) .2rem;
             text-underline-offset: .6rem;
         }
 
         .prompt .infield .help { color: #05b; }
         .prompt .infield .help .help_totype.help_classhighlight { color: #b38; }
-        .prompt .infield_story .story_totype { text-underline-offset: .3rem; color: #fffaf0; }
+        .prompt .infield_story .story_totype { text-underline-offset: .3rem; color: #fff; /* #fffaf0; */ }
         .prompt .infield .reveal_totype      { color: #ccc; }
         .prompt .infield .reveal_totype.help_classhighlight { color: #fac; }
         .prompt .infield_story .reveal_totype  { text-underline-offset: .3rem; }
@@ -101,12 +101,13 @@
             position: absolute;
             top: 0;
             left: 0;
-            border: 2px solid #000;
+            border: 2px solid #f00;
             width: .2rem;
             height: 1.5rem;
             margin-left: -1px;
             border-right: 0 solid transparent;
         }
+        .aged-paper .cursor { border: 2px solid #000; }
         .infield_story .cursor { height: 1.2rem; width: .1rem; }
         .infield .help .cursor { visibility: hidden; }
         
@@ -159,10 +160,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?442">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?443">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?442"></script>
+    <script src="assets/local/beelocal.js?443"></script>
 </head>
 <body>
     <div class="container">
@@ -178,7 +179,7 @@
         <div class="game tab-panel tab-panel-game">
             <div class="prompt">
                 <span class="img"></span>
-                <span class="infield aged-paper"><span class="help"></span><img class="helpwait" src="assets/images/loader.gif"><span class="inp"></span></span>
+                <span class="infield"><span class="help"></span><img class="helpwait" src="assets/images/loader.gif"><span class="inp"></span></span>
                 <div class="addwords"></div>
             </div>
 
@@ -1222,7 +1223,7 @@
         };
 
     </script>
-    <script src="assets/common.js?442"></script>
+    <script src="assets/common.js?443"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1361,7 +1362,8 @@
                 'emoji': word_data.emoji,
                 'ref': word_data.ref,
                 'imgref': word_data.imgref,
-                'add_words': add_words
+                'add_words': add_words,
+                'level': word_data.level
             };
             word_data.proc_cache = proc;
             return proc;
@@ -1802,7 +1804,7 @@
                                 }
                             }
                         }
-                        console.log('success help=', bee.help_asked, 'backspace=', bee.backspace_used, 'outcome=', outcome);
+                        console.log('success help=', bee.help_asked, 'backspace=', bee.backspace_used, 'outcome=', outcome, 'level=', bee.processed_word.level, 'NOTlongstory=', bee.processed_word.level < MIN_LONGSTORY_LEVEL);
                         
                         if(outcome == 'ADD_KNOWN') {
                             queue_success();
@@ -1997,6 +1999,7 @@
         
         function new_question(reason) {  // also called from common.js on successfully answering a question
             console.log('#new_question05() caller=', reason);
+            check_dismiss_puzzle();
             page_update();
             
             try{ document.activeElement.blur(); }catch(e){}
@@ -2222,6 +2225,7 @@
         
         // Schedule question to be shown N questions later
         function reschedule_question(problem, add_reveal) {
+            console.log('reschedule_question', problem, add_reveal);
             const s = get_question_queue();
             s.shift(); // remove this question
             while(s.length < 3) { s.push(undefined); }
@@ -2305,8 +2309,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?442"></script>
-    <script src="assets/aquarium/js/aquarium.js?442"></script>
+    <script src="assets/aquarium/js/config.js?443"></script>
+    <script src="assets/aquarium/js/aquarium.js?443"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

@@ -97,6 +97,12 @@ function dismiss_puzzle_alert() {
     }
 }
 
+// Check if we can dismiss the puzzle and do so
+function check_dismiss_puzzle() {
+    if(bee.is_puzzle && bee.is_puzzle.needs <= 0) {
+        dismiss_puzzle_alert();
+    }
+}
 
 // The player name may be specified in the URL. Returns null if not available
 function get_player_from_url() {
@@ -233,7 +239,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 442;
+const bee_app_version = 443;
 
 call_local_hook('check_version', []);
 
@@ -380,6 +386,7 @@ const bee_confetti = new JSConfetti();
 
 // Check if the page should be refreshed to bring in new versions
 function page_update() {
+    if(bee.is_puzzle) { return; }
     if(Date.now() - bee.load_time > 4*60*60*1000) {
         window.location.reload(true);
         return;
@@ -533,16 +540,8 @@ function add_score(skip_this_score) {
         bee.storage.players[bee.player].score++;
     }
     bee.storage.players[bee.player].lifetime_score++;
-    save_storage('add_score', function(saved) {
-        // If !saved, the state may not have been saved on the server, but there's not much we can do
-        if(skipped_score) { return; }
-        if(bee.is_puzzle) {
-            bee.is_puzzle.needs--;
-            if(bee.is_puzzle.needs <= 0) {
-                dismiss_puzzle_alert();
-            }
-        }
-    });
+    if(bee.is_puzzle && !skipped_score) { bee.is_puzzle.needs--; }
+    save_storage('add_score');
     return (skipped_score ? '_SKIPPED_' : bee.storage.players[bee.player].score);
 }
 
