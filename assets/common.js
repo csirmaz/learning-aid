@@ -98,11 +98,14 @@ function dismiss_puzzle_alert() {
     }
 }
 
-// Check if we can dismiss the puzzle and do so
+// Check if we can dismiss the puzzle and do so. Returns true if we dismissed it,
+// so the caller can stop before generating/speaking another question (see new_question).
 function check_dismiss_puzzle() {
     if(bee.is_puzzle && bee.is_puzzle.needs <= 0) {
         dismiss_puzzle_alert();
+        return true;
     }
+    return false;
 }
 
 // The player name may be specified in the URL. Returns null if not available
@@ -240,7 +243,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 446;
+const bee_app_version = 447;
 
 call_local_hook('check_version', []);
 
