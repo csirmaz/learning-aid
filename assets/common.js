@@ -47,7 +47,8 @@ function bee_alert(message, callback) {
 // callback(value) rather than returned. value is the entered string on OK, or
 // null on Cancel - matching the native prompt() contract. default_value
 // pre-fills the field.
-function bee_prompt(message, callback, default_value) {
+// is_password (optional): render a masked field
+function bee_prompt(message, callback, default_value, is_password) {
     const $overlay = $('<div></div>').css({
         position: 'fixed', left: 0, top: 0, right: 0, bottom: 0,
         background: 'rgba(0,0,0,.4)', zIndex: 999999
@@ -60,7 +61,7 @@ function bee_prompt(message, callback, default_value) {
         font: '16px sans-serif', boxShadow: '0 2px 8px rgba(0,0,0,.4)'
     });
     const $msg = $('<div></div>').css({marginBottom: '10px', whiteSpace: 'pre-wrap'}).text(message);
-    const $input = $('<input type="text">').css({
+    const $input = $(is_password ? '<input type="password">' : '<input type="text">').css({
         display: 'block', width: '100%', boxSizing: 'border-box',
         marginBottom: '10px', padding: '4px', font: 'inherit'
     });
@@ -239,7 +240,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 443;
+const bee_app_version = 446;
 
 call_local_hook('check_version', []);
 
@@ -347,6 +348,9 @@ const audio = {
     session: [
         {file: 'assets/sounds/session/floraphonic-playful-casino-slot-machine-jackpot-3-183921.mp3', volume: .7, object: false},
         {file: 'assets/sounds/session/pw23check-winning-218995.mp3', volume: .7, object: false},
+        {file: 'assets/sounds/session/breakzstudios-upbeat-pop-intro-logo-6-201064.mp3', volume: .7, object: false},
+        {file: 'assets/sounds/session/bombinsound-kids-funk-intro-music-499479.mp3', volume: .7, object: false},
+        {file: 'assets/sounds/session/dariocoiro-intro-podcast-530684.mp3', volume: .7, object: false}
     ],
     music: [
         {file: 'assets/music/satisfying-lofi-for-focus-study-amp-working-242103.mp3', volume: .1, object: false}
@@ -1069,6 +1073,12 @@ Sound Effect by <a href="https://pixabay.com/users/dragon-studio-38165424/?utm_s
 
 Sound Effect by <a href="https://pixabay.com/users/latent-rick-54823268/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=547865">Latent Rick</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=547865">Pixabay</a>
 
+Sound Effect by <a href="https://pixabay.com/users/breakzstudios-38548419/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=201064">Breakz Studios</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=201064">Pixabay</a>
+
+Sound Effect by <a href="https://pixabay.com/users/bombinsound-54782632/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=499479">Bomb Sound</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=499479">Pixabay</a>
+
+Sound Effect by <a href="https://pixabay.com/users/dariocoiro-54756271/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=530684">Dario Coiro</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=530684">Pixabay</a>
+
 Sound Effect by <a href="https://pixabay.com/users/astralsynthesizer-50776509/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=358772">Sarah H</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=358772">Pixabay</a>
 | Words TTS by https://ttsmp3.com/ (No restrictions on use)        
 |
@@ -1103,7 +1113,7 @@ $('.smallprint .handle').on('click', function() {
         bee_prompt("Age verification: What is the capital of Finland?", function(answer) {
             if(answer === null || answer.toLowerCase() != 'helsinki') { return; }
             toggle_smallprint();
-        });
+        }, undefined, true);
         return false;
     }
     toggle_smallprint();
