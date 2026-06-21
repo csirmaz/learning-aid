@@ -243,7 +243,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 447;
+const bee_app_version = 451;
 
 call_local_hook('check_version', []);
 
@@ -349,20 +349,23 @@ const audio = {
         {file: 'assets/sounds/success/astralsynthesizer-11l-victory_beat-1749704521130-358766.mp3', 'volume': .5, 'object': false},
     ],
     session: [
-        {file: 'assets/sounds/session/floraphonic-playful-casino-slot-machine-jackpot-3-183921.mp3', volume: .7, object: false},
-        {file: 'assets/sounds/session/pw23check-winning-218995.mp3', volume: .7, object: false},
-        {file: 'assets/sounds/session/breakzstudios-upbeat-pop-intro-logo-6-201064.mp3', volume: .7, object: false},
-        {file: 'assets/sounds/session/bombinsound-kids-funk-intro-music-499479.mp3', volume: .7, object: false},
-        {file: 'assets/sounds/session/dariocoiro-intro-podcast-530684.mp3', volume: .7, object: false}
+        // {file: 'assets/sounds/session/floraphonic-playful-casino-slot-machine-jackpot-3-183921.mp3', volume: .7, object: false},
+        // {file: 'assets/sounds/session/pw23check-winning-218995.mp3', volume: .7, object: false},
+        // {file: 'assets/sounds/session/breakzstudios-upbeat-pop-intro-logo-6-201064.mp3', volume: .7, object: false},
+        // {file: 'assets/sounds/session/bombinsound-kids-funk-intro-music-499479.mp3', volume: .7, object: false},
+        // {file: 'assets/sounds/session/dariocoiro-intro-podcast-530684.mp3', volume: .7, object: false},
+        {file: 'assets/sounds/session/puzzle_begin_1.mp3', volume: .8, object: false},
+        {file: 'assets/sounds/session/puzzle_begin_2.mp3', volume: .8, object: false},
+        {file: 'assets/sounds/session/puzzle_begin_3.mp3', volume: .8, object: false},
+        {file: 'assets/sounds/session/puzzle_begin_4.mp3', volume: .8, object: false},
+        {file: 'assets/sounds/session/puzzle_begin_5.mp3', volume: .8, object: false}
     ],
     // Played as the celebratory send-off when a puzzle session is completed (see success_common)
     puzzle_end: [
-        {file: 'assets/sounds/success/congrats1.mp3', volume: 1, object: false},
-        {file: 'assets/sounds/success/congrats2.mp3', volume: 1, object: false},
-        {file: 'assets/sounds/success/11l-triumphant_orchestra-1749487505211-360357.mp3', volume: .5, object: false},
-        {file: 'assets/sounds/success/11l-victory-1749704552668-358772.mp3', volume: .5, object: false},
-        {file: 'assets/sounds/success/success-fanfare-trumpets-6185.mp3', volume: .5, object: false},
-        {file: 'assets/sounds/success/puyopuyomegafan1234-winner-game-sound-404167.mp3', volume: .5, object: false}
+        {file: 'assets/sounds/puzzle_end/puzzle_end_1.mp3', volume: .8, object: false},
+        {file: 'assets/sounds/puzzle_end/puzzle_end_2.mp3', volume: .8, object: false},
+        {file: 'assets/sounds/puzzle_end/puzzle_end_3.mp3', volume: .8, object: false},
+        {file: 'assets/sounds/puzzle_end/puzzle_end_4.mp3', volume: .8, object: false}
     ],
     music: [
         {file: 'assets/music/satisfying-lofi-for-focus-study-amp-working-242103.mp3', volume: .1, object: false}
