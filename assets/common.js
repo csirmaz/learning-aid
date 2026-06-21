@@ -355,6 +355,15 @@ const audio = {
         {file: 'assets/sounds/session/bombinsound-kids-funk-intro-music-499479.mp3', volume: .7, object: false},
         {file: 'assets/sounds/session/dariocoiro-intro-podcast-530684.mp3', volume: .7, object: false}
     ],
+    // Played as the celebratory send-off when a puzzle session is completed (see success_common)
+    puzzle_end: [
+        {file: 'assets/sounds/success/congrats1.mp3', volume: 1, object: false},
+        {file: 'assets/sounds/success/congrats2.mp3', volume: 1, object: false},
+        {file: 'assets/sounds/success/11l-triumphant_orchestra-1749487505211-360357.mp3', volume: .5, object: false},
+        {file: 'assets/sounds/success/11l-victory-1749704552668-358772.mp3', volume: .5, object: false},
+        {file: 'assets/sounds/success/success-fanfare-trumpets-6185.mp3', volume: .5, object: false},
+        {file: 'assets/sounds/success/puyopuyomegafan1234-winner-game-sound-404167.mp3', volume: .5, object: false}
+    ],
     music: [
         {file: 'assets/music/satisfying-lofi-for-focus-study-amp-working-242103.mp3', volume: .1, object: false}
     ]
@@ -478,7 +487,6 @@ function play_video(callback) {
 function update_score_ui(do_animate) {
     const score = bee.storage.players[bee.player].score;
     $('.score .value').html(esc_html(score));
-    $('.score .icontext').html(score < bee.score_goal ? '' : esc_html(Math.floor(score / bee.score_goal)));
     if(do_animate !== false) {
         $('.score').addClass((score % bee.score_goal == 0) ? 'goldpulse' : 'pulse');
         if(bee.score_anim_timeout !== false) { clearTimeout(bee.score_anim_timeout); }
@@ -487,11 +495,30 @@ function update_score_ui(do_animate) {
             bee.score_anim_timeout = false;
         }, 1500);
     }
-    
+
     // bar
-    $('.score .bar .barfill').css('width', ((score % bee.score_goal) / bee.score_goal * 100.)+'%');
-    $('.score').toggleClass('goal_reached', score >= bee.score_goal);
-    $('.score .needed').html(bee.score_goal - (score % bee.score_goal));
+    if(bee.is_puzzle) {
+        // In puzzle mode the level bar is repurposed to track progress towards puzzle_needs.
+        // The "X done of Y" message and the bar are merged into one: the message's own
+        // background is the bar, filling from bright gold (done) to dark gold (remaining).
+        const total = bee.puzzle_needs;
+        let done = total - bee.is_puzzle.needs;
+        if(done < 0) { done = 0; }
+        if(done > total) { done = total; }
+        // Start the fill at 10% rather than empty, so zero progress still shows a sliver.
+        const pct = total > 0 ? 10 + done / total * 90. : 10;
+        $('.score').addClass('puzzle');
+        $('.score .icontext').html(''); // no level number in puzzle mode
+        $('.score .needed')
+            .html(esc_html(done + ' done of ' + total))
+            .css('background', 'linear-gradient(to right, #d2c500 '+pct+'%, #a70 '+pct+'%)');
+    }
+    else {
+        $('.score .icontext').html(score < bee.score_goal ? '' : esc_html(Math.floor(score / bee.score_goal)));
+        $('.score .bar .barfill').css('width', ((score % bee.score_goal) / bee.score_goal * 100.)+'%');
+        $('.score').toggleClass('goal_reached', score >= bee.score_goal);
+        $('.score .needed').html(bee.score_goal - (score % bee.score_goal));
+    }
     
     // remaining to next gift
     if(bee.storage.players[bee.player].lifetime_score !== undefined
@@ -547,7 +574,10 @@ function add_score(skip_this_score) {
         bee.storage.players[bee.player].score++;
     }
     bee.storage.players[bee.player].lifetime_score++;
-    if(bee.is_puzzle && !skipped_score) { bee.is_puzzle.needs--; }
+    // In puzzle mode every correct answer counts towards completion — including repeats and
+    // answers skipped by the negative-score penalty — so wrong or repeat answers don't
+    // lengthen the fixed-length puzzle session (add_score only runs on a correct answer).
+    if(bee.is_puzzle) { bee.is_puzzle.needs--; }
     save_storage('add_score');
     return (skipped_score ? '_SKIPPED_' : bee.storage.players[bee.player].score);
 }
@@ -828,6 +858,15 @@ function present_gift(img_src, callback, code_data) {
 }
 
 
+// Celebratory send-off when a puzzle session is completed on a plain success (i.e. one with no
+// gift, end-of-level or video reward of its own): a random puzzle_end sound plus confetti, then
+// dismiss the host webview once the confetti finishes. Called just before the puzzle is dismissed.
+function finish_puzzle_with_confetti() {
+    play_rnd_sound('puzzle_end');
+    show_animation(function() { dismiss_puzzle_alert(); });
+}
+
+
 // Implements common operations when a task is solved
 // Return values: 'level_complete' | 'gift' | 'period_negative' | 'period'
 // Note: there are two ways to skip adding a score. Either add 'skip_this_score':true to options, or increment the negative score
@@ -873,12 +912,14 @@ function success_common(options) {
     
     // special logic for working through negative scores
     if(score === '_SKIPPED_' && bee.storage.players[bee.player].lifetime_score !== undefined && bee.storage.players[bee.player].lifetime_score % celebrate_period == 0) {
+        if(bee.is_puzzle && bee.is_puzzle.needs <= 0) { finish_puzzle_with_confetti(); return 'period_negative'; }
         show_animation(function() { setTimeout(function(){ new_question('success_common:negscore:period'); }, 1100); });
         return 'period_negative';
     }
 
     // default logic to go to next question (no periodic celebration - see "x" below)
     if(score === '_SKIPPED_' || score % celebrate_period > 0) {
+        if(bee.is_puzzle && bee.is_puzzle.needs <= 0) { finish_puzzle_with_confetti(); return 'default'; }
         if(fast_to_next_question) {
             setTimeout(function(){ new_question('success_common:default:fast'); }, 700);
         }
@@ -918,9 +959,18 @@ function success_common(options) {
         if(celebrate_period == 5 && period_ix_lev == 4) { bigger = true; }
         if(celebrate_period == 4 && period_ix_lev == 4 && Math.random() <= .7) { bigger = true; }
     }
+    if(!bigger) {
+        // smaller periodic celebration - see "p" (or the puzzle send-off if a puzzle just finished)
+        if(bee.is_puzzle && bee.is_puzzle.needs <= 0) { finish_puzzle_with_confetti(); return 'period'; }
+        play_success_sound();
+        show_animation(function() { setTimeout(function(){ new_question('success_common:period:small'); }, 1100); });
+        return 'period';
+    }
+    // bigger periodic celebration - see "B": try a reward video (a video is excluded from the puzzle send-off)
     play_success_sound();
-    if((!bigger) || play_video(function(){ new_question('success_common:period:video'); })) { // if `bigger`, bigger periodic celebration, see "B"
-        // smaller periodic celebration, including when video is not available - see "p"
+    if(play_video(function(){ new_question('success_common:period:video'); })) {
+        // no video available - fall back to the smaller celebration (or the puzzle send-off)
+        if(bee.is_puzzle && bee.is_puzzle.needs <= 0) { finish_puzzle_with_confetti(); return 'period'; }
         show_animation(function() { setTimeout(function(){ new_question('success_common:period:small'); }, 1100); });
     }
     return 'period';

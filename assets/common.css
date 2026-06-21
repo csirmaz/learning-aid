@@ -130,6 +130,25 @@ body.condense .scorewrap { zoom: 70%; }
     background: #fe0;
 }
 
+/* Puzzle mode repurposes the level bar to show progress towards puzzle_needs.
+   The "X done of Y" message and the progress bar are merged into one: the message's own
+   background is the bar, filling from dark gold to bright gold (gradient set in
+   update_score_ui). A distinct magenta box marks the mode apart from the normal level bar. */
+.score.puzzle { background: #b30e6f; }
+.score.puzzle .bar { display: none; }
+.score.puzzle .needed {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    min-width: 5rem;
+    text-align: center;
+    background: #a70; /* dark-gold base; update_score_ui overlays the gold fill */
+    color: #fff;
+    border-color: #630;
+    font-weight: bold;
+}
+
 .prompt {
     padding-top: 4rem;
 }
