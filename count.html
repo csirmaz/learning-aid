@@ -397,7 +397,7 @@
                 longform: [a, b]
         */
         const PRBL = {
-            add_to_five: function() {  // e.g. 2+?=[5]
+            missing_addend_makes_five: function() {  // e.g. 2+?=[5]
                 const v = RND(0, 5);
                 return {problem: v+'+?=5', placeholder: true, solution:(5-v), hint: {
                     speak_prompt: v+' plus what is five?',
@@ -405,7 +405,7 @@
                     range: [1,5,1,v]
                 }};
             },
-            add_to_ten: function() {  // e.g. 7+?=[10]
+            missing_addend_makes_ten: function() {  // e.g. 7+?=[10]
                 const v = RND(0, 10);
                 return {problem: v+'+?=10', placeholder: true, solution:(10-v), hint:{
                     speak_prompt: v+' plus what is ten?',
@@ -413,7 +413,7 @@
                     range:[1,10,1,v]
                 }};
             },
-            add_small: function() {  // e.g. 3+8=
+            add_two_numbers_within_ten: function() {  // e.g. 3+8=
                 const a = RND(0, 10);
                 const b = RND(0, 10);
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{
@@ -422,7 +422,7 @@
                     range:[1,20,1,a]
                 }};
             },
-            add_mid: function() {  // e.g. 13+8=
+            add_teen_plus_single_digit: function() {  // e.g. 13+8=
                 const a = RND(0, 10) + 10;
                 const b = RND(0, 10);
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{
@@ -432,7 +432,7 @@
                     longform: [a, b]
                 }};
             },
-            add_hundreds: function () {  // e.g. 500+700=
+            add_whole_hundreds: function () {  // e.g. 500+700=
                 const a = RND(1, 10) * 100;
                 const b = RND(1, 10) * 100;
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{
@@ -442,7 +442,7 @@
                     longform: [a, b]
                 }};
             },
-            sub_five: function() {  // e.g. [5]-3=
+            subtract_from_five: function() {  // e.g. [5]-3=
                 const v = RND(0, 5);
                 return {problem: '5-'+v+'=', solution:(5-v), hint:{
                     speak_prompt: '5 minus '+v+'',
@@ -450,7 +450,7 @@
                     range:[1,5,1,v]
                 }};
             },
-            sub_ten: function() {  // e.g. [10]-7=
+            subtract_from_ten: function() {  // e.g. [10]-7=
                 const v = RND(0, 10);
                 return {problem: '10-'+v+'=', solution:(10-v), hint:{
                     speak_prompt: '10 minus '+v+'',
@@ -458,7 +458,7 @@
                     range:[1,10,1,v]
                 }};
             },
-            sub_five_minus: function() {  // e.g. [5]-8=
+            subtract_from_five_allow_negative: function() {  // e.g. [5]-8=
                 const v = RND(0, 8);
                 return {problem: '5-'+v+'=', solution:(5-v), hint:{
                     speak_prompt: '5 minus '+v+'',
@@ -466,7 +466,7 @@
                     range:[-5,5,1,0]
                 }};
             },
-            sub_ten_minus: function() {  // e.g. [10]-13=
+            subtract_from_ten_allow_negative: function() {  // e.g. [10]-13=
                 const v = RND(0, 13);
                 return {problem: '10-'+v+'=', solution:(10-v), hint:{
                     speak_prompt: '10 minus '+v+'',
@@ -474,7 +474,7 @@
                     range:[-3,10,1,0]
                 }};
             },
-            sub_small: function() {  // e.g. 7-4=  (always positive)
+            subtract_two_within_ten: function() {  // e.g. 7-4=  (always positive)
                 let a = RND(0, 10);
                 let b = RND(0, 10);
                 if(a > b) { const tmp = a; a = b; b = tmp; }
@@ -484,7 +484,7 @@
                     range:[1,b,-1,-1]
                 }};
             },
-            sub_small_any: function() {  // e.g. 4-7=
+            subtract_two_within_ten_allow_negative: function() {  // e.g. 4-7=
                 let a = RND(0, 10);
                 let b = RND(0, 10);
                 return {problem: b+'-'+a+'=', solution:(b-a), hint:{
@@ -493,7 +493,7 @@
                     range:[-10,10,0,b]
                 }};
             },
-            sub_mid: function() {  // e.g. 12-6=
+            subtract_single_digit_from_teen: function() {  // e.g. 12-6=
                 const a = RND(0, 10);
                 const b = RND(0, 10) + 10;
                 return {problem: b+'-'+a+'=', solution:(b-a), hint:{
@@ -502,7 +502,7 @@
                     range:[1,b,-1,-1]
                 }};
             },
-            add_big_no_carry: function() {  // e.g. 36+42= (no carry)
+            add_two_digit_no_carry: function() {  // e.g. 36+42= (no carry)
                 const a1 = RND(0, 9);
                 const a2 = RND(0, 9);
                 const b1 = RND(0, 9);
@@ -511,7 +511,7 @@
                 const b = b1*10+b2;
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{longform:[a, b]}};
             },
-            add_big_carry: function() { // e.g. 36+48= (always carry)
+            add_two_digit_with_carry: function() { // e.g. 36+48= (always carry)
                 const a1 = RND(0, 9);
                 const a2 = RND(0, 9);
                 const b1 = RND(0, 9);
@@ -520,7 +520,7 @@
                 const b = b1*10+b2;
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{longform: [a, b]}};
             },
-            add_big_small: function() { // e.g. 44+8=
+            add_two_digit_plus_single_digit: function() { // e.g. 44+8=
                 const a1 = RND(0, 9);
                 const a2 = RND(0, 9);
                 const b2 = RND(0, 9);
@@ -528,12 +528,12 @@
                 const b = b2;
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{longform: [a, b]}};
             },
-            small_multiply: function() { // e.g. 3x2=
+            multiply_small_factors: function() { // e.g. 3x2=
                 const a = RND(2, 5);
                 const b = RND(0, 5);
                 return get_multiplication_problem(a, b);
             },
-            mult_tables: function(aa) {  // aa=0..12 times tables, 13,14,15=big/mix/small part of 12-times tables; 113,114,115=same w timeout
+            times_table_set: function(aa) {  // aa=0..12 times tables, 13,14,15=big/mix/small part of 12-times tables; 113,114,115=same w timeout
                 const get_prob_swap = function(a, b) {
                     return (RND(0,1) ? get_multiplication_problem(a, b) : get_multiplication_problem(b, a));
                 };
@@ -626,7 +626,7 @@
                 }
                 return {type: 'problem_list', problems: problems};
             },
-            multiply: function() { // e.g. 3x6= (twelve times table) - return groups of 3
+            multiply_three_consecutive: function() { // e.g. 3x6= (twelve times table) - return groups of 3
                 const a = RND(2, 12);
                 const b = RND(2, 12);
                 let problems = [];
@@ -635,7 +635,7 @@
                 }
                 return {type: 'problem_list', problems: problems};
             },
-            halving: function() { // e.g. 10/2=
+            half_of_number: function() { // e.g. 10/2=
                 const a = RND(0, 12);
                 return {problem: a+'/2=', solution:(a/2), hint:{
                     speak_prompt: 'What is half of '+_n(a)+'?',
@@ -643,7 +643,7 @@
                     range:[1,a,-1,-1]
                 }};
             },
-            halving_whole_ph: function() {  // e.g. ?x[2]=8
+            unknown_times_two: function() {  // e.g. ?x[2]=8
                 const a = RND(1, 6)*2;
                 return {problem: '?*2='+a, placeholder: true, solution:(a/2), hint:{
                     speak_prompt: 'What taken twice is '+_n(a)+'?',
@@ -651,7 +651,7 @@
                     groups: multipl_group_help(a/2, 2)
                 }};
             },
-            halving_whole_phi: function() {  // e.g. [2]x?=8
+            two_times_unknown: function() {  // e.g. [2]x?=8
                 const a = RND(1, 6)*2;
                 return {problem: '2*?='+a, placeholder: true, solution:(a/2), hint:{
                     speak_prompt: 'Two taken how many times is '+_n(a)+'?',
@@ -659,7 +659,7 @@
                     groups: multipl_group_help(2, a/2)
                 }};
             },
-            third_whole: function() {  // e.g. 9/[3]=
+            third_of_number: function() {  // e.g. 9/[3]=
                 const a = RND(1, 4)*3;
                 return {problem: a+'/3=', placeholder: false, solution:(a/3), hint:{
                     speak_prompt: 'What is '+_n(a)+' divided by three?',
@@ -667,7 +667,7 @@
                     groups: multipl_group_help(a/3, 3)
                 }};
             },
-            third_whole_ph: function() {  // e.g. ?x[3]=9
+            unknown_times_three: function() {  // e.g. ?x[3]=9
                 const a = RND(1, 4)*3;
                 return {problem: '?*3='+a, placeholder: true, solution:(a/3), hint:{
                     speak_prompt: 'What taken three times is '+_n(a)+'?',
@@ -675,7 +675,7 @@
                     groups: multipl_group_help(a/3, 3)
                 }};
             },
-            third_whole_phi: function() {  // e.g. [3]x?=9
+            three_times_unknown: function() {  // e.g. [3]x?=9
                 const a = RND(1, 4)*3;
                 return {problem: '3*?='+a, placeholder: true, solution:(a/3), hint:{
                     speak_prompt: 'Three taken how many times is '+_n(a)+'?',
@@ -683,7 +683,7 @@
                     groups: multipl_group_help(3, a/3)
                 }};
             },
-            fifth_whole: function() {  // e.g. 9/[5]=
+            fifth_of_number: function() {  // e.g. 9/[5]=
                 const a = RND(1, 5)*5;
                 return {problem: a+'/5=', placeholder: false, solution:(a/5), hint:{
                     speak_prompt: 'What is '+a+' divided by five?',
@@ -691,7 +691,7 @@
                     groups: multipl_group_help(a/5, 5)
                 }};
             },
-            fifth_whole_ph: function() {  // e.g. ?x[5]=25
+            unknown_times_five: function() {  // e.g. ?x[5]=25
                 const a = RND(1, 5)*5;
                 return {problem: '?*5='+a, placeholder: true, solution:(a/5), hint:{
                     speak_prompt: 'What taken five times is '+a+'?',
@@ -699,7 +699,7 @@
                     groups: multipl_group_help(a/5, 5)
                 }};
             },
-            fifth_whole_phi: function() {  // e.g. [5]x?=25
+            five_times_unknown: function() {  // e.g. [5]x?=25
                 const a = RND(1, 5)*5;
                 return {problem: '5*?='+a, placeholder: true, solution:(a/5), hint:{
                     speak_prompt: 'Five taken how many times is '+a+'?',
@@ -712,49 +712,48 @@
         // Lists problems and their relative frequencies
         const PROBLEMSETS = {
             0: [
-                [PRBL.add_to_five, 2],
-                [PRBL.add_to_ten, 10],
-                [PRBL.sub_five_minus, 1],
-                [PRBL.sub_ten_minus, 10],
-                [PRBL.add_mid, 20],
-                // [PRBL.add_big_small, 20],
-                // [PRBL.add_big_no_carry, 20],
-                // [PRBL.add_big_carry, 20],
-                [PRBL.sub_small, 5],
-                [PRBL.sub_mid, 10],
-                [PRBL.add_hundreds, 10],
-                [PRBL.small_multiply, 20],
-                [PRBL.halving, 10],
-                [PRBL.third_whole, 5],
-                [PRBL.halving_whole_ph, 5],
-                // [PRBL.halving_whole_phi, 5],
-                // [PRBL.third_whole_ph, 5],
+                [PRBL.missing_addend_makes_five, 2],
+                [PRBL.missing_addend_makes_ten, 10],
+                [PRBL.subtract_from_five_allow_negative, 1],
+                [PRBL.subtract_from_ten_allow_negative, 10],
+                [PRBL.add_teen_plus_single_digit, 20],
+                // [PRBL.add_two_digit_plus_single_digit, 20],
+                // [PRBL.add_two_digit_no_carry, 20],
+                // [PRBL.add_two_digit_with_carry, 20],
+                [PRBL.subtract_two_within_ten, 5],
+                [PRBL.subtract_single_digit_from_teen, 10],
+                // [PRBL.add_whole_hundreds, 10],
+                // [PRBL.multiply_small_factors, 20],
+                [PRBL.half_of_number, 10],
+                [PRBL.third_of_number, 5],
+                [PRBL.unknown_times_two, 5],
+                // [PRBL.two_times_unknown, 5],
+                // [PRBL.unknown_times_three, 5],
             ],
             1: [
-                [PRBL.add_to_five, 1],
-                [PRBL.add_to_ten, 5],
-                [PRBL.sub_five_minus, 5],
-                [PRBL.sub_ten_minus, 5],
-                [PRBL.sub_small_any, 5],
-                [PRBL.sub_mid, 20],
-                [PRBL.add_hundreds, 15],
-                [PRBL.add_big_no_carry, 10],
-                // [PRBL.add_big_carry, 20],
-                [PRBL.add_big_small, 10],
-                [PRBL.add_hundreds, 5],
-                [PRBL.multiply, 10],
-                [PRBL.halving, 8],
-                [PRBL.halving_whole_ph, 4],
-                [PRBL.halving_whole_phi, 4],
-                [PRBL.third_whole, 8],
-                [PRBL.third_whole_ph, 4],
-                [PRBL.third_whole_phi, 4],
-                [PRBL.fifth_whole, 8],
-                [PRBL.fifth_whole_ph, 4],
-                [PRBL.fifth_whole_phi, 4],
+                [PRBL.missing_addend_makes_five, 1],
+                [PRBL.missing_addend_makes_ten, 5],
+                [PRBL.subtract_from_five_allow_negative, 5],
+                [PRBL.subtract_from_ten_allow_negative, 5],
+                [PRBL.subtract_two_within_ten_allow_negative, 5],
+                [PRBL.subtract_single_digit_from_teen, 20],
+                [PRBL.add_two_digit_no_carry, 10],
+                // [PRBL.add_two_digit_with_carry, 20],
+                [PRBL.add_two_digit_plus_single_digit, 10],
+                // [PRBL.add_whole_hundreds, 5],
+                [PRBL.multiply_three_consecutive, 10],
+                [PRBL.half_of_number, 8],
+                [PRBL.unknown_times_two, 4],
+                [PRBL.two_times_unknown, 4],
+                [PRBL.third_of_number, 8],
+                [PRBL.unknown_times_three, 4],
+                [PRBL.three_times_unknown, 4],
+                [PRBL.fifth_of_number, 8],
+                [PRBL.unknown_times_five, 4],
+                [PRBL.five_times_unknown, 4],
             ],
             2: [
-                [PRBL.multiply, 20],
+                [PRBL.multiply_three_consecutive, 20],
             ]
         };
 
@@ -776,7 +775,7 @@
             score_goal: 30,        // controls the bar under the score and gifts
             max_negative_score: 4, // maximum "negative" score where question doesn't give point
             question_timeout_value: 6, // the timeout (if the problem specifies) in seconds
-            puzzle_needs: 3, // how many successes before puzzle is dismissed
+            puzzle_needs: 2, // how many successes before puzzle is dismissed
             // State (common)
             storage: {'players': {}},  // storage data that's saved into local storage
             load_time: Date.now(),
@@ -1183,7 +1182,7 @@
                 // Generate a new problem
                 let new_prob;
                 if(bee.problemset >= 100) { // Multiplication tables
-                    new_prob = PRBL.mult_tables(bee.problemset - 100);
+                    new_prob = PRBL.times_table_set(bee.problemset - 100);
                 }
                 else {
                     // Choose a problem generator
