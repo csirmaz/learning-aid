@@ -129,8 +129,38 @@ function load_local_data() {
 
 // Initial function
 function bootstrap() {
-    
+
     const pre_chosen_player = get_player_from_url();
+
+    // Apps with bee.no_welcome (videolearn) autostart with the URL-named player: no welcome
+    // screen, no session sound and no button to press. Server data is loaded first when the
+    // load_data hook is present, otherwise we run on browser-local data.
+    if(pre_chosen_player && bee.no_welcome) {
+        bee.player = pre_chosen_player;
+        bee.is_puzzle = {needs: bee.puzzle_needs};
+        $('.game').hide();
+        $('.startmenu').html('Loading...');
+        load_local_data(); // keep the full list of users
+        const start = function() {
+            const go = function() {
+                $('.startmenu').hide();
+                $('.game').show();
+                main();
+            };
+            // Make sure a player record exists (init_player_data is non-interactive here)
+            if(!bee.storage.players[bee.player]) { init_player_data(go); }
+            else { go(); }
+        };
+        if(local_hook_has('load_data')) {
+            // If the server is down, load_data never calls back and we stay on "Loading...", for safety
+            bee_local.load_data(bee.app_name, pre_chosen_player, function(success) { start(); });
+        }
+        else {
+            start();
+        }
+        return;
+    }
+
     if(pre_chosen_player && local_hook_has('load_data')) {
         bee.player = pre_chosen_player;
         bee.is_puzzle = {needs: bee.puzzle_needs};
@@ -253,7 +283,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 454;
+const bee_app_version = 455;
 
 call_local_hook('check_version', []);
 
@@ -441,21 +471,33 @@ function show_animation(callback) {
 }
         
         
-// Play a video as a reward. Return if an alternative reward should be shown.
-function play_video(callback) {
+// Play a video full-screen, then call callback() when it ends (or is closed early).
+// video_list (optional) is the catalogue to choose from; it defaults to the reward `videos`.
+// A video the player has not seen yet is picked at random and recorded as seen, which is
+// persisted via save_storage (so the server keeps the per-player history too). Once every
+// video in the list has been seen, the earliest-seen ones are re-enabled (the oldest entries
+// are dropped from videos_seen) so the rotation can carry on. The videolearn app drives this
+// with its own catalogue. Returns true if no video could be shown (so the caller can fall back
+// to another reward, or dismiss), false if a video is now playing.
+function play_video(callback, video_list) {
+    const reward_videos = (video_list === undefined);
+    if(reward_videos) { video_list = videos; }
+
     let video_file = undefined;
-    if(local_hook_has('choose_video')) { video_file = bee_local.choose_video(); }
+    // The reward-video override hook only applies to the reward catalogue
+    if(reward_videos && local_hook_has('choose_video')) { video_file = bee_local.choose_video(); }
     if(video_file === undefined) {
-        if(videos.length == 0) { return true; } // true: show default reward
-        // Choose unseen video
+        if(video_list.length == 0) { return true; } // true: no video to show
+        // Choose a video the player has not seen yet
         if(bee.storage.players[bee.player].videos_seen === undefined) {
             bee.storage.players[bee.player].videos_seen = [];
         }
         const videos_seen = bee.storage.players[bee.player].videos_seen;
         let videos_remaining;
         while(true) {
-            videos_remaining = videos.filter((v) => videos_seen.indexOf(v) == -1);
+            videos_remaining = video_list.filter((v) => videos_seen.indexOf(v) == -1);
             if(videos_remaining.length == 0) {
+                // Everything has been seen: re-enable the earliest-seen ones and try again
                 for(let i=0; i<8; i++) { videos_seen.shift(); }
                 continue;
             }

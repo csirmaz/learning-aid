@@ -35,6 +35,7 @@ sub procfile {
 
 procfile('count.html', 'HTML');
 procfile('spellbee.html', 'HTML');
+procfile('videolearn.html', 'HTML');
 procfile('assets/common.js', 'JS');
 
 $localver = 'assets/local/version.php';

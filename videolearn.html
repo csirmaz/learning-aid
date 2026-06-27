@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta http-equiv="Content-Language" content="en">
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
+    <title>Video Learn</title>
+    <link rel="stylesheet" type="text/css" href="assets/common.css?455">
+    <style>
+        body { background: #000; }
+        .startmenu { color: #fff; padding: 1rem; font-family: sans-serif; }
+        .smallprint { color: #888; }
+        .smallprint a { color: #aac; }
+    </style>
+    <script src="assets/confetti/js-confetti.browser.js"></script>
+    <script src="assets/jquery/jquery-3.7.1.min.js"></script>
+    <script src="assets/local/beelocal.js?455"></script>
+</head>
+<body>
+    <div class="container">
+        <div class="game"></div>
+        <div class="startmenu"></div>
+    </div>
+
+    <p class="smallprint">
+        v<span class="d_version"></span>
+        Player: <span class="d_player"></span>
+        | <a href="#" class="handle">T</a>ools &amp; Licences
+        <span class="expand_tools">
+            | <a href="#" onclick="dismiss_puzzle_alert(); return false;">Dismiss</a>
+            | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
+            | <a href="#" onclick="delete_user(); return false">Delete user</a>
+        </span>
+        | <a href="https://codeberg.org/csirmaz/learning-aid">C</a>odebase
+        <span class="expand"></span>
+    </p>
+
+    <script>
+
+        // Application data
+        const bee = {
+            // Configuration
+            app_name: 'videolearn',
+            no_welcome: true, // autostart with the URL player: no welcome screen, sound or button
+            puzzle_needs: 1,  // marks a puzzle-alerter session (videolearn dismisses on video end)
+            score_goal: 20,   // unused by videolearn, kept only for the shared score helpers
+            // State (common)
+            storage: {'players': {}}, // storage data that's saved into local storage
+            load_time: Date.now(),
+            player: false,  // name of the player - the videos-seen history is saved under this name
+            giftlist: -1,
+            is_puzzle: false,
+            score_anim_timeout: false
+        };
+
+    </script>
+    <script src="assets/common.js?455"></script>
+    <script>
+
+        // The videos this app can show. Like the reward-video catalogue in common.js, the list
+        // starts empty and is extended by the local layer (bee_local.local_learn_videos) the same way.
+        let learn_videos = [];
+        if(local_hook_has('local_learn_videos')) {
+            learn_videos = learn_videos.concat(bee_local.local_learn_videos);
+        }
+
+
+        function main() {
+            $('.d_player').html(esc_html(bee.player));
+            // Pick a random unseen video and play it; when it ends, dismiss the host webview.
+            // play_video() handles the random choice, the seen-history (saved locally and, via the
+            // save hook, to the server) and the earliest-seen re-enable rotation, just like the
+            // reward videos do.
+            if(play_video(function() { dismiss_puzzle_alert(); }, learn_videos)) {
+                // No videos available - nothing to show, so dismiss straight away
+                dismiss_puzzle_alert();
+            }
+        }
+
+
+        // Non-interactive: create the player record (just the videos-seen history) and continue.
+        // Called by bootstrap() when the URL player has no saved record yet.
+        function init_player_data(callback) {
+            bee.storage.players[bee.player] = {'videos_seen': []};
+            if(callback) { callback(); }
+        }
+
+    </script>
+    <div class="footercontent"></div>
+
+    <script> bootstrap(); </script>
+</body>
+</html>

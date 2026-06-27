@@ -4,12 +4,13 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-`learning-aid` is a set of static web-based tools for KS1/KS2 children (ages 5+) to practise spelling and arithmetic. The two main apps are:
+`learning-aid` is a set of static web-based tools for KS1/KS2 children (ages 5+) to practise spelling and arithmetic. The apps are:
 
 - **`spellbee.html`** — spelling game with an on-screen keyboard, phonics-based word list, and TTS pronunciation
 - **`count.html`** — arithmetic game with an on-screen numeric keypad
+- **`videolearn.html`** — a minimal app that plays a single learning video for the URL-named player and then dismisses the host webview (no questions, score or keyboard); see the architecture note below
 
-Both apps are vanilla JS + jQuery, require no build step, and can be served from any static web server.
+All apps are vanilla JS + jQuery, require no build step, and can be served from any static web server.
 
 ## Agent knowledge files
 
@@ -96,6 +97,14 @@ Words live between `// [WORDS START]` and `// [WORDS END]` comments as pipe-deli
 ### `count.html` — problem generators
 
 Arithmetic problems are produced by generator functions in the `PRBL` object, chosen via `PROBLEMSETS` (a difficulty index → weighted generator list); each returns a `{problem, solution, hint}` object. The generators, the `hint` object's fields, and the full play loop are in [`agent/question-cycle.md`](agent/question-cycle.md).
+
+### `videolearn.html` — play one video and dismiss
+
+A deliberately tiny app: it shows a single learning video to the URL-named player, then dismisses the host webview. There are no questions, scoring, gifts, keyboard or aquarium.
+
+- **Autostart.** Its `bee` config sets `no_welcome: true`. `bootstrap()` honours that flag (when a `?player=` is present) by skipping the welcome screen, session sound and start button entirely — it loads the player's data (from the server when that hook is available, else browser-local), ensures a player record exists via the app's non-interactive `init_player_data()`, and goes straight into `main()`.
+- **Video selection.** `main()` calls the shared `play_video(callback, video_list)` with its own catalogue, `learn_videos`. That catalogue starts empty and is extended by the local layer the same way the reward `videos` list is. `play_video` was generalised to take an optional `video_list` (defaulting to the reward `videos`): it picks a video the player hasn't seen, records it in the player's `videos_seen` (persisted by `save_storage`, so the server keeps the history too), and once all are seen re-enables the earliest-seen ones — the same rotation the reward videos use. The reward-video override hook is only consulted for the default reward catalogue.
+- **Dismissal.** The `play_video` callback (and an immediate call when no video is available) is `dismiss_puzzle_alert()`, so the host webview is dismissed when the video ends or if there is nothing to play.
 
 ### Aquarium (`assets/aquarium/`)
 
