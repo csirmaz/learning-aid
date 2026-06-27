@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?456">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?457">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -160,10 +160,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?456">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?457">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?456"></script>
+    <script src="assets/local/beelocal.js?457"></script>
 </head>
 <body>
     <div class="container">
@@ -1222,7 +1222,7 @@
         };
 
     </script>
-    <script src="assets/common.js?456"></script>
+    <script src="assets/common.js?457"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1910,12 +1910,20 @@
         }
         
         
+        // True when story-type questions (entries with more than one substring to type) should be
+        // withheld this session.
+        function exclude_story_questions() {
+            return !!call_local_hook('exclude_stories');
+        }
+
+
         function try_get_new_word10(word_class) {
             let trials = 50;
-            
+
             let word_ix = undefined;
             let log = 'needclass:'+word_class;
             const queue = get_question_queue();
+            const exclude_stories = exclude_story_questions(); // withhold multi-substring "story" items this session?
             
             
             while(trials > 0) {
@@ -1937,13 +1945,16 @@
                         }
                         if(dupl) { log += ' norep'; continue; }
                     }
+                    // Avoid story-type (multi-substring) questions when this session excludes them;
+                    // relax on the final trial (trials==0) so we never spin forever if none are left
+                    if(trials > 0 && exclude_stories && get_processed_word(word_ix).is_story) { log += ' nostory'; continue; }
                     // Avoid already known words (typed without help)
                     const known_count = is_known_word(word_ix);
                     log += " known:"+known_count;
                     if(!known_score_to_choice20(known_count)) { log += ' no'; continue; }
                     break;
                 }
-                
+
                 if(word_class === undefined) { // first word
                     const longstory_ids = Object.keys(bee.longstory_beginnings);
                     if(longstory_ids.length) { // see MIN_LONGSTORY_LEVEL
@@ -1965,13 +1976,16 @@
                             if(dupl) { log += ' norep'; continue; }
                         }
                     }
+                    // Avoid story-type (multi-substring) questions when this session excludes them;
+                    // relax on the final trial (trials==0) so we never spin forever if none are left
+                    if(trials > 0 && exclude_stories && get_processed_word(word_ix).is_story) { log += ' nostory'; continue; }
                     // Avoid already known words (typed without help)
                     const known_count = is_known_word(word_ix);
                     log += " known:"+known_count;
                     if(!known_score_to_choice20(known_count)) { log += ' no'; continue; }
                     break;
                 }
-                
+
             }
             console.log('try_get_new_word: '+log);
             if(trials == 0) { return undefined; }
@@ -2291,8 +2305,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?456"></script>
-    <script src="assets/aquarium/js/aquarium.js?456"></script>
+    <script src="assets/aquarium/js/config.js?457"></script>
+    <script src="assets/aquarium/js/aquarium.js?457"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
