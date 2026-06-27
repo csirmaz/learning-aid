@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?451">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?454">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -160,10 +160,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?451">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?454">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?451"></script>
+    <script src="assets/local/beelocal.js?454"></script>
 </head>
 <body>
     <div class="container">
@@ -286,7 +286,6 @@
             "di:ew": "ew",
             "di:aw": "aw",
             "t:igh": "igh",
-            "tense:y": "y",
             "end:y@": "y(?: |$)",
             "end:er": "er(?: |$)",
             "end:ie": "ie",
@@ -299,7 +298,7 @@
             "tense:aa": "a",
             "tense:e": "(e)[bcdfgklmnpstvz](e)|(e)(?: |$)",
             "tense:i": "(i)[bcdfgklmnpstvz](e)|(i)(?: |$)",
-            "tense:y": "(a)[bcdfgklmnpstvz](e)|(y)(?: |$)",
+            "tense:y": "(y)[bcdfgklmnpstvz](e)|(y)(?: |$)",
             "tense:o": "(o)[bcdfgklmnpstvz](e)|(o)(?: |$)",
             "tense:u": "(u)[bcdfgklmnpstvz]([ei])|(u)(?: |$)",
             "dark:al": "all?",
@@ -1223,7 +1222,7 @@
         };
 
     </script>
-    <script src="assets/common.js?451"></script>
+    <script src="assets/common.js?454"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1650,25 +1649,8 @@
             
             check_url(file, function(file_exists) {
                 if(file_exists) { // play mp3
-                    let has_ended = false;
-                    const do_end = function(){
-                        if(has_ended) { return; }
-                        has_ended = true;
-                        if(callback) { callback(); }
-                    };
-                    
-                    if(max_timeout !== undefined) { setTimeout(do_end, max_timeout); }
-                    const word_audio = new Audio(file);
-                    word_audio.volume = 1;            
-                    try {
-                        word_audio.src = file;
-                        word_audio.addEventListener('ended', (e) => { do_end(); });
-                        word_audio.addEventListener('stalled', (e) => { do_end(); });
-                        word_audio.play();
-                    } catch(e) {
-                        console.log("Error during play_word", e);
-                        do_end();
-                    }
+                    if(max_timeout === undefined) { max_timeout = bee_tts.speaking_time(s) * 1.7; }
+                    _play_obj({object: false, file: file, volume: 1}, callback, max_timeout);
                 }
                 else { // use TTS
                     bee_tts.speak(s, callback);
@@ -2309,8 +2291,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?451"></script>
-    <script src="assets/aquarium/js/aquarium.js?451"></script>
+    <script src="assets/aquarium/js/config.js?454"></script>
+    <script src="assets/aquarium/js/aquarium.js?454"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

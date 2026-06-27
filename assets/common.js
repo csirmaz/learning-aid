@@ -152,15 +152,25 @@ function bootstrap() {
             // Render stub menu
             // We could likely play audio even before a user event, but let's keep this
             $('.startmenu').html('<div class="startbutton" style="padding:1rem">'+'🪙'+"\ufe0f"+' Let\'s earn<br>some coins!</div>');
+            // We need both the sound to end and the button to be tapped to start
+            let start_game_condition = {button: false, sound: false};
+            const try_start_game = function(reason) {
+                if(start_game_condition === false) { return; }
+                start_game_condition[reason] = true;
+                if(!(start_game_condition.button && start_game_condition.sound)) { return; }
+                start_game_condition = false; // do not start game multiple times                
+                $('.startmenu').hide();
+                $('.game').show();
+                main();
+            };
             setTimeout(function() {  // allow time for rendering
                 $('.startbutton').on('click', function() {
-                    $('.startmenu').hide();
-                    $('.game').show();
-                    main();
+                    try_start_game('button');
+                    $(this).css({background: '#777'});
                     return false;
                 });
                 try { bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 40}); } catch(e) {}
-                try { play_rnd_sound('session'); } catch(e) {}
+                play_rnd_sound('session', function(){ try_start_game('sound'); });
             }, 200);
         });
         return;
@@ -243,7 +253,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 451;
+const bee_app_version = 454;
 
 call_local_hook('check_version', []);
 
@@ -586,44 +596,66 @@ function add_score(skip_this_score) {
 }
 
 
-// Play a specific sound identified by the key `f`
-function playme(f) {
-    const d = audio[f];
+// Play a specific sound given a raw object {object:, file:, volume:}
+function _play_obj(d, callback, max_timeout) {
     if(d.object === false) { 
         // console.log("Audio: setting up", d['file']);
-        d.object = new Audio(d['file']); 
-        d.object.volume = d['volume']; 
-    }            
-    d.object.play();
+        d.do_end = function() {
+            if(d.fallback_timeout !== false) { clearTimeout(d.fallback_timeout); }
+            d.fallback_timeout = false;
+            if(d.has_ended) { return; }
+            d.has_ended = true;
+            if(d.callback) { d.callback(); }
+        };
+        try {
+            d.object = new Audio(d['file']); 
+            d.object.volume = d['volume']; 
+            d.object.addEventListener('ended', (e) => { d.do_end(); });
+            d.object.addEventListener('stalled', (e) => { d.do_end(); });
+            d.object.addEventListener('error', (e) => { d.do_end(); });
+            d.object.addEventListener('abort', (e) => { d.do_end(); });
+        } catch(e) {
+            console.error("Error during setting up audio", e);
+            d.do_end();
+        }
+    } 
+    try {
+        d.callback = callback;
+        d.has_ended = false;
+        if(max_timeout === undefined) { max_timeout = 6*1000; }
+        d.fallback_timeout = setTimeout(d.do_end, max_timeout);
+        d.object.play();
+    } catch(e) {
+        console.error("Error during playing audio", e);
+        d.do_end();
+    }
+}
+
+// Play a specific sound identified by the key `f`
+function playme(f, callback) {
+    _play_obj(audio[f], callback);
 }
         
         
 // Play a random sound from a list given by `f`
-function play_rnd_sound(f) {
+function play_rnd_sound(f, callback) {
     const i = Math.floor(Math.random() * audio[f].length);
-    const d = audio[f][i];
-    if(d.object === false) { 
-        // console.log("Audio: setting up", d['file']);
-        d.object = new Audio(d['file']); 
-        d.object.volume = d['volume']; 
-    }
-    // console.log("Audio: playing", d['file']);
-    d.object.play();
+    _play_obj(audio[f][i], callback);
 }
 
 
-function play_success_sound() {
+function play_success_sound(callback) {
     // Do not use speech-based reward sound in spellbee
     if(bee.app_name == 'spellbee') {
-        play_rnd_sound('success');
+        play_rnd_sound('success', callback);
         return;
     }
     
     const i = Math.floor(Math.random() * (audio['success'].length + audio['success_speech'].length));
     if(i < audio['success'].length) {
-        play_rnd_sound('success'); 
+        play_rnd_sound('success', callback); 
     } else {
-        play_rnd_sound('success_speech'); 
+        play_rnd_sound('success_speech', callback); 
     }
 }
         
@@ -1053,6 +1085,11 @@ bee_tts.initialize = function() {
         return;                
     }
 };
+
+// Returns approximate speaking time based on a string
+bee_tts.speaking_time = function(s) {
+    return 80*s.length + 250;
+};
         
 // Speak an utterance. Returns true if utterance is being spoken; then callback() will be called on end.
 bee_tts.speak = function(s, callback) {
@@ -1060,7 +1097,7 @@ bee_tts.speak = function(s, callback) {
         try {
             window.PuzzleAlerter.speak(s);
             if(callback) {
-                setTimeout(callback, 80*s.lentgth+250);
+                setTimeout(callback, bee_tts.speaking_time(s)); // bridge does not support callbacks at the moment, so approximate using text length
             }
             return true;
         } catch(e) {

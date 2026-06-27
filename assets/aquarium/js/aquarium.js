@@ -326,7 +326,7 @@
     type = (type && Config.items[type]) ? type : pickKey(Config.items);
     var viewX = this.tank.scrollLeft + this.container.clientWidth * rand(0.2, 0.8);
     var nx = clamp(viewX / this.worldW, 0.06, 0.94);
-    var ny = Config.items[type].draggable ? 0.12 : T.itemRest;
+    var ny = Config.items[type].draggable ? 0.12 : Config.tuning.itemRest;
     var it = this._spawnItem(type, nx, ny);   // spawns high, then settles down
     this.attractors.push({ x: it.x, y: this.worldH * 0.72, until: now() / 1000 + Config.tuning.itemTtl }); // fish attracted to new item
     this._saveState();
