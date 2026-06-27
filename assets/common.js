@@ -283,7 +283,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 455;
+const bee_app_version = 456;
 
 call_local_hook('check_version', []);
 
@@ -937,10 +937,15 @@ function present_gift(img_src, callback, code_data) {
 
 // Celebratory send-off when a puzzle session is completed on a plain success (i.e. one with no
 // gift, end-of-level or video reward of its own): a random puzzle_end sound plus confetti, then
-// dismiss the host webview once the confetti finishes. Called just before the puzzle is dismissed.
+// dismiss the host webview. Called just before the puzzle is dismissed. We wait for BOTH the
+// send-off sound and the confetti to finish before dismissing, because dismissing tears down the
+// page and would otherwise cut the audio off mid-play (play_rnd_sound has its own fallback timeout,
+// so the join always completes even if the 'ended' event never fires).
 function finish_puzzle_with_confetti() {
-    play_rnd_sound('puzzle_end');
-    show_animation(function() { dismiss_puzzle_alert(); });
+    let pending = 2;
+    const done = function() { if(--pending <= 0) { dismiss_puzzle_alert(); } };
+    play_rnd_sound('puzzle_end', done);
+    show_animation(done);
 }
 
 
