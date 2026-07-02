@@ -356,7 +356,89 @@
             "cons:ti": "ti",
             "cons:tur:tS": "tur"
         };
-        
+
+        // Phonemes we can voice in a segmented word, keyed by an ascii id, with a short
+        // explanation of the sound. (More will be added later as we cover the missing phonemes.)
+        // Valid phoneme ids for segmented words. Every value is 1 - the object is only used as a
+        // set (does this id exist?); the IPA / example for each id is in its line comment.
+        // 'x' = silent, 'ks' is a cluster, 'SEn'/'Id' are whole-morpheme pseudo-phonemes.
+        const phoneme_sounds = {
+            'x': 1,     // silent - no sound (e.g. the "e" of a split digraph)
+            // Consonants
+            'b': 1,     // /b/ as in "bat"
+            'd': 1,     // /d/ as in "dog"
+            'f': 1,     // /f/ as in "fan" (also the sound of "ph")
+            'g': 1,     // /g/ as in "goat"
+            'h': 1,     // /h/ as in "hat"
+            'k': 1,     // /k/ as in "kit" (also the sound of "c")
+            'l': 1,     // /l/ as in "leg"
+            'm': 1,     // /m/ as in "map"
+            'n': 1,     // /n/ as in "net"
+            'ng': 1,    // /ŋ/ as in "sing"
+            'p': 1,     // /p/ as in "pen"
+            'r': 1,     // /r/ as in "run"
+            's': 1,     // /s/ as in "sun"
+            't': 1,     // /t/ as in "top"
+            'v': 1,     // /v/ as in "van"
+            'w': 1,     // /w/ as in "wet"
+            'z': 1,     // /z/ as in "zip"
+            'S': 1,     // /ʃ/ as in "she"
+            'j': 1,     // /j/ as in "you"
+            'ks': 1,    // /ks/ as in "excellent"
+            'dZ': 1,    // /dʒ/ as in "George"
+            'tS': 1,    // /tʃ/ as in "church"
+            'T': 1,     // /θ/ as in "thin"
+            'D': 1,     // /ð/ as in "this"
+            'Z': 1,     // /ʒ/ as in "vision"
+            // Short (lax) vowels
+            'ae': 1,    // /æ/ as in "cat"
+            'A': 1,     // /ʌ/ as in "cup"
+            'o': 1,     // /ɒ/ as in "hot"
+            'E': 1,     // /ə/ schwa, as in "about"
+            'e': 1,     // /e/ short "e" as in "pen"
+            'I': 1,     // /ɪ/ lax (short) "i" as in "fish"
+            'U': 1,     // /ʊ/ as in "put"
+            // Long (tense) vowels
+            'i:': 1,    // /iː/ as in "see"
+            'u:': 1,    // /uː/ as in "food"
+            'a:': 1,    // /ɑː/ as in "car"
+            'O:': 1,    // /ɔː/ as in "corn"
+            '3:': 1,    // /ɜː/ as in "nurse"
+            // Diphthongs
+            'aI': 1,    // /aɪ/ as in "eye"
+            'eI': 1,    // /eɪ/ as in "day"
+            'EU': 1,    // /əʊ/ as in "road"
+            'OI': 1,    // /ɔɪ/ as in "coin"
+            'aU': 1,    // /aʊ/ as in "cow"
+            'IE': 1,    // /ɪə/ as in "ear"
+            'eE': 1,    // /eə/ as in "air"
+            'UE': 1,    // /ʊə/ as in "cure"
+            // Pseudo-phonemes: a whole morpheme treated as one segment
+            'SEn': 1,   // "-tion" ending, /ʃən/
+            'Id': 1     // "-ed" ending, /ɪd/
+        };
+
+        // Default ascii phoneme (a key of phoneme_sounds) for a segment's grapheme when none is
+        // given after a '/'. Looked up case-insensitively (see default_phoneme()).
+        const segment_default_phoneme = {
+            'b': 'b', 'd': 'd', 'f': 'f', 'g': 'g', 'h': 'h', 'k': 'k',
+            'l': 'l', 'm': 'm', 'n': 'n', 'p': 'p', 'r': 'r', 't': 't',
+            'v': 'v', 'w': 'w', 'z': 'z',
+            'c': 'k',   // "c" is voiced as /k/
+            'ph': 'f',  // "ph" is voiced as /f/
+            's': 's',
+            'e': 'e',
+            'i': 'I',    // "i" is voiced as lax /ɪ/
+            'tion': 'SEn',
+            'ed': 'Id'
+        };
+
+        // Default ascii phoneme for a grapheme, or '' if we have not mapped it yet.
+        function default_phoneme(grapheme) {
+            const ph = segment_default_phoneme[grapheme.toLowerCase()];
+            return (ph === undefined ? '' : ph);
+        }
+
         const MIN_LONGSTORY_LEVEL = 100;
         
         // For the format, see process_word_data()
@@ -368,8 +450,13 @@
 // Each story is a series of "words" (typing questions) identified by having the same level number.
 // They are asked consecutively.
 
+"20||a <y=ou=ng> man|tricky",
 "11|~stonesoup_stone.svg|A <young> man lived <alone> in a small house in a village.|tense:o,tricky",
+"20||go to the <m=a=r=k=e=t>|br:ar,end:et",
+"20||the big <f=o=r=e=s=t>|",
 "11|~stonesoup_bundle.svg|He needed to go to the <market> in town on the other side of the <big forest>.|br:ar,end:et",
+"20||a piece of <c=l=o=th>|cons:th",
+"20||He set out on <f=oo=t>|di:ooU",
 "11|~stonesoup_bundle.svg|He wrapped his last scone in a piece of <cloth>, and set out on <foot>.|cons:th,di:ooU",
 "11|~stonesoup_bundle.svg|He entered the forest, and <walked> and walked until <midday>, when he got <really> hungry.|dark:al,di:ea,end:ly",
 "11|~stonesoup_bundle.svg|He sat down for <lunch>, and ate the scone, picking <up> even the crumbs, as it <wasn't> a big scone at all.|tricky,cons:ch:tS",
@@ -491,10 +578,10 @@
 // --- segmented (phoneme / morpheme) questions ---
 // The '=' separated parts (usually phonemes, sometimes morphemes) are typed one box at a
 // time while the whole word/sentence is read out. Level, image and class tags are as usual.
-"20|@🐘|<e>=<l>=<e>=<ph>=<a>=<n>=<t>|cons:ph",
-"20|@🌍|<n>=<a>=<tion>|cons:ti",
-"20|@🔮|<p>=<r>=<o>=<ph>=<e>=<t>|cons:ph",
-"20|@💬|They <m>=<e>=<n>=<tion>=<ed> my name|cons:ti",
+"20|@🐘|<e=l=e=ph=a=n=t>|cons:ph",
+"20|@🌍|<n=a=tion>|cons:ti",
+"20|@🔮|<p=r=o=ph=e=t>|cons:ph",
+"20|@💬|They <m=e=n=tion=ed> my name|cons:ti",
 
 // --- lax monograph ---
 
@@ -1382,31 +1469,51 @@
             let to_type_str = '';
             let to_disp_str = '';
             let mask_str = '';
-            const add_words = []; // words user needs to type in a story / parts in a segmented word
-            let current_add_word = '';
+            const add_words = []; // words to type in a story / segments (parts) in a segmented word
+            const phonemes = []; // parallel to add_words: ascii phoneme id to voice each segment (see phoneme_sounds)
             const full = word_data.text;
-            // The new "segmented" type joins its <..> parts with '=' (e.g. "<n>=<a>=<tion>");
-            // the '=' is only a separator - never displayed or typed.
+            // In the "segmented" type the <..> region holds '='-separated segments, e.g.
+            // "blue <p=e=n>". A segment may give an explicit phoneme after a '/' (e.g.
+            // "<p/p=e/e=n/n>", or "<m/m=a/eI=k=e/x>"); otherwise the default from
+            // segment_default_phoneme is used. '=' and '/...' are separators/metadata: they are
+            // never displayed or typed. (A plain word or story <..> with no '=' is one segment.)
             const is_segmented = (full.indexOf('=') !== -1);
-            let in_type = false;  // in typing mode
+            let in_type = false;    // inside a <..> region
+            let in_phoneme = false; // reading the phoneme id after a '/'
+            let seg_grapheme = '';  // characters of the current segment (typed + displayed)
+            let seg_phoneme = '';   // explicit phoneme id of the current segment, if any
+
+            // Finish the current segment: record its grapheme and its (explicit or default) phoneme
+            const flush_segment = function() {
+                add_words.push(seg_grapheme);
+                phonemes.push(seg_phoneme.length ? seg_phoneme : default_phoneme(seg_grapheme));
+                seg_grapheme = '';
+                seg_phoneme = '';
+                in_phoneme = false;
+            };
+
             for(let i=0; i<full.length; i++) {
-                if(full[i] == '=') { continue; }
-                if(full[i] == '<') { in_type = true; current_add_word = ''; continue; }
-                if(full[i] == '>') { in_type = false; add_words.push(current_add_word); continue; }
-                if(in_type) { 
-                    to_type_str += full[i];
-                    to_disp_str += full[i];
-                    current_add_word += full[i];
-                    mask_str += '_';
-                    continue; 
-                } else {
-                    to_disp_str += full[i];
+                const ch = full[i];
+                if(!in_type) { // text around the <..> region
+                    if(ch == '<') { in_type = true; seg_grapheme = ''; seg_phoneme = ''; in_phoneme = false; continue; }
+                    to_disp_str += ch;
                     mask_str += '*';
+                    continue;
                 }
+                // Inside a <..> region
+                if(ch == '>') { flush_segment(); in_type = false; continue; }
+                if(ch == '=') { flush_segment(); continue; } // segment separator
+                if(ch == '/') { in_phoneme = true; continue; } // explicit phoneme id follows
+                if(in_phoneme) { seg_phoneme += ch; continue; } // phoneme id char (metadata only)
+                // Grapheme character: typed and displayed
+                to_type_str += ch;
+                to_disp_str += ch;
+                seg_grapheme += ch;
+                mask_str += '_';
             }
-            
+
             if(add_words.length==0) { console.error('Nothing to type in', word_data); }
-            
+
             const proc = {
                 'to_type': to_type_str,
                 'to_display': to_disp_str,
@@ -1417,6 +1524,7 @@
                 'ref': word_data.ref,
                 'imgref': word_data.imgref,
                 'add_words': add_words,
+                'phonemes': phonemes,
                 'level': word_data.level
             };
             word_data.proc_cache = proc;
@@ -1492,11 +1600,12 @@
 
         // ---- Segmented (phoneme / morpheme) question type ----
 
-        // Placeholder: a finished part could be read out here (e.g. "ph", "tion"). Not calling
-        // TTS yet - unsure how the engine handles single-grapheme strings. See play_word().
-        function speak_completed_part(part) {
-            console.log('segmented part completed (TTS placeholder):', part);
-            // play_word(part, undefined, undefined, true);
+        // Placeholder: a finished segment could be voiced here. phoneme is its ascii id (a key of
+        // phoneme_sounds; 'x' means silent). Not voicing yet, and the timing (voice on completion
+        // of this segment) must not change. See play_word() / phoneme_sounds.
+        function speak_completed_part(part, phoneme) {
+            console.log('segmented part completed (TTS placeholder):', part, 'phoneme:', phoneme);
+            // if(phoneme && phoneme != 'x') { play the clip for `phoneme` here }
         }
 
         // Render the input field for a segmented word: non-typed text (from to_display / mask)
@@ -1936,7 +2045,7 @@
                             // out (placeholder for now)
                             const seg_completed = parts_progress().completed;
                             if(seg_completed > seg_completed_before && bee.typed.length < bee.processed_word.to_type.length) {
-                                speak_completed_part(bee.processed_word.add_words[seg_completed - 1]);
+                                speak_completed_part(bee.processed_word.add_words[seg_completed - 1], bee.processed_word.phonemes[seg_completed - 1]);
                             }
                         }
                     }
