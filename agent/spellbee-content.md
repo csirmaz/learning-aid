@@ -17,7 +17,7 @@ Words live between `// [WORDS START]` and `// [WORDS END]` comments as pipe-deli
 
   Long-story entries typically leave this empty (until per-scene images are added).
 - **text**: the prompt sentence; angle-bracket sections `<word>` mark what the child must type. Multiple `<>` regions trigger "story" layout.
-- **class tags**: phonics classification (e.g. `lax:e`, `di:ee`, `tense:a`); used by `class_highlight_rules` to visually highlight the phonics pattern in the displayed word and to group questions. Long-story entries leave this empty (they are not grouped by phonics).
+- **class tags**: phonics classification (e.g. `lax:e`, `di:ee`, `tense:a`); used by `class_highlight_rules` to visually highlight the phonics pattern in the displayed word and to group questions. The naming convention and the full catalogue of class tags are in [`spellbee-classes.md`](spellbee-classes.md). Long-story entries leave this empty (they are not grouped by phonics).
 
 MP3 files for words are resolved as `assets/sounds/words/<phrase_lowercased_spaces_as_underscores>.mp3`. If absent, TTS is used.
 

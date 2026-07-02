@@ -18,6 +18,7 @@ Deeper references live under `agent/` and are loaded on demand — read the rele
 
 - [`agent/question-cycle.md`](agent/question-cycle.md) — the question→answer→reward→next play loop: the shared `success_common()` reward step, per-app `new_question()` selection, the anti-cheat / spaced-repetition queue, count problem generators, and puzzle-mode sessions.
 - [`agent/spellbee-content.md`](agent/spellbee-content.md) — the `spellbee.html` word-list entry format, image-ref forms, phonics class tags, MP3 resolution, and long-format story authoring mechanics.
+- [`agent/spellbee-classes.md`](agent/spellbee-classes.md) — the phonics **class tags**: the `category:grapheme[variant]` naming convention, the two things the engine does with a tag (grouping via `class_to_ix`, highlighting via `class_highlight_rules`), and a full catalogue of every class in use with its grapheme, sound, and example words.
 
 ## Running Locally
 
