@@ -65,7 +65,7 @@ category:grapheme[variant]
   - a **digit** — the /ɜː/ NURSE vowel ("er" sound) spelled otherwise: `br:or` *corn* /ɔː/ vs
     `br:or3` *work* /ɜː/.
   - a **capital letter** — the consonant *sound* a soft/odd grapheme makes:
-    `Z` = /dʒ/ ("j") in `cons:gZ`, `S` = /ʃ/ ("sh") in `cons:chS`, `tS` = /tʃ/ ("ch") in `cons:tur:tS`.
+    `Z` = /dʒ/ ("j") in `cons:gZ`, `S` = /ʃ/ ("sh") in `cons:chS`, `tS` = /tʃ/ ("ch") in `cons:ch:tS` and `cons:tur:tS`.
 
 ## Catalogue
 
@@ -150,6 +150,7 @@ Each row: **tag** · grapheme highlighted (`—` = grouping only, no highlight) 
 | `cons:dZ` | — | /dʒ/ (dge/ge) *village* | village, package, giraffe |
 | `cons:cs` | `c`(before i/e) | soft c /s/ *ice* | ice, police, furnace |
 | `cons:chS` | `ch`(before i/e) | /ʃ/ "sh" *chef* | chef, machine, moustache |
+| `cons:ch:tS` | `tch` / `ch` | /tʃ/ "ch" *chair* | chips, cheese, teacher, kitchen, church |
 | `cons:ti` | `ti` | /ʃ/ "sh" *potion* | potion, competition, destruction |
 | `cons:tur:tS` | `tur` | /tʃ/ "ch" *picture* | picture, structure |
 
