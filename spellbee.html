@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?457">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?460">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -92,6 +92,36 @@
         body .prompt .infield .success .typed_classhighlight { color: #b38; }
         .prompt .infield .helpwait { display: none; }
 
+        /* Segmented (phoneme / morpheme) question type: parts typed into boxes */
+        body .prompt .infield.infield_segmented {
+            font-size: 1.4rem;
+            line-height: 2.6rem;
+            letter-spacing: normal;
+        }
+        .prompt .infield_segmented .typebox {
+            display: inline-block;
+            /* content-box so min-width/min-height are the content area: an empty box already
+               reserves room for the longest part and a full line box, so it does not grow (in
+               either direction) when the child starts typing */
+            box-sizing: content-box;
+            min-width: 1.5rem;   /* overridden inline to hold the longest part */
+            min-height: 2rem;    /* = line-height, so a typed line box fits without enlarging the box */
+            line-height: 2rem;
+            margin: 0 .15rem;
+            padding: .1rem .3rem;
+            border: 2px solid #05b;
+            border-radius: .4rem;
+            text-align: left;
+            vertical-align: middle;
+            background: #fff;
+        }
+        /* A completed segment turns green (all correct) or red (a mistake somewhere) */
+        .prompt .infield_segmented .typebox.typebox_ok  { background: #d7f0cc; border-color: #3a3; }
+        .prompt .infield_segmented .typebox.typebox_err { background: #f6d2d2; border-color: #c33; }
+        /* Drop the green underline under the revealed answer inside the boxes (keep the grey text) */
+        .prompt .infield_segmented .reveal_totype { text-decoration: none; }
+        .prompt .addwords .word.done { color: #ccc; border-color: #ddd; }
+
         @keyframes blink-animation { to { visibility: hidden; } }
         
         .cursor_outer { position: relative; }
@@ -160,10 +190,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?457">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?460">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?457"></script>
+    <script src="assets/local/beelocal.js?460"></script>
 </head>
 <body>
     <div class="container">
@@ -263,70 +293,224 @@
         // Regexes that highlight parts of the word based on the class
         // If there are no matching groups, highlight whole word, otherwise the matching groups
         const class_highlight_rules = {
-            "lax:e": "e",
-            "lax:i": "i",
-            "lax:y": "y",
-            "lax:o": "o",
-            "lax:u": "u",
-            "lax:a": "a",
+            "e/e": "e",
+            "i/I": "i",
+            "y/I": "y",
+            "o/o": "o",
+            "u/A": "u",
+            "a/ae": "a",
             "lax:dbl": "bb|dd|ff|gg|kk|ll|mm|nn|pp|rr|ss|tt|vv|zz",
-            "di:ee": "ee",
-            "di:oo": "oo",
-            "di:ooU": "oo",
-            "di:ai": "ai",
-            "di:ay": "ay",
-            "di:ow": "ow",
-            "di:ow@": "ow",
-            "di:oi": "oi",
-            "di:oy": "oy",
-            "di:ou": "ou",
-            "di:oa": "oa",
-            "di:ea": "ea",
-            "di:eae": "ea",
-            "di:ew": "ew",
-            "di:aw": "aw",
-            "t:igh": "igh",
+            "ee/i:": "ee",
+            "oo/u:": "oo",
+            "oo/U": "oo",
+            "ai/eI": "ai",
+            "ay/eI": "ay",
+            "ow/aU": "ow",
+            "ow/EU": "ow",
+            "oi/OI": "oi",
+            "oy/OI": "oy",
+            "ou/aU": "ou",
+            "oa/EU": "oa",
+            "ea/i:": "ea",
+            "ea/e": "ea",
+            "ew/u:": "ew",
+            "aw/O:": "aw",
+            "igh/aI": "igh",
             "end:y@": "y(?: |$)",
-            "end:er": "er(?: |$)",
+            "er/Er": "er(?: |$)",
             "end:ie": "ie",
             "end:et": "et(?: |$)",
             "end:ot": "ot(?: |$)",
             "end:al@": "al(?: |$)",
             "end:le": "le(?: |$)",
             "end:ly": "ly(?: |$)",
-            "tense:a": "(a)[bcdfgklmnpstvz](e)|(a)(?: |$)",
-            "tense:aa": "a",
-            "tense:e": "(e)[bcdfgklmnpstvz](e)|(e)(?: |$)",
-            "tense:i": "(i)[bcdfgklmnpstvz](e)|(i)(?: |$)",
-            "tense:y": "(y)[bcdfgklmnpstvz](e)|(y)(?: |$)",
-            "tense:o": "(o)[bcdfgklmnpstvz](e)|(o)(?: |$)",
-            "tense:u": "(u)[bcdfgklmnpstvz]([ei])|(u)(?: |$)",
+            "a/eI": "(a)[bcdfgklmnpstvz](e)|(a)(?: |$)",
+            "a/a:": "a",
+            "e/i:": "(e)[bcdfgklmnpstvz](e)|(e)(?: |$)",
+            "i/aI": "(i)[bcdfgklmnpstvz](e)|(i)(?: |$)",
+            "y/aI": "(y)[bcdfgklmnpstvz](e)|(y)(?: |$)",
+            "o/EU": "(o)[bcdfgklmnpstvz](e)|(o)(?: |$)",
+            "u/u:": "(u)[bcdfgklmnpstvz]([ei])|(u)(?: |$)",
             "dark:al": "all?",
             "dark:ol": "ol",
-            "br:or": "or",
-            "br:ar": "ar",
-            "br:ir": "ir",
-            "br:or3": "or",
-            "br:ur3": "ur",
-            "br:ea:i@": "ea",
-            "br:ai:e@": "ai",
-            "br:er3": "er",
-            "o@": "o",
-            "a@": "a",
-            "cons:gZ": "g[ie]",
+            "or/O:": "or",
+            "ar/a:": "ar",
+            "ir/3:": "ir",
+            "or/3:": "or",
+            "ur/3:": "ur",
+            "ea/IE": "ea",
+            "ai/eE": "ai",
+            "er/3:": "er",
+            "o/E": "o",
+            "a/E": "a",
+            "g/dZ": "g[ie]",
             "cons:th": "th",
-            "cons:ph": "ph",
-            "cons:ck": "ck",
-            "cons:wh": "wh",
-            "cons:cs": "c[ie]",
-            "beg:kn": "(?: |^)kn",
-            "beg:wr": "(?: |^)wr",
-            "cons:chS": "ch[ie]",
-            "cons:ch:tS": "tch|ch",
-            "cons:ti": "ti",
-            "cons:tur:tS": "tur"
+            "ph/f": "ph",
+            "ck/k": "ck",
+            "wh/w": "wh",
+            "c/s": "c[ie]",
+            "kn/n": "(?: |^)kn",
+            "wr/r": "(?: |^)wr",
+            "ch/S": "ch[ie]",
+            "ch/tS": "tch|ch",
+            "ti/S": "ti",
+            "tur/tS": "tur",
+            // Grouping only - no highlight (false). A tag missing from this object entirely is
+            // reported by init_wordlist_impl as an unknown / typo class tag.
+            "common": false,
+            "tricky": false,
+            "calendar": false,
+            "dge/dZ": false,
+            "au/O:": false,
+            "end:ey": false,
+            "noclass:": false
         };
-        
+
+        // Phonemes we can voice in a segmented word, keyed by an ascii id, with a short
+        // explanation of the sound. (More will be added later as we cover the missing phonemes.)
+        // Valid phoneme ids for segmented words. Every value is 1 - the object is only used as a
+        // set (does this id exist?); the IPA / example for each id is in its line comment.
+        // 'x' = silent, 'ks' is a cluster, 'SEn'/'Id' are whole-morpheme pseudo-phonemes.
+        const phoneme_sounds = {
+            'x': 1,     // silent - no sound (e.g. the "e" of a split digraph)
+            // Consonants
+            'b': 1,     // /b/ as in "bat"
+            'd': 1,     // /d/ as in "dog"
+            'f': 1,     // /f/ as in "fan" (also the sound of "ph")
+            'g': 1,     // /g/ as in "goat"
+            'h': 1,     // /h/ as in "hat"
+            'k': 1,     // /k/ as in "kit" (also the sound of "c")
+            'l': 1,     // /l/ as in "leg"
+            'm': 1,     // /m/ as in "map"
+            'n': 1,     // /n/ as in "net"
+            'ng': 1,    // /ŋ/ as in "sing"
+            'p': 1,     // /p/ as in "pen"
+            'r': 1,     // /r/ as in "run"
+            's': 1,     // /s/ as in "sun"
+            't': 1,     // /t/ as in "top"
+            'v': 1,     // /v/ as in "van"
+            'z': 1,     // /z/ as in "zip"
+            'S': 1,     // /ʃ/ as in "she"
+            'ks': 1,    // /ks/ as in "excellent"
+            'dZ': 1,    // /dʒ/ as in "George"
+            'tS': 1,    // /tʃ/ as in "church"
+            'T': 1,     // /θ/ as in "thin"
+            'D': 1,     // /ð/ as in "this"
+            'Z': 1,     // /ʒ/ as in "vision"
+            //
+            'j': 1,     // /j/ as in "you"
+            'w': 1,     // /w/ as in "wet"
+            // Short (lax) vowels
+            'ae': 1,    // /æ/ as in "cat"
+            'A': 1,     // /ʌ/ as in "cup"
+            'o': 1,     // /ɒ/ as in "hot"
+            'E': 1,     // /ə/ schwa, as in "about"
+            'Er': 1,    // /ə/ (r-coloured /ɚ/ in rhotic accents) the "-er" ending, as in "teacher"
+            'e': 1,     // /e/ short "e" as in "pen"
+            'I': 1,     // /ɪ/ lax (short) "i" as in "fish"
+            'U': 1,     // /ʊ/ as in "put"
+            // Long (tense) vowels
+            'i:': 1,    // /iː/ as in "see"
+            'u:': 1,    // /uː/ as in "food"
+            'a:': 1,    // /ɑː/ as in "car"
+            'O:': 1,    // /ɔː/ as in "corn"
+            '3:': 1,    // /ɜː/ as in "nurse"
+            // Diphthongs
+            'aI': 1,    // /aɪ/ as in "eye"
+            'eI': 1,    // /eɪ/ as in "day"
+            'EU': 1,    // /əʊ/ as in "road"
+            'OI': 1,    // /ɔɪ/ as in "coin"
+            'aU': 1,    // /aʊ/ as in "cow"
+            'IE': 1,    // /ɪə/ as in "ear"
+            'eE': 1,    // /eə/ as in "air"
+            'UE': 1,    // /ʊə/ as in "cure"
+            // Triphthongs
+            'aIE': 1,    // /aɪə/ as in "fire"            
+            // Pseudo-phonemes: a whole morpheme treated as one segment
+            'Iz': 1,    // one value of the plural / 3rd person morpheme, /ɪz/
+            'kw': 1,    // usual value of "q", /kw/
+            'ju:': 1,   // /ju:/
+            'Ing': 1,   // "-ing" morpheme, /ɪŋ/
+            'Et': 1,    // "-et" ending, /ɪt/ or /ət/
+            'SEn': 1,   // "-tion" ending, /ʃən/
+            'Id': 1,    // one value of the past tense morpheme, "-ed" ending, /ɪd/
+            'lI': 1     // value of -ly morpheme, /lɪ/
+        };
+
+        // Default ascii phoneme (a key of phoneme_sounds) for a segment's grapheme when none is
+        // given after a '/'. Looked up case-insensitively (see default_phoneme()).
+        const segment_default_phoneme = {
+            'b': 'b', 
+            'bb': 'b',
+            'd': 'd', 
+            'dd': 'd',
+            'f': 'f', 
+            'ff': 'f',
+            'g': 'g', 
+            'gg': 'g',
+            'h': 'h', 
+            'k': 'k',
+            'l': 'l', 
+            'll': 'l',
+            'm': 'm', 
+            'mm': 'm',
+            'n': 'n', 
+            'nn': 'n',
+            'ng': 'ng',
+            'p': 'p', 
+            'pp': 'p',
+            'r': 'r', 
+            'rr': 'r',
+            't': 't',
+            'tt': 't',
+            'v': 'v', 
+            'w': 'w', 
+            'x': 'ks',
+            'z': 'z',
+            'c': 'k',   // "c" voiced as /k/
+            'ck': 'k',
+            'ph': 'f',  // "ph" voiced as /f/
+            's': 's',
+            'ss': 's',
+            'sh': 'S',
+            'ch': 'tS',
+            'tch': 'tS',
+
+            'a': 'ae',
+            'e': 'e',
+            'y': 'I',
+            'i': 'I',    // "i" voiced as lax /ɪ/
+            'u': 'U',
+
+            'oo': 'u:',
+            'ai': 'eI',
+            'ay': 'eI',
+            'ee': 'i:',
+            'ea': 'i:',
+            'oi': 'OI',
+            'oy': 'OI',
+            'ew': 'u:',
+            
+            'ar': 'a:',
+            'er': 'Er',
+            'or': 'O:',
+            'ire': 'aIE',
+
+            'igh': 'aI',
+            'tion': 'SEn',
+            'ed': 'Id',
+            'et': 'Et',
+            'ing': 'Ing',
+            'is': 'Iz',
+            'ly': 'lI',
+        };
+
+        // Default ascii phoneme for a grapheme, or '' if we have not mapped it yet.
+        function default_phoneme(grapheme) {
+            const ph = segment_default_phoneme[grapheme.toLowerCase()];
+            return (ph === undefined ? '' : ph);
+        }
+
         const MIN_LONGSTORY_LEVEL = 100;
         
         // For the format, see process_word_data()
@@ -338,496 +522,595 @@
 // Each story is a series of "words" (typing questions) identified by having the same level number.
 // They are asked consecutively.
 
-"11|~stonesoup_stone.svg|A <young> man lived <alone> in a small house in a village.|tense:o,tricky",
-"11|~stonesoup_bundle.svg|He needed to go to the <market> in town on the other side of the <big forest>.|br:ar,end:et",
-"11|~stonesoup_bundle.svg|He wrapped his last scone in a piece of <cloth>, and set out on <foot>.|cons:th,di:ooU",
-"11|~stonesoup_bundle.svg|He entered the forest, and <walked> and walked until <midday>, when he got <really> hungry.|dark:al,di:ea,end:ly",
-"11|~stonesoup_bundle.svg|He sat down for <lunch>, and ate the scone, picking <up> even the crumbs, as it <wasn't> a big scone at all.|tricky,cons:ch:tS",
-"11|~stonesoup_bundle.svg|He continued walking. The <trees> grew denser, and the sky got <darker>, but he still had not got <out of> the forest.|br:ar,di:ou,di:ee",
-"11|~stonesoup_bundle.svg|It was close to midnight, and he was really hungry <again>. Luckily he spotted a flickering <light> in the <distance>.|t:igh,cons:cs",
-"11|~stonesoup_bundle.svg|\"<Someone> must live there,\" he thought, \"and they will <have some> food and <water> for me.\" He walked toward the light.|tricky,end:er",
-"11|~stonesoup_hut.svg|<When> he reached the light, it turned out to be a small, dilapidated hut made of <wooden> planks.|cons:wh,di:ooU",
-"11|~stonesoup_hut.svg|The <windows> were broken, the walls <were> covered in moss, and the <garden> was full of weeds and rocks.|di:ow@,br:ar,tricky",
-"11|~stonesoup_hut.svg|He knocked on <the> door anyway, and an old ugly <woman> opened the door. \"<What> do you want?\"|cons:wh,tricky",
-"11|~stonesoup_hut.svg|\"I have walked all day,\" the man <said>, \"and I wonder if you might have a bite to eat and <some water> to drink for me.\"|tricky,end:er",
-"11|~stonesoup_witch.svg|\"No,\" the woman <shouted> and slammed the door. She <really> looked like a <witch>.|di:ou,di:ea,end:ly,cons:ch:tS",
-"11|~stonesoup_witch.svg|\"Maybe she didn't <hear> me,\" the man thought, and knocked <again>.|br:ea:i@,tricky",
-"11|~stonesoup_witch.svg|\"Is <that> you again?\" the witch said. \"I told you I don't have <anything>. Now go <away>.\"|cons:th,di:ay,a@",
-"11|~stonesoup_stone.svg|The man didn't <know> what to do. He walked around the garden, and stumbled on a big smooth <stone>.|beg:kn,di:ow@,tense:o",
-"11|~stonesoup_stone.svg|He had an idea. He dug <out> the stone, and knocked on the door a third <time>.|di:ou,tense:i",
-"11|~stonesoup_stone.svg|\"Are you <deaf>?\" the witch shouted. \"<Go> away!\"|di:eae,tense:o",
+"20|@🧑|a <y/j=ou/A=ng> man|tricky", // reviewed
+"11|~stonesoup_stone.svg|A <young> man lived <alone> in a small house in a village.|o/EU,tricky",
+"20|@🛒|go to the <m=ar=k=et>|ar/a:,end:et", // reviewed
+"20|@🌲|the big <f=o/o=r=e/I=s=t>|o/o", // reviewed
+"11|~stonesoup_bundle.svg|He needed to go to the <market> in town on the other side of the <big forest>.|ar/a:,end:et",
+"20|@🧵|a piece of <c=l=o/o=th/T>|cons:th", // reviewed
+"20|@🦶|He set out on <f=oo/U=t>|oo/U", // reviewed
+"11|~stonesoup_bundle.svg|He wrapped his last scone in a piece of <cloth>, and set out on <foot>.|cons:th,oo/U",
+"20|@🤔|He got <r=ea/i:=ll=y> hungry|end:ly,ea/i:", // reviewed
+"20|@🚶|He <w=al/O:=k=ed/t> until midday|dark:al", // reviewed
+"11|~stonesoup_bundle.svg|He entered the forest, and <walked> and walked until <midday>, when he got <really> hungry.|dark:al,ea/i:,end:ly",
+"20|@🍽️|eating <l=u/A=n=ch>|ch/tS", // reviewed
+"11|~stonesoup_bundle.svg|He sat down for <lunch>, and ate the scone, picking <up> even the crumbs, as it <wasn't> a big scone at all.|tricky,ch/tS",
+"20|@🌑|The sky got <d=ar=k=er/Er>|ar/a:", // reviewed
+"11|~stonesoup_bundle.svg|He continued walking. The <trees> grew denser, and the sky got <darker>, but he still had not got <out of> the forest.|ar/a:,ou/aU,ee/i:",
+"20|@📏|It was far in the <d=i=s=t=a/E=n=ce/s>|c/s", // reviewed
+"20|@💡|A flickering <l=igh=t>|igh/aI", // reviewed
+"11|~stonesoup_bundle.svg|It was close to midnight, and he was really hungry <again>. Luckily he spotted a flickering <light> in the <distance>.|igh/aI,c/s",
+"20|@💧|<w=a/O:=t=er/Er>|tricky,er/Er", // reviewed
+"11|~stonesoup_bundle.svg|\"<Someone> must live there,\" he thought, \"and they will <have some> food and <water> for me.\" He walked toward the light.|tricky,er/Er",
+"20|@🪵|<w=oo/U=d=e/E=n> planks|oo/U", // reviewed
+"20|@🕐|<Wh/w=e=n> is your birthday?|wh/w", // reviewed
+"11|~stonesoup_hut.svg|<When> he reached the light, it turned out to be a small, dilapidated hut made of <wooden> planks.|wh/w,oo/U",
+"20|~stonesoup_hut.svg|The walls <w=ere/3:> covered in moss|common", // reviewed
+"20|@🌻|<g=ar/a:=d=e/E=n>|ar/a:", // reviewed
+"20|@🪟|The <w=i=n=d=ow/EU=s/z> were broken|ow/EU", // reviewed
+"11|~stonesoup_hut.svg|The <windows> were broken, the walls <were> covered in moss, and the <garden> was full of weeds and rocks.|ow/EU,ar/a:,tricky",
+"20|@❓|<Wh/w=a/o=t> do you need?|wh/w", // reviewed
+"11|~stonesoup_hut.svg|He knocked on <the> door anyway, and an old ugly <woman> opened the door. \"<What> do you want?\"|wh/w,tricky",
+"11|~stonesoup_hut.svg|\"I have walked all day,\" the man <said>, \"and I wonder if you might have a bite to eat and <some water> to drink for me.\"|tricky,er/Er",
+"11|~stonesoup_witch.svg|\"No,\" the woman <shouted> and slammed the door. She <really> looked like a <witch>.|ou/aU,ea/i:,end:ly,ch/tS",
+"11|~stonesoup_witch.svg|\"Maybe she didn't <hear> me,\" the man thought, and knocked <again>.|ea/IE,tricky",
+"11|~stonesoup_witch.svg|\"Is <that> you again?\" the witch said. \"I told you I don't have <anything>. Now go <away>.\"|cons:th,ay/eI,a/E",
+"11|~stonesoup_stone.svg|The man didn't <know> what to do. He walked around the garden, and stumbled on a big smooth <stone>.|kn/n,ow/EU,o/EU",
+"11|~stonesoup_stone.svg|He had an idea. He dug <out> the stone, and knocked on the door a third <time>.|ou/aU,i/aI",
+"11|~stonesoup_stone.svg|\"Are you <deaf>?\" the witch shouted. \"<Go> away!\"|ea/e,o/EU",
 "11|~stonesoup_stone.svg|\"I know you don't have anything, but I have this stone, and if I can use your <fire>, I can cook stone <soup> for both of us.\"|tricky",
-"11|~stonesoup_stone.svg|\"Stone soup?\" the witch asked. She was hungry, too. If she could make <food> out of stones, that would be <great>.|di:oo,tricky",
-"11|~stonesoup_stone.svg|\"Alright, <you can> use the fire.\" She let the man <inside>.|tense:i,tricky",
+"11|~stonesoup_stone.svg|\"Stone soup?\" the witch asked. She was hungry, too. If she could make <food> out of stones, that would be <great>.|oo/u:,tricky",
+"11|~stonesoup_stone.svg|\"Alright, <you can> use the fire.\" She let the man <inside>.|i/aI,tricky",
 "11|~stonesoup_stone.svg|\"I just need a <big> pot and some water,\" the man <said>.|tricky",
-"11|~stonesoup_stone.svg|\"Here. The <well> is outside,\" the witch said. The man drew a <bucket> of water from the well and carried it back.|cons:ck,end:et",
-"11|~stonesoup_pot.svg|He washed the stone, put the pot of <water> on the stove. He put the <stone> inside, and watched it boil.|tense:o,end:er,tricky",
-"11|~stonesoup_pot.svg|The witch <was> hungry. \"Is it <ready> yet?\" she asked.|di:eae,end:y@,tricky",
-"11|~stonesoup_pot.svg|The man tasted the soup. \"It's almost <ready>. But you could make it extra <rich>, you know.\"|di:eae,end:y@,cons:ch:tS",
-"11|~stonesoup_pot.svg|\"How?\" \"If <you> have some salt, that would <make> the soup just <perfect>.\"|tense:a,br:er3,tricky",
+"11|~stonesoup_stone.svg|\"Here. The <well> is outside,\" the witch said. The man drew a <bucket> of water from the well and carried it back.|ck/k,end:et",
+"11|~stonesoup_pot.svg|He washed the stone, put the pot of <water> on the stove. He put the <stone> inside, and watched it boil.|o/EU,er/Er,tricky",
+"11|~stonesoup_pot.svg|The witch <was> hungry. \"Is it <ready> yet?\" she asked.|ea/e,end:y@,tricky",
+"11|~stonesoup_pot.svg|The man tasted the soup. \"It's almost <ready>. But you could make it extra <rich>, you know.\"|ea/e,end:y@,ch/tS",
+"11|~stonesoup_pot.svg|\"How?\" \"If <you> have some salt, that would <make> the soup just <perfect>.\"|a/eI,er/3:,tricky",
 "11|~stonesoup_pot.svg|\"I have a bit <somewhere>,\" the witch said, and gave some <salt> to the man. He put it in the soup.|dark:al,tricky",
-"11|~stonesoup_pot.svg|She was <really> hungry. \"<Is it> ready yet?\" she asked again.|di:ea,end:ly",
-"11|~stonesoup_pot.svg|\"Almost perfect!\" the man said. \"Do you have a <potato> to make it creamy and fit for a <king>?\"|o@",
-"11|~stonesoup_pot.svg|The witch searched <her> pantry and gave <three> potatoes to the man. He <cut> them up and threw them in the water.|br:er3,di:ee",
+"11|~stonesoup_pot.svg|She was <really> hungry. \"<Is it> ready yet?\" she asked again.|ea/i:,end:ly",
+"11|~stonesoup_pot.svg|\"Almost perfect!\" the man said. \"Do you have a <potato> to make it creamy and fit for a <king>?\"|o/E",
+"11|~stonesoup_pot.svg|The witch searched <her> pantry and gave <three> potatoes to the man. He <cut> them up and threw them in the water.|er/3:,ee/i:",
 "11|~stonesoup_pot.svg|\"Is it ready <yet>?\" she asked <again>.|tricky",
-"11|~stonesoup_pot.svg|\"Almost perfect!\" the man said. \"<Do you> have a bit of sausage to give it the best taste in the <world>?\"|br:or3,tricky",
-"11|~stonesoup_pot.svg|The witch found a <pair> of sausages. The man cut them up into circles <and> added them <to the> soup.|br:ai:e@",
-"11|~stonesoup_pot.svg|\"<Is it> ready yet?\" <she> asked again. The lovely <smell> of sausages and potatoes filled the hut.|tense:e,lax:dbl",
-"11|~stonesoup_pot.svg|\"It is ready,\" the man <said>. The witch laid the <table>, with two <bowls> and spoons.|end:le,di:ow@,tricky",
-"11|~stonesoup_pot.svg|She even put a <basket> of <bread> on the table. The man carried the pot there, and poured soup into both bowls.|tense:aa,di:eae,end:et",
-"11|~stonesoup_pot.svg|They ate without a <word>. The man was faster. He <finished> his soup and bread <before> the witch.|br:or3,br:or",
-"11|~stonesoup_pot.svg|\"This is really <good>,\" the witch said, looking into the pot for <more>. She saw the <stone> there.|di:ooU,br:or,tense:o",
-"11|~stonesoup_pot.svg|\"But why did you <need> the -\" she asked, and looked up. But the man <was> gone.|di:ee,tricky",
-"11|~stonesoup_hut.svg|He had got up quietly, had left the hut, and walked as <fast> as he could <away> from the hut before the witch got <angry>.|tense:aa,di:ay,a@",
+"11|~stonesoup_pot.svg|\"Almost perfect!\" the man said. \"<Do you> have a bit of sausage to give it the best taste in the <world>?\"|or/3:,tricky",
+"11|~stonesoup_pot.svg|The witch found a <pair> of sausages. The man cut them up into circles <and> added them <to the> soup.|ai/eE",
+"11|~stonesoup_pot.svg|\"<Is it> ready yet?\" <she> asked again. The lovely <smell> of sausages and potatoes filled the hut.|e/i:,lax:dbl",
+"11|~stonesoup_pot.svg|\"It is ready,\" the man <said>. The witch laid the <table>, with two <bowls> and spoons.|end:le,ow/EU,tricky",
+"11|~stonesoup_pot.svg|She even put a <basket> of <bread> on the table. The man carried the pot there, and poured soup into both bowls.|a/a:,ea/e,end:et",
+"11|~stonesoup_pot.svg|They ate without a <word>. The man was faster. He <finished> his soup and bread <before> the witch.|or/3:,or/O:",
+"11|~stonesoup_pot.svg|\"This is really <good>,\" the witch said, looking into the pot for <more>. She saw the <stone> there.|oo/U,or/O:,o/EU",
+"11|~stonesoup_pot.svg|\"But why did you <need> the -\" she asked, and looked up. But the man <was> gone.|ee/i:,tricky",
+"11|~stonesoup_hut.svg|He had got up quietly, had left the hut, and walked as <fast> as he could <away> from the hut before the witch got <angry>.|a/a:,ay/eI,a/E",
 
-"11|~europa_ship.svg|We were flying to Jupiter's strangest <moon>, Europa. We didn't know what will happen <there>.|di:oo,tricky",
-"11|~europa_ship.svg|All <we> knew was that Base 2 wanted to get the <iron ore> on the moon.|br:or,tricky",
-"11|~europa_ship.svg|They said, if we <meet> anyone there, just ask for the ore and look <grumpy>. Hopefully that will work.|di:ee,end:y@",
-"11|~europa_ship.svg|We landed on the <ice> surface. We knew there was a <huge> ocean <under> the ice.|cons:cs,cons:gZ",
-"11|~europa_ship.svg|So we moved the <machines> off the spaceship, and started drilling. It took <three> hours to get through the ice.|cons:chS,di:ee",
-"11|~europa_dive.svg|(Under the ice, the creatures gathered. \"What is this <noise>?\" the <biggest> asked. \"And where is the guard?\")|di:oi",
-"11|~europa_dive.svg|(\"They are drilling,\" the <thin one> said. \"They are already in the <water>.\")|cons:th,end:er,tricky",
+"11|~europa_ship.svg|We were flying to Jupiter's strangest <moon>, Europa. We didn't know what will happen <there>.|oo/u:,tricky",
+"11|~europa_ship.svg|All <we> knew was that Base 2 wanted to get the <iron ore> on the moon.|or/O:,tricky",
+"11|~europa_ship.svg|They said, if we <meet> anyone there, just ask for the ore and look <grumpy>. Hopefully that will work.|ee/i:,end:y@",
+"11|~europa_ship.svg|We landed on the <ice> surface. We knew there was a <huge> ocean <under> the ice.|c/s,g/dZ",
+"11|~europa_ship.svg|So we moved the <machines> off the spaceship, and started drilling. It took <three> hours to get through the ice.|ch/S,ee/i:",
+"11|~europa_dive.svg|(Under the ice, the creatures gathered. \"What is this <noise>?\" the <biggest> asked. \"And where is the guard?\")|oi/OI",
+"11|~europa_dive.svg|(\"They are drilling,\" the <thin one> said. \"They are already in the <water>.\")|cons:th,er/Er,tricky",
 "11|~europa_dive.svg|When the hole was big <enough> for the excavator to fit through, we changed to diving suits, and <jumped> <into> the ocean.|tricky",
-"11|~europa_dive.svg|The ocean reached around the <whole> moon, and was fifty miles <deep>.|cons:wh,tense:o",
-"11|~europa_dive.svg|Above us, the sunlight came through the <thick> ice. It was like having a hard lid for a <sky>.|cons:th,cons:ck,tense:y",
-"11|~europa_excavator.svg|We put <the> excavator on the <bottom> of the ocean, and started the engine. It made the water <shake>.|tense:a,lax:dbl",
-"11|~europa_excavator.svg|\"What's <that>?\" Sara shouted over the radio, and pushed my arm. She pointed at a dark <rock>. The water was wobbly there.|cons:th,cons:ck",
+"11|~europa_dive.svg|The ocean reached around the <whole> moon, and was fifty miles <deep>.|wh/w,o/EU",
+"11|~europa_dive.svg|Above us, the sunlight came through the <thick> ice. It was like having a hard lid for a <sky>.|cons:th,ck/k,y/aI",
+"11|~europa_excavator.svg|We put <the> excavator on the <bottom> of the ocean, and started the engine. It made the water <shake>.|a/eI,lax:dbl",
+"11|~europa_excavator.svg|\"What's <that>?\" Sara shouted over the radio, and pushed my arm. She pointed at a dark <rock>. The water was wobbly there.|cons:th,ck/k",
 "11|~europa_excavator.svg|\"<Something> moved there,\" she said. \"It was just the waves <from> the machine,\" I said.|cons:th",
 "11|~europa_excavator.svg|(The guard swam away from the dark rock back to the <other> creatures. \"They are trying to get the <iron>,\" he said.)|cons:th,tricky",
 "11|~europa_excavator.svg|(\"You let <them> in!\" they shouted. \"You have made the water <angry>!\" They threw him into a little hole in the sand.)|cons:th",
-"11|~europa_excavator.svg|(\"<What> do we do?\" they asked the biggest creature. \"Get <everyone> together,\" he said. \"We fight.\")|cons:wh,tricky",
-"11|~europa_figures.svg|The excavator was digging out bits of the rock. We collected them so Base 2 could <see> whether there was <enough iron> there.|di:ee,tricky",
-"11|~europa_figures.svg|\"Look <now>!\" Sara shouted again. <She> was looking at the dark rock.|di:ow,tense:e",
-"11|~europa_figures.svg|<There were> about 15 dark figures floating in the <water> there.|end:er,tricky",
-"11|~europa_figures.svg|\"What are they? We did not detect <life> on Europa for <years>.\" \"Well, there they are,\" Sara said.|tense:i,br:ea:i@",
-"11|~europa_figures.svg|\"So they live here,\" I said. \"No, they <don't>,\" Sara said. \"Look at the <bubbles> they make, just like us. They need <air>.\"|br:ai:e@,end:le",
-"11|~europa_figures.svg|(The <creatures> made a little army and lined up at the dark rock. \"Now!\" the biggest <one> shouted.)|cons:tur:tS,di:ea,tricky",
-"11|~europa_fight.svg|We <looked> at the floating figures. They didn't <move>. \"Fire a warning shot,\" our captain said.|di:ooU,tricky",
-"11|~europa_fight.svg|Joe took his dart gun and fired a <dart>. It swished through the water towards the dark <rock>.|br:ar,cons:ck",
-"11|~europa_fight.svg|A moment <later>, a dart appeared coming towards us. \"Incoming!\" <people> shouted. It flew just next to Joe.|end:er,tricky",
+"11|~europa_excavator.svg|(\"<What> do we do?\" they asked the biggest creature. \"Get <everyone> together,\" he said. \"We fight.\")|wh/w,tricky",
+"11|~europa_figures.svg|The excavator was digging out bits of the rock. We collected them so Base 2 could <see> whether there was <enough iron> there.|ee/i:,tricky",
+"11|~europa_figures.svg|\"Look <now>!\" Sara shouted again. <She> was looking at the dark rock.|ow/aU,e/i:",
+"11|~europa_figures.svg|<There were> about 15 dark figures floating in the <water> there.|er/Er,tricky",
+"11|~europa_figures.svg|\"What are they? We did not detect <life> on Europa for <years>.\" \"Well, there they are,\" Sara said.|i/aI,ea/IE",
+"11|~europa_figures.svg|\"So they live here,\" I said. \"No, they <don't>,\" Sara said. \"Look at the <bubbles> they make, just like us. They need <air>.\"|ai/eE,end:le",
+"11|~europa_figures.svg|(The <creatures> made a little army and lined up at the dark rock. \"Now!\" the biggest <one> shouted.)|tur/tS,ea/i:,tricky",
+"11|~europa_fight.svg|We <looked> at the floating figures. They didn't <move>. \"Fire a warning shot,\" our captain said.|oo/U,tricky",
+"11|~europa_fight.svg|Joe took his dart gun and fired a <dart>. It swished through the water towards the dark <rock>.|ar/a:,ck/k",
+"11|~europa_fight.svg|A moment <later>, a dart appeared coming towards us. \"Incoming!\" <people> shouted. It flew just next to Joe.|er/Er,tricky",
 "11|~europa_fight.svg|\"Fire!\" the captain shouted over the <radio>. <Everyone> took their gun and started shooting.|tricky",
-"11|~europa_fight.svg|There was a swarm of darts going out to the dark figures. A <moment> later, they started shooting <back>.|cons:ck",
-"11|~europa_fight.svg|The darts swished between our <legs and feet>. Some put <holes> in our suits.|di:ee,tense:o",
-"11|~europa_creatures.svg|\"<Stop> shooting! Don't <shoot>!\" Sara screamed <in the> radio.|di:oo",
+"11|~europa_fight.svg|There was a swarm of darts going out to the dark figures. A <moment> later, they started shooting <back>.|ck/k",
+"11|~europa_fight.svg|The darts swished between our <legs and feet>. Some put <holes> in our suits.|ee/i:,o/EU",
+"11|~europa_creatures.svg|\"<Stop> shooting! Don't <shoot>!\" Sara screamed <in the> radio.|oo/u:",
 "11|~europa_creatures.svg|Everyone was so surprised, we stopped. <Ten> seconds later, the <enemy> stopped shooting as well.|end:y@",
-"11|~europa_creatures.svg|\"Don't you <see>? We are fighting ourselves,\" Sara said. \"They just reflect what <we do>, like a <mirror>.\"|di:ee,lax:dbl",
-"11|~europa_creatures.svg|I felt <stupid> for not seeing this sooner. Everyone was silent. We didn't know <what to do>.|cons:wh,tricky",
-"11|~europa_creatures.svg|(\"We're tired,\" the <thin> creature said to the biggest one. \"We can't hold on for <much longer>.\")|cons:th,end:er,cons:ch:tS",
-"11|~europa_creatures.svg|(\"And they didn't <go> anywhere,\" another creature said. \"<They> are not even <hurt>.\")|tense:o,br:ur3,tricky",
+"11|~europa_creatures.svg|\"Don't you <see>? We are fighting ourselves,\" Sara said. \"They just reflect what <we do>, like a <mirror>.\"|ee/i:,lax:dbl",
+"11|~europa_creatures.svg|I felt <stupid> for not seeing this sooner. Everyone was silent. We didn't know <what to do>.|wh/w,tricky",
+"11|~europa_creatures.svg|(\"We're tired,\" the <thin> creature said to the biggest one. \"We can't hold on for <much longer>.\")|cons:th,er/Er,ch/tS",
+"11|~europa_creatures.svg|(\"And they didn't <go> anywhere,\" another creature said. \"<They> are not even <hurt>.\")|o/EU,ur/3:,tricky",
 "11|~europa_creatures.svg|We could <still> see the figures through the <muddy> water floating at the dark rock.|lax:dbl,end:y@", 
-"11|~europa_creatures.svg|Joe <spoke> on the radio.\"If we are fighting ourselves, then <who> are they?\"|tense:o,cons:wh",
-"11|~europa_creatures.svg|We didn't know. \"I'm going to <go there>,\" Joe said. \"And <check out> these aliens.\"|tense:o,cons:ck,di:ou,cons:ch:tS",
+"11|~europa_creatures.svg|Joe <spoke> on the radio.\"If we are fighting ourselves, then <who> are they?\"|o/EU,wh/w",
+"11|~europa_creatures.svg|We didn't know. \"I'm going to <go there>,\" Joe said. \"And <check out> these aliens.\"|o/EU,ck/k,ou/aU,ch/tS",
 "11|~europa_mirror.svg|\"Joe, stop!\" the captain said, but Joe was already <swimming> towards the dark rock with his gun in his <hand>.|lax:dbl",
-"11|~europa_mirror.svg|(The <little> army of creatures panicked. \"That one is coming! We are <tired> and cannot keep up the <reflection> much longer!\")|end:le,cons:ti",
-"11|~europa_mirror.svg|(The <guard> floated out of the <hole> in the sand. \"I will go,\" he said. \"You are crazy,\" the other creatures said. \"You will be <hurt>.\")|br:ar,br:ur3,tense:o",
+"11|~europa_mirror.svg|(The <little> army of creatures panicked. \"That one is coming! We are <tired> and cannot keep up the <reflection> much longer!\")|end:le,ti/S",
+"11|~europa_mirror.svg|(The <guard> floated out of the <hole> in the sand. \"I will go,\" he said. \"You are crazy,\" the other creatures said. \"You will be <hurt>.\")|ar/a:,ur/3:,o/EU",
 "11|~europa_mirror.svg|(\"You think <I let them> in anyway,\" the guard said, and <pushed> himself towards Joe.)|cons:th",
-"11|~europa_mirror.svg|All we <could> see was <one> figure starting to swim towards Joe from the other direction. It looked exactly <like> him.|tense:i,tricky",
-"11|~europa_mirror.svg|It had the same <suit>, with the Base 2 mark. It had <the same> dart gun. It made the same bubbles.|tense:a,tricky",
-"11|~europa_mirror.svg|I watched as they got closer and closer to each other. <Five> feet, <four> feet, now just two feet. I covered my <face>.|tense:i,cons:cs,tricky",
-"11|~europa_mirror.svg|I thought there would be an <explosion> like when <matter> meets antimatter. How much of the <universe> would survive?|br:er3,lax:dbl",
-"11|~europa_mirror.svg|They met. The <water> shimmered, and made a shining ripple that quickly <disappeared>. There was silence. Joe stopped, <looked> around, and kept on swimming.|br:ea:i@,di:ooU,end:er",
-"11|~europa_mirror.svg|He reached the dark rock, that looked like a <church tower> under water. He didn't stop and crashed <into> it. The dark figures were <gone>.|br:ur3,di:ow,tricky,cons:ch:tS",
-"11|~europa_mirror.svg|Joe stopped moving, and <slowly> sank to the bottom. He was injured. The <captain> and I went there to get him back.|di:ow@,end:ly,tricky",
-"11|~europa_mirror.svg|\"He needs to <stay> in the <hospital> room until we get back to Base 2, <locked> in,\" the captain said. \"We don't know what they did to him.\"|di:ay,end:al@,cons:ck",
-"11|~europa_ship.svg|Later I saw the report the captain <wrote> about our expedition. He <lied>. He said there was no iron <at all> in the rocks.|beg:wr,end:ie,dark:al",
-"11|~europa_ship.svg|Base 2 stopped trying to get <iron> from Europa, and no one bothered the creatures for another <hundred years>.|br:ea:i@,tricky",
+"11|~europa_mirror.svg|All we <could> see was <one> figure starting to swim towards Joe from the other direction. It looked exactly <like> him.|i/aI,tricky",
+"11|~europa_mirror.svg|It had the same <suit>, with the Base 2 mark. It had <the same> dart gun. It made the same bubbles.|a/eI,tricky",
+"11|~europa_mirror.svg|I watched as they got closer and closer to each other. <Five> feet, <four> feet, now just two feet. I covered my <face>.|i/aI,c/s,tricky",
+"11|~europa_mirror.svg|I thought there would be an <explosion> like when <matter> meets antimatter. How much of the <universe> would survive?|er/3:,lax:dbl",
+"11|~europa_mirror.svg|They met. The <water> shimmered, and made a shining ripple that quickly <disappeared>. There was silence. Joe stopped, <looked> around, and kept on swimming.|ea/IE,oo/U,er/Er",
+"11|~europa_mirror.svg|He reached the dark rock, that looked like a <church tower> under water. He didn't stop and crashed <into> it. The dark figures were <gone>.|ur/3:,ow/aU,tricky,ch/tS",
+"11|~europa_mirror.svg|Joe stopped moving, and <slowly> sank to the bottom. He was injured. The <captain> and I went there to get him back.|ow/EU,end:ly,tricky",
+"11|~europa_mirror.svg|\"He needs to <stay> in the <hospital> room until we get back to Base 2, <locked> in,\" the captain said. \"We don't know what they did to him.\"|ay/eI,end:al@,ck/k",
+"11|~europa_ship.svg|Later I saw the report the captain <wrote> about our expedition. He <lied>. He said there was no iron <at all> in the rocks.|wr/r,end:ie,dark:al",
+"11|~europa_ship.svg|Base 2 stopped trying to get <iron> from Europa, and no one bothered the creatures for another <hundred years>.|ea/IE,tricky",
 
 // Story 102 - The Singing Contest (2-3 typing targets per fragment)
-"11|@🎶|There was a <boy> named Sam who loved to <sing> more than <anything>.|di:oy,cons:th",
-"11|@🚿|But Sam was very <shy>. He only sang when he was alone, in the <shower> or his room.|tense:y,di:ow",
-"11|@🌳|In the <garden>, the birds would <often> stop to listen to his lovely voice.|br:ar,tricky",
-"11|@🪧|One <morning>, a bright poster <appeared> on the school wall.|br:or,br:ea:i@",
-"11|@🏙️|It was a <national> singing contest in the capital <city>.|cons:ti,end:al@,cons:cs",
-"11|@🏆|The <winner> would get a golden <trophy> and sing on the <radio>.|cons:ph,end:y@",
-"11|@🤔|Sam was not <certain>. \"I could never sing in <front> of <people>,\" he thought.|br:er3,cons:cs,tricky",
+"11|@🎶|There was a <boy> named Sam who loved to <sing> more than <anything>.|oy/OI,cons:th",
+"11|@🚿|But Sam was very <shy>. He only sang when he was alone, in the <shower> or his room.|y/aI,ow/aU",
+"11|@🌳|In the <garden>, the birds would <often> stop to listen to his lovely voice.|ar/a:,tricky",
+"11|@🪧|One <morning>, a bright poster <appeared> on the school wall.|or/O:,ea/IE",
+"11|@🏙️|It was a <national> singing contest in the capital <city>.|ti/S,end:al@,c/s",
+"11|@🏆|The <winner> would get a golden <trophy> and sing on the <radio>.|ph/f,end:y@",
+"11|@🤔|Sam was not <certain>. \"I could never sing in <front> of <people>,\" he thought.|er/3:,c/s,tricky",
 "11|@🧑‍🤝‍🧑|His big sister <believed> in him. \"Your voice is <special>,\" she said.|end:ie,end:al@",
-"11|@✍️|After a <difficult> night, Sam <decided> to enter. \"Yes!\" was his answer.|cons:cs,lax:dbl",
-"11|@📨|He sent the form <early> the next <morning>.|br:or,end:ly,tricky",
-"11|@🚌|The big day <arrived>. Sam got on a bus and traveled to the <capital>.|tense:i,end:al@",
+"11|@✍️|After a <difficult> night, Sam <decided> to enter. \"Yes!\" was his answer.|c/s,lax:dbl",
+"11|@📨|He sent the form <early> the next <morning>.|or/O:,end:ly,tricky",
+"11|@🚌|The big day <arrived>. Sam got on a bus and traveled to the <capital>.|i/aI,end:al@",
 "11|@🎭|He <walked> into a huge <hall>. A big <group> of singers was already there.|dark:al,tricky",
-"11|@😰|Sam's heart beat fast. Backstage, he could hardly <breathe>. He took a deep <breath>.|di:ea,di:eae,cons:th",
-"11|@🧑‍⚖️|Three judges sat at a <table>. The bright <lights> made Sam blink.|end:le,t:igh",
-"11|@😳|Sam walked on stage, but he <tripped> by <accident> and dropped the microphone!|cons:cs,lax:dbl",
+"11|@😰|Sam's heart beat fast. Backstage, he could hardly <breathe>. He took a deep <breath>.|ea/i:,ea/e,cons:th",
+"11|@🧑‍⚖️|Three judges sat at a <table>. The bright <lights> made Sam blink.|end:le,igh/aI",
+"11|@😳|Sam walked on stage, but he <tripped> by <accident> and dropped the microphone!|c/s,lax:dbl",
 "11|@😬|The crowd <laughed>. Sam wanted to run away. His face turned <red>.|tricky",
-"11|@🫁|But he <closed> his eyes, took another breath, and <decided> to sing anyway.|tense:o,cons:cs",
-"11|@🎤|He thought of a <personal> memory, lifted the microphone, and began to <sing>.|br:er3,end:al@",
-"11|@🎵|At first there was an <occasional> <shake> in his voice, but it grew <stronger>.|tense:a,end:al@",
-"11|@🎶|Soon his voice rang out clear and <natural>. The whole <hall> went silent.|cons:tur:tS,dark:al,end:al@",
-"11|@🌟|Sam's <vocal> talent was <sensational>!|cons:ti,end:al@",
-"11|@👏|When he <finished>, everyone <stood> up and clapped.|di:ooU",
-"11|@🏆|The judges <smiled>. Sam won the golden <trophy>!|tense:i,cons:ph,end:y@",
-"11|@😊|Sam felt like a <different> boy, and was no longer <shy>.|tense:y,end:er",
+"11|@🫁|But he <closed> his eyes, took another breath, and <decided> to sing anyway.|o/EU,c/s",
+"11|@🎤|He thought of a <personal> memory, lifted the microphone, and began to <sing>.|er/3:,end:al@",
+"11|@🎵|At first there was an <occasional> <shake> in his voice, but it grew <stronger>.|a/eI,end:al@",
+"11|@🎶|Soon his voice rang out clear and <natural>. The whole <hall> went silent.|tur/tS,dark:al,end:al@",
+"11|@🌟|Sam's <vocal> talent was <sensational>!|ti/S,end:al@",
+"11|@👏|When he <finished>, everyone <stood> up and clapped.|oo/U",
+"11|@🏆|The judges <smiled>. Sam won the golden <trophy>!|i/aI,ph/f,end:y@",
+"20|@🏆|The judges <s=m=i/aI=l=ed/d>.|i/aI", // reviewed
+"20|@🏆|Sam won the golden <t=r=o/EU=ph=y>!|ph/f,end:y@", // reviewed
+"11|@😊|Sam felt like a <different> boy, and was no longer <shy>.|y/aI",
+"20|@😊|Sam felt like a <d=i=ff=er/r=e/E=n=t> boy|lax:dbl", // reviewed
+
+// --- segmented (phoneme / morpheme) questions ---
+// The '=' separated parts (usually phonemes, sometimes morphemes) are typed one box at a
+// time while the whole word/sentence is read out. Level, image and class tags are as usual.
+"20|@🐘|<e=l=e/I=ph=a/E=n=t>|ph/f", // reviewed
+"20|@🌍|<n=a/eI=tion>|ti/S", // reviewed
+// "20|@🔮|<p=r=o=ph=e=t>|ph/f",
+"20|@💬|They <m=e=n=tion=ed/d> my name|ti/S", // reviewed
 
 // --- lax monograph ---
 
-// e=e lax:e
-"0|@🖊️|<pen>|lax:e",
-"0|@🟥|<red>|lax:e",
-"0|@🌹|<red> rose|lax:e",
-"0|@🛌|<bed>|lax:e",
-"0|@🪺|<nest>|lax:e",
-"0|@⛺️|<tent>|lax:e",
-"0|egg@🥚|<egg>|lax:e",
-"0|bell@🔔|ring the <bell>|lax:e",
-"1|@🦶|<smelly> foot|lax:e,end:y@,lax:dbl",
-"2|@🔟|<ten>|lax:e",
-"6|@⬅️|turn <left>|lax:e",
-"10|@⛱️|We use <sun>screen to <prevent> burns.|lax:e,lax:u",
-"10|@🚄|Is <this> the <express> <train> to London?|lax:e,cons:th",
+// e=e e/e
+"0|@🖊️|<pen>|e/e",
+"0|@🟥|<red>|e/e",
+"0|@🌹|<red> rose|e/e",
+"0|@🛌|<bed>|e/e",
+"0|@🪺|<nest>|e/e",
+"0|@⛺️|<tent>|e/e",
+"0|egg@🥚|<egg>|e/e",
+"0|bell@🔔|ring the <bell>|e/e",
+"20|bell@🔔|ring the <b=e=ll>|e/e", // reviewed
+"20|bell@🔔|<r=i=ng> the bell|i/I", // reviewed
+"1|@🦶|<smelly> foot|e/e,end:y@,lax:dbl",
+"20|@🦶|<s=m=e=ll=y> foot|e/e,end:y@,lax:dbl", // reviewed
+"2|@🔟|<ten>|e/e",
+"6|@⬅️|turn <left>|e/e",
+"10|@⛱️|We use <sun>screen to <prevent> burns.|e/e,u/A",
+"20|@⛱️|We use sunscreen to <p=r=e/I=v=e=n=t> burns.|e/e", // reviewed
+"10|@🚄|Is <this> the <express> <train> to London?|e/e,cons:th",
+"20|@🚄|Is <th/D=i=s> the express train to London?|cons:th", // reviewed
+"20|@🚄|Is this the <e/I=x/ks=p=r=e=ss> train to London?|e/e", // reviewed
+"20|@🚄|Is this the express <t=r=ai=n> to London?|ai/eI", // reviewed
 
-// i=I lax:i
-"0|@🐬|The dolphin likes <fish>.|lax:i",
-"2|@🏊|<swim>|lax:i",
-"0|@📌|<pin>|lax:i",
-"0|@💍|<ring>|lax:i",
-"0|@🥛|I <drink> milk|lax:i",
-"0|pig@🐖|<pig>|lax:i",
-"0|@😁|happy <grin>|lax:i",
-"2|@🐠|<fish>|lax:i",
-"0|@🥛|I drink <milk>|lax:i",
-"0|@🔔|<ring> the bell|lax:i",
-"2|@🪽|<wing>|lax:i",
-"0|@📎|paper <clip>|lax:i",
-"2|@😽|Cat gives <kiss>.|lax:i",
-"3|@☔️|<It is> raining.|lax:i",
-"0|cat|You can make a Minecraft cat <sit> or stand|lax:i",
-"6|@🖥|<system> error|lax:y",
-"5|@🥝|<kiwi>|lax:i",
-"4|@🍟|I want <chips>!|lax:i,cons:ch:tS",
-"0|@🍟|I want chips <with> ketchup!|lax:i",
-"5|@😽|Cat <gives> kiss.|lax:i",
-"0|@💳|pay <with> card|lax:i",
-"0|@👨🏻‍🎤|He <is> a rapper|lax:i,common",
-"6|@🧑‍🍳|The chef works in the <kitchen>|lax:i,cons:ch:tS",
+// i=I i/I
+"0|@🐬|The dolphin likes <fish>.|i/I",
+"2|@🏊|<swim>|i/I",
+"0|@📌|<pin>|i/I",
+"0|@💍|<ring>|i/I",
+"20|@💍|<r=i=ng>|i/I", // reviewed
+"0|@🥛|I <drink> milk|i/I",
+"0|pig@🐖|<pig>|i/I",
+"0|@😁|happy <grin>|i/I",
+"2|@🐠|<fish>|i/I",
+"0|@🥛|I drink <milk>|i/I",
+"0|@🔔|<ring> the bell|i/I",
+"2|@🪽|<wing>|i/I",
+"20|@🪽|<w=i=ng>|i/I", // reviewed
+"0|@📎|paper <clip>|i/I",
+"2|@😽|Cat gives <kiss>.|i/I",
+"3|@☔️|<It is> raining.|i/I",
+"0|cat|You can make a Minecraft cat <sit> or stand|i/I",
+"6|@🖥|<system> error|y/I",
+"20|@🖥|<s=y=s=t=e/E=m> error|y/I", // reviewed
+"5|@🥝|<kiwi>|i/I",
+"4|@🍟|I want <chips>!|i/I,ch/tS",
+"0|@🍟|I want chips <with> ketchup!|i/I",
+"5|@😽|Cat <gives> kiss.|i/I",
+"0|@💳|pay <with> card|i/I",
+"20|@💳|pay <w=i=th/D> card|i/I", // reviewed
+"0|@👨🏻‍🎤|He <is> a rapper|i/I,common",
+"6|@🧑‍🍳|The chef works in the <kitchen>|i/I,ch/tS",
+"20|@🧑‍🍳|The chef works in the <k=i=tch=e/I=n>|i/I,ch/tS", // reviewed
 
-// y=I lax:y
-"2|@🏋️|<gym>|lax:y",
-"8|@👻|<myth>|lax:y",
-"8|@🏜️|<pyramid>|lax:y",
-"9|amethyst|<crystal>|lax:y",
-// {"level":8, "emoji":"🎤", "text":"<lyric>", "class":["lax:y"]},
-// {"level":8, "emoji":"🎶", "text":"We sing a <hymn>.", "class":["lax:y"]},
+// y=I y/I
+"2|@🏋️|<gym>|y/I",
+"20|@🏋️|<g/dZ=y=m>|y/I", // reviewed
+"8|@👻|<myth>|y/I",
+"20|@👻|<m=y=th/T>|y/I,cons:th", // reviewed
+"8|@🏜️|<pyramid>|y/I",
+"9|amethyst|<crystal>|y/I",
+"20|@🏜️|<p=y=r=a/E=m=i=d>|y/I", // reviewed
+"20|amethyst|<c=r=y=s=t=al/E>|y/I", // reviewed
+// {"level":8, "emoji":"🎤", "text":"<lyric>", "class":["y/I"]},
+// {"level":8, "emoji":"🎶", "text":"We sing a <hymn>.", "class":["y/I"]},
 
-//o=Io lax:o
-"2|@📦|<box>|lax:o",
-"0|@🔥|<hot>|lax:o",
-"0|@🙅🏼‍♀️|<not>|lax:o",
-"2|fox|<fox>|lax:o",
-"0|@🐶|<dog>|lax:o",
-"0|@🛑|<stop>|lax:o",
-"6|@🏖|We are going on a <holiday>!|lax:o,di:ay",
-"6|@🐵|<monkey>|lax:o,end:ey",
-"4|@🍫|<chocolate>|lax:o,cons:ch:tS",
-"5|@💥|<Something> went horribly wrong|cons:th,lax:o",
-
-
-// a=ae lax:a
-"0|cat@🐈‍|<cat>|lax:a",
-"0|@👜|<bag>|lax:a",
-"10|badomen|<bad> omen|lax:a",
-"1|@🖐️|<hand>|lax:a",
-"1|@🏦|<bank>|lax:a",
-"1|@🪤|Careful! It is a <trap>!|lax:a",
-"7|hangingsign|<hanging> sign|lax:a",
-"0|cat|You can make a Minecraft cat sit or <stand>|lax:a",
-"5|@👨🏻‍🎤|He is a <rapper>|lax:a,lax:dbl",
-
-"4|@🎃|<scary> pumpkin|lax:a",
-"7|@🪤|<Careful>! It is a trap!|lax:a",
+//o=Io o/o
+"2|@📦|<box>|o/o",
+"20|@📦|<b=o/o=x>|o/o", // reviewed
+"0|@🔥|<hot>|o/o",
+"0|@🙅🏼‍♀️|<not>|o/o",
+"2|fox|<fox>|o/o",
+"0|@🐶|<dog>|o/o",
+"0|@🛑|<stop>|o/o",
+"6|@🏖|We are going on a <holiday>!|o/o,ay/eI",
+"20|@🏖|We are going on a <h=o/o=l=i=d=ay>!|o/o,ay/eI", // reviewed
+"6|@🐵|<monkey>|o/o,end:ey",
+"20|@🐵|<m=o/A=n/ng=k=ey/I>|o/o,end:ey", // reviewed
+"4|@🍫|<chocolate>|o/o,ch/tS",
+"20|@🍫|<ch=o/o=c=o/x=l=a/E=t=e/x>|o/o,ch/tS", // reviewed
+"5|@💥|<Something> went horribly wrong|cons:th,o/o",
+"20|@💥|<S=o/A=m=e/x=th/T=i=ng> went horribly wrong|cons:th,o/o", // reviewed
 
 
-// u=^ lax:u
-"0|@🥁|<drum>|lax:u",
-"0|@🏃🏻‍♂️‍➡️|<run>|lax:u",
-"0|@🌞|The <sun> shines.|lax:u",
-"1|@🦆|<duck>|lax:u,cons:ck",
-"1|@🕰️|<Just> a bit of time, please|lax:u",
-"2|@👨‍👦|<Adult>s are boring|lax:u",
-"4|@🎃|scary <pumpkin>|lax:u",
-"3|@🏃‍♂️‍➡️|He is <running>.|lax:u,lax:dbl",
-"6|mushroom@🍄|<mushroom>|lax:u",
-"7|@🍟|I want chips with <ketchup>!|lax:u,cons:ch:tS",
-"8|cat|I <instruct> the cat to sit|lax:u",
+// a=ae a/ae
+"0|cat@🐈‍|<cat>|a/ae",
+"0|@👜|<bag>|a/ae",
+"10|badomen|<bad> omen|a/ae",
+"1|@🖐️|<hand>|a/ae",
+"1|@🏦|<bank>|a/ae",
+"1|@🪤|Careful! It is a <trap>!|a/ae",
+"7|hangingsign|<hanging> sign|a/ae",
+"20|hangingsign|<h=a/ae=ng=i=ng> sign|a/ae", // reviewed
+"0|cat|You can make a Minecraft cat sit or <stand>|a/ae",
+"5|@👨🏻‍🎤|He is a <rapper>|a/ae,lax:dbl",
+"20|@👨🏻‍🎤|He is a <r=a/ae=pp=er/Er>|a/ae,lax:dbl", // reviewed
 
-"4|skeletonskull|skeleton <skull>|lax:u",
+"4|@🎃|<scary> pumpkin|a/ae",
+"7|@🪤|<Careful>! It is a trap!|a/ae",
+
+
+// u=^ u/A
+"0|@🥁|<drum>|u/A",
+"0|@🏃🏻‍♂️‍➡️|<run>|u/A",
+"0|@🌞|The <sun> shines.|u/A",
+"1|@🦆|<duck>|u/A,ck/k",
+"20|@🦆|<d=u/A=ck>|u/A,ck/k", // reviewed
+"1|@🕰️|<Just> a bit of time, please|u/A",
+"20|@🕰️|<J/dZ=u/A=s=t> a bit of time, please|u/A", // reviewed
+"2|@👨‍👦|<Adult>s are boring|u/A",
+"20|@👨‍👦|<A/E=d=u/A=l=t>s are boring|u/A", // reviewed
+"4|@🎃|scary <pumpkin>|u/A",
+"3|@🏃‍♂️‍➡️|He is <running>.|u/A,lax:dbl",
+"20|@🏃‍♂️‍➡️|He is <r=u/A=nn=i=ng>.|u/A,lax:dbl", // reviewed
+"6|mushroom@🍄|<mushroom>|u/A",
+"20|mushroom@🍄|<m=u/A=sh=r=oo=m>|u/A", // reviewed
+"7|@🍟|I want chips with <ketchup>!|u/A,ch/tS",
+"20|@🍟|I want chips with <k=e=tch=u/A=p>!|u/A,ch/tS", // reviewed
+"8|cat|I <instruct> the cat to sit|u/A",
+"20|cat|I <i=n=s=t=r=u/A=c=t> the cat to sit|u/A", // reviewed
+
+"4|skeletonskull|skeleton <skull>|u/A",
+"20|skeletonskull|skeleton <s=k=u/A=ll>|u/A", // reviewed
 
 "5|@👮|You're under <arrest>!|lax:dbl",
+"20|@👮|You're under <a/E=rr=e=s=t>!|lax:dbl", // reviewed
 
 // --- digraph ---
 
-// ee=i: di:ee
-"0|@🌳|<tree>|di:ee",
-"0|@🏨|<Sleep> in a hotel|di:ee",
-"0|sheep@🐑|<sheep>|di:ee",
-"0|@🟩|<green>|di:ee",
-"2|@🐭|The mouse likes <cheese>|di:ee,cons:ch:tS",
-"2|@🐭|Mice like <cheese>|di:ee,cons:ch:tS",
-"4|@🦶🏽|<heel>|di:ee",
-"3|@⚙️|<steel>|di:ee",
-"3|@💇🏾‍♂️|Adam <needs> a haircut.|di:ee",
-"3|@🥵|I <need> a towel|di:ee",
-"0|@🤫|<Keep> it a secret!|di:ee",
-"3|@🤫|We must <meet> secretly|di:ee",
-"6|@👨🏻‍🍼|<feeding> the baby|di:ee",
-"5|bee|busy <bee>|di:ee",
+// ee=i: ee/i:
+"0|@🌳|<tree>|ee/i:",
+"0|@🏨|<Sleep> in a hotel|ee/i:",
+"0|sheep@🐑|<sheep>|ee/i:",
+"0|@🟩|<green>|ee/i:",
+"2|@🐭|The mouse likes <cheese>|ee/i:,ch/tS",
+"2|@🐭|Mice like <cheese>|ee/i:,ch/tS",
+"20|@🐭|Mice like <ch=ee=se/z>|ee/i:,ch/tS", // reviewed
+"20|@🐭|<M=i/aI=ce/s> like cheese|i/aI", // reviewed
+"4|@🦶🏽|<heel>|ee/i:",
+"3|@⚙️|<steel>|ee/i:",
+"3|@💇🏾‍♂️|Adam <needs> a haircut.|ee/i:",
+"3|@🥵|I <need> a towel|ee/i:",
+"0|@🤫|<Keep> it a secret!|ee/i:",
+"3|@🤫|We must <meet> secretly|ee/i:",
+"6|@👨🏻‍🍼|<feeding> the baby|ee/i:",
+"20|@👨🏻‍🍼|<f=ee=d=ing> the baby|ee/i:", // reviewed
+"5|bee|busy <bee>|ee/i:",
 
-// oo=u: di:oo
-"1|@🥄|<spoon>|di:oo",
-"3|@🌜|<moon>|di:oo",
-"3|@🍱|<food>|di:oo",
-"4|@🏫|<school>|di:oo",
-"8|boots|<boots>|di:oo",
-"9|bamboo|<bamboo>|di:oo",
-"9|@🦘|<kangaroo>|di:oo",
-
-
-// oo=U   di:ooU
-"1|@🦶|smelly <foot>|di:ooU",
-"1|enchantedbook|enchanted <book>|di:ooU",
-"1|quill|write <a book>|di:ooU",
-"10|bookshelf|<bookshelf>|di:ooU",
-"4|@🍪|<cookie>|di:ooU,end:ie",
-"7|cporkc|<cooked> porkchop|di:ooU",
-"4|@👩🏾‍🍳|<cook>|di:ooU",
-"1|@👍|<good>|di:ooU",
-"1|wood|<wood>|di:ooU",
-"9|hook|<hook>|di:ooU",
-"5|@👀|<Look> where you're going!|di:ooU",
-
-// ai=eI di:ai
-"2|@🚂|<train>|di:ai",
-"4|@☔️|It is <raining>.|di:ai",
-"3|@☔️|It is <rain>ing.|di:ai",
-"3|@☔️|<rain> falls|di:ai",
-"3|@📨|<mail>|di:ai",
-"6|@🌈|<rainbow>|di:ai,di:ow@",
-"2|@✋|<Wait>!|di:ai",
-
-// ay=eI  di:ay
-"1|@⛳️|<play> golf|di:ay",
-"3|@▶️|<play>|di:ay",
-"3|@📥|There was nothing in the <tray>.|di:ay",
-"4|fox|A fox <hunts> small animals, and can <carry> items in its mouth. It runs <away> if you are not sneaking.|di:ay,lax:dbl",
-"7|sign|If you <wax> a sign, no <player> can change the text on it. Use dyes and glow ink to change <how> the text looks.|di:ay,di:ow",
-"3|@☔️|Bad weather <today>|di:ay",
-"2|@🤔|Which <way>?|di:ay",
-"1|@💳|<pay> by card|di:ay",
+// oo=u: oo/u:
+"1|@🥄|<spoon>|oo/u:",
+"3|@🌜|<moon>|oo/u:",
+"3|@🍱|<food>|oo/u:",
+"4|@🏫|<school>|oo/u:",
+"20|@🏫|<s=ch/k=oo=l>|oo/u:", // reviewed
+"8|boots|<boots>|oo/u:",
+"9|bamboo|<bamboo>|oo/u:",
+"9|@🦘|<kangaroo>|oo/u:",
 
 
-// oi=oI di:oi
-"4|@🪙|gold <coin>|di:oi",
-"8|poison|<poison>|di:oi",
-"6|@🚻|Where is the <toilet>?|di:oi,end:et",
-"4|@🥁|<noise>|di:oi",
-"7|pufferfish|Pufferfish <live> in oceans and use <poison> to defend themselves. They <inflate> if you <get> too close.|di:oi,tense:a,lax:i",
-// oy=oI di:oy
-"6|@🤣|<enjoy>|di:oy",
-"0|@🪆|<toy>|di:oy",
-"0|@🧑|<boy>|di:oy",
-"9|@😡|This is so <annoying>!|di:oy",
-"9|@🤠|<cowboy>|di:oy,di:ow",
+// oo=U   oo/U
+"1|@🦶|smelly <foot>|oo/U",
+"1|enchantedbook|enchanted <book>|oo/U",
+"1|quill|write <a book>|oo/U",
+"10|bookshelf|<bookshelf>|oo/U",
+"4|@🍪|<cookie>|oo/U,end:ie",
+"20|@🍪|<c=oo/U=k=ie/I>|oo/U,end:ie", // reviewed
+"7|cporkc|<cooked> porkchop|oo/U",
+"4|@👩🏾‍🍳|<cook>|oo/U",
+"1|@👍|<good>|oo/U",
+"1|wood|<wood>|oo/U",
+"9|hook|<hook>|oo/U",
+"5|@👀|<Look> where you're going!|oo/U",
+"20|@👀|<L=oo/U=k> where you're going!|oo/U", // reviewed
+
+// ai=eI ai/eI
+"2|@🚂|<train>|ai/eI",
+"4|@☔️|It is <raining>.|ai/eI",
+"3|@☔️|It is <rain>ing.|ai/eI",
+"3|@☔️|<rain> falls|ai/eI",
+"3|@📨|<mail>|ai/eI",
+"6|@🌈|<rainbow>|ai/eI,ow/EU",
+"2|@✋|<Wait>!|ai/eI",
+
+// ay=eI  ay/eI
+"1|@⛳️|<play> golf|ay/eI",
+"3|@▶️|<play>|ay/eI",
+"3|@📥|There was nothing in the <tray>.|ay/eI",
+"4|fox|A fox <hunts> small animals, and can <carry> items in its mouth. It runs <away> if you are not sneaking.|ay/eI,lax:dbl",
+"7|sign|If you <wax> a sign, no <player> can change the text on it. Use dyes and glow ink to change <how> the text looks.|ay/eI,ow/aU",
+"3|@☔️|Bad weather <today>|ay/eI",
+"2|@🤔|Which <way>?|ay/eI",
+"1|@💳|<pay> by card|ay/eI",
 
 
-// ea=i: di:ea
-"1|@😸|Finally the cat had enough to <eat>|di:ea",
-"3|carrot@🥕|I would like a carrot, <please>.|di:ea",
-"4|@🥩|Eat <meat>|di:ea",
-"3|@🥩|<Eat> meat|di:ea",
-"4|@👨🏾‍⚕️|<heal>|di:ea",
-"5|@🙄|Oh <really>?|di:ea,end:ly",
-"5|@🦄|Unicorns are <real>?|di:ea",
-"6|@🧑‍🏫|<teacher>|di:ea,end:er,cons:ch:tS",
-"3|@🕰️|A bit of time, <please>|di:ea",
-"7|cherry|<cherry leaves>|di:ea,lax:dbl,cons:ch:tS",
-"8|frog|<Frogs> live <in> swamps. They use their long <tongues> to <eat> small slimes and small magma cubes.|di:ea",
-"7|frog|When a frog <eats> a magma cube, you get a froglight. Different frog <types> make <different> coloured lights.|di:ea,lax:dbl,tense:y",
-"5|@🧜🏼‍♂️|I like the <sea>|di:ea",
-"10|@⚓|Don't <steal> the anchor! It's heavy and made of <steel>.|di:ea,di:ee",
-"10|@⚓|Don't steal the <anchor>! It's <heavy> and made of steel.|lax:a,di:eae,end:y@,o@",
-"10|@🌊|Do not <breathe> under <water>|di:ea,cons:th",
+// oi=oI oi/OI
+"4|@🪙|gold <coin>|oi/OI",
+"8|poison|<poison>|oi/OI",
+"20|poison|<p=oi=s/z=o/E=n>|oi/OI", // reviewed
+"6|@🚻|Where is the <toilet>?|oi/OI,end:et",
+"4|@🥁|<noise>|oi/OI",
+"7|pufferfish|Pufferfish <live> in oceans and use <poison> to defend themselves. They <inflate> if you <get> too close.|oi/OI,a/eI,i/I",
+// oy=oI oy/OI
+"6|@🤣|<enjoy>|oy/OI",
+"0|@🪆|<toy>|oy/OI",
+"0|@🧑|<boy>|oy/OI",
+"9|@😡|This is so <annoying>!|oy/OI",
+"20|@😡|This is so <a/E=nn=oy/OI=ing>!|oy/OI", // reviewed
+"9|@🤠|<cowboy>|oy/OI,ow/aU",
+"20|@🤠|<c=ow/aU=b=oy>|oy/OI,ow/aU", // reviewed
 
-"8|@🧚‍♂️|<appear>|di:ea",
+// ea=i: ea/i:
+"1|@😸|Finally the cat had enough to <eat>|ea/i:",
+"3|carrot@🥕|I would like a carrot, <please>.|ea/i:",
+"20|carrot@🥕|I would like a carrot, <p=l=ea=se/z>.|ea/i:", // reviewed
+"4|@🥩|Eat <meat>|ea/i:",
+"3|@🥩|<Eat> meat|ea/i:",
+"4|@👨🏾‍⚕️|<heal>|ea/i:",
+"5|@🙄|Oh <really>?|ea/i:,end:ly",
+"20|@🙄|Oh <r=ea=ll=y>?|ea/i:,end:ly", // reviewed
+"5|@🦄|Unicorns are <real>?|ea/i:",
+"20|@🦄|Unicorns are <r=ea=l>?|ea/i:", // reviewed
+"6|@🧑‍🏫|<teacher>|ea/i:,er/Er,ch/tS",
+"20|@🧑‍🏫|<t=ea=ch=er>|ea/i:,er/Er,ch/tS", // reviewed
+"3|@🕰️|A bit of time, <please>|ea/i:",
+"7|cherry|<cherry leaves>|ea/i:,lax:dbl,ch/tS",
+"8|frog|<Frogs> live <in> swamps. They use their long <tongues> to <eat> small slimes and small magma cubes.|ea/i:",
+"7|frog|When a frog <eats> a magma cube, you get a froglight. Different frog <types> make <different> coloured lights.|ea/i:,lax:dbl,y/aI",
+"5|@🧜🏼‍♂️|I like the <sea>|ea/i:",
+"10|@⚓|Don't <steal> the anchor! It's heavy and made of <steel>.|ea/i:,ee/i:",
+"10|@⚓|Don't steal the <anchor>! It's <heavy> and made of steel.|a/ae,ea/e,end:y@,o/E",
+"20|@⚓|Don't <s=t=ea=l> the anchor! It's heavy and made of steel.|ea/i:", // reviewed
+"20|@⚓|Don't steal the <a=n/ng=ch/k=or/Er>! It's heavy and made of steel.|a/ae,o/E", // reviewed
+"20|@⚓|Don't steal the anchor! It's <h=ea/e=v=y> and made of steel.|ea/e,end:y@", // reviewed
+"10|@⚓|Don't steal the anchor! It's heavy and made of <s=t=ee=l>.|ee/i:",
+"10|@🌊|Do not <breathe> under <water>|ea/i:,cons:th",
+"20|@🌊|Do not <b=r=ea=th/D=e/x> under water|ea/i:,cons:th", // reviewed
 
-
-// ea=e  di:eae
-"2|bread|slice of <bread>|di:eae",
-"2|zombiehead|zombie <head>|di:eae",
-"2|zombiehead|zombies are <already> dead|di:eae",
-"2|zombiehead|zombies are already <dead>|di:eae",
-"8|zombiehead|<zombie head>|di:eae,end:ie",
-"8|@🦻|Dogs can help <deaf> people|di:eae",
-"5|@☔️|Bad <weather> today|di:eae",
-"4|furnace|The food is <ready>|di:eae",
-"7|@↔️|<instead>|di:eae",
-"4|feather|You can get <a feather> as a morning gift from your cat <when> you wake <up>.|di:eae,cons:th",
-"9|@🌬️|take a <breath>|di:eae,cons:th",
-
-"8|polarbear|<polar bear>|di:eae,tense:o",
-"4|@🧸|teddy <bear>|di:eae",
-
-
-// ow=^U di:ow
-"0|@🏂|He bravely slid <down>|di:ow",
-"3|@🐄|<cow>|di:ow",
-"3|@👑|The king's <crown>|di:ow",
-"3|@📉|<going down>|di:ow",
-"3|@👋🏾|<How> are you?|di:ow",
-"7|@🏙️|going to <town>|di:ow",
-"9|@🥵|I need a <towel>|di:ow",
-"7|fire|You can <put out> fire by <powder> snow, rain, water, <or> a cauldron.|di:ow",
-"4|magmac|Magma cubes <are> fireproof and <jump> like slime blocks. They can <swim> in water, but can also <drown>.|di:ow",
+"8|@🧚‍♂️|<appear>|ea/i:",
 
 
-// ou=^U di:ou
-"3|@🐭|The <mouse> likes cheese|di:ou",
-"0|@🏠|<house>|di:ou",
-"0|@☁️|<cloud>|di:ou",
-"6|horn|It's way <too loud>|di:ou",
-"7|cave|<underground>|di:ou",
-"4|@🪫|The machine <ran out> of battery|di:ou",
-"7|egg|Foxes may <appear> with an egg in their <mouth>. If you drop some food, the fox <will drop> the egg.|di:ou,cons:th,lax:o",
+// ea=e  ea/e
+"2|bread|slice of <bread>|ea/e",
+"2|zombiehead|zombie <head>|ea/e",
+"2|zombiehead|zombies are <already> dead|ea/e",
+"2|zombiehead|zombies are already <dead>|ea/e",
+"8|zombiehead|<zombie head>|ea/e,end:ie",
+"8|@🦻|Dogs can help <deaf> people|ea/e",
+"5|@☔️|Bad <weather> today|ea/e",
+"4|furnace|The food is <ready>|ea/e",
+"7|@↔️|<instead>|ea/e",
+"20|@↔️|<i=n=s=t=ea/e=d>|ea/e", // reviewed
+"4|feather|You can get <a feather> as a morning gift from your cat <when> you wake <up>.|ea/e,cons:th",
+"20|feather|You can get a <f=ea/e=th/D=er/Er> as a morning gift|ea/e,cons:th", // reviewed
+"9|@🌬️|take a <breath>|ea/e,cons:th",
+"20|@🌬️|take a <b=r=ea/e=th/T>|ea/e,cons:th", // reviewed
+
+"8|polarbear|<polar bear>|ea/e,o/EU",
+"4|@🧸|teddy <bear>|ea/e",
+
+
+// ow=^U ow/aU
+"0|@🏂|He bravely slid <down>|ow/aU",
+"3|@🐄|<cow>|ow/aU",
+"3|@👑|The king's <crown>|ow/aU",
+"3|@📉|<going down>|ow/aU",
+"3|@👋🏾|<How> are you?|ow/aU",
+"7|@🏙️|going to <town>|ow/aU",
+"9|@🥵|I need a <towel>|ow/aU",
+"7|fire|You can <put out> fire by <powder> snow, rain, water, <or> a cauldron.|ow/aU",
+"20|fire|You can put out fire by <p=ow/aU=d=er> snow|ow/aU", // reviewed
+"4|magmac|Magma cubes <are> fireproof and <jump> like slime blocks. They can <swim> in water, but can also <drown>.|ow/aU",
+
+
+// ou=^U ou/aU
+"3|@🐭|The <mouse> likes cheese|ou/aU",
+"0|@🏠|<house>|ou/aU",
+"0|@☁️|<cloud>|ou/aU",
+"6|horn|It's way <too loud>|ou/aU",
+"7|cave|<underground>|ou/aU",
+"4|@🪫|The machine <ran out> of battery|ou/aU",
+"7|egg|Foxes may <appear> with an egg in their <mouth>. If you drop some food, the fox <will drop> the egg.|ou/aU,cons:th,o/o",
 
 
 // oa
-"3|@🧥|<coat>|di:oa",
-"3|@🛣|<road>|di:oa",
-"5|@⚽️|<Goal>! shouted everyone.|di:oa",
-"9|boat|<boat>|di:oa",
-"9|coalore|<coal>|di:oa",
-"9|goat|<goat>|di:oa",
-"9|@🍞|<toast>|di:oa",
+"3|@🧥|<coat>|oa/EU",
+"3|@🛣|<road>|oa/EU",
+"5|@⚽️|<Goal>! shouted everyone.|oa/EU",
+"9|boat|<boat>|oa/EU",
+"9|coalore|<coal>|oa/EU",
+"20|coalore|<c=oa/EU=l>|oa/EU", // reviewed
+"9|goat|<goat>|oa/EU",
+"9|@🍞|<toast>|oa/EU",
 
 
-// ow=o@ di:ow@
-"4|@❄️|<snow>|di:ow@",
-"2|bow|<bow>|di:ow@",
-"6|@⛄️|<snowman>|di:ow@",
-"4|frog|Frogs will <follow> you if you hold a slime ball, and you are closer to them than <six> blocks. You can <feed> them.|di:ow@",
-"5|carrot|<Carrots> can heal horses, <donkeys> and mules, and can also make them <grow>, but carrots cannot breed them.|di:ow@,lax:o",
+// ow=o@ ow/EU
+"4|@❄️|<snow>|ow/EU",
+"2|bow|<bow>|ow/EU",
+"6|@⛄️|<snowman>|ow/EU",
+"4|frog|Frogs will <follow> you if you hold a slime ball, and you are closer to them than <six> blocks. You can <feed> them.|ow/EU",
+"4|frog|Frogs will <f=o=ll=ow/EU> you if you hold a slime ball.|ow/EU",
+"5|carrot|<Carrots> can heal horses, <donkeys> and mules, and can also make them <grow>, but carrots cannot breed them.|ow/EU,o/o",
 
 
-// ew=(j)u: di:ew
-"5|@🔩|<screw>|di:ew",
-"1|@📰|good <news>|di:ew",
-"1|@👟|<new> shoes|di:ew",
-"3|@📚|a <few> books|di:ew",
-"9|@😁|I <knew> you could do it!|di:ew",
-"9|@🏞️|What a nice <view>!|di:ew",
+// ew=(j)u: ew/u:
+"5|@🔩|<screw>|ew/u:",
+"1|@📰|good <news>|ew/u:",
+"1|@👟|<new> shoes|ew/u:",
+"3|@📚|a <few> books|ew/u:",
+"20|@📚|a <f=ew/ju:> books|ew/u:", // reviewed
+"9|@😁|I <knew> you could do it!|ew/u:",
+"9|@🏞️|What a nice <view>!|ew/u:",
+"20|@🏞️|What a nice <v=iew/ju:>!|ew/u:", // reviewed
 
-// au=):  di:au
-"7|@🎞️|Let's <pause> the video|di:au",
-"10|@🦕|<dinosaur>|di:au",
-"10|@😾|Just <because>!|di:au",
-"9|fire|<Fire is> extinguished by <powder> snow, rain, water, or a <cauldron>.|di:au,di:ow",
-"7|fire|Fire is <caused by> lightning, lava, <flint> and steel, or <a> fire charge.|di:au",
+// au=):  au/O:
+"7|@🎞️|Let's <pause> the video|au/O:",
+"20|@🎞️|Let's <p=au/O:=se/z> the video|au/O:", // reviewed
+"10|@🦕|<dinosaur>|au/O:",
+"10|@😾|Just <because>!|au/O:",
+"9|fire|<Fire is> extinguished by <powder> snow, rain, water, or a <cauldron>.|au/O:,ow/aU",
+"7|fire|Fire is <caused by> lightning, lava, <flint> and steel, or <a> fire charge.|au/O:",
 
-//      di:aw
-"4|slime|Slimes can <spawn> in swamps when there <is> not much light. They spawn most often on a <full> moon.|di:aw",
-"5|@✏️|<draw>|di:aw",
-"5|raw|<raw>|di:aw",
+//      aw/O:
+"4|slime|Slimes can <spawn> in swamps when there <is> not much light. They spawn most often on a <full> moon.|aw/O:",
+"5|@✏️|<draw>|aw/O:",
+"5|raw|<raw>|aw/O:",
 
-// igh t:igh
-"1|feather@🪶|<light> as a feather|t:igh",
-"3|@🌃|Good <night>!|t:igh",
-"8|frog|When a <frog> eats a magma cube, you get a <froglight>. Different frog types make different coloured <lights>.|t:igh",
-"6|@➡️|turn <right>|t:igh",
-"9|@↕️|<height>|t:igh",
-"7|@➡️|turn <right>|t:igh",
-"7|@🗼|This is way too <high>|t:igh",
-"5|@8️⃣|<eight>|t:igh",
+// igh igh/aI
+"1|feather@🪶|<light> as a feather|igh/aI",
+"3|@🌃|Good <night>!|igh/aI",
+"8|frog|When a <frog> eats a magma cube, you get a <froglight>. Different frog types make different coloured <lights>.|igh/aI",
+"6|@➡️|turn <right>|igh/aI",
+"9|@↕️|<height>|igh/aI",
+"7|@➡️|turn <right>|igh/aI",
+"7|@🗼|This is way too <high>|igh/aI",
+"5|@8️⃣|<eight>|igh/aI",
 
 
 // --- tense monograph ---
 
-// a=eI tense:a
-"0|@🐍|<snake>|tense:a",
-"0|@✈️|<plane>|tense:a",
-"4|@👨‍🦱|<male>|tense:a",
-"5|blaze|<blaze>|tense:a",
-"5|cake|<bake> a cake|tense:a",
-"5|cake|bake a <cake>|tense:a",
-"4|@🌊|<wave>|tense:a",
-"7|@🏷|<nametag>|tense:a",
-"8|chestplate|<chestplate>|tense:a,lax:e,cons:ch:tS",
-"7|arcade|<arcade> machine|tense:a",
+// a=eI a/eI
+"0|@🐍|<snake>|a/eI",
+"0|@✈️|<plane>|a/eI",
+"4|@👨‍🦱|<male>|a/eI",
+"5|blaze|<blaze>|a/eI",
+"5|cake|<bake> a cake|a/eI",
+"5|cake|bake a <cake>|a/eI",
+"4|@🌊|<wave>|a/eI",
+"7|@🏷|<nametag>|a/eI",
+"8|chestplate|<chestplate>|a/eI,e/e,ch/tS",
+"7|arcade|<arcade> machine|a/eI",
 
 
-// a=(I:  tense:aa
-"1|@🛀🏾|I am having a <bath>.|tense:aa",
-"3|grass|<grass>|tense:aa",
-"4|@🍝|<pasta>|a@,tense:aa",
-"3|@🍌|<banana>|a@,tense:aa",
-"2|@🌋|<lava> is hot|a@,tense:aa",
-"6|crafting|<crafting> table|tense:aa",
-"9|enchant|<enchanting> table|tense:aa,cons:ch:tS",
-"0|fire|Fire <is> caused by lightning, <lava>, flint and <steel>, or a fire charge.|tense:aa,di:ee",
-"8|command|<command> block|tense:aa,lax:dbl",
-"7|slime|<Slimes> can spawn in <swamps> when there is not much light. They spawn most <often> on a full <moon>.|tense:aa,di:oo,tense:i",
-"6|@🧺|<basket>|tense:aa,end:et",
-"8|magmac|<Magma> cubes are <fireproof> and jump like slime blocks. They can swim <in water>, but can also drown.|tense:aa,tense:i,a@",
+// a=(I:  a/a:
+"1|@🛀🏾|I am having a <bath>.|a/a:",
+"3|grass|<grass>|a/a:",
+"4|@🍝|<pasta>|a/E,a/a:",
+"3|@🍌|<banana>|a/E,a/a:",
+"2|@🌋|<lava> is hot|a/E,a/a:",
+"6|crafting|<crafting> table|a/a:",
+"9|enchant|<enchanting> table|a/a:,ch/tS",
+"0|fire|Fire <is> caused by lightning, <lava>, flint and <steel>, or a fire charge.|a/a:,ee/i:",
+"8|command|<command> block|a/a:,lax:dbl",
+"7|slime|<Slimes> can spawn in <swamps> when there is not much light. They spawn most <often> on a full <moon>.|a/a:,oo/u:,i/aI",
+"6|@🧺|<basket>|a/a:,end:et",
+"8|magmac|<Magma> cubes are <fireproof> and jump like slime blocks. They can swim <in water>, but can also drown.|a/a:,i/aI,a/E",
 
-// tense:e
-"8|@🇪🇬|<Egypt>|tense:e",
-"3|steve|I am <Steve>|tense:e",
-"0|@👨🏻‍🎤|<He> is a rapper|tense:e,common",
-"0|@👩‍🔧|<She> works in a factory.|tense:e,common",
-"7|@🎞️|Let's pause the <video>|tense:e",
-"9|@🏗|Almost <complete>|tense:e",
+// e/i:
+"8|@🇪🇬|<Egypt>|e/i:",
+"3|steve|I am <Steve>|e/i:",
+"0|@👨🏻‍🎤|<He> is a rapper|e/i:,common",
+"0|@👩‍🔧|<She> works in a factory.|e/i:,common",
+"7|@🎞️|Let's pause the <video>|e/i:",
+"9|@🏗|Almost <complete>|e/i:",
 
-// i=aI tense:i
-"1|@🌞|The sun <shines>.|tense:i",
-"1|@🐭|The mouse <likes> cheese|tense:i",
-"0|@🌽|I <like> corn|tense:i",
-"0|carrot@🥕|I would <like> a carrot.|tense:i",
-"2|@🕰️|A bit of <time>, please|tense:i",
-"4|@🛝|<slide>|tense:i",
-"6|@🧊|cold <ice>|tense:i,cons:cs",
-"8|itemframe|<item frame>|tense:i,tense:a",
-"6|@📦|A package <arrived>.|tense:i",
-"10|jungle|jungle <biome>|tense:i",
-"0|@🍟|<I> want chips with ketchup!|tense:i,common",
-"6|@🧗|<climb> up|tense:i",
-"6|@🪜|<climb up> the ladder|tense:i,lax:u",
-"9|@🏆|first <prize>|tense:i",
-"9|dripstone|<spike>|tense:i",
-"9|pipe|<pipe>|tense:i",
-"10|@🕵️‍♀️|'Please <continue>!' said the detective, and the witness <described> the thief.|tense:u,tense:i",
-"10|@🕵️‍♀️|'Please continue!' said the <detective>, and the witness described the <thief>.|lax:e,cons:th",
-// y=aI tense:y
-"0|@😢|<cry>|tense:y",
-"0|@🪰|<fly>|tense:y",
-"0|@🏜️|too <dry>|tense:y",
+// i=aI i/aI
+"1|@🌞|The sun <shines>.|i/aI",
+"1|@🐭|The mouse <likes> cheese|i/aI",
+"0|@🌽|I <like> corn|i/aI",
+"0|carrot@🥕|I would <like> a carrot.|i/aI",
+"2|@🕰️|A bit of <time>, please|i/aI",
+"4|@🛝|<slide>|i/aI",
+"6|@🧊|cold <ice>|i/aI,c/s",
+"8|itemframe|<item frame>|i/aI,a/eI",
+"6|@📦|A package <arrived>.|i/aI",
+"10|jungle|jungle <biome>|i/aI",
+"0|@🍟|<I> want chips with ketchup!|i/aI,common",
+"6|@🧗|<climb> up|i/aI",
+"6|@🪜|<climb up> the ladder|i/aI,u/A",
+"9|@🏆|first <prize>|i/aI",
+"9|dripstone|<spike>|i/aI",
+"9|pipe|<pipe>|i/aI",
+"10|@🕵️‍♀️|'Please <continue>!' said the detective, and the witness <described> the thief.|u/u:,i/aI",
+"10|@🕵️‍♀️|'Please continue!' said the <detective>, and the witness described the <thief>.|e/e,cons:th",
+// y=aI y/aI
+"0|@😢|<cry>|y/aI",
+"0|@🪰|<fly>|y/aI",
+"0|@🏜️|too <dry>|y/aI",
 
-"1|fire@🔥|<Fire> is hot|tense:i",
+"1|fire@🔥|<Fire> is hot|i/aI",
 
 
-// o=oU tense:o
-"0|@🌹|red <rose>|tense:o",
-"0|@🏨|Sleep in a <hotel>|tense:o",
-"0|@🏡|<home>|tense:o",
-"3|@👃🏻|<nose>|tense:o",
-"3|@⛏|It can break <stone>|tense:o",
-"3|@🦴|<bone>|tense:o",
-"4|@🤨|The car <broke> down again. Typical.|tense:o",
-"8|cocoa|<cocoa>|tense:o,di:oa",
-"7|@🏤|<post office>|tense:o,cons:cs",
-"10|badomen|<bad omen>|tense:o",
-"8|@🛣|<motorway>|tense:o,di:ay",
-"5|@🤖|<robot>|tense:o",
-"5|@🤏|It was this <close>!|tense:o",
-"10|@🔬|You <need> a <microscope> to see things that are <very> small.|tense:o,di:ee",
-"10|@🔭|You can <see> the other <planets> in the Solar System with a <telescope>.|tense:o,di:ee,lax:a",
-"10|@🫏|Today he <rides> a horse. Yesterday he <rode> a <donkey>.|tense:o,tense:i,lax:o,end:ey",
+// o=oU o/EU
+"0|@🌹|red <rose>|o/EU",
+"0|@🏨|Sleep in a <hotel>|o/EU",
+"0|@🏡|<home>|o/EU",
+"3|@👃🏻|<nose>|o/EU",
+"20|@👃🏻|<n=o/EU=se/z>|o/EU", // reviewed
+"3|@⛏|It can break <stone>|o/EU",
+"3|@🦴|<bone>|o/EU",
+"4|@🤨|The car <broke> down again. Typical.|o/EU",
+"20|@🤨|The car <b=r=o/EU=k=e/x> down again. Typical.|o/EU", // reviewed
+"8|cocoa|<cocoa>|o/EU,oa/EU",
+"20|cocoa|<c=o/EU=c=oa/EU>|o/EU,oa/EU", // reviewed
+"7|@🏤|<post office>|o/EU,c/s",
+"20|@🏤|post <o/o=ff=i=ce/s>|o/o,c/s", // reviewed
+"10|badomen|<bad omen>|o/EU",
+"8|@🛣|<motorway>|o/EU,ay/eI",
+"20|@🛣|<m=o/EU=t=or/E=w=ay/eI>|o/EU,ay/eI", // reviewed
+"5|@🤖|<robot>|o/EU",
+"5|@🤏|It was this <close>!|o/EU",
+"20|@🤏|It was this <c=l=o/EU=s/s=e/x>!|o/EU", // reviewed
+"10|@🔬|You <need> a <microscope> to see things that are <very> small.|o/EU,ee/i:",
+"10|@🔭|You can <see> the other <planets> in the Solar System with a <telescope>.|o/EU,ee/i:,a/ae",
+"10|@🫏|Today he <rides> a horse. Yesterday he <rode> a <donkey>.|o/EU,i/aI,o/o,end:ey",
 
-// u=ju:  tense:u
-"4|grass|<cube>|tense:u",
-"7|frog|Frogs live <in swamps>. They use their <long> tongues to eat small slimes and <small> magma <cubes>.|dark:al,tense:u",
-"7|@📏|<ruler>|end:er,tense:u",
-"8|cat|Cats are <good> to <chase> away phantoms and creepers. Black cats are only born <during> full moon.|tense:a,tense:u,cons:ch:tS",
-"4|@📏|one <unit>|tense:u",
-"8|@🇬🇧|<United> Kingdom|tense:u",
-"9|chick|So <cute>!|tense:u",
-"9|@🔇|The television is <muted>|tense:u",
+// u=ju:  u/u:
+"4|grass|<cube>|u/u:",
+"7|frog|Frogs live <in swamps>. They use their <long> tongues to eat small slimes and <small> magma <cubes>.|dark:al,u/u:",
+"7|@📏|<ruler>|er/Er,u/u:",
+"20|@📏|<r=u/u:=l=er>|er/Er,u/u:", // reviewed
+"8|cat|Cats are <good> to <chase> away phantoms and creepers. Black cats are only born <during> full moon.|a/eI,u/u:,ch/tS",
+"20|cat|Black cats are only born <d=u/ju:=r=ing> full moon.|u/u:", // reviewed
+"4|@📏|one <unit>|u/u:",
+"20|@📏|one <u/ju:=n=i/I=t>|u/u:", // reviewed
+"8|@🇬🇧|<United> Kingdom|u/u:",
+"20|@🇬🇧|<U/ju:=n=i/aI=t=e/I=d> Kingdom|u/u:", // reviewed
+"9|chick|So <cute>!|u/u:",
+"20|chick|So <c=u/ju:=t=e/x>!|u/u:", // reviewed
+"9|@🔇|The television is <muted>|u/u:",
+"20|@🔇|The television is <m=u/ju:=t=ed>|u/u:", // reviewed
 
 // ---- breaking, darkening ------
 
@@ -838,9 +1121,9 @@
 "2|trapdoor|Mobs <think> all trapdoors are closed, and <fall> through open trapdoors. You can use this to <make> a trap.|cons:th,dark:al",
 "4|trapdoor|Mobs think all trapdoors are closed, and <fall> through open <trapdoors>. You can use this <to make> a trap.|dark:al",
 "4|@🚶‍♀️‍➡️|She is <walking>.|dark:al",
-"9|@🔐|My date of birth is <personal>|dark:al,br:er3",
-"9|@🇫🇷|Paris is the <capital> of France.|dark:al,lax:a",
-"9|@🇩🇪|Berlin is the <capital> for Germany.|dark:al,lax:a",
+"9|@🔐|My date of birth is <personal>|dark:al,er/3:",
+"9|@🇫🇷|Paris is the <capital> of France.|dark:al,a/ae",
+"9|@🇩🇪|Berlin is the <capital> for Germany.|dark:al,a/ae",
 
 // ol  dark:ol
 "1|@⛳️|play <golf>|dark:ol",
@@ -848,95 +1131,96 @@
 "0|@🪙|<gold> coin|dark:ol",
 "3|@🧊|<cold> ice|dark:ol",
 
-// or=):  br:or
-"1|@🐴|<horse>|br:or",
-"1|@🌽|I like <corn>|br:or",
-"6|@🌅|early <morning>|br:or",
-"3|door@🚪|<door>|br:or",
-"8|trapdoor|Mobs think all <trapdoors> are closed, and fall <through> open trapdoors. You can use this to make a <trap>.|br:or,cons:th",
-"7|@🍿|<popcorn>|br:or",
-"8|copperore|copper <ore>|br:or",
-"1|@🙅🏼‍♂️|I don't want any <more>!|br:or",
-"8|cporkc|cooked <porkchop>|br:or,cons:ch:tS",
-"5|carrot|Carrots can heal <horses>, donkeys and mules, and can also <make> them grow, but carrots <cannot> breed them.|br:or",
-"1|feather|You can get a feather as a <morning> gift from your <cat> when you <wake> up.|br:or",
-"6|netherportal|nether <portal>|br:or,end:al@",
-"1|carrot|In the Java version of Minecraft, there is a <bug>, and skeleton <horses> can also eat carrots.|lax:u,br:or",
+// or=):  or/O:
+"1|@🐴|<horse>|or/O:",
+"1|@🌽|I like <corn>|or/O:",
+"6|@🌅|early <morning>|or/O:",
+"20|@🌅|early <m=or=n=ing>|or/O:", // reviewed
+"3|door@🚪|<door>|or/O:",
+"8|trapdoor|Mobs think all <trapdoors> are closed, and fall <through> open trapdoors. You can use this to make a <trap>.|or/O:,cons:th",
+"7|@🍿|<popcorn>|or/O:",
+"8|copperore|copper <ore>|or/O:",
+"1|@🙅🏼‍♂️|I don't want any <more>!|or/O:",
+"8|cporkc|cooked <porkchop>|or/O:,ch/tS",
+"5|carrot|Carrots can heal <horses>, donkeys and mules, and can also <make> them grow, but carrots <cannot> breed them.|or/O:",
+"1|feather|You can get a feather as a <morning> gift from your <cat> when you <wake> up.|or/O:",
+"6|netherportal|nether <portal>|or/O:,end:al@",
+"1|carrot|In the Java version of Minecraft, there is a <bug>, and skeleton <horses> can also eat carrots.|u/A,or/O:",
 
-// ar=(]:  br:ar
-"1|@🦈|<shark>|br:ar",
-"1|@💳|pay by <card>|br:ar",
-"1|@🚗|<car>|br:ar",
-"4|@🧣|warm <scarf>|br:ar",
-"1|@🚓|police <car>|br:ar",
-"1|mushroom|If you <put> a small mushroom on <top> of a full block where it is <dark>, it can <grow> into a huge mushroom.|br:ar,di:ow@",
+// ar=(]:  ar/a:
+"1|@🦈|<shark>|ar/a:",
+"1|@💳|pay by <card>|ar/a:",
+"1|@🚗|<car>|ar/a:",
+"4|@🧣|warm <scarf>|ar/a:",
+"1|@🚓|police <car>|ar/a:",
+"1|mushroom|If you <put> a small mushroom on <top> of a full block where it is <dark>, it can <grow> into a huge mushroom.|ar/a:,ow/EU",
 
-// ir=3:  br:ir
-"3|@👕|<shirt>|br:ir",
-"6|@🎂|It is my <birthday>!|br:ir,di:ay",
+// ir=3:  ir/3:
+"3|@👕|<shirt>|ir/3:",
+"6|@🎂|It is my <birthday>!|ir/3:,ay/eI",
 
-// or=3:  br:or3
-"3|@🧑‍🍳|The chef <works> in the kitchen|br:or3",
-"3|@🌍|the whole <world>|br:or3",
+// or=3:  or/3:
+"3|@🧑‍🍳|The chef <works> in the kitchen|or/3:",
+"3|@🌍|the whole <world>|or/3:",
 
-// ur=3:   br:ur3
-"3|@🛞|The wheel <turns>.|br:ur3",
-"4|cat|<Cats> do not get <hurt> by falling, <and> they can <see> you even if you are invisible.|br:ur3,di:ee",
-"6|@🖼|<picture>|br:ur3,cons:tur:tS",
-"6|@➡️|<turn> right|br:ur3",
-"7|fire|The fire <burns>|br:ur3",
-"8|@🗼|Is this the tallest <structure>?|br:ur3,lax:u,cons:tur:tS",
+// ur=3:   ur/3:
+"3|@🛞|The wheel <turns>.|ur/3:",
+"4|cat|<Cats> do not get <hurt> by falling, <and> they can <see> you even if you are invisible.|ur/3:,ee/i:",
+"6|@🖼|<picture>|ur/3:,tur/tS",
+"6|@➡️|<turn> right|ur/3:",
+"7|fire|The fire <burns>|ur/3:",
+"8|@🗼|Is this the tallest <structure>?|ur/3:,u/A,tur/tS",
 
-//   br:ea:i@
-"3|@👂|<ear>|br:ea:i@",
-"3|@🦻🏽|I <hear> you|br:ea:i@",
-"3|@🗓️|A <year> later|br:ea:i@",
+//   ea/IE
+"3|@👂|<ear>|ea/IE",
+"3|@🦻🏽|I <hear> you|ea/IE",
+"3|@🗓️|A <year> later|ea/IE",
 
-// air = e@   br:ai:e@
-"7|@💇🏾‍♂️|Adam needs a <haircut>.|br:ai:e@,lax:u",
-"6|@☴|<air>|br:ai:e@",
-"6|@👱‍♀️|long <hair>|br:ai:e@",
-"6|@😡|It's not <fair>!|br:ai:e@",
-"6|@🧑🏽‍🐰‍🧑🏼|<pair>|br:ai:e@",
+// air = e@   ai/eE
+"7|@💇🏾‍♂️|Adam needs a <haircut>.|ai/eE,u/A",
+"6|@☴|<air>|ai/eE",
+"6|@👱‍♀️|long <hair>|ai/eE",
+"6|@😡|It's not <fair>!|ai/eE",
+"6|@🧑🏽‍🐰‍🧑🏼|<pair>|ai/eE",
 
 // --------- schwa -------------------
 
-// er$  end:er
-"3|@🏞️|<river>|end:er,lax:i",
-"7|@🪜|climb up the <ladder>|end:er,lax:dbl,lax:a",
-"6|@🕷|<spider>|end:er,tense:i",
-"0|pillager|The village is <under> attack!|end:er,lax:u",
-"0|trial|There's something <under> me!|end:er",
+// er$  er/Er
+"3|@🏞️|<river>|er/Er,i/I",
+"7|@🪜|climb up the <ladder>|er/Er,lax:dbl,a/ae",
+"6|@🕷|<spider>|er/Er,i/aI",
+"0|pillager|The village is <under> attack!|er/Er,u/A",
+"0|trial|There's something <under> me!|er/Er",
 "5|trial|There's <something> under me!|cons:th",
-"8|@😯|<beginner>|end:er,lax:dbl",
-"8|@🚁|<helicopter>|end:er",
-"3|@📎|<paper> clip|end:er,tense:a",
-"7|@🪶|light as a <feather>|end:er,cons:th,di:eae",
+"8|@😯|<beginner>|er/Er,lax:dbl",
+"8|@🚁|<helicopter>|er/Er",
+"3|@📎|<paper> clip|er/Er,a/eI",
+"7|@🪶|light as a <feather>|er/Er,cons:th,ea/e",
 
-// breaking er=3:  br:er3
-"7|@🏜️|<desert>|br:er3",
-"8|@😎|He is an <expert>.|br:er3",
-"8|@🌠|<universe>|br:er3,tense:u",
-"9|@🎓|He goes to <university>|br:er3,tense:u,end:y@",
+// breaking er=3:  er/3:
+"7|@🏜️|<desert>|er/3:",
+"8|@😎|He is an <expert>.|er/3:",
+"8|@🌠|<universe>|er/3:,u/u:",
+"9|@🎓|He goes to <university>|er/3:,u/u:,end:y@",
 
 // y  end:y@
-"3|@👶|<baby>|end:y@,tense:a",
+"3|@👶|<baby>|end:y@,a/eI",
 "3|@👨🏻‍🍼|feeding the <baby>|end:y@",
-"8|@🕵️|<mystery>|end:y@,lax:y",
-"8|@🕵️|It's a <mystery>|end:y@,lax:y",
-"8|@🏭|She works in a <factory>.|end:y@,lax:a",
-"1|@🍬|sweet <candy>|end:y@,lax:a",
-"7|@🪫|The machine ran out of <battery>|end:y@,lax:a,lax:dbl",
+"8|@🕵️|<mystery>|end:y@,y/I",
+"8|@🕵️|It's a <mystery>|end:y@,y/I",
+"8|@🏭|She works in a <factory>.|end:y@,a/ae",
+"1|@🍬|sweet <candy>|end:y@,a/ae",
+"7|@🪫|The machine ran out of <battery>|end:y@,a/ae,lax:dbl",
 
 // end:ie
 "7|@🛡|<shield>|end:ie",
 
 // end:et
-"7|@🎺|<trumpet>|lax:u,end:et",
-"6|@🤫|Keep it a <secret>!|lax:u,end:et",
-"2|waterbucket|<water bucket>|lax:u,end:et,end:er",
-"2|waterbucket|water <bucket>|lax:u,end:et",
-"8|axolotl|An axolotl is an aquatic mob <found in> lush caves and sometimes in <buckets>. It can assist you in <combat>.|lax:u,end:et,di:ou",
+"7|@🎺|<trumpet>|u/A,end:et",
+"6|@🤫|Keep it a <secret>!|u/A,end:et",
+"2|waterbucket|<water bucket>|u/A,end:et,er/Er",
+"2|waterbucket|water <bucket>|u/A,end:et",
+"8|axolotl|An axolotl is an aquatic mob <found in> lush caves and sometimes in <buckets>. It can assist you in <combat>.|u/A,end:et,ou/aU",
 
 
 // end:ot
@@ -945,128 +1229,128 @@
 
 //   end:al@
 "8|@🤨|The car broke down again. <Typical>.|end:al@",
-"7|fox|A fox hunts small <animals>, and can carry items in its <mouth>. It runs away if you are not <sneaking>.|end:al@,di:ou,di:ea",
+"7|fox|A fox hunts small <animals>, and can carry items in its <mouth>. It runs away if you are not <sneaking>.|end:al@,ou/aU,ea/i:",
 "6|@🏥|<hospital>|end:al@",
 
 
-// o  o@
-"5|@🖍|<crayon>|lax:a,o@",
-"8|poison|<poison>|di:oi,o@",
-"2|@🍋|<lemon>|o@,lax:e",
-"6|skeletonskull|<skeleton> skull|o@,lax:e",
-"7|trapdoor|Trapdoors <can> be moved by <pistons>. They also block flowing water and <lava>.|a@,o@,tense:aa",
-"6|melons|<melon slice>|o@,cons:cs",
-"4|@🎹|play the <piano>|o@",
-"6|cat|You can make <a cat> sit or stand <by> pressing the use <button> on it. Then the cat does not teleport.|lax:u,lax:a,lax:dbl,o@",
-"8|carrot|In the Java <version> of <Minecraft>, there is a bug, and <skeleton> horses can also eat carrots.|o@,end:er",
-"7|diamond@💎|<diamond>|o@,tense:i",
-"6|@🐇|Rabbits like <carrots>.|o@,lax:dbl",
-"8|@🇪🇺|European <Union>|o@,tense:u",
+// o  o/E
+"5|@🖍|<crayon>|a/ae,o/E",
+"8|poison|<poison>|oi/OI,o/E",
+"2|@🍋|<lemon>|o/E,e/e",
+"6|skeletonskull|<skeleton> skull|o/E,e/e",
+"7|trapdoor|Trapdoors <can> be moved by <pistons>. They also block flowing water and <lava>.|a/E,o/E,a/a:",
+"6|melons|<melon slice>|o/E,c/s",
+"4|@🎹|play the <piano>|o/E",
+"6|cat|You can make <a cat> sit or stand <by> pressing the use <button> on it. Then the cat does not teleport.|u/A,a/ae,lax:dbl,o/E",
+"8|carrot|In the Java <version> of <Minecraft>, there is a bug, and <skeleton> horses can also eat carrots.|o/E,er/3:",
+"7|diamond@💎|<diamond>|o/E,i/aI",
+"6|@🐇|Rabbits like <carrots>.|o/E,lax:dbl",
+"8|@🇪🇺|European <Union>|o/E,u/u:",
 
-"6|@🪞|<mirror>|o@",
-"6|@🚜|<tractor>|o@,lax:a",
-"7|@🖥|system <error>|o@,lax:dbl",
-"8|@👩🏽‍🏫|<instructor>|o@,lax:u",
+"6|@🪞|<mirror>|o/E",
+"6|@🚜|<tractor>|o/E,a/ae",
+"7|@🖥|system <error>|o/E,lax:dbl",
+"8|@👩🏽‍🏫|<instructor>|o/E,u/A",
 
-"8|@🔣|<symbol>|o@",
+"8|@🔣|<symbol>|o/E",
 
-// a  a@
-"4|@🍕|I love <pizza>|a@,lax:dbl,lax:i",
+// a  a/E
+"4|@🍕|I love <pizza>|a/E,lax:dbl,i/I",
 
 //  end:le
-"0|crafting|crafting <table>|end:le,tense:a",
-"5|@👨🏾‍💼|His father's brother is his <uncle>|end:le,lax:u",
+"0|crafting|crafting <table>|end:le,a/eI",
+"5|@👨🏾‍💼|His father's brother is his <uncle>|end:le,u/A",
 "8|jungle|<jungle> biome|end:le",
-"7|turtle|<turtle>|end:le,br:ur3",
-"7|cat|Cats do not <get hurt> by falling, and they can see you <even> if you are <invisible>.|end:le,br:ur3",
+"7|turtle|<turtle>|end:le,ur/3:",
+"7|cat|Cats do not <get hurt> by falling, and they can see you <even> if you are <invisible>.|end:le,ur/3:",
 
 
 // ------- consonants -------------------
 
-// g=dZ  cons:gZ
-"5|pillager|The <village> is under attack!|cons:dZ,lax:dbl",
-"5|pillager|<pillager>|cons:dZ",
-"6|@📦|A <package> arrived.|cons:dZ",
-"8|@🦒|The <giraffe> is tall.|cons:dZ",
-"4|mushroom|If you put a <small> mushroom on top of a full block <where> it is dark, it can grow into a <huge> mushroom.|dark:al,cons:gZ,tense:u",
-"6|diamond|You need diamonds to make <fireworks> and smithing templates to decorate the <edges> of your armour.|cons:gZ,tense:i",
-"6|sign|If you wax a <sign>, no player can <change> the text on it. Use dyes and <glow> ink to change how the text looks.|tense:a,cons:gZ,di:ow@,cons:ch:tS",
+// g=dZ  g/dZ
+"5|pillager|The <village> is under attack!|dge/dZ,lax:dbl",
+"5|pillager|<pillager>|dge/dZ",
+"6|@📦|A <package> arrived.|dge/dZ",
+"8|@🦒|The <giraffe> is tall.|dge/dZ",
+"4|mushroom|If you put a <small> mushroom on top of a full block <where> it is dark, it can grow into a <huge> mushroom.|dark:al,g/dZ,u/u:",
+"6|diamond|You need diamonds to make <fireworks> and smithing templates to decorate the <edges> of your armour.|g/dZ,i/aI",
+"6|sign|If you wax a <sign>, no player can <change> the text on it. Use dyes and <glow> ink to change how the text looks.|a/eI,g/dZ,ow/EU,ch/tS",
 
-// ck cons:ck
-"2|@🪨|<rock>|cons:ck",
-"2|@🔒|<lock>|cons:ck",
-"2|@🧦|<socks>|cons:ck",
-"3|@⬛️|<black>|cons:ck",
-"3|chick@🐤|<chick>|cons:ck,cons:ch:tS",
-"8|command|command <block>|cons:ck",
-"4|pillager|The village is under <attack>!|lax:dbl,cons:ck",
+// ck ck/k
+"2|@🪨|<rock>|ck/k",
+"2|@🔒|<lock>|ck/k",
+"2|@🧦|<socks>|ck/k",
+"3|@⬛️|<black>|ck/k",
+"3|chick@🐤|<chick>|ck/k,ch/tS",
+"8|command|command <block>|ck/k",
+"4|pillager|The village is under <attack>!|lax:dbl,ck/k",
 
 // th  cons:th
 "1|@📦|It's a <thing>|cons:th",
 "1|@💥|Some<thing> went horribly wrong|cons:th",
 "5|@👍🏿|<thumb>|cons:th",
 "3|@👄|<mouth>|cons:th",
-"8|@🪥|<toothbrush>|cons:th,di:oo",
+"8|@🪥|<toothbrush>|cons:th,oo/u:",
 "6|trial|<There's> something under me!|cons:th",
-"0|@👦|my <brother>|cons:th,end:er",
+"0|@👦|my <brother>|cons:th,er/Er",
 "6|@📥|There was <nothing> in the tray.|cons:th",
 
-// ph  cons:ph
-"2|@📱|Call the <phone>|cons:ph",
-"9|phantom|<phantom>|cons:ph",
-"6|@🐬|The <dolphin> likes fish.|cons:ph",
-"10|sulphurc|<sulphur> cube|cons:ph",
-"10|cat|Cats are good <to chase> away <phantoms> and creepers. Black cats are only born during <full moon>.|cons:ph,cons:ch:tS",
+// ph  ph/f
+"2|@📱|Call the <phone>|ph/f",
+"9|phantom|<phantom>|ph/f",
+"6|@🐬|The <dolphin> likes fish.|ph/f",
+"10|sulphurc|<sulphur> cube|ph/f",
+"10|cat|Cats are good <to chase> away <phantoms> and creepers. Black cats are only born during <full moon>.|ph/f,ch/tS",
 
 
-// wh  cons:wh
-"4|@🛞|The <wheel> turns.|cons:wh",
-"2|@🚻|<Where> is the toilet?|cons:wh",
-"2|@🗺|<Where> are we?|cons:wh",
-"3|@⬜️|<white>|cons:wh,tense:i",
+// wh  wh/w
+"4|@🛞|The <wheel> turns.|wh/w",
+"2|@🚻|<Where> is the toilet?|wh/w",
+"2|@🗺|<Where> are we?|wh/w",
+"3|@⬜️|<white>|wh/w,i/aI",
 
-// c=s  cons:cs
-"6|@🚓|<police> car|cons:cs",
-"8|sign|You can <burn> overworld signs in a <furnace>. Nether signs (crimson and warped) <cannot be> used as fuel.|cons:cs,br:ur3",
-"0|bread|<slice> of bread|cons:cs,tense:i",
-"9|@🏞️|What a <nice> view!|cons:cs,tense:i",
+// c=s  c/s
+"6|@🚓|<police> car|c/s",
+"8|sign|You can <burn> overworld signs in a <furnace>. Nether signs (crimson and warped) <cannot be> used as fuel.|c/s,ur/3:",
+"0|bread|<slice> of bread|c/s,i/aI",
+"9|@🏞️|What a <nice> view!|c/s,i/aI",
 
 
-// $kn  beg:kn
-"4|@🪢|<knot>|beg:kn",
-"3|@🤷🏼|I don't <know>|beg:kn,di:ow@",
-"3|@♞|<knight>|beg:kn,t:igh",
-"5|bookshelf|<knowledge> is <power>|beg:kn,cons:gZ",
+// $kn  kn/n
+"4|@🪢|<knot>|kn/n",
+"3|@🤷🏼|I don't <know>|kn/n,ow/EU",
+"3|@♞|<knight>|kn/n,igh/aI",
+"5|bookshelf|<knowledge> is <power>|kn/n,g/dZ",
 
-// $wr  beg:wr
-"4|@💥|Something went horribly <wrong>|beg:wr",
-"10|quill|<write> a book|beg:wr,tense:i",
+// $wr  wr/r
+"4|@💥|Something went horribly <wrong>|wr/r",
+"10|quill|<write> a book|wr/r,i/aI",
 
-// ch=S   cons:chS
-"6|@🧑‍🍳|The <chef> works in the <kitchen>|cons:chS,cons:ch:tS",
-//"6|@🧑‍🍳|The <chef> works in the kitchen|cons:chS",
-"6|@🪫|The <machine> ran out of battery|cons:chS",
-"6|arcade|arcade <machine>|cons:chS",
-"6|@🤖|Silly <machine>!|cons:chS",
-//"9|@🥸|fake <moustache>|cons:chS",
-"9|@🥸|The <spy> put on a fake <moustache>|cons:chS",
+// ch=S   ch/S
+"6|@🧑‍🍳|The <chef> works in the <kitchen>|ch/S,ch/tS",
+//"6|@🧑‍🍳|The <chef> works in the kitchen|ch/S",
+"6|@🪫|The <machine> ran out of battery|ch/S",
+"6|arcade|arcade <machine>|ch/S",
+"6|@🤖|Silly <machine>!|ch/S",
+//"9|@🥸|fake <moustache>|ch/S",
+"9|@🥸|The <spy> put on a fake <moustache>|ch/S",
 
-// ti=S  cons:ti
-"8|potion|<potion>|cons:ti",
-//"10|levitation|<levitation>|cons:ti",
-"10|levitation|The <wizard> tried <levitation> and bumped his <head> in a cloud|cons:ti",
-//"8|@🏃🏾‍♂️‍➡️|<competition>|cons:ti",
-"8|@🏃🏾‍♂️‍➡️|He <won> the <competition>|cons:ti",
-"9|tnt|<destruction>|cons:ti",
-"8|@🏗️|He works in <construction> building <houses>.|cons:ti,lax:u",
-"8|@🖥️|The <computer> received an <instruction>|cons:ti,lax:u",
-//"9|@💌|<invitation>|cons:ti",
-"9|@💌|I <received> an <invitation> to the party|cons:ti",
+// ti=S  ti/S
+"8|potion|<potion>|ti/S",
+//"10|levitation|<levitation>|ti/S",
+"10|levitation|The <wizard> tried <levitation> and bumped his <head> in a cloud|ti/S",
+//"8|@🏃🏾‍♂️‍➡️|<competition>|ti/S",
+"8|@🏃🏾‍♂️‍➡️|He <won> the <competition>|ti/S",
+"9|tnt|<destruction>|ti/S",
+"8|@🏗️|He works in <construction> building <houses>.|ti/S,u/A",
+"8|@🖥️|The <computer> received an <instruction>|ti/S,u/A",
+//"9|@💌|<invitation>|ti/S",
+"9|@💌|I <received> an <invitation> to the party|ti/S",
 
 
 // ly$   end:ly
 "8|@🏂|He <bravely> slid down|end:ly",
-"8|@😸|<Finally> the cat had enough to eat|end:ly,tense:i",
+"8|@😸|<Finally> the cat had enough to eat|end:ly,i/aI",
 "9|@🤫|We must meet <secretly>|end:ly",
 "8|@🌤|Summers are <usually> sometimes hot|end:ly",
 "6|@🤸🏾‍♀️|She can do it <easily>|end:ly",
@@ -1078,7 +1362,7 @@
 "3|@🧸|<teddy>|lax:dbl,end:y@",
 "0|@😀|I am <happy>|lax:dbl,end:y@",
 "0|@🎾|play <tennis>|lax:dbl",
-"4|@🌤|<Summer>s are usually sometimes hot|lax:dbl,lax:u",
+"4|@🌤|<Summer>s are usually sometimes hot|lax:dbl,u/A",
 "6|@🐇|<Rabbits> like carrots.|lax:dbl",
 "4|carrot@🥕|I would like a <carrot>.|lax:dbl",
 "8|@🤔|<forgetting>|lax:dbl",
@@ -1095,8 +1379,8 @@
 "5|@🤷🏼|I <don't> know|common",
 "0|trial|There's something under <me>!|common",
 "0|feather@🪶|light <as a> feather|common",
-"4|@🏖|<We are> going on a holiday!|tense:e,common",
-"3|@🚶‍♀️‍➡️|<She is> walking.|tense:e,common",
+"4|@🏖|<We are> going on a holiday!|e/i:,common",
+"3|@🚶‍♀️‍➡️|<She is> walking.|e/i:,common",
 "4|@🗺|Where <are we>?|common",
 "4|carrot@🥕|I <would> like a carrot.|common",
 "3|@🗺️|We are <here>.|common",
@@ -1106,25 +1390,25 @@
 "3|@🫂|I love <you>|common",
 "3|@🤸🏾‍♀️|She <can do it> easily|common",
 "3|@🤫|<We must> meet secretly|common",
-"0|@👦|<my> brother|tense:y",
-"2|@🎂|It is <my> birthday!|tense:y",
+"0|@👦|<my> brother|y/aI",
+"2|@🎂|It is <my> birthday!|y/aI",
 "0|@💥|<Some>thing went horribly wrong|common",
 "2|@🎮|<Come> on, let's play!|common",
 "3|@🍟|<I want> chips!|common",
 "3|@🏖|We are <going> on a holiday!|common",
-"2|@💥|Something <went> horribly wrong|lax:e",
+"2|@💥|Something <went> horribly wrong|e/e",
 
 "6|pillager|<The> village is under attack!|common,cons:th",
 "3|@📥|There was nothing <in the> tray.|common,cons:th",
 "6|@📥|<There was> nothing in the tray.|common,cons:th",
 "4|@🚻|Where <is the> toilet?|common,cons:th",
-"5|frog|Frogs will follow you if you hold a slime ball, and <you are> closer to them <than> six blocks. You <can feed> them.|common,di:ee",
+"5|frog|Frogs will follow you if you hold a slime ball, and <you are> closer to them <than> six blocks. You <can feed> them.|common,ee/i:",
 
 "1|trapdoor|Trapdoors <can> be moved <by> pistons. <They> also block flowing water and lava.|common",
-"1|frog|Frogs <will> follow you if <you> hold a slime ball, and you are closer to them than six blocks. You can <feed> them.|common,di:ee",
+"1|frog|Frogs <will> follow you if <you> hold a slime ball, and you are closer to them than six blocks. You can <feed> them.|common,ee/i:",
 "4|carrot|In the Java version of Minecraft, <there is> a bug, and skeleton horses <can also> eat carrots.|common,cons:th",
 "2|egg|Foxes may appear with <an> egg in <their> mouth. If you drop <some> food, the fox will drop the egg.|common",
-"1|egg|Foxes may appear <with> an egg in their mouth. If <you> drop some food, the fox <will> drop the egg.|common,lax:i",
+"1|egg|Foxes may appear <with> an egg in their mouth. If <you> drop some food, the fox <will> drop the egg.|common,i/I",
 
 
 // Tricky words  tricky
@@ -1134,9 +1418,9 @@
 "6|@👁|<eye>|tricky",
 "4|@👩‍🦰|one <woman>|tricky",
 "6|@👭|two <women>|tricky",
-"6|@💧|<water>|tricky,end:er",
-"6|@🍉|<watermelon>|tricky,end:er",
-"2|waterbucket|<water> bucket|end:er,tricky",
+"6|@💧|<water>|tricky,er/Er",
+"6|@🍉|<watermelon>|tricky,er/Er",
+"2|waterbucket|<water> bucket|er/Er,tricky",
 "8|@😸|Finally the cat had <enough> to eat|tricky",
 "4|@🤨|The car broke down <again>.|tricky",
 "5|sign@🪧|<sign>|tricky",
@@ -1147,7 +1431,7 @@
 // ear=(]:
 "6|@❤️|<heart>|tricky",
 "2|@👞|<shoe>|tricky",
-"5|witch|<witch>|tricky,cons:ch:tS",
+"5|witch|<witch>|tricky,ch/tS",
 // ea=eI .....
 "4|pickaxe@⛏|It can <break> stone|tricky",
 // ou ......
@@ -1155,24 +1439,24 @@
 // ey=i: di:eyi
 "4|@🔑|<key>|tricky,end:ey",
 
-"4|@😾|This cat <is angry>.|end:y@,lax:a",
-"4|cat|<Cats are> good to chase away phantoms and creepers. <Black> cats are <only> born during full moon.|cons:ck,end:y@",
-"8|cat|You can make a cat sit <or> stand by <pressing> the use button on it. Then the cat does not <teleport>.|br:or",
-"9|axolotl|An axolotl is an <aquatic> mob found in <lush caves> and sometimes in buckets. It can <assist> you in combat.|lax:u,lax:dbl,tense:a",
-"5|cat|You can make a cat sit or <stand> by pressing the use button on it. Then the cat <does not> teleport.|common,lax:a",
-"4|egg|Foxes may appear with an egg <in their> mouth. If you drop <some> food, <the fox> will drop the egg.|cons:th,common,lax:o",
-"1|fire|You can put out <fire> by powder <snow>, rain, <water>, or a cauldron.|tricky,di:ow@,tense:i",
+"4|@😾|This cat <is angry>.|end:y@,a/ae",
+"4|cat|<Cats are> good to chase away phantoms and creepers. <Black> cats are <only> born during full moon.|ck/k,end:y@",
+"8|cat|You can make a cat sit <or> stand by <pressing> the use button on it. Then the cat does not <teleport>.|or/O:",
+"9|axolotl|An axolotl is an <aquatic> mob found in <lush caves> and sometimes in buckets. It can <assist> you in combat.|u/A,lax:dbl,a/eI",
+"5|cat|You can make a cat sit or <stand> by pressing the use button on it. Then the cat <does not> teleport.|common,a/ae",
+"4|egg|Foxes may appear with an egg <in their> mouth. If you drop <some> food, <the fox> will drop the egg.|cons:th,common,o/o",
+"1|fire|You can put out <fire> by powder <snow>, rain, <water>, or a cauldron.|tricky,ow/EU,i/aI",
 
 // calendar
-"6|@🗓️|The weekend is <Saturday> and <Sunday>|calendar,lax:u,di:ay,lax:a",
-"6|@🗓️|Friday, <Saturday>, <Sunday>|calendar,lax:u,di:ay,lax:a",
-"6|@🗓️|The workweek starts with <Monday>, then it's <Tuesday>|calendar,lax:o,di:ay",
-"6|@🗓️|<Thursday>, <Friday>, then it's the weekend|calendar,tense:i,br:ur3,di:ay",
-"6|@🗓️|<Monday>, <Tuesday>, Wednesday, Thursday, Friday|calendar,lax:o,di:ay",
-"6|@🗓️|Monday, <Tuesday>, <Wednesday>, Thursday, Friday|calendar,di:ay",
-"6|@🗓️|Monday, Tuesday, Wednesday, <Thursday>, <Friday>|calendar,tense:i,br:ur3,di:ay",
-"3|@🗓️|There are seven days in a <week>|calendar,di:ee",
-"6|@🗓️|<Sunday>|lax:u,di:ay",
+"6|@🗓️|The weekend is <Saturday> and <Sunday>|calendar,u/A,ay/eI,a/ae",
+"6|@🗓️|Friday, <Saturday>, <Sunday>|calendar,u/A,ay/eI,a/ae",
+"6|@🗓️|The workweek starts with <Monday>, then it's <Tuesday>|calendar,o/o,ay/eI",
+"6|@🗓️|<Thursday>, <Friday>, then it's the weekend|calendar,i/aI,ur/3:,ay/eI",
+"6|@🗓️|<Monday>, <Tuesday>, Wednesday, Thursday, Friday|calendar,o/o,ay/eI",
+"6|@🗓️|Monday, <Tuesday>, <Wednesday>, Thursday, Friday|calendar,ay/eI",
+"6|@🗓️|Monday, Tuesday, Wednesday, <Thursday>, <Friday>|calendar,i/aI,ur/3:,ay/eI",
+"3|@🗓️|There are seven days in a <week>|calendar,ee/i:",
+"6|@🗓️|<Sunday>|u/A,ay/eI",
 
 
 
@@ -1188,10 +1472,10 @@
 "10|sign|You can burn overworld <signs> in a furnace. Nether signs (<crimson> and warped) cannot be used as <fuel>.|",
 
 "10|@📏|<length>|cons:th",
-"12|@❗|This is very <important>.|br:or",
+"12|@❗|This is very <important>.|or/O:",
 "12|@🏝️|pirate <island>|tricky",
 "12|@📜|<History> happened a long time ago.|end:y@",
-"12|@💬|They <mention> my name|cons:ti",
+"12|@💬|They <mention> my name|ti/S",
 
 ];
 // [WORDS END]
@@ -1202,7 +1486,7 @@
             app_name: 'spellbee',
             score_goal: 30,        // controls the bar under the score and gifts
             max_negative_score: 4, // maximum "negative" score where question doesn't give point
-            puzzle_needs: 2, // how many successes before puzzle is dismissed
+            puzzle_needs: 4, // how many successes before puzzle is dismissed
             // State (common)
             storage: {'players': {}},  // storage data that's saved into local storage
             load_time: Date.now(),
@@ -1229,7 +1513,7 @@
         };
 
     </script>
-    <script src="assets/common.js?457"></script>
+    <script src="assets/common.js?460"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1327,6 +1611,11 @@
             ref: str
             is_story: BOOL
             add_words: [str]  // if is_story
+
+            SEGMENTED type: a word/sentence whose <..> parts are joined by '=', e.g.
+            'They <m>=<e>=<n>=<tion>=<ed> my name'. The '=' is only a separator (never shown
+            or typed). Sets is_segmented (instead of is_story); the ordered parts are add_words
+            and the layout (surrounding text vs. the typed run) comes from to_display / mask.
         */
 
         // Extract the to_type string from a word entry
@@ -1339,36 +1628,68 @@
             let to_type_str = '';
             let to_disp_str = '';
             let mask_str = '';
-            const add_words = []; // words user needs to type in a story
-            let current_add_word = '';
+            const add_words = []; // words to type in a story / segments (parts) in a segmented word
+            const phonemes = []; // parallel to add_words: ascii phoneme id to voice each segment (see phoneme_sounds)
             const full = word_data.text;
-            let in_type = false;  // in typing mode
-            for(let i=0; i<full.length; i++) {
-                if(full[i] == '<') { in_type = true; current_add_word = ''; continue; }
-                if(full[i] == '>') { in_type = false; add_words.push(current_add_word); continue; }
-                if(in_type) { 
-                    to_type_str += full[i];
-                    to_disp_str += full[i];
-                    current_add_word += full[i];
-                    mask_str += '_';
-                    continue; 
-                } else {
-                    to_disp_str += full[i];
-                    mask_str += '*';
+            // In the "segmented" type the <..> region holds '='-separated segments, e.g.
+            // "blue <p=e=n>". A segment may give an explicit phoneme after a '/' (e.g.
+            // "<p/p=e/e=n/n>", or "<m/m=a/eI=k=e/x>"); otherwise the default from
+            // segment_default_phoneme is used. '=' and '/...' are separators/metadata: they are
+            // never displayed or typed. (A plain word or story <..> with no '=' is one segment.)
+            const is_segmented = (full.indexOf('=') !== -1);
+            let in_type = false;    // inside a <..> region
+            let in_phoneme = false; // reading the phoneme id after a '/'
+            let seg_grapheme = '';  // characters of the current segment (typed + displayed)
+            let seg_phoneme = '';   // explicit phoneme id of the current segment, if any
+
+            // Finish the current segment: record its grapheme and its (explicit or default) phoneme
+            const flush_segment = function() {
+                const ph = seg_phoneme.length ? seg_phoneme : default_phoneme(seg_grapheme);
+                add_words.push(seg_grapheme);
+                phonemes.push(ph);
+                // Flag segments whose phoneme is missing from the master list (a typo, or a
+                // grapheme with no default and no explicit /phoneme yet)
+                if(is_segmented && phoneme_sounds[ph] === undefined) {
+                    console.error('Unknown phoneme', JSON.stringify(ph), 'for segment', JSON.stringify(seg_grapheme), 'in', JSON.stringify(full));
                 }
+                seg_grapheme = '';
+                seg_phoneme = '';
+                in_phoneme = false;
+            };
+
+            for(let i=0; i<full.length; i++) {
+                const ch = full[i];
+                if(!in_type) { // text around the <..> region
+                    if(ch == '<') { in_type = true; seg_grapheme = ''; seg_phoneme = ''; in_phoneme = false; continue; }
+                    to_disp_str += ch;
+                    mask_str += '*';
+                    continue;
+                }
+                // Inside a <..> region
+                if(ch == '>') { flush_segment(); in_type = false; continue; }
+                if(ch == '=') { flush_segment(); continue; } // segment separator
+                if(ch == '/') { in_phoneme = true; continue; } // explicit phoneme id follows
+                if(in_phoneme) { seg_phoneme += ch; continue; } // phoneme id char (metadata only)
+                // Grapheme character: typed and displayed
+                to_type_str += ch;
+                to_disp_str += ch;
+                seg_grapheme += ch;
+                mask_str += '_';
             }
-            
+
             if(add_words.length==0) { console.error('Nothing to type in', word_data); }
-            
+
             const proc = {
-                'to_type': to_type_str, 
-                'to_display': to_disp_str, 
-                'mask': mask_str, 
-                'is_story': (add_words.length > 1), 
+                'to_type': to_type_str,
+                'to_display': to_disp_str,
+                'mask': mask_str,
+                'is_story': (add_words.length > 1) && !is_segmented,
+                'is_segmented': is_segmented,
                 'emoji': word_data.emoji,
                 'ref': word_data.ref,
                 'imgref': word_data.imgref,
                 'add_words': add_words,
+                'phonemes': phonemes,
                 'level': word_data.level
             };
             word_data.proc_cache = proc;
@@ -1376,7 +1697,8 @@
         }
         
         
-        // Render words user needs to type in a story
+        // Render the word bank: the words to type in a story, or the parts of a segmented word
+        // (both shuffled). update_completed_chips() greys the chips as parts are completed.
         function render_addwords() {
             let words = bee.processed_word.add_words.slice(); // clone
             shuffle(words); // WARNING changes array
@@ -1386,14 +1708,131 @@
             }
             return o;
         }
-        
-        
+
+
+        // ---- Multi-part words (stories and segmented) ----
+
+        // Greedy mapping of bee.typed onto the ordered parts (add_words). A part counts as
+        // finished as soon as enough characters have been typed to fill it - so on a segmented
+        // "<p>=<r>=<o>=<ph>..." the first "p" advances to the next part (we assume the child is
+        // typing the right thing), and in a story the count tracks completed words. Returns
+        // {completed: number of parts fully typed, starts: [to_type index each part begins at]}
+        function parts_progress() {
+            const parts = bee.processed_word.add_words;
+            const starts = [];
+            let start = 0;
+            let completed = 0;
+            for(let i=0; i<parts.length; i++) {
+                starts.push(start);
+                if(bee.typed.length >= start + parts[i].length) { completed++; }
+                start += parts[i].length;
+            }
+            return {'completed': completed, 'starts': starts};
+        }
+
+        // Status of a segment (part), given its start index in to_type and its length: 'pending'
+        // (not fully typed yet), 'ok' (fully typed, all correct) or 'error' (fully typed with a
+        // mistake). Used to colour the boxes and to decide whether to grey the chip.
+        function segment_status(start, len) {
+            if(bee.typed.length < start + len) { return 'pending'; }
+            const to_type = bee.processed_word.to_type;
+            for(let p=start; p<start+len; p++) {
+                if(to_type[p].toLowerCase() != bee.typed[p].toLowerCase()) { return 'error'; }
+            }
+            return 'ok';
+        }
+
+        // Grey out the word-bank chips of correctly-completed parts (story words and segmented
+        // parts alike) - a part entered wrongly is not greyed. With duplicate parts we grey the
+        // first matching (by content) chip that is not yet grey ("first one in the list"). Grey
+        // state is derived from what has been typed, so nothing is persisted - the shuffled order
+        // lives in the DOM.
+        function update_completed_chips() {
+            const prog = parts_progress();
+            const parts = bee.processed_word.add_words;
+            const $chips = $('.prompt .addwords .word');
+            $chips.removeClass('done');
+            for(let k=0; k<prog.completed; k++) {
+                if(segment_status(prog.starts[k], parts[k].length) != 'ok') { continue; } // don't grey a wrongly-typed part
+                const p = parts[k].toLowerCase();
+                for(let i=0; i<$chips.length; i++) {
+                    const $c = $chips.eq(i);
+                    if(!$c.hasClass('done') && $c.text().toLowerCase() == p) { $c.addClass('done'); break; }
+                }
+            }
+        }
+
+
+        // ---- Segmented (phoneme / morpheme) question type ----
+
+        // Placeholder: a finished segment could be voiced here. phoneme is its ascii id (a key of
+        // phoneme_sounds; 'x' means silent).
+        const phoneme_sound_objs = {};
+        function speak_completed_part(part, phoneme) {
+            if(phoneme_sound_objs[phoneme] === undefined) {
+                phoneme_sound_objs[phoneme] = {
+                    file: 'assets/sounds/phonemes/ph_' + phoneme.replaceAll(/[^a-zA-Z0-9]/g, '_') + '.mp3',
+                    volume: .7,
+                    object: false
+                };
+            }
+            _play_obj(phoneme_sound_objs[phoneme]);
+            console.log('segmented part completed (TTS placeholder):', part, 'phoneme:', phoneme);
+            // if(phoneme && phoneme != 'x') { play the clip for `phoneme` here }
+        }
+
+        // Render the input field for a segmented word: non-typed text (from to_display / mask)
+        // plus one fixed-width box per part (add_words), filling as the child types. Wrong
+        // characters are underlined; on a reveal repeat the answer is shown in grey.
+        function render_segmented_input() {
+            const s = bee.processed_word.to_display;
+            const mask = bee.processed_word.mask;
+            const to_type = bee.processed_word.to_type;
+            const parts = bee.processed_word.add_words;
+
+            // Size every box to hold the longest part (see the .typebox CSS)
+            let max_part_len = 0;
+            for(let i=0; i<parts.length; i++) { if(parts[i].length > max_part_len) { max_part_len = parts[i].length; } }
+            const boxstyle = ' style="min-width:'+(max_part_len*1.2)+'ch"';
+
+            let o = '';
+            let type_ix = 0;    // index into to_type / the current typed position
+            let part_ix = 0;    // index into parts
+            let part_start = 0; // to_type index where the current part begins
+            for(let i=0; i<s.length; i++) {
+                if(mask[i] == '*') { // non-typed text around the parts
+                    o += (s[i] == ' ' ? '&nbsp;' : esc_html(s[i]));
+                    continue;
+                }
+                if(type_ix == part_start) { // open a box at each part start; colour it once the part is completed
+                    const st = segment_status(part_start, parts[part_ix].length);
+                    o += '<span class="typebox'+(st == 'ok' ? ' typebox_ok' : (st == 'error' ? ' typebox_err' : ''))+'"'+boxstyle+'>';
+                }
+                if(type_ix == bee.typed.length) { o += '<span class="cursor_outer"><span class="cursor"></span></span>'; }
+                if(type_ix < bee.typed.length) { // already typed (no per-character underline - the box colour shows errors)
+                    const userchar = bee.typed[type_ix];
+                    o += (userchar == ' ' ? '&nbsp;' : esc_html(userchar));
+                } else if(bee.problem.is_reveal) { // reveal repeat: show the answer in grey
+                    o += '<span class="reveal_totype">'+esc_html(to_type[type_ix])+'</span>';
+                }
+                if(type_ix == part_start + parts[part_ix].length - 1) { // close the box at the end of the part
+                    o += '</span>';
+                    part_ix++;
+                    part_start = type_ix + 1;
+                }
+                type_ix++;
+            }
+            return o;
+        }
+
+
+
         // Choose characters to highlight in the help text from the ones to be typed
         // If there are no matching groups, we highlight all matches, otherwise the matching groups
         function get_class_highlight_mask(to_type_str, word_class) {
             if(word_class === undefined) { return undefined; }
             let rule = class_highlight_rules[word_class];
-            if(rule === undefined) { return undefined; }
+            if(rule === undefined || rule === false) { return undefined; } // false = known grouping-only tag, no highlight
             rule = new RegExp(rule, 'gdi');
             
             const match = rule.exec(to_type_str);
@@ -1421,8 +1860,9 @@
         
         // Render a typed input into HTML. prefix=what is typed, s=full string
         function render_to_html(for_help) {
+            if(bee.processed_word.is_segmented && !for_help) { return render_segmented_input(); }
             const line_length = 15; // word wrap after this many characters (for non-stories)
-    
+
             const s = bee.processed_word.to_display;
             const class_highlight_mask = get_class_highlight_mask(bee.processed_word.to_type, bee.problem.word_class);
             
@@ -1523,11 +1963,23 @@
         // Render the typing and underscores
         function update_input_field() {
             bee.$input.html(render_to_html(false));
+            if(bee.processed_word.is_story || bee.processed_word.is_segmented) { update_completed_chips(); }
         }
 
 
         // Display target word briefly
         function show_help(is_initial) {
+            if(bee.processed_word.is_segmented) {
+                // No spelling reveal; just show the boxes and read the whole text out (req 1)
+                bee.$help.hide();
+                bee.$input.show();
+                update_input_field();
+                call_local_hook('keyboard_press_hook', [undefined]);
+                // play_word(text, callback, max_timeout, force): default text (the whole display
+                // string), no callback, default timeout, force past the anti-repeat throttle
+                if(is_initial) { play_word(undefined, undefined, undefined, true); }
+                return;
+            }
             console.log("Disabling help");
             if(bee.processed_word.is_story) {
                 bee.$help.hide();
@@ -1745,6 +2197,9 @@
                         }
                     }
                 
+                    // Segmented: how many parts were complete before this keystroke
+                    const seg_completed_before = bee.processed_word.is_segmented ? parts_progress().completed : 0;
+
                     if(story_word_boundary && typed_key == ' ') {
                         console.log("Skipping space at story word boundary");
                     } else {
@@ -1755,6 +2210,18 @@
                                 const word_to_play = bee.processed_word.add_words[addwords_last];
                                 console.log("Speaking story word", word_to_play);
                                 play_word(word_to_play, undefined, undefined, true); /* text, callback, max_timeout, force */
+                            }
+                        }
+                        if(bee.processed_word.is_segmented) {
+                            // This keystroke fills at most one part; if it just filled one, voice its
+                            // phoneme - but only if that part was typed correctly (don't voice a wrong
+                            // entry). The final part is voiced too; the success handler below waits for
+                            // it before proceeding.
+                            const seg_prog = parts_progress();
+                            const seg_completed = seg_prog.completed;
+                            const done_ix = seg_completed - 1;
+                            if(seg_completed > seg_completed_before && segment_status(seg_prog.starts[done_ix], bee.processed_word.add_words[done_ix].length) == 'ok') {
+                                speak_completed_part(bee.processed_word.add_words[done_ix], bee.processed_word.phonemes[done_ix]);
                             }
                         }
                     }
@@ -1814,7 +2281,15 @@
                             success_common({'skip_this_score':bee.problem.is_repeat});
                         };
 
-                        if(bee.processed_word.is_story && !bee.problem.is_reveal) { play_word(undefined, on_success, undefined, true); } else { on_success(); }
+                        // Story / segmented: re-read the whole text before advancing (req 6)
+                        const re_read = (bee.processed_word.is_story || bee.processed_word.is_segmented) && !bee.problem.is_reveal;
+                        if(bee.processed_word.is_segmented) {
+                            // The final part's phoneme was just voiced; pause ~1s to let it finish
+                            // before the success actions (re-read the whole word, then success_common)
+                            setTimeout(function() {
+                                if(re_read) { play_word(undefined, on_success, undefined, true); } else { on_success(); }
+                            }, 1000);
+                        } else if(re_read) { play_word(undefined, on_success, undefined, true); } else { on_success(); }
                     }
                 }
                 return;
@@ -1885,16 +2360,21 @@
             bee.help_asked = 0;
             bee.backspace_used = 0;
 
-            if(!bee.processed_word.is_story) { 
+            if(!bee.processed_word.is_story && !bee.processed_word.is_segmented) {
                 bee.$help.html(render_to_html(true));
                 $('.prompt .addwords').hide();
                 $('.kbdiv .kbhelp').css({'visibility': 'visible'});
             } else {
+                // Story or segmented: show the (shuffled) word bank below the prompt. Stories force
+                // reading (both help keys hidden); segmented keeps the replay key (💬) but hides the
+                // spelling-reveal key (?)
                 $('.prompt .addwords').html(render_addwords()).show();
-                $('.kbdiv .kbhelp').css({'visibility': 'hidden'}); // TTS works fine but let's force reading
+                $('.kbdiv .kbkey[data-key="HELP"]').css({'visibility': 'hidden'});
+                $('.kbdiv .kbkey[data-key="PLAY_WORD"]').css({'visibility': bee.processed_word.is_segmented ? 'visible' : 'hidden'});
             }
             bee.$input.html('');
             $('.prompt .infield').toggleClass('infield_story', !!bee.processed_word.is_story);
+            $('.prompt .infield').toggleClass('infield_segmented', !!bee.processed_word.is_segmented);
             bee.$input.removeClass('success');
             
             enable_typing();
@@ -2137,7 +2617,13 @@
                 for(let j=0; j<cl.length; j++) {
                     const thisclass = cl[j];
                     let cllist = out.class_to_ix[thisclass];
-                    if(cllist === undefined) { out.class_to_ix[thisclass] = []; cllist = out.class_to_ix[thisclass]; }
+                    if(cllist === undefined) {
+                        out.class_to_ix[thisclass] = []; cllist = out.class_to_ix[thisclass];
+                        // Flag an unrecognised tag once (typo?): not present in class_highlight_rules at all
+                        if(class_highlight_rules[thisclass] === undefined) {
+                            console.error('Unknown class tag', JSON.stringify(thisclass), 'e.g. in', JSON.stringify(out.words[i].text));
+                        }
+                    }
                     cllist.push(i);
                 }
             }
@@ -2312,8 +2798,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?457"></script>
-    <script src="assets/aquarium/js/aquarium.js?457"></script>
+    <script src="assets/aquarium/js/config.js?460"></script>
+    <script src="assets/aquarium/js/aquarium.js?460"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

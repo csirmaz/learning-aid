@@ -283,7 +283,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 457;
+const bee_app_version = 460;
 
 call_local_hook('check_version', []);
 
@@ -1216,6 +1216,8 @@ Sound Effect by <a href="https://pixabay.com/users/latent-rick-54823268/?utm_sou
 Sound Effect by <a href="https://pixabay.com/users/breakzstudios-38548419/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=201064">Breakz Studios</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=201064">Pixabay</a>
 
 Sound Effect by <a href="https://pixabay.com/users/bombinsound-54782632/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=499479">Bomb Sound</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=499479">Pixabay</a>
+
+Sound Effect by <a href="https://pixabay.com/users/humordome-44873699/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=453255">Humor Dome</a> from <a href="https://pixabay.com//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=453255">Pixabay</a>
 
 Sound Effect by <a href="https://pixabay.com/users/dariocoiro-54756271/?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=530684">Dario Coiro</a> from <a href="https://pixabay.com/sound-effects//?utm_source=link-attribution&utm_medium=referral&utm_campaign=music&utm_content=530684">Pixabay</a>
 
