@@ -5,13 +5,16 @@
 //         defaults: html-file = ../spellbee-new.html (repo root), level = 20
 //
 // For every entry at the given level it prints the target text with each segment resolved to
-// its phoneme (marking an explicit '/phoneme' spec with '*', a missing phoneme as '[?]'), and
-// flags a missing image / missing class tag / missing phoneme. It loads the app's own parser
-// (word_repository, process_word_data, get_processed_word, phoneme_sounds,
-// segment_default_phoneme) out of the HTML, so the audit always matches runtime behaviour.
+// its phoneme (marking an explicit '/phoneme' spec with '*', a missing phoneme as '[?]', and a
+// segment that resolved to an UNKNOWN phoneme id as '[!x]'), and flags a missing image /
+// missing class / missing phoneme, an invalid phoneme, or a class tag that is absent from
+// class_highlight_rules. It loads the app's own parser (word_repository, process_word_data,
+// get_processed_word, phoneme_sounds, class_highlight_rules, segment_default_phoneme) out of
+// the HTML, so the audit always matches runtime behaviour.
 //
-// It only reports gaps; it does not judge whether a resolved phoneme is correct for RP - that
-// is the human review step. Re-run after editing to confirm no gaps remain.
+// It flags structural gaps (missing / invalid phonemes and classes); it does not judge whether
+// a valid resolved phoneme is correct for RP - that is the human/LLM review step. Re-run after
+// editing to confirm nothing needs work.
 
 const fs = require('fs');
 const path = require('path');
@@ -53,17 +56,23 @@ const audit = `
         const inner = (w.text.match(/<([^>]*)>/) || [])[1] || '';
         const rawsegs = inner.split('=');
         const segs = [];
-        let missing = 0;
+        let missing = 0, invalid = 0;
         for(let i = 0; i < p.add_words.length; i++) {
             const explicit = (rawsegs[i] || '').indexOf('/') >= 0;
             const ph = p.phonemes[i];
-            if(ph === '') missing++;
-            segs.push(p.add_words[i] + '[' + (ph === '' ? '?' : ph) + ']' + (explicit ? '*' : ''));
+            let tag;
+            if(ph === '') { missing++; tag = '?'; }                                    // unmapped: no default and no spec
+            else if(phoneme_sounds[ph] === undefined) { invalid++; tag = '!' + ph; }   // resolved to an unknown phoneme id (typo)
+            else tag = ph;
+            segs.push(p.add_words[i] + '[' + tag + ']' + (explicit ? '*' : ''));
         }
+        const badClasses = (w.class || []).filter(c => class_highlight_rules[c] === undefined); // tag absent from class_highlight_rules
         rows.push({
             display: w.text.replace(/<[^>]*>/, '<' + p.add_words.join('=') + '>'),
             segs: segs.join(' '),
             missing: missing,
+            invalid: invalid,
+            badClasses: badClasses,
             noImage: (w.emoji === undefined && w.ref === undefined && w.imgref === undefined),
             noClass: (!w.class || w.class.length === 0)
         });
@@ -77,9 +86,15 @@ const rows = fn($, String, a => a, silent, noop, noop, { addEventListener: noop 
 
 let needWork = 0;
 for(const r of rows) {
-    const flags = [r.missing ? r.missing + ' missing-phoneme' : '', r.noImage ? 'NO-IMAGE' : '', r.noClass ? 'NO-CLASS' : ''].filter(Boolean).join(', ');
+    const flags = [
+        r.missing ? r.missing + ' missing-phoneme' : '',
+        r.invalid ? r.invalid + ' invalid-phoneme' : '',
+        r.badClasses.length ? 'invalid-class:' + r.badClasses.join(',') : '',
+        r.noImage ? 'NO-IMAGE' : '',
+        r.noClass ? 'NO-CLASS' : ''
+    ].filter(Boolean).join(', ');
     if(flags) needWork++;
     console.log(r.display);
     console.log('    ' + r.segs + (flags ? '   <<< ' + flags : ''));
 }
-console.log('\n' + rows.length + ' level-' + level + ' entries; ' + needWork + ' need work.  (* = explicit /phoneme, [?] = missing)');
+console.log('\n' + rows.length + ' level-' + level + ' entries; ' + needWork + ' need work.  (* = explicit /phoneme, [?] = missing, [!x] = unknown phoneme)');

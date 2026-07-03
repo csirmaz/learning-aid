@@ -178,7 +178,7 @@ Each row: **tag** · grapheme highlighted (`—` = grouping only, no highlight) 
 |---|---|---|---|
 | `kn/n` | initial `kn` | silent k *knot* | knot, know, knight |
 | `wr/r` | initial `wr` | silent w *wrong* | wrong, write |
-| `er/E` | final `er` | /ə/ *teacher* | teacher, ruler, river, ladder |
+| `er/Er` | final `er` | /ə/ *teacher* | teacher, ruler, river, ladder |
 | `end:y@` | final `y` | /i/ *smelly* *(legacy)* | smelly, baby, mystery |
 | `end:ey` | — | /i/ *monkey* *(legacy)* | monkey, donkey, key |
 | `end:le` | final `le` | /əl/ *table* *(legacy)* | table, jungle, turtle |

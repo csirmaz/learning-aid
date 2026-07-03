@@ -20,7 +20,7 @@ For each entry `"level|image|text|class"`:
    `segment_default_phoneme` (`default_phoneme()`), else to `''` (unmapped). Go through **every**
    segment and, wherever the resolved phoneme is missing (`''`) **or wrong for RP**, add/replace
    an explicit `/phoneme` with the correct id from `phoneme_sounds` (e.g. `/ɒ/`→`o`, `/ɔː/`→`O:`,
-   `/ɑː/`→`a:`, `/ə/`→`E`, `/ʌ/`→`A`, `/eɪ/`→`eI`, silent→`x`). **Always override a wrong
+   `/ɑː/`→`a:`, `/ə/`→`E` (`Er` for an `-er` ending), `/ʌ/`→`A`, `/eɪ/`→`eI`, silent→`x`). **Always override a wrong
    default** — the defaults are broad and frequently wrong in context (see below); never leave a
    segment voicing the wrong sound just because a default supplied one.
 4. **Mark it.** Append an end-of-line comment `// reviewed` so the line is not re-reviewed.
@@ -41,11 +41,14 @@ To enumerate gaps in bulk, run the saved extractor [`segmented-audit.js`](segmen
 node agent/segmented-audit.js [html-file] [level]     # defaults: spellbee-new.html, level 20
 ```
 
-It loads the app's own `word_repository` / `process_word_data()` / `get_processed_word()` and
-lists, for each **segmented** entry at that level, every segment resolved to its phoneme
-(`*` = explicit spec, `[?]` = missing), flagging a missing image / class / phoneme — so the
-audit always matches runtime behaviour. It reports gaps only; judging whether a resolved
-phoneme is *correct for RP* is the (LLM/human) review step.
+It loads the app's own `word_repository` / `process_word_data()` / `get_processed_word()` /
+`phoneme_sounds` / `class_highlight_rules` and lists, for each **segmented** entry at that
+level, every segment resolved to its phoneme (`*` = explicit spec, `[?]` = missing,
+`[!x]` = resolved to an unknown phoneme id), flagging a missing image / class / phoneme, an
+**invalid phoneme**, or a **class tag absent from `class_highlight_rules`** — so the audit
+always matches runtime behaviour. It reports structural gaps only; judging whether a *valid*
+resolved phoneme is *correct for RP* is the (LLM/human) review step — and **arguable specs are
+put to the maintainer** (see Judgement notes).
 
 Once the edits are decided, apply them with [`apply-line-edits.js`](apply-line-edits.js):
 
@@ -65,8 +68,10 @@ to confirm 0 gaps remain.
 ## Judgement notes
 
 - **Reduced / elided vowels.** Unstressed vowels are usually `/ə/` = `E` (e.g. the `a` of
-  *elephant*, *distance*). A vowel that is dropped in RP is silent = `x` (e.g. the middle `o`
-  of *chocolate* /ˈtʃɒklət/).
+  *elephant*, *distance*), but an unstressed **`-er` ending** is its own phoneme **`Er`**
+  (*teacher, water, rapper*) — and `er`→`Er` is a default, so an `er` segment resolves to `Er`
+  without a spec. A vowel that is dropped in RP is silent = `x` (e.g. the middle `o` of
+  *chocolate* /ˈtʃɒklət/).
 - **Same grapheme, context-dependent sound.** `o` is `o` /ɒ/ in *box*, but `A` /ʌ/ in *monkey*,
   *something*; `a` is `ae` /æ/ in *hanging*, `O:` /ɔː/ in *water*, `E` /ə/ in *distance*. Judge
   by the word, not the letter — the class tag on the entry is for grouping and may differ.
@@ -81,3 +86,7 @@ to confirm 0 gaps remain.
   is wrong for a voiced plural `/z/` (*windows*); `n`→`/n/` is `/ŋ/` before k/g (*monkey*).
 - **Fix wrong explicit specs too.** A clearly-wrong explicit spec is corrected, not just flagged
   (e.g. *walked*'s `-ed` is `/t/` after /k/, not `/d/`).
+- **Ask the maintainer about arguable specs.** Where a segment's RP phoneme is genuinely
+  uncertain — a weak vowel that could be `/ɪ/`=`I` or `/ə/`=`E`, or a variant pronunciation
+  (e.g. *during* `u` = `ju:` vs a `UE`-type value, *real* `ea` = `i:` vs `IE`) — **do not decide
+  silently**: ask the maintainer and apply their choice. This is a standing preference.
