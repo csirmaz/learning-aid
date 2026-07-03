@@ -354,7 +354,16 @@
             "ch/S": "ch[ie]",
             "ch/tS": "tch|ch",
             "ti/S": "ti",
-            "tur/tS": "tur"
+            "tur/tS": "tur",
+            // Grouping only - no highlight (false). A tag missing from this object entirely is
+            // reported by init_wordlist_impl as an unknown / typo class tag.
+            "common": false,
+            "tricky": false,
+            "calendar": false,
+            "dge/dZ": false,
+            "au/O:": false,
+            "end:ey": false,
+            "noclass:": false
         };
 
         // Phonemes we can voice in a segmented word, keyed by an ascii id, with a short
@@ -380,16 +389,17 @@
             's': 1,     // /s/ as in "sun"
             't': 1,     // /t/ as in "top"
             'v': 1,     // /v/ as in "van"
-            'w': 1,     // /w/ as in "wet"
             'z': 1,     // /z/ as in "zip"
             'S': 1,     // /ʃ/ as in "she"
-            'j': 1,     // /j/ as in "you"
             'ks': 1,    // /ks/ as in "excellent"
             'dZ': 1,    // /dʒ/ as in "George"
             'tS': 1,    // /tʃ/ as in "church"
             'T': 1,     // /θ/ as in "thin"
             'D': 1,     // /ð/ as in "this"
             'Z': 1,     // /ʒ/ as in "vision"
+            //
+            'j': 1,     // /j/ as in "you"
+            'w': 1,     // /w/ as in "wet"
             // Short (lax) vowels
             'ae': 1,    // /æ/ as in "cat"
             'A': 1,     // /ʌ/ as in "cup"
@@ -414,6 +424,7 @@
             'eE': 1,    // /eə/ as in "air"
             'UE': 1,    // /ʊə/ as in "cure"
             // Pseudo-phonemes: a whole morpheme treated as one segment
+            'kw': 1,
             'SEn': 1,   // "-tion" ending, /ʃən/
             'Id': 1     // "-ed" ending, /ɪd/
         };
@@ -421,14 +432,53 @@
         // Default ascii phoneme (a key of phoneme_sounds) for a segment's grapheme when none is
         // given after a '/'. Looked up case-insensitively (see default_phoneme()).
         const segment_default_phoneme = {
-            'b': 'b', 'd': 'd', 'f': 'f', 'g': 'g', 'h': 'h', 'k': 'k',
-            'l': 'l', 'm': 'm', 'n': 'n', 'p': 'p', 'r': 'r', 't': 't',
-            'v': 'v', 'w': 'w', 'z': 'z',
-            'c': 'k',   // "c" is voiced as /k/
-            'ph': 'f',  // "ph" is voiced as /f/
+            'b': 'b', 
+            'bb': 'b',
+            'd': 'd', 
+            'dd': 'd',
+            'f': 'f', 
+            'ff': 'f',
+            'g': 'g', 
+            'gg': 'g',
+            'h': 'h', 
+            'k': 'k',
+            'l': 'l', 
+            'll': 'l',
+            'm': 'm', 
+            'mm': 'm',
+            'n': 'n', 
+            'nn': 'n',
+            'ng': 'ng',
+            'p': 'p', 
+            'pp': 'p',
+            'r': 'r', 
+            'rr': 'r',
+            't': 't',
+            'tt': 't',
+            'v': 'v', 
+            'w': 'w', 
+            'x': 'ks',
+            'z': 'z',
+            'c': 'k',   // "c" voiced as /k/
+            'ph': 'f',  // "ph" voiced as /f/
             's': 's',
+            'ss': 's',
+            'sh': 'S',
+            'ch': 'tS',
+            'tch': 'tS',
+
             'e': 'e',
-            'i': 'I',    // "i" is voiced as lax /ɪ/
+            'y': 'I',
+            'i': 'I',    // "i" voiced as lax /ɪ/
+            'u': 'U',
+
+            'oo': 'u:',
+            'ai': 'eI',
+            'ay': 'eI',
+            
+            'ar': 'a:',
+
+            'igh': 'aI',
             'tion': 'SEn',
             'ed': 'Id'
         };
@@ -450,21 +500,34 @@
 // Each story is a series of "words" (typing questions) identified by having the same level number.
 // They are asked consecutively.
 
-"20||a <y=ou=ng> man|tricky",
+"20|@🧑|a <y/j=ou/A=ng> man|tricky", // reviewed
 "11|~stonesoup_stone.svg|A <young> man lived <alone> in a small house in a village.|o/EU,tricky",
-"20||go to the <m=a=r=k=e=t>|ar/a:,end:et",
-"20||the big <f=o=r=e=s=t>|",
+"20|@🛒|go to the <m=ar=k=e/I=t>|ar/a:,end:et", // reviewed
+"20|@🌲|the big <f=o/o=r=e/I=s=t>|o/o", // reviewed
 "11|~stonesoup_bundle.svg|He needed to go to the <market> in town on the other side of the <big forest>.|ar/a:,end:et",
-"20||a piece of <c=l=o=th>|cons:th",
-"20||He set out on <f=oo=t>|oo/U",
+"20|@🧵|a piece of <c=l=o/o=th/T>|cons:th", // reviewed
+"20|@🦶|He set out on <f=oo/U=t>|oo/U", // reviewed
 "11|~stonesoup_bundle.svg|He wrapped his last scone in a piece of <cloth>, and set out on <foot>.|cons:th,oo/U",
+"20|@🤔|He got <r=ea/i:=ll=y> hungry|end:ly,ea/i:", // reviewed
+"20|@🚶|He <w=al/O:=k=ed/t> until midday|dark:al", // reviewed
 "11|~stonesoup_bundle.svg|He entered the forest, and <walked> and walked until <midday>, when he got <really> hungry.|dark:al,ea/i:,end:ly",
+"20|@🍽️|eating <l=u/A=n=ch>|ch/tS", // reviewed
 "11|~stonesoup_bundle.svg|He sat down for <lunch>, and ate the scone, picking <up> even the crumbs, as it <wasn't> a big scone at all.|tricky,ch/tS",
+"20|@🌑|The sky got <d=ar=k=er/E>|ar/a:", // reviewed
 "11|~stonesoup_bundle.svg|He continued walking. The <trees> grew denser, and the sky got <darker>, but he still had not got <out of> the forest.|ar/a:,ou/aU,ee/i:",
+"20|@📏|It was far in the <d=i=s=t=a/E=n=ce/s>|c/s", // reviewed
+"20|@💡|A flickering <l=igh=t>|igh/aI", // reviewed
 "11|~stonesoup_bundle.svg|It was close to midnight, and he was really hungry <again>. Luckily he spotted a flickering <light> in the <distance>.|igh/aI,c/s",
+"20|@💧|<w=a/O:=t=er/E>|tricky,er/E", // reviewed
 "11|~stonesoup_bundle.svg|\"<Someone> must live there,\" he thought, \"and they will <have some> food and <water> for me.\" He walked toward the light.|tricky,er/E",
+"20|@🪵|<w=oo/U=d=e/E=n> planks|oo/U", // reviewed
+"20|@🕐|<Wh/w=e=n> is your birthday?|wh/w", // reviewed
 "11|~stonesoup_hut.svg|<When> he reached the light, it turned out to be a small, dilapidated hut made of <wooden> planks.|wh/w,oo/U",
+"20|~stonesoup_hut.svg|The walls <w=ere/3:> covered in moss|common", // reviewed
+"20|@🌻|<g=ar/a:=d=e/E=n>|ar/a:", // reviewed
+"20|@🪟|The <w=i=n=d=ow/EU=s/z> were broken|ow/EU", // reviewed
 "11|~stonesoup_hut.svg|The <windows> were broken, the walls <were> covered in moss, and the <garden> was full of weeds and rocks.|ow/EU,ar/a:,tricky",
+"20|@❓|<Wh/w=a/o=t> do you need?|wh/w", // reviewed
 "11|~stonesoup_hut.svg|He knocked on <the> door anyway, and an old ugly <woman> opened the door. \"<What> do you want?\"|wh/w,tricky",
 "11|~stonesoup_hut.svg|\"I have walked all day,\" the man <said>, \"and I wonder if you might have a bite to eat and <some water> to drink for me.\"|tricky,er/E",
 "11|~stonesoup_witch.svg|\"No,\" the woman <shouted> and slammed the door. She <really> looked like a <witch>.|ou/aU,ea/i:,end:ly,ch/tS",
@@ -573,15 +636,18 @@
 "11|@🌟|Sam's <vocal> talent was <sensational>!|ti/S,end:al@",
 "11|@👏|When he <finished>, everyone <stood> up and clapped.|oo/U",
 "11|@🏆|The judges <smiled>. Sam won the golden <trophy>!|i/aI,ph/f,end:y@",
+"20|@🏆|The judges <s=m=i/aI=l=ed/d>.|i/aI", // reviewed
+"20|@🏆|Sam won the golden <t=r=o/EU=ph=y>!|ph/f,end:y@", // reviewed
 "11|@😊|Sam felt like a <different> boy, and was no longer <shy>.|y/aI,er/E",
+"20|@😊|Sam felt like a <d=i=ff=er/r=e/E=n=t> boy|lax:dbl", // reviewed
 
 // --- segmented (phoneme / morpheme) questions ---
 // The '=' separated parts (usually phonemes, sometimes morphemes) are typed one box at a
 // time while the whole word/sentence is read out. Level, image and class tags are as usual.
-"20|@🐘|<e=l=e=ph=a=n=t>|ph/f",
-"20|@🌍|<n=a=tion>|ti/S",
-"20|@🔮|<p=r=o=ph=e=t>|ph/f",
-"20|@💬|They <m=e=n=tion=ed> my name|ti/S",
+"20|@🐘|<e=l=e/I=ph=a/E=n=t>|ph/f", // reviewed
+"20|@🌍|<n=a/eI=tion>|ti/S", // reviewed
+// "20|@🔮|<p=r=o=ph=e=t>|ph/f",
+"20|@💬|They <m=e=n=tion=ed/d> my name|ti/S", // reviewed
 
 // --- lax monograph ---
 
@@ -595,16 +661,22 @@
 "0|egg@🥚|<egg>|e/e",
 "0|bell@🔔|ring the <bell>|e/e",
 "1|@🦶|<smelly> foot|e/e,end:y@,lax:dbl",
+"20|@🦶|<s=m=e=ll=y> foot|e/e,end:y@,lax:dbl", // reviewed
 "2|@🔟|<ten>|e/e",
 "6|@⬅️|turn <left>|e/e",
 "10|@⛱️|We use <sun>screen to <prevent> burns.|e/e,u/A",
+"20|@⛱️|We use sunscreen to <p=r=e/I=v=e=n=t> burns.|e/e", // reviewed
 "10|@🚄|Is <this> the <express> <train> to London?|e/e,cons:th",
+"20|@🚄|Is <th/D=i=s> the express train to London?|cons:th", // reviewed
+"20|@🚄|Is this the <e/I=x/ks=p=r=e=ss> train to London?|e/e", // reviewed
+"20|@🚄|Is this the express <t=r=ai=n> to London?|ai/eI", // reviewed
 
 // i=I i/I
 "0|@🐬|The dolphin likes <fish>.|i/I",
 "2|@🏊|<swim>|i/I",
 "0|@📌|<pin>|i/I",
 "0|@💍|<ring>|i/I",
+"20|@💍|<r=i=ng>|i/I", // reviewed
 "0|@🥛|I <drink> milk|i/I",
 "0|pig@🐖|<pig>|i/I",
 "0|@😁|happy <grin>|i/I",
@@ -612,38 +684,51 @@
 "0|@🥛|I drink <milk>|i/I",
 "0|@🔔|<ring> the bell|i/I",
 "2|@🪽|<wing>|i/I",
+"20|@🪽|<w=i=ng>|i/I", // reviewed
 "0|@📎|paper <clip>|i/I",
 "2|@😽|Cat gives <kiss>.|i/I",
 "3|@☔️|<It is> raining.|i/I",
 "0|cat|You can make a Minecraft cat <sit> or stand|i/I",
 "6|@🖥|<system> error|y/I",
+"20|@🖥|<s=y=s=t=e/E=m> error|y/I", // reviewed
 "5|@🥝|<kiwi>|i/I",
 "4|@🍟|I want <chips>!|i/I,ch/tS",
 "0|@🍟|I want chips <with> ketchup!|i/I",
 "5|@😽|Cat <gives> kiss.|i/I",
 "0|@💳|pay <with> card|i/I",
+"20|@💳|pay <w=i=th/D> card|i/I", // reviewed
 "0|@👨🏻‍🎤|He <is> a rapper|i/I,common",
 "6|@🧑‍🍳|The chef works in the <kitchen>|i/I,ch/tS",
+"20|@🧑‍🍳|The chef works in the <k=i=tch=e/I=n>|i/I,ch/tS", // reviewed
 
 // y=I y/I
 "2|@🏋️|<gym>|y/I",
+"20|@🏋️|<g/dZ=y=m>|y/I", // reviewed
 "8|@👻|<myth>|y/I",
+"20|@👻|<m=y=th/T>|y/I,cons:th", // reviewed
 "8|@🏜️|<pyramid>|y/I",
 "9|amethyst|<crystal>|y/I",
+"20|@🏜️|<p=y=r=a/E=m=i=d>|y/I", // reviewed
+"20|amethyst|<c=r=y=s=t=al/E>|y/I", // reviewed
 // {"level":8, "emoji":"🎤", "text":"<lyric>", "class":["y/I"]},
 // {"level":8, "emoji":"🎶", "text":"We sing a <hymn>.", "class":["y/I"]},
 
 //o=Io o/o
 "2|@📦|<box>|o/o",
+"20|@📦|<b=o/o=x>|o/o", // reviewed
 "0|@🔥|<hot>|o/o",
 "0|@🙅🏼‍♀️|<not>|o/o",
 "2|fox|<fox>|o/o",
 "0|@🐶|<dog>|o/o",
 "0|@🛑|<stop>|o/o",
 "6|@🏖|We are going on a <holiday>!|o/o,ay/eI",
+"20|@🏖|We are going on a <h=o/o=l=i=d=ay>!|o/o,ay/eI", // reviewed
 "6|@🐵|<monkey>|o/o,end:ey",
+"20|@🐵|<m=o/A=n/ng=k=ey/I>|o/o,end:ey", // reviewed
 "4|@🍫|<chocolate>|o/o,ch/tS",
+"20|@🍫|<ch=o/o=c=o/x=l=a/E=t=e/x>|o/o,ch/tS", // reviewed
 "5|@💥|<Something> went horribly wrong|cons:th,o/o",
+"20|@💥|<S=o/A=m=e/x=th/T=i=ng> went horribly wrong|cons:th,o/o", // reviewed
 
 
 // a=ae a/ae
@@ -654,6 +739,7 @@
 "1|@🏦|<bank>|a/ae",
 "1|@🪤|Careful! It is a <trap>!|a/ae",
 "7|hangingsign|<hanging> sign|a/ae",
+"20|hangingsign|<h=a/ae=ng=i=ng> sign|a/ae", // reviewed
 "0|cat|You can make a Minecraft cat sit or <stand>|a/ae",
 "5|@👨🏻‍🎤|He is a <rapper>|a/ae,lax:dbl",
 
@@ -668,15 +754,22 @@
 "1|@🦆|<duck>|u/A,ck/k",
 "1|@🕰️|<Just> a bit of time, please|u/A",
 "2|@👨‍👦|<Adult>s are boring|u/A",
+"20|@👨‍👦|<A/E=d=u/A=l=t>s are boring|u/A", // reviewed
 "4|@🎃|scary <pumpkin>|u/A",
 "3|@🏃‍♂️‍➡️|He is <running>.|u/A,lax:dbl",
+"20|@🏃‍♂️‍➡️|He is <r=u/A=nn=i=ng>.|u/A,lax:dbl", // reviewed
 "6|mushroom@🍄|<mushroom>|u/A",
+"20|mushroom@🍄|<m=u/A=sh=r=oo=m>|u/A", // reviewed
 "7|@🍟|I want chips with <ketchup>!|u/A,ch/tS",
+"20|@🍟|I want chips with <k=e=tch=u/A=p>!|u/A,ch/tS", // reviewed
 "8|cat|I <instruct> the cat to sit|u/A",
+"20|cat|I <i=n=s=t=r=u/A=c=t> the cat to sit|u/A", // reviewed
 
 "4|skeletonskull|skeleton <skull>|u/A",
+"20|skeletonskull|skeleton <s=k=u/A=ll>|u/A", // reviewed
 
 "5|@👮|You're under <arrest>!|lax:dbl",
+"20|@👮|You're under <a/E=rr=e=s=t>!|lax:dbl", // reviewed
 
 // --- digraph ---
 
@@ -1485,8 +1578,14 @@
 
             // Finish the current segment: record its grapheme and its (explicit or default) phoneme
             const flush_segment = function() {
+                const ph = seg_phoneme.length ? seg_phoneme : default_phoneme(seg_grapheme);
                 add_words.push(seg_grapheme);
-                phonemes.push(seg_phoneme.length ? seg_phoneme : default_phoneme(seg_grapheme));
+                phonemes.push(ph);
+                // Flag segments whose phoneme is missing from the master list (a typo, or a
+                // grapheme with no default and no explicit /phoneme yet)
+                if(is_segmented && phoneme_sounds[ph] === undefined) {
+                    console.error('Unknown phoneme', JSON.stringify(ph), 'for segment', JSON.stringify(seg_grapheme), 'in', JSON.stringify(full));
+                }
                 seg_grapheme = '';
                 seg_phoneme = '';
                 in_phoneme = false;
@@ -1659,7 +1758,7 @@
         function get_class_highlight_mask(to_type_str, word_class) {
             if(word_class === undefined) { return undefined; }
             let rule = class_highlight_rules[word_class];
-            if(rule === undefined) { return undefined; }
+            if(rule === undefined || rule === false) { return undefined; } // false = known grouping-only tag, no highlight
             rule = new RegExp(rule, 'gdi');
             
             const match = rule.exec(to_type_str);
@@ -2434,7 +2533,13 @@
                 for(let j=0; j<cl.length; j++) {
                     const thisclass = cl[j];
                     let cllist = out.class_to_ix[thisclass];
-                    if(cllist === undefined) { out.class_to_ix[thisclass] = []; cllist = out.class_to_ix[thisclass]; }
+                    if(cllist === undefined) {
+                        out.class_to_ix[thisclass] = []; cllist = out.class_to_ix[thisclass];
+                        // Flag an unrecognised tag once (typo?): not present in class_highlight_rules at all
+                        if(class_highlight_rules[thisclass] === undefined) {
+                            console.error('Unknown class tag', JSON.stringify(thisclass), 'e.g. in', JSON.stringify(out.words[i].text));
+                        }
+                    }
                     cllist.push(i);
                 }
             }

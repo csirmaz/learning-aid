@@ -111,6 +111,18 @@ def check_text(phrase, avoid_alice=False, force=False):
     generate_tts(phrase, filename, voice_ix)
 
 
+def normalize_markup(text):
+    """Collapse a segmented region like <p/p=e/e=n/n> into a single to-type part <pen>: drop
+    each segment's '/phoneme' spec and the '=' separators, keeping just the graphemes. A
+    segmented problem then looks like an ordinary one-part word, so its full phrase is spoken
+    but its individual phoneme segments are not turned into speech. Plain words and multi-word
+    stories (no '=') come through unchanged."""
+    def merge(m):
+        segments = m.group(1).split('=')
+        return '<' + ''.join(seg.split('/', 1)[0] for seg in segments) + '>'
+    return re.sub(r'<([^>]+)>', merge, text)
+
+
 def scan_words():
     word_area = False
     for line in open(html_file, 'r'):
@@ -128,6 +140,8 @@ def scan_words():
                 phrase = match.group(2)
                 phrase = phrase.replace(r"\'", "'")
                 phrase = phrase.replace(r'\"', '"')
+                # Collapse a segmented <a=b> into a single <ab> part (see normalize_markup)
+                phrase = normalize_markup(phrase)
                 # Alice is not great with multiple sentences
                 check_text(phrase.replace('<','').replace('>',''), avoid_alice=(level >= 100))
                 
