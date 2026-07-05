@@ -1,8 +1,11 @@
-# spellbee-new.html — reviewing segmented problem entries
+# spellbee.html — reviewing segmented problem entries
 
 How to review a **segmented** problem entry (a word entry whose `<…>` region is split into
-`=`-separated segments, e.g. `"20|@🐘|<e=l=e=ph=a/E=n=t>|ph/f"`). Segmented entries currently
-live at **level 20**. For the format itself see [`spellbee-content.md`](spellbee-content.md);
+`=`-separated segments, e.g. `"20|@🐘|<e=l=e=ph=a/E=n=t>|ph/f"`). Review is **not** scoped to a
+particular level/class: **every** entry whose text contains a `=` is in scope, at any level.
+Segmented entries currently all live at **level 20**, so one found at any other level is reported
+as a finding (this expectation may change in future). For the format itself see
+[`spellbee-content.md`](spellbee-content.md);
 for the phoneme ids see the `phoneme_sounds` object and for class tags
 [`spellbee-classes.md`](spellbee-classes.md).
 
@@ -38,14 +41,15 @@ Two `console.error`s fire during page load (open the browser console):
 To enumerate gaps in bulk, run the saved extractor [`segmented-audit.js`](segmented-audit.js):
 
 ```
-node agent/segmented-audit.js [html-file] [level]     # defaults: spellbee-new.html, level 20
+node agent/segmented-audit.js [html-file] [expected-level]   # defaults: spellbee.html, expected-level 20
 ```
 
 It loads the app's own `word_repository` / `process_word_data()` / `get_processed_word()` /
-`phoneme_sounds` / `class_highlight_rules` and lists, for each **segmented** entry at that
-level, every segment resolved to its phoneme (`*` = explicit spec, `[?]` = missing,
-`[!x]` = resolved to an unknown phoneme id), flagging a missing image / class / phoneme, an
-**invalid phoneme**, or a **class tag absent from `class_highlight_rules`** — so the audit
+`phoneme_sounds` / `class_highlight_rules` and lists, for **every** segmented entry (any whose
+text contains a `=`, at any level), every segment resolved to its phoneme (`*` = explicit spec,
+`[?]` = missing, `[!x]` = resolved to an unknown phoneme id), flagging a missing image / class /
+phoneme, an **invalid phoneme**, a **class tag absent from `class_highlight_rules`**, or an
+entry whose **level is not the expected-level** (`UNEXPECTED-LEVEL`, default 20) — so the audit
 always matches runtime behaviour. It reports structural gaps only; judging whether a *valid*
 resolved phoneme is *correct for RP* is the (LLM/human) review step — and **arguable specs are
 put to the maintainer** (see Judgement notes).
@@ -53,7 +57,7 @@ put to the maintainer** (see Judgement notes).
 Once the edits are decided, apply them with [`apply-line-edits.js`](apply-line-edits.js):
 
 ```
-node agent/apply-line-edits.js spellbee-new.html edits.json [--dry-run]
+node agent/apply-line-edits.js spellbee.html edits.json [--dry-run]
 ```
 
 `edits.json` is an array of `{"old": "<full entry line>", "new": "<edited line>"}` (edits may
@@ -75,8 +79,11 @@ to confirm 0 gaps remain.
 - **Same grapheme, context-dependent sound.** `o` is `o` /ɒ/ in *box*, but `A` /ʌ/ in *monkey*,
   *something*; `a` is `ae` /æ/ in *hanging*, `O:` /ɔː/ in *water*, `E` /ə/ in *distance*. Judge
   by the word, not the letter — the class tag on the entry is for grouping and may differ.
-- **No single-phoneme match.** Syllabic endings like the `al` /əl/ of *crystal* have no single
-  ascii phoneme; approximate with the schwa `E` and flag for a maintainer decision.
+- **Syllabic `l` endings.** A syllabic `-al`/`-el`/`-le` /əl/ (as in *capital*, *portal*,
+  *crystal*) has no single vowel+`l` phoneme; voice it as just **`l`** (the `l` is syllabic and
+  voiced anyway). This is the maintainer's standing choice — do not use `E` or `O:` for these.
+- **Other no-single-phoneme matches.** For any *other* ending with no clean ascii phoneme,
+  approximate with the nearest id and flag for a maintainer decision.
 - **`-ed` endings** are `Id` /ɪd/ only after t/d (*wanted*); otherwise `/t/`=`t` after a
   voiceless sound (*walked*) or `/d/`=`d` after a voiced one (*mentioned*).
 - **Common wrong defaults to watch.** `e`→`/e/` is wrong for the many reduced `e`s that are

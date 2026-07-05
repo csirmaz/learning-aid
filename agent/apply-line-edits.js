@@ -14,7 +14,7 @@
 // safely. Pairs with old === new are treated as no-ops.
 //
 // Example:
-//   node agent/apply-line-edits.js spellbee-new.html - --dry-run <<'JSON'
+//   node agent/apply-line-edits.js spellbee.html - --dry-run <<'JSON'
 //   [{"old":"\"20|@🐘|<e=l=e=ph=a=n=t>|ph/f\", // reviewed",
 //     "new":"\"20|@🐘|<e=l=e/I=ph=a/E=n=t>|ph/f\", // reviewed"}]
 //   JSON
