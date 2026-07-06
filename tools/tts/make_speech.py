@@ -80,7 +80,11 @@ def avoid_tts(text):
         'breath',
         'breathe',
         'front',
-        'stand'
+        'stand',
+        'a',
+        'A',
+        'an',
+        'An',
     ]
 
 seen = set()

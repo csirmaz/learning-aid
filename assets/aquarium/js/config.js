@@ -32,7 +32,7 @@ window.AQUARIUM_CONFIG = {
     dragonfish:    { src: 'assets/fish/dragonfish.svg',    h: 0.26, aspect: 1.558, speed: 0.100 },
     crab:          { src: 'assets/fish/crab.svg',          h: 0.22, aspect: 1.404, speed: 0.055 },
     seahorse:      { src: 'assets/fish/seahorse.png', h:0.24, aspect: 400/228, speed: 0.065 },
-    axolotl:       { src: 'assets/fish/axolotl.png', h:0.28, aspect: 400/207, speed: 0.080 }
+    axolotl:       { src: 'assets/fish/axolotl.png?2', h:0.28, aspect: 400/207, speed: 0.080 }
   },
 
   items: {

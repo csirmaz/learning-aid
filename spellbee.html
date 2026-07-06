@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?463">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?464">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -192,10 +192,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?463">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?464">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?463"></script>
+    <script src="assets/local/beelocal.js?464"></script>
 </head>
 <body>
     <div class="container">
@@ -402,6 +402,7 @@
             //
             'j': 1,     // /j/ as in "you"
             'w': 1,     // /w/ as in "wet"
+            'sl': 1,    // syllabic l
             // Short (lax) vowels
             'ae': 1,    // /æ/ as in "cat"
             'A': 1,     // /ʌ/ as in "cup"
@@ -437,8 +438,8 @@
             'SEn': 1,   // "-tion" ending, /ʃən/
             'Id': 1,    // one value of the past tense morpheme, "-ed" ending, /ɪd/
             'lI': 1,    // value of -ly morpheme, /lɪ/
-            'ItI': 1,   // value of -ity /ɪtɪ/
-            'Ent': 1    // value of -ant /ənt/
+            'ItI': 1,   // value of -ity /ɪtɪ/     TODO soundfile
+            'Ent': 1    // value of -ant /ənt/     TODO soundfile
         };
 
         // Default ascii phoneme (a key of phoneme_sounds) for a segment's grapheme when none is
@@ -1169,7 +1170,7 @@
 "4|@🚶‍♀️‍➡️|She is <walking>.|dark:al",
 "9|@🔐|My date of birth is <personal>|dark:al,er/3:",
 "9|@🇫🇷|Paris is the <capital> of France.|dark:al,a/ae",
-"20|@🇫🇷|Paris is the <c=a=p=i=t=al/l> of France.|dark:al,a/ae", // reviewed
+"20|@🇫🇷|Paris is the <c=a=p=i=t=al/sl> of France.|dark:al,a/ae", // reviewed
 "9|@🇩🇪|Berlin is the <capital> for Germany.|dark:al,a/ae",
 
 // ol  dark:ol
@@ -1199,7 +1200,7 @@
 "20|carrot|Carrots can heal <h=or=s=es/Iz>|or/O:", // reviewed
 "1|feather|You can get a feather as a <morning> gift from your <cat> when you <wake> up.|or/O:",
 "6|netherportal|nether <portal>|or/O:,end:al@",
-"20|netherportal|nether <p=or=t=al/l>|or/O:,end:al@", // reviewed
+"20|netherportal|nether <p=or=t=al/sl>|or/O:,end:al@", // reviewed
 "1|carrot|In the Java version of Minecraft, there is a <bug>, and skeleton <horses> can also eat carrots.|u/A,or/O:",
 
 // ar=(]:  ar/a:
@@ -1628,7 +1629,7 @@
         };
 
     </script>
-    <script src="assets/common.js?463"></script>
+    <script src="assets/common.js?464"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -2920,8 +2921,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?463"></script>
-    <script src="assets/aquarium/js/aquarium.js?463"></script>
+    <script src="assets/aquarium/js/config.js?464"></script>
+    <script src="assets/aquarium/js/aquarium.js?464"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
