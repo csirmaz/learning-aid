@@ -103,10 +103,10 @@
         .prompt .infield_segmented .typebox {
             display: inline-block;
             /* content-box so min-width/min-height are the content area: an empty box already
-               reserves room for the longest part and a full line box, so it does not grow (in
-               either direction) when the child starts typing */
+               reserves room for its part (see render_segmented_input) and a full line box, so it
+               does not grow (in either direction) when the child starts typing */
             box-sizing: content-box;
-            min-width: 1.5rem;   /* overridden inline to hold the longest part */
+            min-width: 1.5rem;   /* overridden inline per box; see render_segmented_input for the width */
             min-height: 2rem;    /* = line-height, so a typed line box fits without enlarging the box */
             line-height: 2rem;
             margin: 0 .15rem;
@@ -1673,6 +1673,8 @@
             score_goal: 30,        // controls the bar under the score and gifts
             max_negative_score: 4, // maximum "negative" score where question doesn't give point
             puzzle_needs: 4, // how many successes before puzzle is dismissed
+            max_box_len: 14, // segmented words: once the boxes' proxy length exceeds this, boxes are
+                             // sized compactly instead of uniformly (see render_segmented_input)
             // State (common)
             storage: {'players': {}},  // storage data that's saved into local storage
             load_time: Date.now(),
@@ -1987,10 +1989,36 @@
             const to_type = bee.processed_word.to_type;
             const parts = bee.processed_word.add_words;
 
-            // Size every box to hold the longest part (see the .typebox CSS)
+            // Decide how wide (in characters) to render each segment's box.
+            // Normally every box is sized to the longest part, so the boxes are uniform and give no
+            // clue about how long each part is. But horizontal space is limited, so for a long
+            // series of boxes we switch to a compact mode that sizes boxes closer to their real
+            // length rather than overflowing the row.
             let max_part_len = 0;
-            for(let i=0; i<parts.length; i++) { if(parts[i].length > max_part_len) { max_part_len = parts[i].length; } }
-            const boxstyle = ' style="min-width:'+(max_part_len*1.2)+'ch"';
+            let total_chars = 0;   // characters to render across all boxes
+            let has_two_char = false; // is any segment exactly 2 characters?
+            for(let i=0; i<parts.length; i++) {
+                const len = parts[i].length;
+                if(len > max_part_len) { max_part_len = len; }
+                total_chars += len;
+                if(len == 2) { has_two_char = true; }
+            }
+            // Proxy for the on-screen length of the box series: the characters in the boxes plus the
+            // gaps between adjacent boxes (one per segment boundary, i.e. segments - 1).
+            const box_series_len = total_chars + (parts.length - 1);
+            // box_char_len(len) -> character widths to render a box holding a `len`-character segment
+            let box_char_len;
+            if(box_series_len < bee.max_box_len) {
+                // Enough room: uniform boxes sized to the longest part (no length clue)
+                box_char_len = function(len) { return max_part_len; };
+            } else {
+                // Compact: size boxes to their real length. To avoid singling out 1-character
+                // segments when 2-character ones are present, render 1-char boxes at 2 characters
+                // (so they look the same as the 2-char boxes); otherwise render them at 1 character.
+                // Segments of 2+ characters are rendered at exactly their own width.
+                const one_char_len = has_two_char ? 2 : 1;
+                box_char_len = function(len) { return len == 1 ? one_char_len : len; };
+            }
 
             let o = '';
             let type_ix = 0;    // index into to_type / the current typed position
@@ -2006,6 +2034,7 @@
                 }
                 if(type_ix == part_start) { // open a box at each part start; colour it once the part is completed
                     const st = segment_status(part_start, parts[part_ix].length);
+                    const boxstyle = ' style="min-width:'+(box_char_len(parts[part_ix].length)*1.2)+'ch"';
                     o += '<span class="typebox'+(st == 'ok' ? ' typebox_ok' : (st == 'error' ? ' typebox_err' : ''))+'"'+boxstyle+'>';
                 }
                 if(type_ix == bee.typed.length) { o += '<span class="cursor_outer"><span class="cursor"></span></span>'; }
@@ -2033,9 +2062,11 @@
         // '/X' (silent + link, see get_processed_word) is a silent "e" that lengthens the vowel two
         // boxes to its left, with one consonant box between them. Once that vowel box is completed
         // correctly we draw a rounded "bottom half of a box" (.segbox_link) joining the vowel box to
-        // the silent-e box, passing under the box between them. All boxes are equal width and kept on
-        // one line, so the line is just measured off the rendered DOM. Called after each re-render of
-        // the input; the lines are children of .inp and are dropped when its html is next replaced.
+        // the silent-e box, passing under the box between them. Boxes may be non-uniform width (see
+        // render_segmented_input's compact mode) but are kept on one line, so the link is measured
+        // centre-to-centre off the rendered DOM rects and works at any box widths. Called after each
+        // re-render of the input; the lines are children of .inp and are dropped when its html is
+        // next replaced.
         function draw_segment_connectors() {
             const connectors = bee.processed_word.connectors;
             if(!connectors || connectors.indexOf(true) < 0) { return; } // nothing to link
@@ -2720,6 +2751,11 @@
         function new_question(reason) {  // also called from common.js on successfully answering a question
             console.log('#new_question05() caller=', reason);
             if(check_dismiss_puzzle()) { return; } // puzzle solved: don't generate/speak the next question
+            // No words match the selected level range: warn instead of crashing while picking a word
+            if(bee.words.length == 0) {
+                bee_alert('No words found for the selected level range. Please choose a different range with "Update word sets".');
+                return;
+            }
             page_update();
             
             try{ document.activeElement.blur(); }catch(e){}
@@ -2897,7 +2933,7 @@
         
         
         function init_wordlist() {
-            const min_wordset = bee.storage.players[bee.player].min_wordset; // min level
+            let min_wordset = bee.storage.players[bee.player].min_wordset; // min level
             if(min_wordset === undefined) { min_wordset = 0; }
             const max_wordset = bee.storage.players[bee.player].wordsets; // max level
             
