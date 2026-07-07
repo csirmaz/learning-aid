@@ -6,11 +6,17 @@
 //
 // For every segmented entry (any word whose <…> region contains a '=', at ANY level) it prints
 // the target text with each segment resolved to
-// its phoneme (marking an explicit '/phoneme' spec with '*', a missing phoneme as '[?]', and a
-// segment that resolved to an UNKNOWN phoneme id as '[!x]'), and flags a missing image /
-// missing class / missing phoneme, an invalid phoneme, a class tag that is absent from
-// class_highlight_rules, or an entry whose level is not the expected-level (segmented problems
-// currently all live at that level - see EXPECTED_LEVEL; this may change in future).
+// its phoneme (marking an explicit '/phoneme' spec with '*', a missing phoneme as '[?]', a
+// segment that resolved to an UNKNOWN phoneme id as '[!x]', and a split-digraph link '/X' with a
+// trailing '~'), and flags a missing image / missing class / missing phoneme, an invalid phoneme,
+// a split-digraph link with no target box two segments to its left ('link-no-target'), a class tag
+// that is absent from class_highlight_rules, or an entry whose level is not the expected-level
+// (segmented problems currently all live at that level - see EXPECTED_LEVEL; this may change).
+//
+// A '/X' link folds to the silent phoneme 'x' at runtime, so it is a valid phoneme, not a gap;
+// this audit only checks its structure (that a vowel box exists two segments to its left). Whether
+// '/X' is the right call - i.e. the vowel is genuinely tensed by the silent e - is the human/LLM
+// review step (see agent/segmented-review.md), same as judging any phoneme's RP correctness.
 // It loads the app's own parser (word_repository, process_word_data,
 // get_processed_word, phoneme_sounds, class_highlight_rules, segment_default_phoneme) out of
 // the HTML, so the audit always matches runtime behaviour.
@@ -62,15 +68,17 @@ const audit = `
         const inner = (w.text.match(/<([^>]*)>/) || [])[1] || '';
         const rawsegs = inner.split('=');
         const segs = [];
-        let missing = 0, invalid = 0;
+        let missing = 0, invalid = 0, badLinks = 0;
         for(let i = 0; i < p.add_words.length; i++) {
             const explicit = (rawsegs[i] || '').indexOf('/') >= 0;
+            const link = !!(p.connectors && p.connectors[i]); // '/X' split-digraph link
+            if(link && i < 2) { badLinks++; }                 // link needs a vowel box two segments to its left
             const ph = p.phonemes[i];
             let tag;
             if(ph === '') { missing++; tag = '?'; }                                    // unmapped: no default and no spec
             else if(phoneme_sounds[ph] === undefined) { invalid++; tag = '!' + ph; }   // resolved to an unknown phoneme id (typo)
             else tag = ph;
-            segs.push(p.add_words[i] + '[' + tag + ']' + (explicit ? '*' : ''));
+            segs.push(p.add_words[i] + '[' + tag + ']' + (explicit ? '*' : '') + (link ? '~' : ''));
         }
         const badClasses = (w.class || []).filter(c => class_highlight_rules[c] === undefined); // tag absent from class_highlight_rules
         rows.push({
@@ -79,6 +87,7 @@ const audit = `
             level: String(raw).split('|')[0], // 1st field; flagged below if not the expected level
             missing: missing,
             invalid: invalid,
+            badLinks: badLinks,
             badClasses: badClasses,
             noImage: (w.emoji === undefined && w.ref === undefined && w.imgref === undefined),
             noClass: (!w.class || w.class.length === 0)
@@ -96,6 +105,7 @@ for(const r of rows) {
     const flags = [
         r.missing ? r.missing + ' missing-phoneme' : '',
         r.invalid ? r.invalid + ' invalid-phoneme' : '',
+        r.badLinks ? r.badLinks + ' link-no-target' : '',
         r.badClasses.length ? 'invalid-class:' + r.badClasses.join(',') : '',
         r.level !== EXPECTED_LEVEL ? 'UNEXPECTED-LEVEL:' + r.level + ' (expected ' + EXPECTED_LEVEL + ')' : '',
         r.noImage ? 'NO-IMAGE' : '',
@@ -105,4 +115,4 @@ for(const r of rows) {
     console.log(r.display);
     console.log('    ' + r.segs + (flags ? '   <<< ' + flags : ''));
 }
-console.log('\n' + rows.length + ' segmented entries; ' + needWork + ' need work.  (* = explicit /phoneme, [?] = missing, [!x] = unknown phoneme)');
+console.log('\n' + rows.length + ' segmented entries; ' + needWork + ' need work.  (* = explicit /phoneme, ~ = split-digraph link /X, [?] = missing, [!x] = unknown phoneme)');

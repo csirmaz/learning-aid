@@ -26,6 +26,13 @@ For each entry `"level|image|text|class"`:
    `/ɑː/`→`a:`, `/ə/`→`E` (`Er` for an `-er` ending), `/ʌ/`→`A`, `/eɪ/`→`eI`, silent→`x`). **Always override a wrong
    default** — the defaults are broad and frequently wrong in context (see below); never leave a
    segment voicing the wrong sound just because a default supplied one.
+   - **Split-digraph link `/X`.** A silent split-digraph "e" that lengthens the vowel **two boxes
+     to its left** (one consonant box between them, e.g. `<h=o/EU=m=e/X>`) may be spec'd `/X`
+     (capital) instead of `/x`: it is silent exactly like `/x` but also draws a linking line back
+     to the vowel box in the UI. Use `/X` only when the vowel is genuinely tensed by the e (`eI`,
+     `i:`, `aI`, `EU`, `ju:`, `u:`); leave r-controlled or reduced vowels (horse, come, chocolate)
+     as plain `/x`. It folds to `x`, so the audit still sees a valid phoneme — **do not "correct"
+     `/X` back to `/x`.**
 4. **Mark it.** Append an end-of-line comment `// reviewed` so the line is not re-reviewed.
 
 ## Tooling that surfaces gaps
@@ -47,12 +54,14 @@ node agent/segmented-audit.js [html-file] [expected-level]   # defaults: spellbe
 It loads the app's own `word_repository` / `process_word_data()` / `get_processed_word()` /
 `phoneme_sounds` / `class_highlight_rules` and lists, for **every** segmented entry (any whose
 text contains a `=`, at any level), every segment resolved to its phoneme (`*` = explicit spec,
-`[?]` = missing, `[!x]` = resolved to an unknown phoneme id), flagging a missing image / class /
-phoneme, an **invalid phoneme**, a **class tag absent from `class_highlight_rules`**, or an
-entry whose **level is not the expected-level** (`UNEXPECTED-LEVEL`, default 20) — so the audit
-always matches runtime behaviour. It reports structural gaps only; judging whether a *valid*
-resolved phoneme is *correct for RP* is the (LLM/human) review step — and **arguable specs are
-put to the maintainer** (see Judgement notes).
+`~` = a `/X` split-digraph link, `[?]` = missing, `[!x]` = resolved to an unknown phoneme id),
+flagging a missing image / class / phoneme, an **invalid phoneme**, a **`/X` link with no target
+box two segments to its left** (`link-no-target`), a **class tag absent from
+`class_highlight_rules`**, or an entry whose **level is not the expected-level**
+(`UNEXPECTED-LEVEL`, default 20) — so the audit always matches runtime behaviour. It reports
+structural gaps only; judging whether a *valid* resolved phoneme is *correct for RP* — or whether
+a `/X` link is warranted (the vowel is genuinely tensed by the silent e) — is the (LLM/human)
+review step, and **arguable specs are put to the maintainer** (see Judgement notes).
 
 Once the edits are decided, apply them with [`apply-line-edits.js`](apply-line-edits.js):
 
