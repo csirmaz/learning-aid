@@ -88,9 +88,11 @@ to confirm 0 gaps remain.
 - **Same grapheme, context-dependent sound.** `o` is `o` /ɒ/ in *box*, but `A` /ʌ/ in *monkey*,
   *something*; `a` is `ae` /æ/ in *hanging*, `O:` /ɔː/ in *water*, `E` /ə/ in *distance*. Judge
   by the word, not the letter — the class tag on the entry is for grouping and may differ.
-- **Syllabic `l` endings.** A syllabic `-al`/`-el`/`-le` /əl/ (as in *capital*, *portal*,
-  *crystal*) has no single vowel+`l` phoneme; voice it as just **`l`** (the `l` is syllabic and
-  voiced anyway). This is the maintainer's standing choice — do not use `E` or `O:` for these.
+- **Syllabic `l` endings.** A syllabic `-al`/`-el`/`-le`/`-ol` /əl/ (as in *capital*, *portal*,
+  *table*, *symbol*, *crystal*) is voiced with the dedicated **`sl`** phoneme ("syllabic l") —
+  e.g. `<c=a=p=i=t=al/sl>`, `<t=a=b=le/sl>`. This is the maintainer's standing choice — do not use
+  `l`, `E`, or `O:` for these (`O:` is only for true `all` /ɔːl/ words like *call*/*tall*/*wall*).
+  Watch for the transposition typo `ls` (invalid — the audit flags it `[!ls]`).
 - **Other no-single-phoneme matches.** For any *other* ending with no clean ascii phoneme,
   approximate with the nearest id and flag for a maintainer decision.
 - **`-ed` endings** are `Id` /ɪd/ only after t/d (*wanted*); otherwise `/t/`=`t` after a
