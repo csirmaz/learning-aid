@@ -666,7 +666,7 @@
                 const b = RND(1, 12);
                 let problems = [];
                 for(let bb=b; bb<b+3; bb++) {
-                    problems.push(get_div_problem_from_mult(a, bb>12?bb-12:bb));
+                    problems.push(get_div_problem_from_mult(bb>12?bb-12:bb, a));
                 }
                 return {type: 'problem_list', problems: problems};
             },
@@ -784,8 +784,8 @@
                 [PRBL.unknown_times_three, 4],
                 [PRBL.three_times_unknown, 4],
                 // [PRBL.fifth_of_number, 8],
-                [PRBL.unknown_times_five, 4],
-                [PRBL.five_times_unknown, 4],
+                // [PRBL.unknown_times_five, 4],
+                // [PRBL.five_times_unknown, 4],
                 [PRBL.divide_three_consecutive, 24],
             ],
             2: [
@@ -927,7 +927,7 @@
                 o += '</tr>';
                 $('.hint').html(o);
                 setTimeout(function() {
-                    $('.hintloader').hide();
+                    if(!auto) { $('.hintloader').hide(); } // auto mode: the loader may belong to a concurrent penalty_delay, so leave it alone
                     $('.hint').show();
                     if(data.groups) { $('body').addClass('condense'); }
                 }, 100); // allow rendering
