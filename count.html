@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?465">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?466">
     <style>
         body {
             /* Disables pull-to-refresh but allows overscroll glow effects. */
@@ -160,10 +160,10 @@
         }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?465">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?466">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?465"></script>
+    <script src="assets/local/beelocal.js?466"></script>
 </head>
 <body>
     <div class="container">
@@ -316,22 +316,38 @@
         }
         
         function speak_yes() {
-            return ['Yes! ', 'Good! ', 'Great! ', 'Correct! ', 'Good job! ', 'Well done! '][RND(0, 5)];
+            return choose_from(['Yes! ', 'Good! ', 'Great! ', 'Correct! ', 'Good job! ', 'Well done! ']);
+        }
+        
+        function speak_repeat(problem, solution) {
+            const prefix = choose_from([
+                ['Actually, ', ' is ', '.'], 
+                ['So, ', ' is ', '.'],
+                ['Did you know that ', ' is ', '?'],
+                ['', ' is actually ', '.'],
+                ['', ' is really ', '.'],
+            ]);
+            const suffix = choose_from(['Let\'s try again!', 'Let\'s do it again!', 'Let\'s do it once more!', 'Can you type in the answer next?']);
+            return prefix[0] + problem + prefix[1] + solution + prefix[2] + ' ' + suffix;
         }
         
         function speak_multiplication(a, b, is_success) {
             // Return things to say on success and on failure
-            const p = ''+_n(a)+' times '+_n(b)+' is ';
+            const p = ''+_n(a)+' times '+_n(b);
             const ab = _n(a*b);
-            const suffix = ['Let\'s try again!', 'Let\'s do it again!', 'Let\'s do it once more!', 'Can you type in the answer next?'][RND(0, 3)];
-            if(is_success) { return speak_yes()+p+ab; }
-            const r = RND(0, 3);
-            if(r==0) { return 'Actually, '+p+ab+'. '+suffix; }
-            if(r==1) { return 'So, '+p+ab+'. '+suffix; }
-            if(r==2) { return 'Did you know that '+p+ab+' ? '+suffix; }
-            return p+'actually '+ab+'. '+suffix;
+            if(is_success) { return speak_yes()+p+' is '+ab; }
+            return speak_repeat(p, ab);
         }
-        
+
+        function speak_division(a, b, is_success) {
+            // WARNING The problem statement is a*b / b = ?
+            // Return things to say on success and on failure
+            const p = ''+_n(a*b)+' divided by '+_n(b);
+            const ab = _n(a);
+            if(is_success) { return speak_yes()+p+' is '+ab; }
+            return speak_repeat(p, ab);
+        }
+
         function multiply_hint(a, b) {
             return ((a==10 || b==10)?'To multiply by ten, just write a zero after the other number.':
                 ((a==0 || b==0)?'You are multiplying by zero':
@@ -369,6 +385,16 @@
                 speak_failed: speak_multiplication(a, b, false),
                 groups: multipl_group_help(a, b),
                 help_speech: multiply_hint(a, b)
+            }}; 
+        }
+        
+        function get_div_problem_from_mult(a, b) {
+            return {problem: (a*b)+'/'+b+'=', solution:a, hint:{
+                speak_prompt: ''+_n(a*b)+' divided by '+b+'',
+                speak_solution: speak_division(a, b, true),
+                speak_failed: speak_division(a, b, false),
+                groups: multipl_group_help(a, b),
+                help_speech: 'How many times '+b+' is '+_n(a*b)+'?'
             }}; 
         }
 
@@ -635,6 +661,15 @@
                 }
                 return {type: 'problem_list', problems: problems};
             },
+            divide_three_consecutive: function() { // e.g. 36/6= (twelve times table) - return groups of 3
+                const a = RND(1, 12);
+                const b = RND(1, 12);
+                let problems = [];
+                for(let bb=b; bb<b+3; bb++) {
+                    problems.push(get_div_problem_from_mult(a, bb>12?bb-12:bb));
+                }
+                return {type: 'problem_list', problems: problems};
+            },
             half_of_number: function() { // e.g. 10/2=
                 const a = RND(0, 12);
                 return {problem: a+'/2=', solution:(a/2), hint:{
@@ -717,8 +752,8 @@
                 [PRBL.subtract_from_five_allow_negative, 1],
                 [PRBL.subtract_from_ten_allow_negative, 10],
                 [PRBL.add_teen_plus_single_digit, 20],
-                // [PRBL.add_two_digit_plus_single_digit, 20],
-                // [PRBL.add_two_digit_no_carry, 20],
+                [PRBL.add_two_digit_plus_single_digit, 20],
+                [PRBL.add_two_digit_no_carry, 20],
                 // [PRBL.add_two_digit_with_carry, 20],
                 [PRBL.subtract_two_within_ten, 5],
                 [PRBL.subtract_single_digit_from_teen, 10],
@@ -742,15 +777,16 @@
                 [PRBL.add_two_digit_plus_single_digit, 10],
                 // [PRBL.add_whole_hundreds, 5],
                 [PRBL.multiply_three_consecutive, 10],
-                [PRBL.half_of_number, 8],
+                // [PRBL.half_of_number, 8],
                 [PRBL.unknown_times_two, 4],
                 [PRBL.two_times_unknown, 4],
-                [PRBL.third_of_number, 8],
+                // [PRBL.third_of_number, 8],
                 [PRBL.unknown_times_three, 4],
                 [PRBL.three_times_unknown, 4],
-                [PRBL.fifth_of_number, 8],
+                // [PRBL.fifth_of_number, 8],
                 [PRBL.unknown_times_five, 4],
                 [PRBL.five_times_unknown, 4],
+                [PRBL.divide_three_consecutive, 24],
             ],
             2: [
                 [PRBL.multiply_three_consecutive, 20],
@@ -776,6 +812,7 @@
             max_negative_score: 4, // maximum "negative" score where question doesn't give point
             question_timeout_value: 6, // the timeout (if the problem specifies) in seconds
             puzzle_needs: 2, // how many successes before puzzle is dismissed
+            longform_help_shown: true, // whether to automatically show help if it's longform
             // State (common)
             storage: {'players': {}},  // storage data that's saved into local storage
             load_time: Date.now(),
@@ -800,7 +837,7 @@
         };
 
     </script>
-    <script src="assets/common.js?465"></script>
+    <script src="assets/common.js?466"></script>
     <script>
 
         
@@ -1322,8 +1359,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?465"></script>
-    <script src="assets/aquarium/js/aquarium.js?465"></script>
+    <script src="assets/aquarium/js/config.js?466"></script>
+    <script src="assets/aquarium/js/aquarium.js?466"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

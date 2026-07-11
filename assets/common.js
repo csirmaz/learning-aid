@@ -283,7 +283,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 465;
+const bee_app_version = 466;
 
 call_local_hook('check_version', []);
 
@@ -291,6 +291,11 @@ call_local_hook('check_version', []);
 function esc_html(s) {
     s = String(s);
     return s.replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
+}
+
+
+function choose_from(array) {
+    return array[Math.floor(Math.random() * array.length)];
 }
 
 
