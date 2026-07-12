@@ -283,7 +283,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 469;
+const bee_app_version = 470;
 
 call_local_hook('check_version', []);
 
@@ -457,6 +457,28 @@ function page_update() {
     }
     call_local_hook('check_version', []);
 }
+
+
+// Keep a backgrounded tab fresh: when the child returns to a tab that has been hidden for a while,
+// reload so bootstrap()/load_data pulls the latest saved state (notably the shared aquarium, which
+// another app/tab may have changed). Guarded so a quick glance-away or an in-progress puzzle is
+// never disturbed. The 180s threshold matches the current_question_time anti-cheat window, so a
+// post-reload start_question does not also fire that penalty.
+let bee_hidden_at = null;
+function bee_return_reload() {
+    if(bee.is_puzzle || bee.player === false) { return; }
+    if(bee_hidden_at !== null && Date.now() - bee_hidden_at >= 180*1000) {
+        window.location.reload(true);
+    }
+}
+document.addEventListener('visibilitychange', function() {
+    if(document.hidden) { bee_hidden_at = Date.now(); }
+    else { bee_return_reload(); }
+});
+window.addEventListener('pageshow', function(e) {
+    // bfcache restore: JS state (bee_hidden_at, set on the hide before the freeze) is preserved.
+    if(e.persisted) { bee_return_reload(); }
+});
         
         
 // Show a reward animation (confetti)
@@ -1386,12 +1408,15 @@ $('.giftlist .list .exchange').on('click', function() {
 
 const bee_aquarium = {
     game: undefined,
+    // Set true by the data-load hook (load_data) for a non-spellbee app when the server returned
+    // shared aquarium data for the player. Spellbee is always active regardless.
+    _enabled: false,
     food_counter: $('.aq-feed-btn .count')
 };
 // Usage: bee_aquarium.init_game()
 
 bee_aquarium.is_active = function() {
-    return (bee.app_name == 'spellbee');
+    return (bee.app_name == 'spellbee' || bee_aquarium._enabled);
 };
 
 bee_aquarium.get_storage_key = function(player_name) {
@@ -1403,7 +1428,9 @@ bee_aquarium.get_storage_key = function(player_name) {
             player_name = bee.player;
         }
     }
-    return 'Aquarium:' + bee.app_name + ':' + player_name;
+    // The app segment is frozen to 'spellbee' (the aquarium's original app) so the key is the SAME
+    // across apps -> one shared aquarium, and existing spellbee keys keep working.
+    return 'Aquarium:spellbee:' + player_name;
 };
 
 bee_aquarium.init_game = function() {
@@ -1416,15 +1443,18 @@ bee_aquarium.init_game = function() {
 };
 
 bee_aquarium.get_data = function() {
+    // Per-app aquarium state in the game blob. Only the food-award SCHEDULE (next_food_at, tied to
+    // this app's score) lives here now; the food wallet and the fish/item collection are shared and
+    // live in the widget's own persisted state.
     if(bee.storage.players[bee.player].aquarium_data === undefined) {
-        bee.storage.players[bee.player].aquarium_data = {'food': 0, 'fish': [], 'items': []};
+        bee.storage.players[bee.player].aquarium_data = {};
     }
     return bee.storage.players[bee.player].aquarium_data;
 };
 
 bee_aquarium.init_food = function() {
-    const d = bee_aquarium.get_data();
-    bee_aquarium.food_counter.html(d.food);
+    if(!bee_aquarium.is_active()) { return; }
+    bee_aquarium.food_counter.html(bee_aquarium.game.getFoodCount());
 };
 
 bee_aquarium.decide_award_food = function(lifetime_score) {
@@ -1438,39 +1468,33 @@ bee_aquarium.decide_award_food = function(lifetime_score) {
 
 bee_aquarium.award_food = function() {
     if(!bee_aquarium.is_active()) { return; }
-    const d = bee_aquarium.get_data();
-    d.food++;
-    bee_aquarium.food_counter.html(d.food);
+    // Food wallet is shared -> lives in the widget's persisted state.
+    bee_aquarium.food_counter.html(bee_aquarium.game.addFoodCount(1));
 };
 
 bee_aquarium.feed = function() {
-    const d = bee_aquarium.get_data();
-    if(d.food <= 0) { return; }
-    d.food--;
-    bee_aquarium.food_counter.html(d.food);
+    if(!bee_aquarium.is_active()) { return; }
+    if(bee_aquarium.game.getFoodCount() <= 0) { return; }
+    bee_aquarium.food_counter.html(bee_aquarium.game.spendFoodCount(1));
     bee_aquarium.game.feed(8);
 };
 
 bee_aquarium.initial_stage = function() { // Whether we're early in populating
     if(!bee_aquarium.is_active()) { return false; }
-    const d = bee_aquarium.get_data();
-    if(d.fish.length + d.items.length < 9) { return true; }
+    // Fish/item collection is shared -> counted from the widget, not a per-app list.
+    if(bee_aquarium.game.fish.length + bee_aquarium.game.items.length < 9) { return true; }
     return false;
 };
 
 bee_aquarium.grant_fish = function() {
     if(!bee_aquarium.is_active()) { return false; }
-    const d = bee_aquarium.get_data();
     const typ = bee_aquarium.game.grantFish();
-    d.fish.push(typ);
     return {'type': typ, 'img_src': 'assets/aquarium/' + AQUARIUM_CONFIG.fish[typ].src};
 };
 
 bee_aquarium.grant_item = function() {
     if(!bee_aquarium.is_active()) { return false; }
-    const d = bee_aquarium.get_data();
     const typ = bee_aquarium.game.grantItem();
-    d.items.push(typ);
     return {'type': typ, 'img_src': 'assets/aquarium/' + AQUARIUM_CONFIG.items[typ].src};
 };
 

@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?469">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?470">
     <style>
         body {
             /* Disables pull-to-refresh but allows overscroll glow effects. */
@@ -160,10 +160,10 @@
         }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?469">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?470">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?469"></script>
+    <script src="assets/local/beelocal.js?470"></script>
 </head>
 <body>
     <div class="container">
@@ -173,7 +173,7 @@
                 <span class="icon">🪙</span><span class="icontext"></span> <span class="value">0</span>
                 <div class="bar"><span class="barfill"></span></div>
                 <span class="needed">-</span>
-            </div><div class="headerbutton gifts"><span class="open">🎁</span><span class="close">X</span><span class="needed">-</span></div>
+            </div><div class="headerbutton gifts"><span class="open">🎁</span><span class="close">X</span><span class="needed">-</span></div><div class="headerbutton aquarium-btn"><span class="open">🐟</span><span class="close">X</span></div>
         </div>
         <div class="game tab-panel tab-panel-game prompt">
             <div class="infield">
@@ -212,6 +212,15 @@
             <td class="kpext" data-i="D-">-</td>
         </tr>
         </table>
+
+        <div class="game tab-panel tab-panel-aquarium">
+            <div class="aq-controls">
+                <div class="aq-feed-btn">
+                    <img src="assets/aquarium/assets/misc/food.svg"><span class="count">0</span>
+                </div>
+            </div>
+            <div id="aquarium"></div>
+        </div>
 
         <div class="startmenu"></div>
         
@@ -837,7 +846,7 @@
         };
 
     </script>
-    <script src="assets/common.js?469"></script>
+    <script src="assets/common.js?470"></script>
     <script>
 
         
@@ -1374,6 +1383,15 @@
             update_score_ui(false);
             $('.d_player').html(esc_html(bee.player));
             init_problemset();
+
+            // Shared aquarium: init_game() only builds the widget when is_active() (spellbee, or
+            // count once load_data enabled it because the player has a shared aquarium row);
+            // init_food() and the gift hook are no-ops otherwise.
+            bee_aquarium.init_game();
+            bee_aquarium.init_food();
+            // Switch to the aquarium tab automatically after a fish/item gift animation
+            bee_aquarium.on_aquarium_gift = function() { switch_to_tab('aquarium'); };
+
             switch_to_tab('game');
             new_question('main');
         }
@@ -1387,8 +1405,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?469"></script>
-    <script src="assets/aquarium/js/aquarium.js?469"></script>
+    <script src="assets/aquarium/js/config.js?470"></script>
+    <script src="assets/aquarium/js/aquarium.js?470"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

@@ -44,9 +44,10 @@
     this.opts = options || {};
     this.storeKey = this.opts.storageKey || 'aquarium_default';
 
-    this.fish = []; 
-    this.items = []; 
+    this.fish = [];
+    this.items = [];
     this.food = [];
+    this.foodCount = 0;   // shared "food wallet" (feeds available); persisted so it is shared across apps
     this.attractors = [];
     this.worldW = 0; 
     this.worldH = 0;
@@ -293,6 +294,7 @@
       if (Config.fish[s.type]) self._spawnFish(s.type, s.nx, s.ny, s.dir);
     });
     (data.food || []).forEach(function (s) { self._spawnFood(s.nx, s.ny); });
+    this.foodCount = (data.foodCount | 0) || 0;
     return true;
   };
 
@@ -300,7 +302,8 @@
     var data = {
       items: this.items.map(function (it) { return { type: it.type, nx: it.nx, ny: it.ny }; }),
       fish:  this.fish.map(function (f)  { return { type: f.type, nx: f.nx, ny: f.ny, dir: f.dir }; }),
-      food:  this.food.map(function (p)  { return { nx: p.nx, ny: p.ny }; })
+      food:  this.food.map(function (p)  { return { nx: p.nx, ny: p.ny }; }),
+      foodCount: this.foodCount | 0
     };
     try { global.localStorage.setItem(this.storeKey, JSON.stringify(data)); } catch (e) {}
     this._dirty = false;
@@ -310,6 +313,16 @@
   P._queueSave = function () { this._dirty = true; };
 
   /* ---------- public-ish grant API --------------------------------------- */
+
+  // The food "wallet" (count of feeds available) lives in the persisted, shared state so it is
+  // shared across apps, unlike the per-app award schedule which the host tracks separately.
+  P.getFoodCount = function() { return this.foodCount | 0; };
+  P.addFoodCount = function(n) { this.foodCount = (this.foodCount | 0) + ((n | 0) || 1); this._saveState(); return this.foodCount; };
+  P.spendFoodCount = function(n) {
+    this.foodCount = Math.max(0, (this.foodCount | 0) - ((n | 0) || 1));
+    this._saveState();
+    return this.foodCount;
+  };
 
   P.grantFish = function(type) {
     type = (type && Config.fish[type]) ? type : pickKey(Config.fish);
