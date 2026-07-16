@@ -13,8 +13,16 @@ for the phoneme ids see the `phoneme_sounds` object and for class tags
 
 For each entry `"level|image|text|class"`:
 
-1. **Image** (2nd field). If empty (`"20||…"`), add one that hints at the target word —
-   `@<emoji>`, `word@<emoji>`, or a `~file.svg` / named ref (same forms as any word entry).
+1. **Image** (2nd field). If empty (`"20||…"`) **and the target word is picturable**, add one that
+   hints at the word — `@<emoji>`, `word@<emoji>`, or a `~file.svg` / named ref (same forms as any
+   word entry). The picture must denote the **specific** target — for a homophone, specifically
+   enough to distinguish it (a *sea* scene for `sea`, not `see`).
+   **Only picture what is picturable.** A word with no clear, unambiguous depiction — abstract and
+   function words (*were, this, just, because, very, of*) — is **left imageless**: a vague or
+   miscuing picture is worse than none. An empty image on such a word is a valid **final** state,
+   not an omission — so confirm the word is genuinely not picturable, then leave the field empty
+   and mark the line reviewed. The audit still prints `NO-IMAGE` for it (the flag is mechanical and
+   can't tell "not done yet" from "deliberately none"); do **not** add a picture just to clear it.
 2. **Class tag** (4th field). If empty, add the appropriate `spelling/phoneme` tag(s) for the
    target word's notable grapheme(s) (see [`spellbee-classes.md`](spellbee-classes.md)). Only
    add when the field is empty — don't churn existing tags.
@@ -61,7 +69,9 @@ box two segments to its left** (`link-no-target`), a **class tag absent from
 (`UNEXPECTED-LEVEL`, default 20) — so the audit always matches runtime behaviour. It reports
 structural gaps only; judging whether a *valid* resolved phoneme is *correct for RP* — or whether
 a `/X` link is warranted (the vowel is genuinely tensed by the silent e) — is the (LLM/human)
-review step, and **arguable specs are put to the maintainer** (see Judgement notes).
+review step, and **arguable specs are put to the maintainer** (see Judgement notes). `NO-IMAGE` is
+mechanical too: for a non-picturable word (step 1) an empty image is the correct final state, so
+confirm and leave it rather than adding a picture to clear the flag.
 
 Once the edits are decided, apply them with [`apply-line-edits.js`](apply-line-edits.js):
 

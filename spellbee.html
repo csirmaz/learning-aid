@@ -309,7 +309,10 @@
         // Use e.g. https://ttsmp3.com/ to generate TTS
         
         // Regexes that highlight parts of the word based on the class
-        // If there are no matching groups, highlight whole word, otherwise the matching groups
+        // If there are no matching groups, highlight whole match, otherwise the matching groups
+        // false means no highlight
+        // A tag missing from this object entirely is
+        // reported by init_wordlist_impl as an unknown / typo class tag.
         const class_highlight_rules = {
             "e/e": "e",
             "i/I": "i",
@@ -373,14 +376,12 @@
             "ch/tS": "tch|ch",
             "ti/S": "ti",
             "tur/tS": "tur",
-            // Grouping only - no highlight (false). A tag missing from this object entirely is
-            // reported by init_wordlist_impl as an unknown / typo class tag.
             "common": false,
             "tricky": false,
             "calendar": false,
-            "dge/dZ": false,
-            "au/O:": false,
-            "end:ey": false,
+            "dge/dZ": "dge",
+            "au/O:": "au",
+            "end:ey": "ey(?: |$)",
             "noclass:": false
         };
 
@@ -460,7 +461,8 @@
             'ItI': 1,   // value of -ity /ɪtɪ/
             'Ent': 1,   // value of -ant /ənt/
             'IdZ': 1,   // value of -age /ɪdʒ/
-            'tSE': 1,  // value of -ture /tʃə/
+            'tSE': 1,   // value of -ture /tʃə/
+            'In': 1,    // value of in- /ɪn/
         };
 
         // Default ascii phoneme (a key of phoneme_sounds) for a segment's grapheme when none is
@@ -547,168 +549,37 @@
         // [WORDS START]
         const word_repository = [
         
-// --- long-format stories ---
 // level >= MIN_LONGSTORY_LEVEL = 100 represent long-format stories
 // Each story is a series of "words" (typing questions) identified by having the same level number.
 // They are asked consecutively.
 
-"20|@🧑|a <y/j=ou/A=ng> man|tricky", // [young] reviewed
-"11|~stonesoup_stone.svg|A <young> man lived <alone> in a small house in a village.|o/EU,tricky",
+// TODO
+// Form regular typing problems from segmented ones by ignoring segments
 
+"20|@🧑|a <y/j=ou/A=ng> man|tricky", // [young] reviewed
 "20|@🛒|go to the <m=ar=k=et>|ar/a:,end:et", // [market] reviewed
 "20|@🌲|the big <f=o/o=r=e/I=s=t>|o/o", // [forest] reviewed
-"11|~stonesoup_bundle.svg|He needed to go to the <market> in town on the other side of the <big forest>.|ar/a:,end:et",
-
 "20|@🧵|a piece of <c=l=o/o=th/T>|cons:th", // [cloth] reviewed
 "20|@🦶|He set out on <f=oo/U=t>|oo/U", // [foot] reviewed
-"11|~stonesoup_bundle.svg|He wrapped his last scone in a piece of <cloth>, and set out on <foot>.|cons:th,oo/U",
-
 "20|@🤔|He got <r=ea/i:=ll=y> hungry|end:ly,ea/i:", // [really] reviewed
 "20|@🚶|He <w=al/O:=k=ed/t> until midday|dark:al", // [walked] reviewed
-"11|~stonesoup_bundle.svg|He entered the forest, and <walked> and walked until <midday>, when he got <really> hungry.|dark:al,ea/i:,end:ly",
-
 "20|@🍽️|eating <l=u/A=n=ch>|ch/tS", // [lunch] reviewed
-"11|~stonesoup_bundle.svg|He sat down for <lunch>, and ate the scone, picking <up> even the crumbs, as it <wasn't> a big scone at all.|tricky,ch/tS",
-
 "20|@🌑|The sky got <d=ar=k=er/Er>|ar/a:", // [darker] reviewed
-"11|~stonesoup_bundle.svg|He continued walking. The <trees> grew denser, and the sky got <darker>, but he still had not got <out of> the forest.|ar/a:,ou/aU,ee/i:",
-
 "20|@📏|It was far in the <d=i=s=t=a/E=n=ce/s>|c/s", // [distance] reviewed
 "20|@💡|A flickering <l=igh=t>|igh/aI", // [light] reviewed
-"11|~stonesoup_bundle.svg|It was close to midnight, and he was really hungry <again>. Luckily he spotted a flickering <light> in the <distance>.|igh/aI,c/s",
-
 "20|@💧|<w=a/O:=t=er/Er>|tricky,er/Er", // [water] reviewed
-"11|~stonesoup_bundle.svg|\"<Someone> must live there,\" he thought, \"and they will <have some> food and <water> for me.\" He walked toward the light.|tricky,er/Er",
-
 "20|@🪵|<w=oo/U=d=e/E=n> planks|oo/U", // [wooden] reviewed
 "20|@🕐|<Wh/w=e=n> is your birthday?|wh/w", // [when] reviewed
-"11|~stonesoup_hut.svg|<When> he reached the light, it turned out to be a small, dilapidated hut made of <wooden> planks.|wh/w,oo/U",
-
 "20|~stonesoup_hut.svg|The walls <w=ere/3:> covered in moss|common", // [were] reviewed
 "20|@🌻|<g=ar/a:=d=e/E=n>|ar/a:", // [garden] reviewed
 "20|@🪟|The <w=i=n=d=ow/EU=s/z> were broken|ow/EU", // [windows] reviewed
-"11|~stonesoup_hut.svg|The <windows> were broken, the walls <were> covered in moss, and the <garden> was full of weeds and rocks.|ow/EU,ar/a:,tricky",
-
 "20|@❓|<Wh/w=a/o=t> do you need?|wh/w", // [what] reviewed
-"11|~stonesoup_hut.svg|He knocked on <the> door anyway, and an old ugly <woman> opened the door. \"<What> do you want?\"|wh/w,tricky",
-
-"11|~stonesoup_hut.svg|\"I have walked all day,\" the man <said>, \"and I wonder if you might have a bite to eat and <some water> to drink for me.\"|tricky,er/Er",
-"11|~stonesoup_witch.svg|\"No,\" the woman <shouted> and slammed the door. She <really> looked like a <witch>.|ou/aU,ea/i:,end:ly,ch/tS",
-"11|~stonesoup_witch.svg|\"Maybe she didn't <hear> me,\" the man thought, and knocked <again>.|ea/IE,tricky",
-"11|~stonesoup_witch.svg|\"Is <that> you again?\" the witch said. \"I told you I don't have <anything>. Now go <away>.\"|cons:th,ay/eI,a/E",
-"11|~stonesoup_stone.svg|The man didn't <know> what to do. He walked around the garden, and stumbled on a big smooth <stone>.|kn/n,ow/EU,o/EU",
-"11|~stonesoup_stone.svg|He had an idea. He dug <out> the stone, and knocked on the door a third <time>.|ou/aU,i/aI",
-"11|~stonesoup_stone.svg|\"Are you <deaf>?\" the witch shouted. \"<Go> away!\"|ea/e,o/EU",
-"11|~stonesoup_stone.svg|\"I know you don't have anything, but I have this stone, and if I can use your <fire>, I can cook stone <soup> for both of us.\"|tricky",
-"11|~stonesoup_stone.svg|\"Stone soup?\" the witch asked. She was hungry, too. If she could make <food> out of stones, that would be <great>.|oo/u:,tricky",
-"11|~stonesoup_stone.svg|\"Alright, <you can> use the fire.\" She let the man <inside>.|i/aI,tricky",
-"11|~stonesoup_stone.svg|\"I just need a <big> pot and some water,\" the man <said>.|tricky",
-"11|~stonesoup_stone.svg|\"Here. The <well> is outside,\" the witch said. The man drew a <bucket> of water from the well and carried it back.|ck/k,end:et",
-"11|~stonesoup_pot.svg|He washed the stone, put the pot of <water> on the stove. He put the <stone> inside, and watched it boil.|o/EU,er/Er,tricky",
-"11|~stonesoup_pot.svg|The witch <was> hungry. \"Is it <ready> yet?\" she asked.|ea/e,end:y@,tricky",
-"11|~stonesoup_pot.svg|The man tasted the soup. \"It's almost <ready>. But you could make it extra <rich>, you know.\"|ea/e,end:y@,ch/tS",
-"11|~stonesoup_pot.svg|\"How?\" \"If <you> have some salt, that would <make> the soup just <perfect>.\"|a/eI,er/3:,tricky",
-"11|~stonesoup_pot.svg|\"I have a bit <somewhere>,\" the witch said, and gave some <salt> to the man. He put it in the soup.|dark:al,tricky",
-"11|~stonesoup_pot.svg|She was <really> hungry. \"<Is it> ready yet?\" she asked again.|ea/i:,end:ly",
-"11|~stonesoup_pot.svg|\"Almost perfect!\" the man said. \"Do you have a <potato> to make it creamy and fit for a <king>?\"|o/E",
-"11|~stonesoup_pot.svg|The witch searched <her> pantry and gave <three> potatoes to the man. He <cut> them up and threw them in the water.|er/3:,ee/i:",
-"11|~stonesoup_pot.svg|\"Is it ready <yet>?\" she asked <again>.|tricky",
-"11|~stonesoup_pot.svg|\"Almost perfect!\" the man said. \"<Do you> have a bit of sausage to give it the best taste in the <world>?\"|or/3:,tricky",
-"11|~stonesoup_pot.svg|The witch found a <pair> of sausages. The man cut them up into circles <and> added them <to the> soup.|ai/eE",
-"11|~stonesoup_pot.svg|\"<Is it> ready yet?\" <she> asked again. The lovely <smell> of sausages and potatoes filled the hut.|e/i:,lax:dbl",
-"11|~stonesoup_pot.svg|\"It is ready,\" the man <said>. The witch laid the <table>, with two <bowls> and spoons.|end:le,ow/EU,tricky",
-"11|~stonesoup_pot.svg|She even put a <basket> of <bread> on the table. The man carried the pot there, and poured soup into both bowls.|a/a:,ea/e,end:et",
-"11|~stonesoup_pot.svg|They ate without a <word>. The man was faster. He <finished> his soup and bread <before> the witch.|or/3:,or/O:",
-"11|~stonesoup_pot.svg|\"This is really <good>,\" the witch said, looking into the pot for <more>. She saw the <stone> there.|oo/U,or/O:,o/EU",
-"11|~stonesoup_pot.svg|\"But why did you <need> the -\" she asked, and looked up. But the man <was> gone.|ee/i:,tricky",
-"11|~stonesoup_hut.svg|He had got up quietly, had left the hut, and walked as <fast> as he could <away> from the hut before the witch got <angry>.|a/a:,ay/eI,a/E",
-
-"11|~europa_ship.svg|We were flying to Jupiter's strangest <moon>, Europa. We didn't know what will happen <there>.|oo/u:,tricky",
-"11|~europa_ship.svg|All <we> knew was that Base 2 wanted to get the <iron ore> on the moon.|or/O:,tricky",
-"11|~europa_ship.svg|They said, if we <meet> anyone there, just ask for the ore and look <grumpy>. Hopefully that will work.|ee/i:,end:y@",
-"11|~europa_ship.svg|We landed on the <ice> surface. We knew there was a <huge> ocean <under> the ice.|c/s,g/dZ",
-"11|~europa_ship.svg|So we moved the <machines> off the spaceship, and started drilling. It took <three> hours to get through the ice.|ch/S,ee/i:",
-"11|~europa_dive.svg|(Under the ice, the creatures gathered. \"What is this <noise>?\" the <biggest> asked. \"And where is the guard?\")|oi/OI",
-"11|~europa_dive.svg|(\"They are drilling,\" the <thin one> said. \"They are already in the <water>.\")|cons:th,er/Er,tricky",
-"11|~europa_dive.svg|When the hole was big <enough> for the excavator to fit through, we changed to diving suits, and <jumped> <into> the ocean.|tricky",
-"11|~europa_dive.svg|The ocean reached around the <whole> moon, and was fifty miles <deep>.|wh/w,o/EU",
-"11|~europa_dive.svg|Above us, the sunlight came through the <thick> ice. It was like having a hard lid for a <sky>.|cons:th,ck/k,y/aI",
-"11|~europa_excavator.svg|We put <the> excavator on the <bottom> of the ocean, and started the engine. It made the water <shake>.|a/eI,lax:dbl",
-"11|~europa_excavator.svg|\"What's <that>?\" Sara shouted over the radio, and pushed my arm. She pointed at a dark <rock>. The water was wobbly there.|cons:th,ck/k",
-"11|~europa_excavator.svg|\"<Something> moved there,\" she said. \"It was just the waves <from> the machine,\" I said.|cons:th",
-"11|~europa_excavator.svg|(The guard swam away from the dark rock back to the <other> creatures. \"They are trying to get the <iron>,\" he said.)|cons:th,tricky",
-"11|~europa_excavator.svg|(\"You let <them> in!\" they shouted. \"You have made the water <angry>!\" They threw him into a little hole in the sand.)|cons:th",
-"11|~europa_excavator.svg|(\"<What> do we do?\" they asked the biggest creature. \"Get <everyone> together,\" he said. \"We fight.\")|wh/w,tricky",
-"11|~europa_figures.svg|The excavator was digging out bits of the rock. We collected them so Base 2 could <see> whether there was <enough iron> there.|ee/i:,tricky",
-"11|~europa_figures.svg|\"Look <now>!\" Sara shouted again. <She> was looking at the dark rock.|ow/aU,e/i:",
-"11|~europa_figures.svg|<There were> about 15 dark figures floating in the <water> there.|er/Er,tricky",
-"11|~europa_figures.svg|\"What are they? We did not detect <life> on Europa for <years>.\" \"Well, there they are,\" Sara said.|i/aI,ea/IE",
-"11|~europa_figures.svg|\"So they live here,\" I said. \"No, they <don't>,\" Sara said. \"Look at the <bubbles> they make, just like us. They need <air>.\"|ai/eE,end:le",
-"11|~europa_figures.svg|(The <creatures> made a little army and lined up at the dark rock. \"Now!\" the biggest <one> shouted.)|tur/tS,ea/i:,tricky",
-"11|~europa_fight.svg|We <looked> at the floating figures. They didn't <move>. \"Fire a warning shot,\" our captain said.|oo/U,tricky",
-"11|~europa_fight.svg|Joe took his dart gun and fired a <dart>. It swished through the water towards the dark <rock>.|ar/a:,ck/k",
-"11|~europa_fight.svg|A moment <later>, a dart appeared coming towards us. \"Incoming!\" <people> shouted. It flew just next to Joe.|er/Er,tricky",
-"11|~europa_fight.svg|\"Fire!\" the captain shouted over the <radio>. <Everyone> took their gun and started shooting.|tricky",
-"11|~europa_fight.svg|There was a swarm of darts going out to the dark figures. A <moment> later, they started shooting <back>.|ck/k",
-"11|~europa_fight.svg|The darts swished between our <legs and feet>. Some put <holes> in our suits.|ee/i:,o/EU",
-"11|~europa_creatures.svg|\"<Stop> shooting! Don't <shoot>!\" Sara screamed <in the> radio.|oo/u:",
-"11|~europa_creatures.svg|Everyone was so surprised, we stopped. <Ten> seconds later, the <enemy> stopped shooting as well.|end:y@",
-"11|~europa_creatures.svg|\"Don't you <see>? We are fighting ourselves,\" Sara said. \"They just reflect what <we do>, like a <mirror>.\"|ee/i:,lax:dbl",
-"11|~europa_creatures.svg|I felt <stupid> for not seeing this sooner. Everyone was silent. We didn't know <what to do>.|wh/w,tricky",
-"11|~europa_creatures.svg|(\"We're tired,\" the <thin> creature said to the biggest one. \"We can't hold on for <much longer>.\")|cons:th,er/Er,ch/tS",
-"11|~europa_creatures.svg|(\"And they didn't <go> anywhere,\" another creature said. \"<They> are not even <hurt>.\")|o/EU,ur/3:,tricky",
-"11|~europa_creatures.svg|We could <still> see the figures through the <muddy> water floating at the dark rock.|lax:dbl,end:y@", 
-"11|~europa_creatures.svg|Joe <spoke> on the radio.\"If we are fighting ourselves, then <who> are they?\"|o/EU,wh/w",
-"11|~europa_creatures.svg|We didn't know. \"I'm going to <go there>,\" Joe said. \"And <check out> these aliens.\"|o/EU,ck/k,ou/aU,ch/tS",
-"11|~europa_mirror.svg|\"Joe, stop!\" the captain said, but Joe was already <swimming> towards the dark rock with his gun in his <hand>.|lax:dbl",
-"11|~europa_mirror.svg|(The <little> army of creatures panicked. \"That one is coming! We are <tired> and cannot keep up the <reflection> much longer!\")|end:le,ti/S",
-"11|~europa_mirror.svg|(The <guard> floated out of the <hole> in the sand. \"I will go,\" he said. \"You are crazy,\" the other creatures said. \"You will be <hurt>.\")|ar/a:,ur/3:,o/EU",
-"11|~europa_mirror.svg|(\"You think <I let them> in anyway,\" the guard said, and <pushed> himself towards Joe.)|cons:th",
-"11|~europa_mirror.svg|All we <could> see was <one> figure starting to swim towards Joe from the other direction. It looked exactly <like> him.|i/aI,tricky",
-"11|~europa_mirror.svg|It had the same <suit>, with the Base 2 mark. It had <the same> dart gun. It made the same bubbles.|a/eI,tricky",
-"11|~europa_mirror.svg|I watched as they got closer and closer to each other. <Five> feet, <four> feet, now just two feet. I covered my <face>.|i/aI,c/s,tricky",
-"11|~europa_mirror.svg|I thought there would be an <explosion> like when <matter> meets antimatter. How much of the <universe> would survive?|er/3:,lax:dbl",
-"11|~europa_mirror.svg|They met. The <water> shimmered, and made a shining ripple that quickly <disappeared>. There was silence. Joe stopped, <looked> around, and kept on swimming.|ea/IE,oo/U,er/Er",
-"11|~europa_mirror.svg|He reached the dark rock, that looked like a <church tower> under water. He didn't stop and crashed <into> it. The dark figures were <gone>.|ur/3:,ow/aU,tricky,ch/tS",
-"11|~europa_mirror.svg|Joe stopped moving, and <slowly> sank to the bottom. He was injured. The <captain> and I went there to get him back.|ow/EU,end:ly,tricky",
-"11|~europa_mirror.svg|\"He needs to <stay> in the <hospital> room until we get back to Base 2, <locked> in,\" the captain said. \"We don't know what they did to him.\"|ay/eI,end:al@,ck/k",
-"11|~europa_ship.svg|Later I saw the report the captain <wrote> about our expedition. He <lied>. He said there was no iron <at all> in the rocks.|wr/r,end:ie,dark:al",
-"11|~europa_ship.svg|Base 2 stopped trying to get <iron> from Europa, and no one bothered the creatures for another <hundred years>.|ea/IE,tricky",
-
-// Story 102 - The Singing Contest (2-3 typing targets per fragment)
-"11|@🎶|There was a <boy> named Sam who loved to <sing> more than <anything>.|oy/OI,cons:th",
-"11|@🚿|But Sam was very <shy>. He only sang when he was alone, in the <shower> or his room.|y/aI,ow/aU",
-"11|@🌳|In the <garden>, the birds would <often> stop to listen to his lovely voice.|ar/a:,tricky",
-"11|@🪧|One <morning>, a bright poster <appeared> on the school wall.|or/O:,ea/IE",
-"11|@🏙️|It was a <national> singing contest in the capital <city>.|ti/S,end:al@,c/s",
-"11|@🏆|The <winner> would get a golden <trophy> and sing on the <radio>.|ph/f,end:y@",
-"11|@🤔|Sam was not <certain>. \"I could never sing in <front> of <people>,\" he thought.|er/3:,c/s,tricky",
-"11|@🧑‍🤝‍🧑|His big sister <believed> in him. \"Your voice is <special>,\" she said.|end:ie,end:al@",
-"11|@✍️|After a <difficult> night, Sam <decided> to enter. \"Yes!\" was his answer.|c/s,lax:dbl",
-"11|@📨|He sent the form <early> the next <morning>.|or/O:,end:ly,tricky",
-"11|@🚌|The big day <arrived>. Sam got on a bus and traveled to the <capital>.|i/aI,end:al@",
-"11|@🎭|He <walked> into a huge <hall>. A big <group> of singers was already there.|dark:al,tricky",
-"11|@😰|Sam's heart beat fast. Backstage, he could hardly <breathe>. He took a deep <breath>.|ea/i:,ea/e,cons:th",
-"11|@🧑‍⚖️|Three judges sat at a <table>. The bright <lights> made Sam blink.|end:le,igh/aI",
-"11|@😳|Sam walked on stage, but he <tripped> by <accident> and dropped the microphone!|c/s,lax:dbl",
-"11|@😬|The crowd <laughed>. Sam wanted to run away. His face turned <red>.|tricky",
-"11|@🫁|But he <closed> his eyes, took another breath, and <decided> to sing anyway.|o/EU,c/s",
-"11|@🎤|He thought of a <personal> memory, lifted the microphone, and began to <sing>.|er/3:,end:al@",
-"11|@🎵|At first there was an <occasional> <shake> in his voice, but it grew <stronger>.|a/eI,end:al@",
-"11|@🎶|Soon his voice rang out clear and <natural>. The whole <hall> went silent.|tur/tS,dark:al,end:al@",
-"11|@🌟|Sam's <vocal> talent was <sensational>!|ti/S,end:al@",
-"11|@👏|When he <finished>, everyone <stood> up and clapped.|oo/U",
-
-"11|@🏆|The judges <smiled>. Sam won the golden <trophy>!|i/aI,ph/f,end:y@",
 "20|@🏆|The judges <s=m=i/aI=l=ed/d>.|i/aI", // [smiled] reviewed
-"20|@🏆|Sam won the golden <t=r=o/EU=ph=y>!|ph/f,end:y@", // [trophy] reviewed
-
-"11|@😊|Sam felt like a <different> boy, and was no longer <shy>.|y/aI",
+"20|@🏆|He won the <t=r=o/EU=ph=y>!|ph/f,end:y@", // [trophy] reviewed
 "20|@😊|Sam felt like a <d=i=ff=er/r=ent/Ent> boy|lax:dbl", // [different] reviewed
 
 "20|@🐘|<e=l=e/I=ph/f=ant/Ent>|ph/f", // [elephant] reviewed
 "20|@🌍|<n=a/eI=tion>|ti/S", // [nation] reviewed
-// "20|@🔮|<p=r=o=ph=e=t>|ph/f",
 "20|@💬|They <m=e=n=tion=ed/d> my name|ti/S", // [mentioned] reviewed
 
 // --- lax monograph ---
@@ -718,84 +589,62 @@
 "0|@🟥|<red>|e/e",
 "0|@🌹|<red> rose|e/e",
 "0|@🛌|<bed>|e/e",
-"0|@🪺|<nest>|e/e",
-"0|@⛺️|<tent>|e/e",
-"0|egg@🥚|<egg>|e/e",
-"0|bell@🔔|ring the <bell>|e/e",
+"20|@🪺|<n=e=s=t>|e/e", // [nest] reviewed
+"20|@⛺️|<t=e=n=t>|e/e", // [tent] reviewed
+"20|egg@🥚|<e=gg/g>|e/e", // [egg] reviewed
 "20|bell@🔔|ring the <b=e=ll>|e/e", // [bell] reviewed
 "20|bell@🔔|<r=i=ng> the bell|i/I", // [ring] reviewed
-"1|@🦶|<smelly> foot|e/e,end:y@,lax:dbl",
 "20|@🦶|<s=m=e=ll=y> foot|e/e,end:y@,lax:dbl", // [smelly] reviewed
-"2|@🔟|<ten>|e/e",
-"6|@⬅️|turn <left>|e/e",
-"10|@⛱️|We use <sun>screen to <prevent> burns.|e/e,u/A",
-"20|@⛱️|We use sunscreen to <p=r=e/I=v=e=n=t> burns.|e/e", // [prevent] reviewed
-"10|@🚄|Is <this> the <express> <train> to London?|e/e,cons:th",
+"20|@🔟|<t=e/e=n>|e/e", // [ten] reviewed
+"20|@⬅️|turn <l=e=f=t>|e/e", // [left] reviewed
+"20|@⛱️|Use sunscreen to <p=r=e/I=v=e=n=t> burns.|e/e", // [prevent] reviewed
 "20|@🚄|Is <th/D=i=s> the express train to London?|cons:th", // [this] reviewed
-"20|@🚄|Is this the <e/I=x/ks=p=r=e=ss> train to London?|e/e", // [express] reviewed
-"20|@🚄|Is this the express <t=r=ai=n> to London?|ai/eI", // [train] reviewed
+"20|@🚄|Is this the <e/I=x/ks=p=r=e=ss> train?|e/e", // [express] reviewed
+"20|@🚄|Is this the <t=r=ai=n> to London?|ai/eI", // [train] reviewed
 
 // i=I i/I
-"0|@🐬|The dolphin likes <fish>.|i/I",
 "20|@🐬|The dolphin likes <f=i=sh>.|i/I", // [fish] reviewed
-"2|@🏊|<swim>|i/I",
+"20|@🏊|<s=w=i=m>|i/I", // [swim] reviewed
 "0|@📌|<pin>|i/I",
-"0|@💍|<ring>|i/I",
 "20|@💍|<r=i=ng>|i/I", // [ring] reviewed
-"0|@🥛|I <drink> milk|i/I",
 "20|@🥛|I <d=r=i=n/ng=k> milk|i/I", // [drink] reviewed
 "0|pig@🐖|<pig>|i/I",
 "0|@😁|happy <grin>|i/I",
 "2|@🐠|<fish>|i/I",
-"0|@🥛|I drink <milk>|i/I",
 "0|@🔔|<ring> the bell|i/I",
-"2|@🪽|<wing>|i/I",
 "20|@🪽|<w=i=ng>|i/I", // [wing] reviewed
 "0|@📎|paper <clip>|i/I",
 "2|@😽|Cat gives <kiss>.|i/I",
 "3|@☔️|<It is> raining.|i/I",
 "0|cat|You can make a Minecraft cat <sit> or stand|i/I",
-"6|@🖥|<system> error|y/I",
 "20|@🖥|<s=y=s=t=e/E=m> error|y/I", // [system] reviewed
 "5|@🥝|<kiwi>|i/I",
 "4|@🍟|I want <chips>!|i/I,ch/tS",
-"0|@🍟|I want chips <with> ketchup!|i/I",
 "20|@🍟|I want chips <w=i=th/D> ketchup!|i/I", // [with] reviewed
 "5|@😽|Cat <gives> kiss.|i/I",
-"0|@💳|pay <with> card|i/I",
 "20|@💳|pay <w=i=th/D> card|i/I", // [with] reviewed
 "0|@👨🏻‍🎤|He <is> a rapper|i/I,common",
-"6|@🧑‍🍳|The chef works in the <kitchen>|i/I,ch/tS",
 "20|@🧑‍🍳|The chef works in the <k=i=tch=e/E=n>|i/I,ch/tS", // [kitchen] reviewed
 
 // y=I y/I
-"2|@🏋️|<gym>|y/I",
 "20|@🏋️|<g/dZ=y=m>|y/I", // [gym] reviewed
-"8|@👻|<myth>|y/I",
 "20|@👻|<m=y=th/T>|y/I,cons:th", // [myth] reviewed
-"8|@🏜️|<pyramid>|y/I",
-"9|amethyst|<crystal>|y/I",
 "20|@🏜️|<p=y=r=a/E=m=i=d>|y/I", // [pyramid] reviewed
 "20|amethyst|<c=r=y=s=t=al/sl>|y/I", // [crystal] reviewed
 // {"level":8, "emoji":"🎤", "text":"<lyric>", "class":["y/I"]},
 // {"level":8, "emoji":"🎶", "text":"We sing a <hymn>.", "class":["y/I"]},
 
 //o=Io o/o
-"2|@📦|<box>|o/o",
 "20|@📦|<b=o/o=x>|o/o", // [box] reviewed
 "0|@🔥|<hot>|o/o",
-"0|@🙅🏼‍♀️|<not>|o/o",
+"20|@🙅🏼‍♀️|<n=o/o=t>|o/o", // [not] reviewed
 "2|fox|<fox>|o/o",
 "0|@🐶|<dog>|o/o",
-"0|@🛑|<stop>|o/o",
-"6|@🏖|We are going on a <holiday>!|o/o,ay/eI",
+"20|@🛑|<s=t=o/o=p>|o/o", // [stop] reviewed
 "20|@🏖|We are going on a <h=o/o=l=i=d=ay>!|o/o,ay/eI", // [holiday] reviewed
-"6|@🐵|<monkey>|o/o,end:ey",
 "20|@🐵|<m=o/A=n/ng=k=ey/I>|o/o,end:ey", // [monkey] reviewed
-"4|@🍫|<chocolate>|o/o,ch/tS",
 "20|@🍫|<ch=o/o=c=o/x=l=a/E=t=e/x>|o/o,ch/tS", // [chocolate] reviewed
-"5|@💥|<Something> went horribly wrong|cons:th,o/o",
-"20|@💥|<S=o/A=m=e/x=th/T=i=ng> went horribly wrong|cons:th,o/o", // [something] reviewed
+"20|@💥|<S=o/A=m=e/x=th/T=i=ng> went wrong|cons:th,o/o", // [something] reviewed
 
 
 // a=ae a/ae
@@ -805,10 +654,8 @@
 "1|@🖐️|<hand>|a/ae",
 "1|@🏦|<bank>|a/ae",
 "1|@🪤|Careful! It is a <trap>!|a/ae",
-"7|hangingsign|<hanging> sign|a/ae",
 "20|hangingsign|<h=a/ae=ng=ing> sign|a/ae", // [hanging] reviewed
 "0|cat|You can make a Minecraft cat sit or <stand>|a/ae",
-"5|@👨🏻‍🎤|He is a <rapper>|a/ae,lax:dbl",
 "20|@👨🏻‍🎤|He is a <r=a/ae=pp=er/Er>|a/ae,lax:dbl", // [rapper] reviewed
 
 "4|@🎃|<scary> pumpkin|a/ae",
@@ -817,48 +664,36 @@
 
 // u=^ u/A
 "0|@🥁|<drum>|u/A",
-"0|@🏃🏻‍♂️‍➡️|<run>|u/A",
-"0|@🌞|The <sun> shines.|u/A",
-"1|@🦆|<duck>|u/A,ck/k",
+"20|@🏃🏻‍♂️‍➡️|<r=u/A=n>|u/A", // [run] reviewed
+"20|@🌞|The <s=u/A=n> shines.|u/A", // [sun] reviewed
 "20|@🦆|<d=u/A=ck>|u/A,ck/k", // [duck] reviewed
-"1|@🕰️|<Just> a bit of time, please|u/A",
 "20|@🕰️|<J/dZ=u/A=s=t> a bit of time, please|u/A", // [just] reviewed
-"2|@👨‍👦|<Adult>s are boring|u/A",
 "20|@👨‍👦|<A/E=d=u/A=l=t>s are boring|u/A", // [adults] reviewed
 "4|@🎃|scary <pumpkin>|u/A",
-"3|@🏃‍♂️‍➡️|He is <running>.|u/A,lax:dbl",
 "20|@🏃‍♂️‍➡️|He is <r=u/A=nn=ing>.|u/A,lax:dbl", // [running] reviewed
-"6|mushroom@🍄|<mushroom>|u/A",
 "20|mushroom@🍄|<m=u/A=sh=r=oo/u:=m>|u/A", // [mushroom] reviewed
-"7|@🍟|I want chips with <ketchup>!|u/A,ch/tS",
 "20|@🍟|I want chips with <k=e=tch=u/A=p>!|u/A,ch/tS", // [ketchup] reviewed
-"8|cat|I <instruct> the cat to sit|u/A",
 "20|cat|I <i=n=s=t=r=u/A=c=t> the cat to sit|u/A", // [instruct] reviewed
 
-"4|skeletonskull|skeleton <skull>|u/A",
 "20|skeletonskull|skeleton <s=k=u/A=ll>|u/A", // [skull] reviewed
 
-"5|@👮|You're under <arrest>!|lax:dbl",
 "20|@👮|You're under <a/E=rr=e=s=t>!|lax:dbl", // [arrest] reviewed
 
 // --- digraph ---
 
 // ee=i: ee/i:
 "0|@🌳|<tree>|ee/i:",
-"0|@🏨|<Sleep> in a hotel|ee/i:",
-"0|sheep@🐑|<sheep>|ee/i:",
+"20|@🏨|<S=l=ee=p> in a hotel|ee/i:", // [sleep] reviewed
+"20|sheep@🐑|<sh=ee=p>|ee/i:", // [sheep] reviewed
 "0|@🟩|<green>|ee/i:",
-"2|@🐭|The mouse likes <cheese>|ee/i:,ch/tS",
-"2|@🐭|Mice like <cheese>|ee/i:,ch/tS",
 "20|@🐭|Mice like <ch=ee=s/z=e/x>|ee/i:,ch/tS", // [cheese] reviewed
 "20|@🐭|<M=i/aI=ce/s> like cheese|i/aI", // [mice] reviewed
-"4|@🦶🏽|<heel>|ee/i:",
-"3|@⚙️|<steel>|ee/i:",
+"20|@🦶🏽|<h=ee=l>|ee/i:", // [heel] reviewed
+"20|@⚙️|<s=t=ee=l>|ee/i:", // [steel] reviewed
 "3|@💇🏾‍♂️|Adam <needs> a haircut.|ee/i:",
 "3|@🥵|I <need> a towel|ee/i:",
 "0|@🤫|<Keep> it a secret!|ee/i:",
 "3|@🤫|We must <meet> secretly|ee/i:",
-"6|@👨🏻‍🍼|<feeding> the baby|ee/i:",
 "20|@👨🏻‍🍼|<f=ee=d=ing> the baby|ee/i:", // [feeding] reviewed
 "5|bee|busy <bee>|ee/i:",
 
@@ -866,7 +701,6 @@
 "1|@🥄|<spoon>|oo/u:",
 "3|@🌜|<moon>|oo/u:",
 "3|@🍱|<food>|oo/u:",
-"4|@🏫|<school>|oo/u:",
 "20|@🏫|<s=ch/k=oo=l>|oo/u:", // [school] reviewed
 "8|boots|<boots>|oo/u:",
 "9|bamboo|<bamboo>|oo/u:",
@@ -878,142 +712,98 @@
 "1|enchantedbook|enchanted <book>|oo/U",
 "1|quill|write <a book>|oo/U",
 "10|bookshelf|<bookshelf>|oo/U",
-"4|@🍪|<cookie>|oo/U,end:ie",
 "20|@🍪|<c=oo/U=k=ie/I>|oo/U,end:ie", // [cookie] reviewed
 "7|cporkc|<cooked> porkchop|oo/U",
 "4|@👩🏾‍🍳|<cook>|oo/U",
 "1|@👍|<good>|oo/U",
 "1|wood|<wood>|oo/U",
 "9|hook|<hook>|oo/U",
-"5|@👀|<Look> where you're going!|oo/U",
-"20|@👀|<L=oo/U=k> where you're going!|oo/U", // reviewed
+"20|@👀|<L=oo/U=k> where you're going!|oo/U", // [look] reviewed
 
 // ai=eI ai/eI
 "2|@🚂|<train>|ai/eI",
-"4|@☔️|It is <raining>.|ai/eI",
-"3|@☔️|It is <rain>ing.|ai/eI",
+"20|@☔️|It is <r=ai/eI=n=ing>.|ai/eI", // [raining] reviewed
 "3|@☔️|<rain> falls|ai/eI",
 "3|@📨|<mail>|ai/eI",
 "6|@🌈|<rainbow>|ai/eI,ow/EU",
-"2|@✋|<Wait>!|ai/eI",
+"20|@✋|<W=ai/eI=t>!|ai/eI", // [wait] reviewed
 
 // ay=eI  ay/eI
 "1|@⛳️|<play> golf|ay/eI",
 "3|@▶️|<play>|ay/eI",
 "3|@📥|There was nothing in the <tray>.|ay/eI",
-"4|fox|A fox <hunts> small animals, and can <carry> items in its mouth. It runs <away> if you are not sneaking.|ay/eI,lax:dbl",
-"7|sign|If you <wax> a sign, no <player> can change the text on it. Use dyes and glow ink to change <how> the text looks.|ay/eI,ow/aU",
 "3|@☔️|Bad weather <today>|ay/eI",
-"2|@🤔|Which <way>?|ay/eI",
+"20|@🤔|Which <w=ay/eI>?|ay/eI", // [way] reviewed
 "1|@💳|<pay> by card|ay/eI",
 
 
 // oi=oI oi/OI
 "4|@🪙|gold <coin>|oi/OI",
-"8|poison|<poison>|oi/OI",
-"20|poison|<p=oi=s/z=o/E=n>|oi/OI", // reviewed
+"20|poison|<p=oi=s/z=o/E=n>|oi/OI", // [poison] reviewed
 "6|@🚻|Where is the <toilet>?|oi/OI,end:et",
 "4|@🥁|<noise>|oi/OI",
-"7|pufferfish|Pufferfish <live> in oceans and use <poison> to defend themselves. They <inflate> if you <get> too close.|oi/OI,a/eI,i/I",
 // oy=oI oy/OI
 "6|@🤣|<enjoy>|oy/OI",
 "0|@🪆|<toy>|oy/OI",
 "0|@🧑|<boy>|oy/OI",
-"9|@😡|This is so <annoying>!|oy/OI",
-"20|@😡|This is so <a/E=nn=oy/OI=ing>!|oy/OI", // reviewed
-"9|@🤠|<cowboy>|oy/OI,ow/aU",
-"20|@🤠|<c=ow/aU=b=oy>|oy/OI,ow/aU", // reviewed
+"20|@😡|This is so <a/E=nn=oy/OI=ing>!|oy/OI", // [annoying] reviewed
+"20|@🤠|<c=ow/aU=b=oy>|oy/OI,ow/aU", // [cowboy] reviewed
 
 // ea=i: ea/i:
 "1|@😸|Finally the cat had enough to <eat>|ea/i:",
-"3|carrot@🥕|I would like a carrot, <please>.|ea/i:",
 "20|carrot@🥕|I would like a carrot, <p=l=ea=s/z=e/x>.|ea/i:", // [please] reviewed
-"4|@🥩|Eat <meat>|ea/i:",
 "20|@🥩|Eat <m=ea=t>|ea/i:", // [meat] reviewed
-"3|@🥩|<Eat> meat|ea/i:",
 "20|@🥩|<Ea=t> meat|ea/i:", // [eat] reviewed
 "4|@👨🏾‍⚕️|<heal>|ea/i:",
-"5|@🙄|Oh <really>?|ea/i:,end:ly",
 "20|@🙄|Oh <r=ea=ll=y>?|ea/i:,end:ly", // [really] reviewed
-"5|@🦄|Unicorns are <real>?|ea/i:",
 "20|@🦄|Unicorns are <r=ea=l>?|ea/i:", // [real] reviewed
-"6|@🧑‍🏫|<teacher>|ea/i:,er/Er,ch/tS",
 "20|@🧑‍🏫|<t=ea=ch=er>|ea/i:,er/Er,ch/tS", // [teacher] reviewed
-"3|@🕰️|A bit of time, <please>|ea/i:",
 "20|@🕰️|A bit of time, <p=l=ea=s/z=e/x>|ea/i:", // [please] reviewed
 "7|cherry|<cherry leaves>|ea/i:,lax:dbl,ch/tS",
-"8|frog|<Frogs> live <in> swamps. They use their long <tongues> to <eat> small slimes and small magma cubes.|ea/i:",
-"7|frog|When a frog <eats> a magma cube, you get a froglight. Different frog <types> make <different> coloured lights.|ea/i:,lax:dbl,y/aI",
-"5|@🧜🏼‍♂️|I like the <sea>|ea/i:",
-"10|@⚓|Don't <steal> the anchor! It's heavy and made of <steel>.|ea/i:,ee/i:",
-"10|@⚓|Don't steal the <anchor>! It's <heavy> and made of steel.|a/ae,ea/e,end:y@,o/E",
-"20|@⚓|Don't <s=t=ea=l> the anchor! It's heavy and made of steel.|ea/i:", // [steal] reviewed
-"20|@⚓|Don't steal the <a=n/ng=ch/k=or/Er>! It's heavy and made of steel.|a/ae,o/E", // [anchor] reviewed
-"20|@⚓|Don't steal the anchor! It's <h=ea/e=v=y> and made of steel.|ea/e,end:y@", // [heavy] reviewed
-"20|@⚓|Don't steal the anchor! It's heavy and made of <s=t=ee=l>.|ee/i:", // [steel] reviewed
-"10|@🌊|Do not <breathe> under <water>|ea/i:,cons:th",
+"20|@🧜🏼‍♂️|I like the <s=ea/i:>|ea/i:", // [sea] reviewed
+"20|@⚓|Don't <s=t=ea=l> the anchor!|ea/i:", // [steal] reviewed
+"20|@⚓|Don't steal the <a=n/ng=ch/k=or/Er>!|a/ae,o/E", // [anchor] reviewed
+"20|@⚓|The anchor is <h=ea/e=v=y>.|ea/e,end:y@", // [heavy] reviewed
+"20|@⚓|The anchor is made of <s=t=ee=l>.|ee/i:", // [steel] reviewed
 "20|@🌊|Do not <b=r=ea=th/D=e/x> under water|ea/i:,cons:th", // [breathe] reviewed
 
-"8|@🧚‍♂️|<appear>|ea/i:",
 "20|@🧚‍♂️|<a/E=pp=ear/IE>|ea/i:", // [appear] reviewed
 
 
 // ea=e  ea/e
-"2|bread|slice of <bread>|ea/e",
 "20|bread|slice of <b=r=ea/e=d>|ea/e", // [bread] reviewed
-"2|zombiehead|zombie <head>|ea/e",
 "20|zombiehead|zombie <h=ea/e=d>|ea/e", // [head] reviewed
 "2|zombiehead|zombies are <already> dead|ea/e",
 "2|zombiehead|zombies are already <dead>|ea/e",
-"8|zombiehead|<zombie head>|ea/e,end:ie",
-"8|@🦻|Dogs can help <deaf> people|ea/e",
 "20|@🦻|Dogs can help <d=ea/e=f> people|ea/e", // [deaf] reviewed
-"5|@☔️|Bad <weather> today|ea/e",
 "20|@☔️|Bad <w=ea/e=th/D=er/Er> today|ea/e", // [weather] reviewed
-"4|furnace|The food is <ready>|ea/e",
 "20|furnace|The food is <r=ea/e=d=y/I>|ea/e", // [ready] reviewed
-"7|@↔️|<instead>|ea/e",
 "20|@↔️|<i=n=s=t=ea/e=d>|ea/e", // [instead] reviewed
-"4|feather|You can get <a feather> as a morning gift from your cat <when> you wake <up>.|ea/e,cons:th",
-"20|feather|You can get a <f=ea/e=th/D=er/Er> as a morning gift|ea/e,cons:th", // [feather] reviewed
-"9|@🌬️|take a <breath>|ea/e,cons:th",
+"20|feather|Peacock <f=ea/e=th/D=er/Er>|ea/e,cons:th", // [feather] reviewed
 "20|@🌬️|take a <b=r=ea/e=th/T>|ea/e,cons:th", // [breath] reviewed
 
 "8|polarbear|<polar bear>|ea/e,o/EU",
-"4|@🧸|teddy <bear>|ea/e",
 "20|@🧸|teddy <b=ear/eE>|ea/e", // [bear] reviewed
 
 
 // ow=^U ow/aU
 "0|@🏂|He bravely slid <down>|ow/aU",
 "3|@🐄|<cow>|ow/aU",
-"3|@👑|The king's <crown>|ow/aU",
 "20|@👑|The king's <c/k=r=ow/aU=n>|ow/aU", // [crown] reviewed
 "3|@📉|<going down>|ow/aU",
-"3|@👋🏾|<How> are you?|ow/aU",
 "20|@👋🏾|<H=ow/aU> are you?|ow/aU", // [how] reviewed
-"7|@🏙️|going to <town>|ow/aU",
 "20|@🏙️|going to <t=ow/aU=n>|ow/aU", // [town] reviewed
-"9|@🥵|I need a <towel>|ow/aU",
 "20|@🥵|I need a <t=ow/aU=el/sl>|ow/aU", // [towel] reviewed
-"7|fire|You can <put out> fire by <powder> snow, rain, water, <or> a cauldron.|ow/aU",
-"20|fire|You can put out fire by <p=ow/aU=d=er> snow|ow/aU", // reviewed
-"4|magmac|Magma cubes <are> fireproof and <jump> like slime blocks. They can <swim> in water, but can also <drown>.|ow/aU",
+"20|fire|You can put out fire by <p=ow/aU=d=er> snow|ow/aU", // [powder] reviewed
 
 
 // ou=^U ou/aU
-"3|@🐭|The <mouse> likes cheese|ou/aU",
 "20|@🐭|The <m=ou/aU=s/s=e/x> likes cheese|ou/aU", // [mouse] reviewed
-"0|@🏠|<house>|ou/aU",
 "20|@🏠|<h=ou/aU=s/s=e/x>|ou/aU", // [house] reviewed
-"0|@☁️|<cloud>|ou/aU",
 "20|@☁️|<c=l=ou/aU=d>|ou/aU", // [cloud] reviewed
-"6|horn|It's way <too loud>|ou/aU",
 "20|horn|It's way too <l=ou/aU=d>|ou/aU", // [loud] reviewed
 "7|cave|<underground>|ou/aU",
-"4|@🪫|The machine <ran out> of battery|ou/aU",
 "20|@🪫|The machine ran <ou/aU=t> of battery|ou/aU", // [out] reviewed
-"7|egg|Foxes may <appear> with an egg in their <mouth>. If you drop some food, the fox <will drop> the egg.|ou/aU,cons:th,o/o",
 
 
 // oa
@@ -1021,57 +811,42 @@
 "3|@🛣|<road>|oa/EU",
 "5|@⚽️|<Goal>! shouted everyone.|oa/EU",
 "9|boat|<boat>|oa/EU",
-"9|coalore|<coal>|oa/EU",
-"20|coalore|<c=oa/EU=l>|oa/EU", // reviewed
-"9|goat|<goat>|oa/EU",
-"9|@🍞|<toast>|oa/EU",
+"20|coalore|<c=oa/EU=l>|oa/EU", // [coal] reviewed
+"20|goat|<g=oa/EU=t>|oa/EU", // [goat] reviewed
+"20|@🍞|<t=oa/EU=s=t>|oa/EU", // [toast] reviewed
 
 
 // ow=o@ ow/EU
-"4|@❄️|<snow>|ow/EU",
-"2|bow|<bow>|ow/EU",
+"20|@❄️|<s=n=ow/EU>|ow/EU", // [snow] reviewed
+"20|bow|<b=ow/EU>|ow/EU", // [bow] reviewed
 "6|@⛄️|<snowman>|ow/EU",
-"4|frog|Frogs will <follow> you if you hold a slime ball, and you are closer to them than <six> blocks. You can <feed> them.|ow/EU",
 "20|frog|Frogs will <f=o/o=ll=ow/EU> you if you hold a slime ball.|ow/EU", // reviewed
-"5|carrot|<Carrots> can heal horses, <donkeys> and mules, and can also make them <grow>, but carrots cannot breed them.|ow/EU,o/o",
 
 
 // ew=(j)u: ew/u:
-"5|@🔩|<screw>|ew/u:",
-"1|@📰|good <news>|ew/u:",
-"1|@👟|<new> shoes|ew/u:",
-"3|@📚|a <few> books|ew/u:",
-"20|@📚|a <f=ew/ju:> books|ew/u:", // reviewed
+"20|@🔩|<s=c=r=ew/u:>|ew/u:", // [screw] reviewed
+"20|@📰|good <n=ew/u:=s/z>|ew/u:", // [news] reviewed
+"20|@👟|<n=ew/u:> shoes|ew/u:", // [new] reviewed
+"20|@👟|new <sh=oe/u:=s/z>|ew/u:", // [shoes] reviewed
+"20|@📚|a <f=ew/ju:> books|ew/u:", // [few] reviewed
 "9|@😁|I <knew> you could do it!|ew/u:",
-"9|@🏞️|What a nice <view>!|ew/u:",
-"20|@🏞️|What a nice <v=iew/ju:>!|ew/u:", // reviewed
+"20|@🏞️|What a nice <v=iew/ju:>!|ew/u:", // [view] reviewed
 
 // au=):  au/O:
-"7|@🎞️|Let's <pause> the video|au/O:",
-"20|@🎞️|Let's <p=au/O:=se/z> the video|au/O:", // reviewed
+"20|@🎞️|Let's <p=au/O:=se/z> the video|au/O:", // [pause] reviewed
 "10|@🦕|<dinosaur>|au/O:",
 "10|@😾|Just <because>!|au/O:",
-"9|fire|<Fire is> extinguished by <powder> snow, rain, water, or a <cauldron>.|au/O:,ow/aU",
-"7|fire|Fire is <caused by> lightning, lava, <flint> and steel, or <a> fire charge.|au/O:",
 
 //      aw/O:
-"4|slime|Slimes can <spawn> in swamps when there <is> not much light. They spawn most often on a <full> moon.|aw/O:",
 "20|slime|Slimes can <s=p=aw/O:=n> in swamps|aw/O:", // [spawn] reviewed
-"5|@✏️|<draw>|aw/O:",
 "20|@✏️|<d=r=aw/O:>|aw/O:", // [draw] reviewed
-"5|raw|<raw>|aw/O:",
 "20|raw|<r=aw/O:>|aw/O:",  // [raw] reviewed
 
 // igh igh/aI
 "1|feather@🪶|<light> as a feather|igh/aI",
-"3|@🌃|Good <night>!|igh/aI",
 "20|@🌃|Good <n=igh/aI=t>!|igh/aI", // [night] reviewed
-"8|frog|When a <frog> eats a magma cube, you get a <froglight>. Different frog types make different coloured <lights>.|igh/aI",
-"6|@➡️|turn <right>|igh/aI",
 "20|@➡️|turn <r=igh/aI=t>|igh/aI", // [right] reviewed
-"9|@↕️|<height>|igh/aI",
 "20|@↕️|<h=eigh/aI=t>|igh/aI", // [height] reviewed
-"7|@🗼|This is way too <high>|igh/aI",
 "20|@🗼|This is way too <h=igh/aI>|igh/aI", // [high] reviewed
 
 "20|@8️⃣|<eigh/eI=t>|tricky", // [eight] reviewed
@@ -1082,376 +857,225 @@
 // a=eI a/eI
 "0|@🐍|<snake>|a/eI",
 "0|@✈️|<plane>|a/eI",
-"4|@👨‍🦱|<male>|a/eI", // *
 "20|@👨‍🦱|<m=a/eI=l=e/X>|a/eI", // [male] reviewed
-"5|blaze|<blaze>|a/eI", // *
 "20|blaze|<b=l=a/eI=z=e/X>|a/eI", // [blaze] reviewed
-"5|cake|<bake> a cake|a/eI", // *
 "20|cake|<b=a/eI=k=e/X> a cake|a/eI", // [bake] reviewed
-"5|cake|bake a <cake>|a/eI", // *
 "20|cake|bake a <c=a/eI=k=e/X>|a/eI", // [cake] reviewed
-"4|@🌊|<wave>|a/eI", // *
 "20|@🌊|<w=a/eI=v=e/X>|a/eI", // [wave] reviewed
-"7|@🏷|<nametag>|a/eI", // *
 "20|@🏷|<n=a/eI=m=e/X=t=a=g>|a/eI", // [nametag] reviewed
-"8|chestplate|<chestplate>|a/eI,e/e,ch/tS", // *
 "20|chestplate|<ch=e=s=t=p=l=a/eI=t=e/X>|a/eI,e/e,ch/tS", // [chestplate] reviewed
 "7|arcade|<arcade> machine|a/eI",
 
 
 // a=(I:  a/a:
-"1|@🛀🏾|I am having a <bath>.|a/a:", // *
-"20|@🛀🏾|I am having a <b=a/a:=th/T>.|a/a:", // reviewed
-"3|grass|<grass>|a/a:", // *
+"20|@🛀🏾|I am having a <b=a/a:=th/T>.|a/a:", // [bath] reviewed
 "20|grass|<g=r=a/a:=ss/s>|a/a:", // [grass] reviewed
-"4|@🍝|<pasta>|a/E,a/a:", // *
 "20|@🍝|<p=a/a:=s=t=a/E>|a/E,a/a:", // [pasta] reviewed
-"3|@🍌|<banana>|a/E,a/a:", // *
 "20|@🍌|<b=a/E=n=a/a:=n=a/E>|a/E,a/a:", // [banana] reviewed
-"2|@🌋|<lava> is hot|a/E,a/a:", // *
 "20|@🌋|<l=a/a:=v=a/E> is hot|a/E,a/a:", // [lava] reviewed
-"6|crafting|<crafting> table|a/a:", // *
 "20|crafting|<c=r=a/a:=f=t=ing> table|a/a:", // [crafting] reviewed
-"9|enchant|<enchanting> table|a/a:,ch/tS", // *
 "20|enchant|<e=n=ch=a/a:=n=t=ing> table|a/a:,ch/tS", // [enchanting] reviewed
-"0|fire|Fire <is> caused by lightning, <lava>, flint and <steel>, or a fire charge.|a/a:,ee/i:",
-"8|command|<command> block|a/a:,lax:dbl", // *
 "20|command|<c=o/E=mm=a/a:=n=d> block|a/a:,lax:dbl", // [command] reviewed
-"7|slime|<Slimes> can spawn in <swamps> when there is not much light. They spawn most <often> on a full <moon>.|a/a:,oo/u:,i/aI",
-"6|@🧺|<basket>|a/a:,end:et", // *
 "20|@🧺|<b=a/a:=s=k=et>|a/a:,end:et", // [basket] reviewed
-"8|magmac|<Magma> cubes are <fireproof> and jump like slime blocks. They can swim <in water>, but can also drown.|a/a:,i/aI,a/E",
 
 // e/i:
-"8|@🇪🇬|<Egypt>|e/i:", // *
 "20|@🇪🇬|<E/i:=g/dZ=y=p=t>|e/i:", // [Egypt] reviewed
-"3|steve|I am <Steve>|e/i:", // *
 "20|steve|I am <S=t=e/i:=v=e/X>|e/i:", // [Steve] reviewed
-"0|@👨🏻‍🎤|<He> is a rapper|e/i:,common",
-"0|@👩‍🔧|<She> works in a factory.|e/i:,common", // *
+"20|@👨🏻‍🎤|<H=e/i:> is a rapper|e/i:,common", // [he] reviewed
 "20|@👩‍🔧|<Sh=e/i:> works in a factory.|e/i:,common", // [she] reviewed
-"7|@🎞️|Let's pause the <video>|e/i:", // *
 "20|@🎞️|Let's pause the <v=i/I=d=e/i:=o/EU>|e/i:", // [video] reviewed
-"9|@🏗|Almost <complete>|e/i:", // *
 "20|@🏗|Almost <c=o/E=m=p=l=e/i:=t=e/X>|e/i:", // [complete] reviewed
 
 // i=aI i/aI
-"1|@🌞|The sun <shines>.|i/aI", // *
 "20|@🌞|The sun <sh=i/aI=n=e/X=s/z>.|i/aI", // [shines] reviewed
-"1|@🐭|The mouse <likes> cheese|i/aI", // *
 "20|@🐭|The mouse <l=i/aI=k=e/X=s/s> cheese|i/aI", // [likes] reviewed
-"0|@🌽|I <like> corn|i/aI", // *
 "20|@🌽|I <l=i/aI=k=e/X> corn|i/aI", // [like] reviewed
 "0|carrot@🥕|I would <like> a carrot.|i/aI",
 "2|@🕰️|A bit of <time>, please|i/aI",
 "4|@🛝|<slide>|i/aI",
-"6|@🧊|cold <ice>|i/aI,c/s", // *
 "20|@🧊|cold <i/aI=ce/s>|i/aI,c/s", // [ice] reviewed
-"8|itemframe|<item frame>|i/aI,a/eI", // *
 "20|itemframe|<i/aI=t=e/E=m> frame|i/aI", // [item] reviewed
-"6|@📦|A package <arrived>.|i/aI", // *
 "20|@📦|A package <a/E=rr=i/aI=v=e/X=d>.|i/aI", // [arrived] reviewed
 "10|jungle|jungle <biome>|i/aI",
 "0|@🍟|<I> want chips with ketchup!|i/aI,common",
-"6|@🧗|<climb> up|i/aI",
-"6|@🪜|<climb up> the ladder|i/aI,u/A", // *
 "20|@🪜|<c=l=i/aI=mb/m> up the ladder|i/aI", // [climb] reviewed
 "20|@🪜|climb <u/A=p> the ladder|u/A", // [up] reviewed
-"9|@🏆|first <prize>|i/aI", // *
 "20|@🏆|first <p=r=i/aI=z=e/X>|i/aI", // [prize] reviewed
-"9|dripstone|<spike>|i/aI", // *
 "20|dripstone|<s=p=i/aI=k=e/X>|i/aI", // [spike] reviewed
-"9|pipe|<pipe>|i/aI",
 "20|pipe|<p=i/aI=p=e/X>|i/aI", // [pipe] reviewed
-"10|@🕵️‍♀️|'Please <continue>!' said the detective, and the witness <described> the thief.|u/u:,i/aI",
-"10|@🕵️‍♀️|'Please continue!' said the <detective>, and the witness described the <thief>.|e/e,cons:th", // *
 "20|@🕵️‍♀️|The witness described the <th/T=ie/i:=f>.|cons:th", // [thief] reviewed
 "20|@🕵️‍♀️|The witness <d=e/I=s=c=r=i/aI=b=e/X=d> the thief.|cons:th", // [described] reviewed
 // y=aI y/aI
-"0|@😢|<cry>|y/aI", // *
 "20|@😢|<c=r=y/aI>|y/aI", // [cry] reviewed
-"0|@🪰|<fly>|y/aI", // *
 "20|@🪰|<f=l=y/aI>|y/aI", // [fly] reviewed
-"0|@🏜️|too <dry>|y/aI", // *
-"20|@🏜️|too <d=r=y/aI>|y/aI", // reviewed
+"20|@🏜️|too <d=r=y/aI>|y/aI", // [dry] reviewed
 
-"1|fire@🔥|<Fire> is hot|i/aI", // *
 "20|fire@🔥|<F=ire/aIE> is hot|i/aI", // [fire] reviewed
 
 
 // o=oU o/EU
-"0|@🌹|red <rose>|o/EU", // *
 "20|@🌹|red <r=o/EU=s/z=e/X>|o/EU", // [rose] reviewed
-"0|@🏨|Sleep in a <hotel>|o/EU", // *
 "20|@🏨|Sleep in a <h=o/EU=t=e/e=l>|o/EU", // [hotel] reviewed
-"0|@🏡|<home>|o/EU", // *
 "20|@🏡|<h=o/EU=m=e/X>|o/EU", // [home] reviewed
-"3|@👃🏻|<nose>|o/EU", // *
 "20|@👃🏻|<n=o/EU=s/z=e/X>|o/EU", // [nose] reviewed
-"3|@⛏|It can break <stone>|o/EU", // *
 "20|@⛏|It can break <s=t=o/EU=n=e/X>|o/EU", // [stone] reviewed
 "3|@🦴|<bone>|o/EU",
-"4|@🤨|The car <broke> down again. Typical.|o/EU", // *
-"20|@🤨|The car <b=r=o/EU=k=e/X> down again. Typical.|o/EU", // [broke] reviewed
-"8|cocoa|<cocoa>|o/EU,oa/EU", // *
+"20|@🤨|The car <b=r=o/EU=k=e/X> down again|o/EU", // [broke] reviewed
 "20|cocoa|<c=o/EU=c=oa/EU>|o/EU,oa/EU", // [cocoa] reviewed
-"7|@🏤|<post office>|o/EU,c/s", // *
 "20|@🏤|post <o/o=ff=i=ce/s>|o/o,c/s", // [office] reviewed
 "10|badomen|<bad omen>|o/EU",
-"8|@🛣|<motorway>|o/EU,ay/eI", // *
 "20|@🛣|<m=o/EU=t=or/E=w=ay/eI>|o/EU,ay/eI", // [motorway] reviewed
-"5|@🤖|<robot>|o/EU", // *
 "20|@🤖|<r=o/EU=b=o/o=t>|o/EU", // [robot] reviewed
-"5|@🤏|It was this <close>!|o/EU", // *
 "20|@🤏|It was this <c=l=o/EU=s/s=e/X>!|o/EU", // [close] reviewed
-"10|@🔬|You <need> a <microscope> to see things that are <very> small.|o/EU,ee/i:",
-"10|@🔭|You can <see> the other <planets> in the Solar System with a <telescope>.|o/EU,ee/i:,a/ae",
-"10|@🫏|Today he <rides> a horse. Yesterday he <rode> a <donkey>.|o/EU,i/aI,o/o,end:ey", // *
-"20|@🫏|Today he <r=i/aI=d=e/X=s/z> a horse. Yesterday he rode a donkey.|i/aI", // [rides] reviewed
+"20|@🫏|Today he <r=i/aI=d=e/X=s/z> a horse|i/aI", // [rides] reviewed
 "20|@🫏|Today he rides a horse. Yesterday he <r=o/EU=d=e/X> a donkey.|o/EU", // [rode] reviewed
-"20|@🫏|Today he rides a horse. Yesterday he rode a <d=o/o=n/ng=k=ey/I>.|o/EU,i/aI,o/o,end:ey", // [donkey] reviewed
+"20|@🫏|Yesterday he rode a <d=o/o=n/ng=k=ey/I>.|o/EU,i/aI,o/o,end:ey", // [donkey] reviewed
 
 // u=ju:  u/u:
-"4|grass|<cube>|u/u:", // *
 "20|grass|<c=u/ju:=b=e/X>|u/u:", // [cube] reviewed
-"7|frog|Frogs live <in swamps>. They use their <long> tongues to eat small slimes and <small> magma <cubes>.|dark:al,u/u:",
-"7|@📏|<ruler>|er/Er,u/u:", // *
 "20|@📏|<r=u/u:=l=er>|er/Er,u/u:", // [ruler] reviewed
-"8|cat|Cats are <good> to <chase> away phantoms and creepers. Black cats are only born <during> full moon.|a/eI,u/u:,ch/tS",
 "20|cat|Black cats are only born <d=u/ju:=r=ing> full moon.|u/u:", // [during] reviewed
-"4|@📏|one <unit>|u/u:", // *
 "20|@📏|one <u/ju:=n=i/I=t>|u/u:", // [unit] reviewed
-"8|@🇬🇧|<United> Kingdom|u/u:", // *
 "20|@🇬🇧|<U/ju:=n=i/aI=t=e/I=d> Kingdom|u/u:", // [united] reviewed
-"9|chick|So <cute>!|u/u:", // *
 "20|chick|So <c=u/ju:=t=e/X>!|u/u:", // [cute] reviewed
-"9|@🔇|The television is <muted>|u/u:", // *
 "20|@🔇|The television is <m=u/ju:=t=ed/Id>|u/u:", // [muted] reviewed
 
 // ---- breaking, darkening ------
 
 // al  dark:al
-"0|@📱|<Call> the phone|dark:al", // *
 "20|@📱|<C=all/O:> the phone|dark:al", // [call] reviewed
-"0|@🦒|The giraffe is <tall>.|dark:al", //  *
 "20|@🦒|The giraffe is <t=all/O:>.|dark:al", // [tall] reviewed
-"3|@🧱|<wall>|dark:al", // *
 "20|@🧱|<w=all/O:>|dark:al", // [wall] reviewed
-"2|trapdoor|Mobs <think> all trapdoors are closed, and <fall> through open trapdoors. You can use this to <make> a trap.|cons:th,dark:al",
-"4|trapdoor|Mobs think all trapdoors are closed, and <fall> through open <trapdoors>. You can use this <to make> a trap.|dark:al",
 "4|@🚶‍♀️‍➡️|She is <walking>.|dark:al",
 "9|@🔐|My date of birth is <personal>|dark:al,er/3:",
-"9|@🇫🇷|Paris is the <capital> of France.|dark:al,a/ae", // *
 "20|@🇫🇷|Paris is the <c=a=p=i=t=al/sl> of France.|dark:al,a/ae", // [capital] reviewed
-"9|@🇩🇪|Berlin is the <capital> of Germany.|dark:al,a/ae",
 "20|@🇩🇪|Berlin is the <c=a=p=i=t=al/sl> of Germany.|dark:al,a/ae", // [capital] reviewed
 "20|@🇬🇧|London is the <c=a=p=i=t=al/sl> of the United Kingdom.|dark:al,a/ae", // [capital] reviewed
 
 // ol  dark:ol
-"1|@⛳️|play <golf>|dark:ol", // *
 "20|@⛳️|play <g=o/o=l=f>|o/o", // [golf] reviewed
-"0|@🥶|<cold>|dark:ol",
-"0|@🪙|<gold> coin|dark:ol", // *
 "20|@🪙|<g=ol/EU=d> coin|dark:ol", // [gold] reviewed
-"3|@🧊|<cold> ice|dark:ol", // *
 "20|@🧊|<c=ol/EU=d> ice|dark:ol", // [cold] reviewed
 
 // or=):  or/O:
-"1|@🐴|<horse>|or/O:", // *
 "20|@🐴|<h=or/O:=s=e/x>|or/O:", // [horse] reviewed
-"1|@🌽|I like <corn>|or/O:", // *
 "20|@🌽|I like <c=or/O:=n>|or/O:", // [corn] reviewed
-"6|@🌅|early <morning>|or/O:", // *
 "20|@🌅|early <m=or=n=ing>|or/O:", // [morning] reviewed
-"3|door@🚪|<door>|or/O:", // *
 "20|door@🚪|<d=oor/O:>|or/O:", // [door] reviewed
-"8|trapdoor|Mobs think all <trapdoors> are closed, and fall <through> open trapdoors. You can use this to make a <trap>.|or/O:,cons:th",
-"7|@🍿|<popcorn>|or/O:", // *
 "20|@🍿|<p=o/o=p=c=or=n>|or/O:", // [popcorn] reviewed
 "8|copperore|copper <ore>|or/O:",
-"1|@🙅🏼‍♂️|I don't want any <more>!|or/O:", // *
 "20|@🙅🏼‍♂️|I don't want any <m=or=e/x>!|or/O:", // [more] reviewed
-"8|cporkc|cooked <porkchop>|or/O:,ch/tS", // *
 "20|cporkc|cooked <p=or=k=ch=o/o=p>|or/O:,ch/tS", // [porkchop] reviewed
-"5|carrot|Carrots can heal <horses>, donkeys and mules, and can also <make> them grow, but carrots <cannot> breed them.|or/O:",
 "20|carrot|Carrots can heal <h=or=s=es/Iz>|or/O:", // [horses] reviewed
-"1|feather|You can get a feather as a <morning> gift from your <cat> when you <wake> up.|or/O:",
-"6|netherportal|nether <portal>|or/O:,end:al@", // *
 "20|netherportal|nether <p=or=t=al/sl>|or/O:,end:al@", // [portal] reviewed
-"1|carrot|In the Java version of Minecraft, there is a <bug>, and skeleton <horses> can also eat carrots.|u/A,or/O:",
 
 // ar=(]:  ar/a:
-"1|@🦈|<shark>|ar/a:", // *
 "20|@🦈|<sh=ar=k>|ar/a:", // [shark] reviewed
-"1|@💳|pay by <card>|ar/a:", // *
 "20|@💳|pay by <c=ar/a:=d>|ar/a:", // [card] reviewed
 "1|@🚗|<car>|ar/a:",
-"4|@🧣|warm <scarf>|ar/a:",
 "20|@🧣|warm <s=c=ar=f>|ar/a:", // [scarf] reviewed
-"1|@🚓|police <car>|ar/a:",
-"1|mushroom|If you <put> a small mushroom on <top> of a full block where it is <dark>, it can <grow> into a huge mushroom.|ar/a:,ow/EU",
+"20|@🚓|police <c=ar/a:>|ar/a:", // [car] reviewed
 
 // ir=3:  ir/3:
-"3|@👕|<shirt>|ir/3:", // *
 "20|@👕|<sh=ir=t>|ir/3:", // [shirt] reviewed
-"6|@🎂|It is my <birthday>!|ir/3:,ay/eI", // *
 "20|@🎂|It is my <b=ir=th/T=d=ay>!|ir/3:,ay/eI", // [birthday] reviewed
 
 // or=3:  or/3:
-"3|@🧑‍🍳|The chef <works> in the kitchen|or/3:", // *
 "20|@🧑‍🍳|The chef <w=or/3:=k=s> in the kitchen|or/3:", // reviewed
-"3|@🌍|the whole <world>|or/3:", // *
 "20|@🌍|the whole <w=or/3:=l=d>|or/3:", // reviewed
 
 // ur=3:   ur/3:
-"3|@🛞|The wheel <turns>.|ur/3:", // *
 "20|@🛞|The wheel <t=ur=n=s>.|ur/3:", // reviewed
-"4|cat|<Cats> do not get <hurt> by falling, <and> they can <see> you even if you are invisible.|ur/3:,ee/i:",
-"6|@🖼|<picture>|ur/3:,tur/tS", // *
 "20|@🖼|<p=i=c=ture>|ur/3:,tur/tS", // [picture] reviewed
-"6|@➡️|<turn> right|ur/3:", // *
 "20|@➡️|<t=ur/3:=n> right|ur/3:", // [turn] reviewed
-"7|fire|The fire <burns>|ur/3:", // *
 "20|fire|The fire <b=ur/3:=n=s/z>|ur/3:", // [burns] reviewed
-"8|@🗼|Is this the tallest <structure>?|ur/3:,u/A,tur/tS", // *
 "20|@🗼|Is this the tallest <s=t=r=u/A=c=ture>?|ur/3:,u/A,tur/tS", // [structure] reviewed
 
 //   ea/IE
-"3|@👂|<ear>|ea/IE", // *
 "20|@👂|<ear>|ea/IE", // --same--
-"3|@🦻🏽|I <hear> you|ea/IE", // *
 "20|@🦻🏽|I <h=ear> you|ea/IE", // [hear] reviewed
-"3|@🗓️|A <year> later|ea/IE", // *
-"20|@🗓️|A <y/j=ear> later|ea/IE", // reviewed
+"20|@🗓️|A <y/j=ear> later|ea/IE", // [year] reviewed
 
 // air = e@   ai/eE
-"7|@💇🏾‍♂️|Adam needs a <haircut>.|ai/eE,u/A", // *
 "20|@💇🏾‍♂️|Adam needs a <h=air/eE=c=u/A=t>.|ai/eE,u/A", // [haircut] reviewed
 "6|@☴|<air>|ai/eE",
-"6|@👱‍♀️|long <hair>|ai/eE", // *
 "20|@👱‍♀️|long <h=air/eE>|ai/eE", // [hair] reviewed
-"6|@😡|It's not <fair>!|ai/eE", // *
 "20|@😡|It's not <f=air/eE>!|ai/eE", // [fair] reviewed
-"6|@🧑🏽‍🐰‍🧑🏼|<pair>|ai/eE", // *
 "20|@🧑🏽‍🐰‍🧑🏼|<p=air/eE>|ai/eE", // [pair] reviewed
 
 // --------- schwa -------------------
 
 // er$  er/Er
-"3|@🏞️|<river>|er/Er,i/I", // *
-"20|@🏞️|<r=i=v=er>|er/Er,i/I", // reviewed
-"7|@🪜|climb up the <ladder>|er/Er,lax:dbl,a/ae", // *
-"20|@🪜|climb up the <l=a=dd=er>|er/Er,lax:dbl,a/ae", // reviewed
-"6|@🕷|<spider>|er/Er,i/aI", // *
-"20|@🕷|<s=p=i/aI=d=er>|er/Er,i/aI", // reviewed
-"0|pillager|The village is <under> attack!|er/Er,u/A", // *
+"20|@🏞️|<r=i=v=er>|er/Er,i/I", // [river] reviewed
+"20|@🪜|climb up the <l=a=dd=er>|er/Er,lax:dbl,a/ae", // [ladder] reviewed
+"20|@🕷|<s=p=i/aI=d=er>|er/Er,i/aI", // [spider] reviewed
 "20|pillager|The village is <u/A=n=d=er/Er> attack!|er/Er,u/A", // [under] reviewed
-"0|trial|There's something <under> me!|er/Er", // *
 "20|trial|There's something <u/A=n=d=er/Er> me!|er/Er", // [under] reviewed
-"5|trial|There's <something> under me!|cons:th", // *
 "20|trial|There's <s=o/A=m=e/x=th/T=ing> under me!|cons:th", // [something] reviewed
-"8|@😯|<beginner>|er/Er,lax:dbl", // *
 "20|@😯|<b=e/I=g=i=nn=er/Er>|er/Er,lax:dbl", // [beginner] reviewed
 "8|@🚁|<helicopter>|er/Er",
-"3|@📎|<paper> clip|er/Er,a/eI", // *
-"20|@📎|<p=a/eI=p=er> clip|er/Er,a/eI", // reviewed
-"7|@🪶|light as a <feather>|er/Er,cons:th,ea/e", // *
-"20|@🪶|light as a <f=ea/e=th/D=er>|er/Er,cons:th,ea/e", // reviewed
+"20|@📎|<p=a/eI=p=er> clip|er/Er,a/eI", // [paper] reviewed
+"20|@🪶|light as a <f=ea/e=th/D=er>|er/Er,cons:th,ea/e", // [feather] reviewed
 
 // breaking er=3:  er/3:
-"7|@🏜️|<desert>|er/3:", // *
 "20|@🏜️|<d=e/e=s/z=er/Er=t>|er/3:",  // [desert] reviewed
-"8|@😎|He is an <expert>.|er/3:", // *
 "20|@😎|He is an <e/e=x/ks=p=er/3:=t>.|er/3:", // [expert] reviewed
-"8|@🌠|<universe>|er/3:,u/u:", // *
-"20|@🌠|<u/ju:=n=i=v=er/3:=s=e/x>|er/3:,u/u:", // reviewed
-"9|@🎓|He goes to <university>|er/3:,u/u:,end:y@", // *
-"20|@🎓|He goes to <u/ju:=n=i=v=er/3:=s=ity/ItI>|er/3:,u/u:,end:y@", // reviewed
+"20|@🌠|<u/ju:=n=i=v=er/3:=s=e/x>|er/3:,u/u:", // [universe] reviewed
+"20|@🎓|He goes to <u/ju:=n=i=v=er/3:=s=ity/ItI>|er/3:,u/u:,end:y@", // [university] reviewed
 
 // y  end:y@
-"3|@👶|<baby>|end:y@,a/eI", // *
 "20|@👶|<b=a/eI=b=y/I>|end:y@,a/eI", // [baby] reviewed
-"3|@👨🏻‍🍼|feeding the <baby>|end:y@",
-"8|@🕵️|<mystery>|end:y@,y/I", // *
-"20|@🕵️|<m=y/I=s=t=er/Er=y/I>|end:y@,y/I", // [mystery] reviewed
-"8|@🕵️|It's a <mystery>|end:y@,y/I",
-"8|@🏭|She works in a <factory>.|end:y@,a/ae", // *
+"20|@👨🏻‍🍼|feeding the <b=a/eI=b=y/I>|end:y@,a/eI", // [baby] reviewed
+"20|@🕵️|It's a <m=y/I=s=t=er/Er=y/I>|end:y@,y/I", // [mystery] reviewed
 "20|@🏭|She works in a <f=a/ae=c=t=or/Er=y/I>.|end:y@,a/ae", // [factory] reviewed
-"1|@🍬|sweet <candy>|end:y@,a/ae", // *
 "20|@🍬|sweet <c=a/ae=n=d=y/I>|end:y@,a/ae", // [candy] reviewed
-"7|@🪫|The machine ran out of <battery>|end:y@,a/ae,lax:dbl", // *
 "20|@🪫|The machine ran out of <b=a/ae=tt=er/Er=y/I>|end:y@,a/ae,lax:dbl", // [battery] reviewed
 
 // end:ie
-"7|@🛡|<shield>|end:ie", // *
 "20|@🛡|<sh=ie/i:=l=d>|end:ie", // [shield] reviewed
 
 // end:et
-"7|@🎺|<trumpet>|u/A,end:et", // *
 "20|@🎺|<t=r=u/A=m=p=et>|u/A,end:et", // [trumpet] reviewed
-"6|@🤫|Keep it a <secret>!|u/A,end:et", // *
 "20|@🤫|Keep it a <s=e/i:=c=r=et>!|u/A,end:et", // [secret] reviewed
-"2|waterbucket|<water bucket>|u/A,end:et,er/Er",
-"2|waterbucket|water <bucket>|u/A,end:et", // *
 "20|waterbucket|water <b=u/A=ck=et>|u/A,end:et", // [bucket] reviewed
-"8|axolotl|An axolotl is an aquatic mob <found in> lush caves and sometimes in <buckets>. It can assist you in <combat>.|u/A,end:et,ou/aU",
 
 
 // end:ot
-"6|@🦜|<parrot>|end:ot", // *
 "20|@🦜|<p=a/ae=rr=ot/Et>|end:ot", // [parrot] reviewed
-"6|@👩‍✈️|<pilot>|end:ot", // *
 "20|@👩‍✈️|<p=i/aI=l=ot/Et>|end:ot", // [pilot] reviewed
 
 //   end:al@
-"8|@🤨|The car broke down again. <Typical>.|end:al@", // *
 "20|@🤨|The car broke down again. <T=y/I=p=i/I=c=al/sl>.|end:al@", // [typical] reviewed
-"7|fox|A fox hunts small <animals>, and can carry items in its <mouth>. It runs away if you are not <sneaking>.|end:al@,ou/aU,ea/i:",
-"6|@🏥|<hospital>|end:al@", // *
-"20|@🏥|<h=o/o=s=p=i/I=t=al/sl>|end:al@", // [hopsital] reviewed
-
+"20|@🏥|<h=o/o=s=p=i/I=t=al/sl>|end:al@", // [hospital] reviewed
+"20|@🐾|<a/ae=n=i/I=m=al/sl>|end:al@", // [animal] reviewed
 
 // o  o/E
 "5|@🖍|<crayon>|a/ae,o/E",
 "8|poison|<poison>|oi/OI,o/E",
-"2|@🍋|<lemon>|o/E,e/e", // *
 "20|@🍋|<l=e=m=o/E=n>|o/E,e/e", // [lemon] reviewed
-"6|skeletonskull|<skeleton> skull|o/E,e/e", // *
 "20|skeletonskull|<s=k=e/e=l=e/I=t=o/E=n> skull|o/E,e/e", // [skeleton] reviewed
-"7|trapdoor|Trapdoors <can> be moved by <pistons>. They also block flowing water and <lava>.|a/E,o/E,a/a:",
 "6|melons|<melon slice>|o/E,c/s",
 "4|@🎹|play the <piano>|o/E",
-"6|cat|You can make <a cat> sit or stand <by> pressing the use <button> on it. Then the cat does not teleport.|u/A,a/ae,lax:dbl,o/E",
-"8|carrot|In the Java <version> of <Minecraft>, there is a bug, and <skeleton> horses can also eat carrots.|o/E,er/3:",
 "7|diamond@💎|<diamond>|o/E,i/aI",
 "6|@🐇|Rabbits like <carrots>.|o/E,lax:dbl",
-"8|@🇪🇺|European <Union>|o/E,u/u:",
+"20|@🇪🇺|European <U/ju:=n=io/IE=n>|o/E,u/u:", // [union] reviewed
 
-"6|@🪞|<mirror>|o/E", // *
 "20|@🪞|<m=i=rr=or/Er>|o/E", // [mirror] reviewed
-"6|@🚜|<tractor>|o/E,a/ae", // *
 "20|@🚜|<t=r=a/ae=c=t=or/Er>|o/E,a/ae", // [tractor] reviewed
-"7|@🖥|system <error>|o/E,lax:dbl", // *
 "20|@🖥|system <e=rr=or/Er>|o/E,lax:dbl", // [error] reviewed
-"8|@👩🏽‍🏫|<instructor>|o/E,u/A", // *
 "20|@👩🏽‍🏫|<i=n=s=t=r=u/A=c=t=or/Er>|o/E,u/A", // [instructor] reviewed
 
-"8|@🔣|<symbol>|o/E", // *
 "20|@🔣|<s=y/I=m=b=ol/sl>|o/E", // [symbol] reviewed
 
 // a  a/E
 "4|@🍕|I love <pizza>|a/E,lax:dbl,i/I",
 
 //  end:le
-"0|crafting|crafting <table>|end:le,a/eI", // *
 "20|crafting|crafting <t=a/eI=b=le/sl>|end:le,a/eI", // [table] reviewed
 "5|@👨🏾‍💼|His father's brother is his <uncle>|end:le,u/A",
-"8|jungle|<jungle> biome|end:le", // *
 "20|jungle|<j/dZ=u/A=ng=le/sl> biome|end:le", // [jungle] reviewed
-"7|turtle|<turtle>|end:le,ur/3:", // *
 "20|turtle|<t=ur/3:=t=le/sl>|end:le,ur/3:", // [turtle] reviewed
-"7|cat|Cats do not <get hurt> by falling, and they can see you <even> if you are <invisible>.|end:le,ur/3:",
-
+"20|@🫥|<in/In=v=i/I=s/z=i/I=b=le/sl>|end:le", // [invisible] reviewed
 
 // ------- consonants -------------------
 
@@ -1459,156 +1083,101 @@
 "5|pillager|The <village> is under attack!|dge/dZ,lax:dbl",
 "20|pillager|The <v=i=ll=age/IdZ> is under attack!|dge/dZ,lax:dbl", // [village] reviewed
 "5|pillager|<pillager>|dge/dZ",
-"6|@📦|A <package> arrived.|dge/dZ", // *
 "20|@📦|A <p=a=ck=age/IdZ> arrived.|dge/dZ", // [package] reviewed
-"8|@🦒|The <giraffe> is tall.|dge/dZ", // *
 "20|@🦒|The <g/dZ=i=r=a/a:=ff=e/x> is tall.|dge/dZ", // [giraffe] reviewed
-"4|mushroom|If you put a <small> mushroom on top of a full block <where> it is dark, it can grow into a <huge> mushroom.|dark:al,g/dZ,u/u:",
-"6|diamond|You need diamonds to make <fireworks> and smithing templates to decorate the <edges> of your armour.|g/dZ,i/aI",
-"6|sign|If you wax a <sign>, no player can <change> the text on it. Use dyes and <glow> ink to change how the text looks.|a/eI,g/dZ,ow/EU,ch/tS",
+"20|□|<e/e=dge/dZ>|dge/dZ", // [edge] reviewed
+
+"20||<h=u/ju:=ge/dZ>|g/dZ", // [huge] reviewed
+"20||<ch/tS=a/eI=n=ge/dZ>|g/dZ", // [change] reviewed
 
 // ck ck/k
 "2|@🪨|<rock>|ck/k",
-"2|@🔒|<lock>|ck/k",
 "20|@🔒|<l=o/o=ck>|ck/k", // [lock] reviewed
-"2|@🧦|<socks>|ck/k",
 "20|@🧦|<s=o/o=ck=s>|ck/k", // [socks] reviewed
-"3|@⬛️|<black>|ck/k",
 "20|@⬛️|<b=l=a=ck>|ck/k", // [black] reviewed
-"3|chick@🐤|<chick>|ck/k,ch/tS",
 "20|chick@🐤|<ch/tS=i=ck>|ck/k,ch/tS", // [chick] reviewed
-"8|command|command <block>|ck/k",
 "20|command|command <b=l=o/o=ck>|ck/k", // [block] reviewed
-"4|pillager|The village is under <attack>!|lax:dbl,ck/k",
 "20|pillager|The village is under <a/E=tt=a/ae=ck/k>!|lax:dbl,ck/k", // [attack] reviewed
 
 // th  cons:th
-"1|@📦|It's a <thing>|cons:th",
 "20|@📦|It's a <th/T=ing>|cons:th", // [thing] reviewed
-"1|@💥|Some<thing> went horribly wrong|cons:th",
-"5|@👍🏿|<thumb>|cons:th",
 "20|@👍🏿|<th/T=u/A=mb/m>|cons:th", // [thumb] reviewed
-"3|@👄|<mouth>|cons:th",
 "20|@👄|<m=ou/aU=th/T>|cons:th", // [mouth] reviewed
-"8|@🪥|<toothbrush>|cons:th,oo/u:",
 "20|@🪥|<t=oo/u:=th/T=b=r=u/A=sh>|cons:th,oo/u:", // [toothbrush] reviewed
 "6|trial|<There's> something under me!|cons:th",
-"0|@👦|my <brother>|cons:th,er/Er",
 "20|@👦|my <b=r=o/A=th/D=er>|cons:th,er/Er", // [brother] reviewed
-"6|@📥|There was <nothing> in the tray.|cons:th",
 "20|@📥|There was <n=o/A=th/T=ing> in the tray.|cons:th", // [nothing] reviewed
 
 // ph  ph/f
-"2|@📱|Call the <phone>|ph/f",
 "20|@📱|Call the <ph/f=o/EU=n=e/X>|ph/f", // [phone] reviewed
-"9|phantom|<phantom>|ph/f",
 "20|phantom|<ph/f=a=n=t=o/E=m>|ph/f", // [phantom] reviewed
-"6|@🐬|The <dolphin> likes fish.|ph/f",
 "20|@🐬|The <d=o/o=l=ph/f=i=n> likes fish.|ph/f", // [dolphin] reviewed
-"10|sulphurc|<sulphur> cube|ph/f",
 "20|sulphurc|<s=u/A=l=ph/f=ur/Er> cube|ph/f", // [sulphur] reviewed
-"10|cat|Cats are good <to chase> away <phantoms> and creepers. Black cats are only born during <full moon>.|ph/f,ch/tS",
 
 
 // wh  wh/w
-"4|@🛞|The <wheel> turns.|wh/w",
 "20|@🛞|The <wh/w=ee=l> turns.|wh/w", // [wheel] reviewed
-"2|@🚻|<Where> is the toilet?|wh/w",
 "2|@🗺|<Where> are we?|wh/w",
 "20|@🚻|<Wh/w=ere/eE> is the toilet?|wh/w", // [where] reviewed
-"3|@⬜️|<white>|wh/w,i/aI",
 "20|@⬜️|<wh/w=i/aI=t=e/X>|wh/w,i/aI", // [white] reviewed
 
 // c=s  c/s
-"6|@🚓|<police> car|c/s",
 "20|@🚓|<p=o/E=l=i/i:=ce/s> car|c/s", // [police] reviewed
-"8|sign|You can <burn> overworld signs in a <furnace>. Nether signs (crimson and warped) <cannot be> used as fuel.|c/s,ur/3:",
 "0|bread|<slice> of bread|c/s,i/aI",
-"9|@🏞️|What a <nice> view!|c/s,i/aI",
 "20|@🏞️|What a <n=i/aI=ce/s> view!|c/s,i/aI", // [nice] reviewed
 
 
 // $kn  kn/n
-"4|@🪢|<knot>|kn/n",
 "20|@🪢|<kn/n=o/o=t>|kn/n", // [knot] reviewed
-"3|@🤷🏼|I don't <know>|kn/n,ow/EU",
 "20|@🤷🏼|I don't <kn/n=ow/EU>|kn/n,ow/EU", // [know] reviewed
-"3|@♞|<knight>|kn/n,igh/aI",
 "20|@♞|<kn/n=igh=t>|kn/n,igh/aI", // [knight] reviewed
-"5|bookshelf|<knowledge> is <power>|kn/n,g/dZ",
 "20|bookshelf|<kn/n=ow/o=l=e/I=dge/dZ> is power|kn/n,g/dZ", // [knowledge] reviewed
 
 // $wr  wr/r
-"4|@💥|Something went horribly <wrong>|wr/r",
-"20|@💥|Something went horribly <wr/r=o/o=ng>|wr/r", // [wrong] reviewed
-"10|quill|<write> a book|wr/r,i/aI",
+"20|@💥|Something went <wr/r=o/o=ng>|wr/r", // [wrong] reviewed
 "20|quill|<wr/r=i/aI=t=e/X> a book|wr/r,i/aI", // [write] reviewed
 
 // ch=S   ch/S
-"6|@🧑‍🍳|The <chef> works in the <kitchen>|ch/S,ch/tS",
 "20|@🧑‍🍳|The <ch/S=e=f> works in the kitchen|ch/S", // [chef] reviewed
-//"6|@🧑‍🍳|The <chef> works in the kitchen|ch/S",
-"6|@🪫|The <machine> ran out of battery|ch/S",
 "20|@🪫|The <m=a/E=ch/S=i/i:=n=e/X> ran out of battery|ch/S", // [machine] reviewed
 "6|arcade|arcade <machine>|ch/S",
 "6|@🤖|Silly <machine>!|ch/S",
 //"9|@🥸|fake <moustache>|ch/S",
-"9|@🥸|The <spy> put on a fake <moustache>|ch/S",
 "20|@🥸|The <s=p=y/aI> put on a fake moustache|y/aI", // [spy] reviewed
 "20|@🥸|The spy put on a fake <m=ou/E=s=t=a/a:=ch/S=e/x>|ch/S", // [moustache] reviewed
 
 // ti=S  ti/S
-"8|potion|<potion>|ti/S",
 "20|potion|<p=o/EU=ti/S=o/E=n>|ti/S", // [potion] reviewed
 //"10|levitation|<levitation>|ti/S",
-"10|levitation|The <wizard> tried <levitation> and bumped his <head> in a cloud|ti/S",
 //"8|@🏃🏾‍♂️‍➡️|<competition>|ti/S",
-"8|@🏃🏾‍♂️‍➡️|He <won> the <competition>|ti/S",
 "20|@🏃🏾‍♂️‍➡️|He won the <c=o/o=m=p=e/E=t=i=tion>|ti/S", // [competition] reviewed
-"9|tnt|<destruction>|ti/S",
 "20|tnt|<d=e/I=s=t=r=u/A=c=tion>|ti/S", // [destruction] reviewed
 "8|@🏗️|He works in <construction> building <houses>.|ti/S,u/A",
-"8|@🖥️|The <computer> received an <instruction>|ti/S,u/A",
 "20|@🖥️|The <c/k=o/E=m=p=u/ju:=t=er/Er> received an instruction|u/u:", // [computer] reviewed
 "20|@🖥️|The computer received an <i=n=s=t=r=u/A=c=tion>|ti/S,u/A", // [instruction] reviewed
-//"9|@💌|<invitation>|ti/S",
-"9|@💌|I <received> an <invitation> to the party|ti/S",
-"20|@💌|I <r=e/I=c/s=ei/i:=v=ed/d> an invitation to the party|ti/S", // [received] reviewed
-"20|@💌|I received an <i=n=v=i=t=a/eI=tion> to the party|ti/S", // [invitation] reviewed
+"20|@💌|I <r=e/I=c/s=ei/i:=v=ed/d> an invitation|ti/S", // [received] reviewed
+"20|@💌|I received an <i=n=v=i=t=a/eI=tion>|ti/S", // [invitation] reviewed
 
 
 // ly$   end:ly
-"8|@🏂|He <bravely> slid down|end:ly",
 "20|@🏂|He <b=r=a/eI=v=e/X=ly> slid down|end:ly", // [bravely] reviewed
-"8|@😸|<Finally> the cat had enough to eat|end:ly,i/aI",
 "20|@😸|<F=i/aI=n=a/E=l=ly> the cat had enough to eat|end:ly,i/aI", // [finally] reviewed
-"9|@🤫|We must meet <secretly>|end:ly",
 "20|@🤫|We must meet <s=e/i:=c=r=e/E=t=ly>|end:ly", // [secrelty] reviewed
-"8|@🌤|Summers are <usually> sometimes hot|end:ly",
 "20|@🌤|Summers are <u/ju:=s/Z=ua/U=l=ly> sometimes hot|end:ly", // [usually] reviewed
-"6|@🤸🏾‍♀️|She can do it <easily>|end:ly",
 "20|@🤸🏾‍♀️|She can do it <ea=s/z=i=ly>|end:ly", // reviewed
-"9|@💥|Something went <horribly> wrong|end:ly",
 "20|@💥|Something went <h=o/o=rr=i=b=ly> wrong|end:ly", // reviewed
 
 
 // double (closed)  lax:dbl
-"3|@🤖|<Silly> machine!|lax:dbl",
 "20|@🤖|<S=i=ll=y> machine!|lax:dbl", // [silly] reviewed
 "3|@🧸|<teddy>|lax:dbl,end:y@",
-"0|@😀|I am <happy>|lax:dbl,end:y@",
 "20|@😀|I am <h=a=pp=y>|lax:dbl,end:y@", // [happy] reviewed
 "0|@🎾|play <tennis>|lax:dbl",
-"4|@🌤|<Summer>s are usually sometimes hot|lax:dbl,u/A",
 "20|@🌤|<S=u/A=mm=er=s/z> are usually sometimes hot|lax:dbl,u/A", // [summers] reviewed
 "6|@🐇|<Rabbits> like carrots.|lax:dbl",
-"4|carrot@🥕|I would like a <carrot>.|lax:dbl",
 "20|carrot@🥕|I would like a <c/k=a=rr=o/E=t>.|lax:dbl", // [carrot] reviewed
-"8|@🤔|<forgetting>|lax:dbl",
 "20|@🤔|<f=or/O:=g=e=tt=ing>|lax:dbl", // [forgetting] reviewed
-"6|copperore|<copper> ore|lax:dbl",
 "20|copperore|<c=o/o=pp=er> ore|lax:dbl", // [copper] reviewed
-"9|@⛔️|Smoking is <forbidden>|lax:dbl",
 "20|@⛔️|Smoking is <f=or/O:=b=i/I=dd=e/E=n>|lax:dbl", // [forbidden] reviewed
 
 
@@ -1625,97 +1194,60 @@
 "4|@🏖|<We are> going on a holiday!|e/i:,common",
 "3|@🚶‍♀️‍➡️|<She is> walking.|e/i:,common",
 "4|@🗺|Where <are we>?|common",
-"4|carrot@🥕|I <would> like a carrot.|common",
 "20|carrot@🥕|I <w=oul/U=d> like a carrot.|common", // [would] reviewed
 "3|@🗺️|We are <here>.|common",
 "20|@🗺️|We are <h=ere/IE>.|common", // [here] reviewed
 "4|@🕰️|<A bit of> time, please|common",
 "3|@🛀🏾|I am <having> a bath.|common",
 "3|@🎂|<It is my> birthday!|common",
-"3|@🫂|I love <you>|common",
 "20|@🫂|I love <y/j=ou/u:>|common", // [you] reviewed
 "3|@🤸🏾‍♀️|She <can do it> easily|common",
-"3|@🤫|<We must> meet secretly|common",
 "20|@🤫|We <m=u/A=s=t> meet secretly|common", // [must] reviewed
 "0|@👦|<my> brother|y/aI",
-"2|@🎂|It is <my> birthday!|y/aI",
 "20|@🎂|It is <m=y/aI> birthday!|y/aI", // [my] reviewed
 "0|@💥|<Some>thing went horribly wrong|common",
-"2|@🎮|<Come> on, let's play!|common",
 "20|@🎮|<C=o/A=m=e/x> on, let's play!|common", // [come] reviewed
 "3|@🍟|<I want> chips!|common",
-"3|@🏖|We are <going> on a holiday!|common",
 "20|@🏖|We are <g=o/EU=ing> on a holiday!|common", // [going] reviewed
-"2|@💥|Something <went> horribly wrong|e/e",
+"2|@💥|Something <went> wrong|e/e",
 
 "6|pillager|<The> village is under attack!|common,cons:th",
 "3|@📥|There was nothing <in the> tray.|common,cons:th",
-"6|@📥|<There was> nothing in the tray.|common,cons:th",
 "20|@📥|<Th/D=ere/eE> was nothing in the tray.|common,cons:th", // [there] reviewed
 "4|@🚻|Where <is the> toilet?|common,cons:th",
-"5|frog|Frogs will follow you if you hold a slime ball, and <you are> closer to them <than> six blocks. You <can feed> them.|common,ee/i:",
-
-"1|trapdoor|Trapdoors <can> be moved <by> pistons. <They> also block flowing water and lava.|common",
-"1|frog|Frogs <will> follow you if <you> hold a slime ball, and you are closer to them than six blocks. You can <feed> them.|common,ee/i:",
-"4|carrot|In the Java version of Minecraft, <there is> a bug, and skeleton horses <can also> eat carrots.|common,cons:th",
-"2|egg|Foxes may appear with <an> egg in <their> mouth. If you drop <some> food, the fox will drop the egg.|common",
-"1|egg|Foxes may appear <with> an egg in their mouth. If <you> drop some food, the fox <will> drop the egg.|common,i/I",
 
 
 // Tricky words  tricky
-"3|@📏|<one> unit|tricky",
 "20|@📏|<o/A=n=e/x> unit|tricky", // reviewed
 "3|@🍕|<I love> pizza|tricky",
-"3|@🫂|I <love> you|tricky",
 "20|@🫂|I <l=o/A=v=e/x> you|tricky", // reviewed
-"6|@👁|<eye>|tricky",
 "20|@👁|<eye>|tricky",
 "4|@👩‍🦰|one <woman>|tricky",
 "6|@👭|two <women>|tricky",
-"6|@💧|<water>|tricky,er/Er",
 "20|@💧|<w=a/O:=t=er>|tricky,er/Er", // [water] reviewed
 "6|@🍉|<watermelon>|tricky,er/Er",
 "2|waterbucket|<water> bucket|er/Er,tricky",
-"8|@😸|Finally the cat had <enough> to eat|tricky",
-"20|@😸|Finally the cat had <e/I=n=ou/A=gh/f> to eat|tricky", // reviewed
-"4|@🤨|The car broke down <again>.|tricky",
+"20|@😸|The cat had <e/I=n=ou/A=gh/f> to eat|tricky", // reviewed
 "20|@🤨|The car broke down <a/E=g=ai/e=n>.|tricky", // reviewed
 "5|sign@🪧|<sign>|tricky",
-"5|hangingsign|hanging <sign>|tricky",
 "20|hangingsign|hanging <s=ig/aI=n>|tricky", // reviewed
-"3|@🧴|Let's <wash> hands|tricky",
 "20|@🧴|Let's <w=a/o=sh> hands|tricky", // reviewed
-"10|@🍎|<fruit>|tricky",
 "20|@🍎|<f=r=ui/u:=t>|tricky", // reviewed
-"10|@👂|I <heard> a noise|tricky",
 "20|@👂|I <h=ear/3:=d> a noise|tricky", // reviewed
 // ear=(]:
-"6|@❤️|<heart>|tricky",
 "20|@❤️|<h=ear/a:=t>|tricky", // [heart] reviewed
-"2|@👞|<shoe>|tricky",
 "20|@👞|<sh=oe/u:>|tricky", // [shoe] reviewed
-"5|witch|<witch>|tricky,ch/tS",
 "20|witch|<w=i=tch>|tricky,ch/tS", // [witch] reviewed
 // ea=eI .....
-"4|pickaxe@⛏|It can <break> stone|tricky",
 "20|pickaxe@⛏|It can <b=r=ea/eI=k> stone|tricky", // [break] reviewed
 // ou ......
-"5|@👯‍♀️|a <group> of people|tricky",
 "20|@👯‍♀️|a <g=r=ou/u:=p> of people|tricky", // [group] reviewed
 // ey=i: di:eyi
-"4|@🔑|<key>|tricky,end:ey",
 "20|@🔑|<k=ey/i:>|tricky,end:ey", // [key] reviewed
 
-"4|@😾|This cat <is angry>.|end:y@,a/ae",
-"4|cat|<Cats are> good to chase away phantoms and creepers. <Black> cats are <only> born during full moon.|ck/k,end:y@",
-"8|cat|You can make a cat sit <or> stand by <pressing> the use button on it. Then the cat does not <teleport>.|or/O:",
-"9|axolotl|An axolotl is an <aquatic> mob found in <lush caves> and sometimes in buckets. It can <assist> you in combat.|u/A,lax:dbl,a/eI",
-"5|cat|You can make a cat sit or <stand> by pressing the use button on it. Then the cat <does not> teleport.|common,a/ae",
-"4|egg|Foxes may appear with an egg <in their> mouth. If you drop <some> food, <the fox> will drop the egg.|cons:th,common,o/o",
-"1|fire|You can put out <fire> by powder <snow>, rain, <water>, or a cauldron.|tricky,ow/EU,i/aI",
+"20|@😾|This cat is <a/ae=ng=r=y/I>.|end:y@,a/ae", // [angry] reviewed
 
 // calendar
-"6|@🗓️|The weekend is <Saturday> and <Sunday>|calendar,u/A,ay/eI,a/ae",
 "20|@🗓️|The weekend is <S=a=t=ur/E=d=ay> and Sunday|calendar,u/A,ay/eI,a/ae", // [Saturday] reviewed
 "6|@🗓️|Friday, <Saturday>, <Sunday>|calendar,u/A,ay/eI,a/ae",
 "6|@🗓️|The workweek starts with <Monday>, then it's <Tuesday>|calendar,o/o,ay/eI",
@@ -1724,29 +1256,15 @@
 "6|@🗓️|Monday, <Tuesday>, <Wednesday>, Thursday, Friday|calendar,ay/eI",
 "6|@🗓️|Monday, Tuesday, Wednesday, <Thursday>, <Friday>|calendar,i/aI,ur/3:,ay/eI",
 "3|@🗓️|There are seven days in a <week>|calendar,ee/i:",
-"6|@🗓️|<Sunday>|u/A,ay/eI",
 "20|@🗓️|<S=u/A=n=d=ay>|u/A,ay/eI", // [Sunday] reviewed
 
 
-
-// unclassified
-"8|pufferfish|Pufferfish live in <oceans> and use poison to <defend> themselves. They inflate <if> you get too close.|",
-"8|diamond|You need <diamonds> to make fireworks and smithing templates to <decorate> the edges <of> your armour.|",
-
-"9|@☑️|<preferred>|",
 "20|@☑️|<p=r=e/I=f=err/3:=ed/d>|er/3:", // [preferred] reviewed
-"9|enderpearl|<ender pearl>|",
 "20|enderpearl|ender <p=ear/3:=l>|tricky", // [pearl] reviewed
 "9|nquartz|nether <quartz>|",
 
-"10|diamond|You need diamonds to <make> fireworks and smithing <templates> to decorate the edges of your <armour>.|",
-"10|sign|You can burn overworld <signs> in a furnace. Nether signs (<crimson> and warped) cannot be used as <fuel>.|",
-
-"10|@📏|<length>|cons:th",
 "20|@📏|<l=e=ng=th/T>|cons:th", // [length] reviewed
-"12|@❗|This is very <important>.|or/O:",
 "20|@❗|This is very <i=m=p=or/O:=t=ant/Ent>.|or/O:", // [important] reviewed
-"12|@🏝️|pirate <island>|tricky",
 "20|@🏝️|pirate <is/aI=l=a/E=n=d>|tricky", // [island] reviewed
 "12|@📜|<History> happened a long time ago.|end:y@",
 "12|@💬|They <mention> my name|ti/S",
