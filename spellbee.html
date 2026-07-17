@@ -2220,8 +2220,8 @@
                 bee.$image.html('<img src="assets/images/words/'+bee.processed_word.imgref+'">');
             }
             else if(bee.processed_word.emoji === undefined) {
-                bee.$image.html('?');
-            } 
+                bee.$image.html(''); // no image specified: show an empty box
+            }
             else {
                 let emoji = bee.processed_word.emoji;
                 // Ensure emoji code ends in picture modifier
