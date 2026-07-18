@@ -107,6 +107,13 @@ to confirm 0 gaps remain.
   approximate with the nearest id and flag for a maintainer decision.
 - **`-ed` endings** are `Id` /ɪd/ only after t/d (*wanted*); otherwise `/t/`=`t` after a
   voiceless sound (*walked*) or `/d/`=`d` after a voiced one (*mentioned*).
+- **Plural / 3rd-person `-s` on a `/t/`-final base stays two segments** — `t` + `s`, never a
+  merged `/ts/` (e.g. *boots* `<b=oo/u:=t=s/s>`, *cats* `<c=a=t=s/s>`). English has no `/ts/`
+  phoneme: the [ts] here is `/t/`+`/s/` across a morpheme boundary, so splitting it keeps the base
+  word intact and the regular plural pattern visible (`s`→`s` after a voiceless sound, `s`→`z`
+  after a voiced one — see *windows* above). Merge into a `ts` affricate **only** when the [ts] is
+  *tautomorphemic* (inside one morpheme, e.g. *pizza*, *tsar*), and only if a `ts` id exists — it
+  currently does not, so a word like *pizza* is the sole motivation for ever adding one.
 - **Common wrong defaults to watch.** `e`→`/e/` is wrong for the many reduced `e`s that are
   `/ɪ/` (*market, kitchen, elephant*'s 2nd `e`, *express*'s 1st `e`) or `/ə/` (*wooden, garden,
   different*); `u`→`/ʊ/` is wrong for the usual `/ʌ/` (*lunch*); `oo`→`/uː/` is wrong for the

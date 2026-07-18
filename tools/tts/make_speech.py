@@ -138,7 +138,7 @@ def scan_words():
             continue
         if word_area:
             # print(line)
-            match = re.search(r'^\s*"([0-9]+)\|[^\|]+\|([^\|]+)\|', line)
+            match = re.search(r'^\s*"([0-9]+)\|[^\|]*\|([^\|]+)\|', line)
             if match:
                 level = int(match.group(1))
                 phrase = match.group(2)
