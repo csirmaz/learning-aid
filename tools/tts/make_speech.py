@@ -137,8 +137,11 @@ def scan_words():
             word_area = False
             continue
         if word_area:
-            # print(line)
-            match = re.search(r'^\s*"([0-9]+)\|[^\|]*\|([^\|]+)\|', line)
+            match = re.search(r'^\s*"[^"]+",', line)
+            if not match:
+                continue
+            #                        level    |img    |phrase
+            match = re.search(r'^\s*"([0-9]+)\|[^\|]*\|([^\|"]+)', line)
             if match:
                 level = int(match.group(1))
                 phrase = match.group(2)
@@ -154,6 +157,8 @@ def scan_words():
                     for p in parts:
                         # Alice is usually not great with individual words
                         check_text(p, avoid_alice=True)
+            else:
+                raise ValueError(f"Cannot parse line: [{line}]")
 
 scan_words()
 # generate_tts("Eight is a feather", "test0.mp3", 0)
