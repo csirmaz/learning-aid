@@ -17,17 +17,9 @@ full string matters, and it drives two mechanisms:
    random), so a session drills one orthographic rule at a time. An entry with an empty
    class field falls into the catch-all `'noclass:'` bucket.
 
-2. **Highlighting** (`class_highlight_rules`, consumed by `get_class_highlight_mask()`).
-   Each rule is a regex over the word being typed; the matched letters (or, if the regex
-   has capture groups, the captured letters) are highlighted in the help text so the child
-   sees the grapheme. The highlight only renders when the regex matches **exactly once** —
-   zero or multiple matches highlight nothing. Capture groups let a rule pick out
-   non-adjacent letters, e.g. the split digraph `a…e` while skipping the consonant between
-   (`a/eI` = `(a)[bcdfgklmnpstvz](e)|(a)(?: |$)`).
-
-A class used for grouping does **not** need a highlight rule. Six grouping-only classes
-have no entry in `class_highlight_rules` and so never highlight: `common`, `tricky`,
-`calendar`, `dge/dZ`, `au/O:`, `end:ey`.
+2. **Validation** (`known_class_tags`, checked in `init_wordlist_impl()`). This set is the
+   registry of every valid tag; a tag on a word that is missing from it is reported once via
+   `console.error` as a likely typo. It carries no per-tag data — membership is all that matters.
 
 ## Tagging multi-target fragments
 
@@ -45,11 +37,7 @@ applicable to each of its target words**. Conventions:
   words and can be omitted.
 
 Note this is a grouping convention only: grouping needs the class to be in `class_to_ix`,
-which any tag satisfies. Whether the highlight actually renders is independent — for a
-multi-target fragment the highlight regex runs against the concatenation of all the
-target words and must match **exactly once** there (per the rule above), so a grapheme
-that appears in two of the targets will not highlight even though the tag is still valid
-for grouping.
+which any tag satisfies.
 
 ## Naming convention
 
@@ -63,7 +51,7 @@ spelling/phoneme
   words (`<grapheme/phoneme>`), and the ids are the same set.
 
 Because the tag pairs *both* halves, it distinguishes the two ways spellings and sounds
-overlap, keeping each spelling its own group and its own highlight regex:
+overlap, keeping each spelling its own group:
 
 - **One sound, several spellings → several tags.** /iː/ is `ee/i:` (tree), `ea/i:` (eat),
   `e/i:` (he); /eɪ/ is `a/eI` (snake), `ai/eI` (rain), `ay/eI` (play); /ɜː/ is `or/3:`
@@ -87,12 +75,12 @@ names:
 
 ## Catalogue
 
-Each row: **tag** · grapheme highlighted (`—` = grouping only, no highlight) · the sound
-(keyword) · example targets drawn from the word list.
+Each row: **tag** · the grapheme it names (`—` = grouping only, no single grapheme) · the
+sound (keyword) · example targets drawn from the word list.
 
 ### Short ("lax") vowels
 
-| tag | highlights | sound | examples |
+| tag | grapheme | sound | examples |
 |---|---|---|---|
 | `a/ae` | `a` | /æ/ *cat* | cat, bag, hand, bank |
 | `e/e` | `e` | /e/ *pen* | pen, red, bed, nest |
@@ -104,7 +92,7 @@ Each row: **tag** · grapheme highlighted (`—` = grouping only, no highlight) 
 
 ### Long ("tense") vowels — split digraph (a–e) or open vowel
 
-| tag | highlights | sound | examples |
+| tag | grapheme | sound | examples |
 |---|---|---|---|
 | `a/eI` | `a…e` / final `a` | /eɪ/ *snake* | snake, plane, blaze, inflate |
 | `a/a:` | `a` | /ɑː/ broad-a *bath* | bath, grass, pasta |
@@ -116,7 +104,7 @@ Each row: **tag** · grapheme highlighted (`—` = grouping only, no highlight) 
 
 ### Vowel digraphs / diphthongs
 
-| tag | highlights | sound | examples |
+| tag | grapheme | sound | examples |
 |---|---|---|---|
 | `ee/i:` | `ee` | /iː/ *tree* | tree, sleep, green, cheese |
 | `ea/i:` | `ea` | /iː/ *eat* | eat, meat, please, heal |
@@ -138,7 +126,7 @@ Each row: **tag** · grapheme highlighted (`—` = grouping only, no highlight) 
 
 ### R-controlled ("bossy r") vowels
 
-| tag | highlights | sound | examples |
+| tag | grapheme | sound | examples |
 |---|---|---|---|
 | `ar/a:` | `ar` | /ɑː/ *car* | car, shark, card, dark |
 | `or/O:` | `or` | /ɔː/ *corn* | corn, horse, morning, door |
@@ -151,14 +139,14 @@ Each row: **tag** · grapheme highlighted (`—` = grouping only, no highlight) 
 
 ### Dark L *(legacy — vowel + dark L is not a single phoneme)*
 
-| tag | highlights | sound | examples |
+| tag | grapheme | sound | examples |
 |---|---|---|---|
 | `dark:al` | `al` / `all` | /ɔːl/ *call* | small, call, tall, wall |
 | `dark:ol` | `ol` | /əʊl/ *cold* | cold, gold, golf |
 
 ### Consonant graphemes
 
-| tag | highlights | sound | examples |
+| tag | grapheme | sound | examples |
 |---|---|---|---|
 | `ph/f` | `ph` | /f/ *phone* | phone, dolphin, sulphur |
 | `ck/k` | `ck` | /k/ *duck* | duck, rock, socks, black |
@@ -174,7 +162,7 @@ Each row: **tag** · grapheme highlighted (`—` = grouping only, no highlight) 
 
 ### Word beginnings & endings
 
-| tag | highlights | sound | examples |
+| tag | grapheme | sound | examples |
 |---|---|---|---|
 | `kn/n` | initial `kn` | silent k *knot* | knot, know, knight |
 | `wr/r` | initial `wr` | silent w *wrong* | wrong, write |
@@ -190,12 +178,12 @@ Each row: **tag** · grapheme highlighted (`—` = grouping only, no highlight) 
 
 ### Schwa / unstressed
 
-| tag | highlights | sound | examples |
+| tag | grapheme | sound | examples |
 |---|---|---|---|
 | `o/E` | `o` | unstressed /ə/ *lemon* | lemon, skeleton, anchor, crayon |
 | `a/E` | `a` | unstressed /ə/ *banana* | banana, pasta, lava |
 
-### Non-phonetic groupings (no highlight rule)
+### Non-phonetic groupings
 
 | tag | purpose | examples |
 |---|---|---|

@@ -21,8 +21,9 @@ For each entry `"level|image|text|class"`:
    function words (*were, this, just, because, very, of*) — is **left imageless**: a vague or
    miscuing picture is worse than none. An empty image on such a word is a valid **final** state,
    not an omission — so confirm the word is genuinely not picturable, then leave the field empty
-   and mark the line reviewed. The audit still prints `NO-IMAGE` for it (the flag is mechanical and
-   can't tell "not done yet" from "deliberately none"); do **not** add a picture just to clear it.
+   and mark the line reviewed. The audit does **not** flag a missing image (it can't tell "not done
+   yet" from "deliberately none"), so an empty image never shows as needing work — judging
+   picturability is this review step's job, not the audit's.
 2. **Class tag** (4th field). If empty, add the appropriate `spelling/phoneme` tag(s) for the
    target word's notable grapheme(s) (see [`spellbee-classes.md`](spellbee-classes.md)). Only
    add when the field is empty — don't churn existing tags.
@@ -51,7 +52,7 @@ Two `console.error`s fire during page load (open the browser console):
   phoneme is missing from `phoneme_sounds` (i.e. resolves to `''`). These are exactly the
   segments step 3 fills.
 - **`Unknown class tag …`** — from `init_wordlist_impl()`; flags a class tag absent from
-  `class_highlight_rules` (a typo). `false`-valued entries there are known grouping-only tags.
+  `known_class_tags` (a typo). That set is the registry of every valid tag.
 
 To enumerate gaps in bulk, run the saved extractor [`segmented-audit.js`](segmented-audit.js):
 
@@ -60,18 +61,18 @@ node agent/segmented-audit.js [html-file] [expected-level]   # defaults: spellbe
 ```
 
 It loads the app's own `word_repository` / `process_word_data()` / `get_processed_word()` /
-`phoneme_sounds` / `class_highlight_rules` and lists, for **every** segmented entry (any whose
+`phoneme_sounds` / `known_class_tags` and lists, for **every** segmented entry (any whose
 text contains a `=`, at any level), every segment resolved to its phoneme (`*` = explicit spec,
 `~` = a `/X` split-digraph link, `[?]` = missing, `[!x]` = resolved to an unknown phoneme id),
-flagging a missing image / class / phoneme, an **invalid phoneme**, a **`/X` link with no target
+flagging a missing class / phoneme, an **invalid phoneme**, a **`/X` link with no target
 box two segments to its left** (`link-no-target`), a **class tag absent from
-`class_highlight_rules`**, or an entry whose **level is not the expected-level**
+`known_class_tags`**, or an entry whose **level is not the expected-level**
 (`UNEXPECTED-LEVEL`, default 20) — so the audit always matches runtime behaviour. It reports
 structural gaps only; judging whether a *valid* resolved phoneme is *correct for RP* — or whether
 a `/X` link is warranted (the vowel is genuinely tensed by the silent e) — is the (LLM/human)
-review step, and **arguable specs are put to the maintainer** (see Judgement notes). `NO-IMAGE` is
-mechanical too: for a non-picturable word (step 1) an empty image is the correct final state, so
-confirm and leave it rather than adding a picture to clear the flag.
+review step, and **arguable specs are put to the maintainer** (see Judgement notes). A **missing
+image is not a gap** and is not flagged: for a non-picturable word (step 1) an empty image is the
+correct final state, so judging picturability is the review step's job, not the audit's.
 
 Once the edits are decided, apply them with [`apply-line-edits.js`](apply-line-edits.js):
 

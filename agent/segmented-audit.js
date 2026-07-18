@@ -8,17 +8,21 @@
 // the target text with each segment resolved to
 // its phoneme (marking an explicit '/phoneme' spec with '*', a missing phoneme as '[?]', a
 // segment that resolved to an UNKNOWN phoneme id as '[!x]', and a split-digraph link '/X' with a
-// trailing '~'), and flags a missing image / missing class / missing phoneme, an invalid phoneme,
+// trailing '~'), and flags a missing class / missing phoneme, an invalid phoneme,
 // a split-digraph link with no target box two segments to its left ('link-no-target'), a class tag
-// that is absent from class_highlight_rules, or an entry whose level is not the expected-level
+// that is absent from known_class_tags, or an entry whose level is not the expected-level
 // (segmented problems currently all live at that level - see EXPECTED_LEVEL; this may change).
+//
+// A missing image is NOT a gap: for a non-picturable word an empty image is the correct final
+// state, and telling those apart from "not done yet" is a human/LLM judgement (see
+// agent/segmented-review.md), so the audit does not flag it.
 //
 // A '/X' link folds to the silent phoneme 'x' at runtime, so it is a valid phoneme, not a gap;
 // this audit only checks its structure (that a vowel box exists two segments to its left). Whether
 // '/X' is the right call - i.e. the vowel is genuinely tensed by the silent e - is the human/LLM
 // review step (see agent/segmented-review.md), same as judging any phoneme's RP correctness.
 // It loads the app's own parser (word_repository, process_word_data,
-// get_processed_word, phoneme_sounds, class_highlight_rules, segment_default_phoneme) out of
+// get_processed_word, phoneme_sounds, known_class_tags, segment_default_phoneme) out of
 // the HTML, so the audit always matches runtime behaviour.
 //
 // It flags structural gaps (missing / invalid phonemes and classes); it does not judge whether
@@ -80,7 +84,7 @@ const audit = `
             else tag = ph;
             segs.push(p.add_words[i] + '[' + tag + ']' + (explicit ? '*' : '') + (link ? '~' : ''));
         }
-        const badClasses = (w.class || []).filter(c => class_highlight_rules[c] === undefined); // tag absent from class_highlight_rules
+        const badClasses = (w.class || []).filter(c => known_class_tags[c] === undefined); // tag absent from known_class_tags
         rows.push({
             display: w.text.replace(/<[^>]*>/, '<' + p.add_words.join('=') + '>'),
             segs: segs.join(' '),
@@ -89,7 +93,6 @@ const audit = `
             invalid: invalid,
             badLinks: badLinks,
             badClasses: badClasses,
-            noImage: (w.emoji === undefined && w.ref === undefined && w.imgref === undefined),
             noClass: (!w.class || w.class.length === 0)
         });
     }
@@ -108,7 +111,6 @@ for(const r of rows) {
         r.badLinks ? r.badLinks + ' link-no-target' : '',
         r.badClasses.length ? 'invalid-class:' + r.badClasses.join(',') : '',
         r.level !== EXPECTED_LEVEL ? 'UNEXPECTED-LEVEL:' + r.level + ' (expected ' + EXPECTED_LEVEL + ')' : '',
-        r.noImage ? 'NO-IMAGE' : '',
         r.noClass ? 'NO-CLASS' : ''
     ].filter(Boolean).join(', ');
     if(flags) needWork++;
