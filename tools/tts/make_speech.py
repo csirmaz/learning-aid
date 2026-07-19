@@ -140,17 +140,16 @@ def scan_words():
             match = re.search(r'^\s*"[^"]+",', line)
             if not match:
                 continue
-            #                        level    |img    |phrase
-            match = re.search(r'^\s*"([0-9]+)\|[^\|]*\|([^\|"]+)', line)
+            #                        img    |phrase
+            match = re.search(r'^\s*"[^\|]*\|([^\|"]+)', line)
             if match:
-                level = int(match.group(1))
                 phrase = match.group(2)
                 phrase = phrase.replace(r"\'", "'")
                 phrase = phrase.replace(r'\"', '"')
                 # Collapse a segmented <a=b> into a single <ab> part (see normalize_markup)
                 phrase = normalize_markup(phrase)
                 # Alice is not great with multiple sentences
-                check_text(phrase.replace('<','').replace('>',''), avoid_alice=(level >= 100))
+                check_text(phrase.replace('<','').replace('>',''), avoid_alice=True)
                 
                 parts = list(re.findall(r'<([^>]+)>', phrase))
                 if len(parts) > 1:
