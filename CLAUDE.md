@@ -17,9 +17,10 @@ All apps are vanilla JS + jQuery, require no build step, and can be served from 
 Deeper references live under `agent/` and are loaded on demand — read the relevant one before working in that area:
 
 - [`agent/question-cycle.md`](agent/question-cycle.md) — the question→answer→reward→next play loop: the shared `success_common()` reward step, per-app `new_question()` selection, the anti-cheat / spaced-repetition queue, count problem generators, and puzzle-mode sessions.
-- [`agent/spellbee-content.md`](agent/spellbee-content.md) — the `spellbee.html` word-list entry format, image-ref forms, phonics class tags, MP3 resolution, and long-format story authoring mechanics.
-- [`agent/spellbee-classes.md`](agent/spellbee-classes.md) — the phonics **class tags**: the `spelling/phoneme` naming convention (a few legacy `category:grapheme` tags remain), the two things the engine does with a tag (grouping via `class_to_ix`, and validation against the `known_class_tags` registry), and a full catalogue of every class in use with its grapheme, sound, and example words.
+- [`agent/spellbee-content.md`](agent/spellbee-content.md) — the `spellbee.html` word-list entry format, image-ref forms, auto-derived level & classes, and MP3 resolution.
+- [`agent/spellbee-classes.md`](agent/spellbee-classes.md) — the phonics **classes**: how they are auto-derived from each segment's `grapheme/phoneme` pair, the two registries that drive it (`gp_grouping_pairs` = pairs that form drill groups via `class_to_ix`; `gp_other_pairs` = valid-but-ungrouped pairs; an unknown pair is a `console.error`), and the optional explicit `class` field.
 - [`agent/segmented-review.md`](agent/segmented-review.md) — reviewing **segmented** problem entries (a word whose `<…>` region splits into `=`-separated `grapheme/phoneme` segments, e.g. `<e=l=e/I=ph=a/E=n=t>`): the per-entry checklist (image, class tag, and an RP-correct phoneme on every segment — always overriding wrong defaults), the `console.error` gap-detectors, and the reusable [`agent/segmented-audit.js`](agent/segmented-audit.js) extractor.
+- [`agent/removed-features.md`](agent/removed-features.md) — features **removed** from the apps but preserved for possible restoration (currently the long-format story mechanism, removed 2026-07-19).
 
 ## Running Locally
 
@@ -94,7 +95,7 @@ Two paths:
 
 ### `spellbee.html` — word list format
 
-Words live between `// [WORDS START]` and `// [WORDS END]` comments as pipe-delimited `"level|image_ref|text|class"` strings; angle-bracket regions `<word>` in the text mark what the child must type, and entries whose level is `≥ MIN_LONGSTORY_LEVEL` form multi-prompt **long stories** keyed by the level number. The full entry format, image-ref forms, phonics class tags, MP3 resolution, and long-story authoring mechanics are in [`agent/spellbee-content.md`](agent/spellbee-content.md).
+Words live between `// [WORDS START]` and `// [WORDS END]` comments as pipe-delimited `"image_ref|text|class"` strings; angle-bracket regions `<word>` in the text mark what the child must type. Difficulty (**level**) and phonics **classes** are both derived automatically — level from the segment count, classes from each segment's grapheme/phoneme pair — so entries carry neither field (the trailing `class` field is optional and now rarely used). The full entry format, image-ref forms, and MP3 resolution are in [`agent/spellbee-content.md`](agent/spellbee-content.md). (Long-format stories were removed — see [`agent/removed-features.md`](agent/removed-features.md).)
 
 ### `count.html` — problem generators
 

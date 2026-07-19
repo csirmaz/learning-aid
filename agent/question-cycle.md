@@ -15,12 +15,11 @@ Each app persists the pending question(s) so a page refresh can't skip a hard on
 
 ## spellbee selection (`new_question` ~2000)
 
-If the queue is empty, pick a first word with `try_get_new_word10(undefined)`. Two modes:
+If the queue is empty, pick a first word with `try_get_new_word10(undefined)`, then pick one of that word's phonics classes at random and queue up to ~7 words from that class (`bee.class_to_ix`) — one orthographic group per session.
 
-- **(a) long-story** — if the chosen word's level ≥ `MIN_LONGSTORY_LEVEL`, queue every consecutive fragment of that same level in order (see `agent/spellbee-content.md`).
-- **(b) normal** — pick one of the word's phonics classes at random and queue up to ~7 words from that class (`bee.class_to_ix`).
+Word weighting: `choose_using_levels20` weights by `1.5^(-level)`, where `level` is auto-derived as the entry's segment count (`proc_cache.add_words.length`), so shorter words are favoured. `known_score_to_choice20` probabilistically *rejects* already-known words (typed without help; tracked in `pstore.known_words`). On success, `outcome` is derived from `help_asked` + `backspace_used` → `ADD_KNOWN` (mark known, advance), `OK` (advance), or `ASK_ONCE`/`ASK_ALL` (`reschedule_question` re-inserts the word ~3 slots later, optionally with a reveal — spaced repetition). Repeats pass `skip_this_score:true`.
 
-Word weighting: `choose_using_levels20` weights by `1.5^(-level)` (easier/lower levels favoured). `known_score_to_choice20` probabilistically *rejects* already-known words (typed without help; tracked in `pstore.known_words`). On success, `outcome` is derived from `help_asked` + `backspace_used` → `ADD_KNOWN` (mark known, advance), `OK` (advance), or `ASK_ONCE`/`ASK_ALL` (`reschedule_question` re-inserts the word ~3 slots later, optionally with a reveal — spaced repetition; skipped for long-story levels). Repeats pass `skip_this_score:true`.
+(A former **long-story mode** — level ≥ 100 fragments queued as one consecutive story — was removed 2026-07-19; see [`removed-features.md`](removed-features.md).)
 
 ## count selection (`new_question` ~1169)
 

@@ -1,19 +1,16 @@
 # spellbee.html — reviewing segmented problem entries
 
 How to review a **segmented** problem entry (a word entry whose `<…>` region is split into
-`=`-separated segments, e.g. `"20|@🐘|<e=l=e=ph=a/E=n=t>|ph/f"`). Review is **not** scoped to a
-particular level/class: **every** entry whose text contains a `=` is in scope, at any level.
-Segmented entries currently all live at **level 20**, so one found at any other level is reported
-as a finding (this expectation may change in future). For the format itself see
-[`spellbee-content.md`](spellbee-content.md);
-for the phoneme ids see the `phoneme_sounds` object and for class tags
+`=`-separated segments, e.g. `"@🐘|<e=l=e/I=ph/f=a/E=n=t>"`). **Every** entry whose text contains a
+`=` is in scope. For the entry format see [`spellbee-content.md`](spellbee-content.md); for the
+phoneme ids see the `phoneme_sounds` object; for how classes are derived from the segments see
 [`spellbee-classes.md`](spellbee-classes.md).
 
 ## Per-entry checklist
 
-For each entry `"level|image|text|class"`:
+For each entry `"image|text|class"` (the `class` field is optional and usually absent):
 
-1. **Image** (2nd field). If empty (`"20||…"`) **and the target word is picturable**, add one that
+1. **Image** (1st field). If empty (`"|…"`) **and the target word is picturable**, add one that
    hints at the word — `@<emoji>`, `word@<emoji>`, or a `~file.svg` / named ref (same forms as any
    word entry). The picture must denote the **specific** target — for a homophone, specifically
    enough to distinguish it (a *sea* scene for `sea`, not `see`).
@@ -24,9 +21,10 @@ For each entry `"level|image|text|class"`:
    and mark the line reviewed. The audit does **not** flag a missing image (it can't tell "not done
    yet" from "deliberately none"), so an empty image never shows as needing work — judging
    picturability is this review step's job, not the audit's.
-2. **Class tag** (4th field). If empty, add the appropriate `spelling/phoneme` tag(s) for the
-   target word's notable grapheme(s) (see [`spellbee-classes.md`](spellbee-classes.md)). Only
-   add when the field is empty — don't churn existing tags.
+2. **Classes.** Normally nothing to do — classes are derived automatically from the segments'
+   grapheme/phoneme pairs (see [`spellbee-classes.md`](spellbee-classes.md)), so getting the
+   phonemes right (step 3) is what makes the classes right. Add an explicit `class` field (last,
+   optional) only for a grouping auto-derivation can't produce, and don't churn existing ones.
 3. **Phonemes.** Every segment's resolved phoneme must be the correct **Received Pronunciation
    (SSBE)** sound. A segment resolves via its explicit `/phoneme` spec, else via
    `segment_default_phoneme` (`default_phoneme()`), else to `''` (unmapped). Go through **every**
@@ -48,26 +46,27 @@ For each entry `"level|image|text|class"`:
 
 Two `console.error`s fire during page load (open the browser console):
 
-- **`Unknown phoneme "" for segment …`** — from `get_processed_word()`; flags a segment whose
-  phoneme is missing from `phoneme_sounds` (i.e. resolves to `''`). These are exactly the
-  segments step 3 fills.
-- **`Unknown class tag …`** — from `init_wordlist_impl()`; flags a class tag absent from
-  `known_class_tags` (a typo). That set is the registry of every valid tag.
+- **`Unknown phoneme "" for segment …`** — from `process_word_internals()` (which caches the
+  processed word on `word_data.proc_cache`); flags a segment whose phoneme is missing from
+  `phoneme_sounds` (i.e. resolves to `''`). These are exactly the segments step 3 fills.
+- **`Unknown grapheme/phoneme pair …`** — from `init_wordlist_impl()`; flags a segment's
+  `grapheme/phoneme` pair that is in neither `gp_grouping_pairs` nor `gp_other_pairs` (a typo, or a
+  new pattern to classify).
 
 To enumerate gaps in bulk, run the saved extractor [`segmented-audit.js`](segmented-audit.js):
 
 ```
-node agent/segmented-audit.js [html-file] [expected-level]   # defaults: spellbee.html, expected-level 20
+node agent/segmented-audit.js [html-file]   # default: spellbee.html
 ```
 
-It loads the app's own `word_repository` / `process_word_data()` / `get_processed_word()` /
-`phoneme_sounds` / `known_class_tags` and lists, for **every** segmented entry (any whose
-text contains a `=`, at any level), every segment resolved to its phoneme (`*` = explicit spec,
-`~` = a `/X` split-digraph link, `[?]` = missing, `[!x]` = resolved to an unknown phoneme id),
-flagging a missing class / phoneme, an **invalid phoneme**, a **`/X` link with no target
-box two segments to its left** (`link-no-target`), a **class tag absent from
-`known_class_tags`**, or an entry whose **level is not the expected-level**
-(`UNEXPECTED-LEVEL`, default 20) — so the audit always matches runtime behaviour. It reports
+It loads the app's own `word_repository` / `process_word_data()` (which caches the processed word on
+`word_data.proc_cache`) / `phoneme_sounds` / `gp_grouping_pairs` / `gp_other_pairs` and lists, for
+**every** segmented entry (any whose text contains a `=`), every segment resolved to its phoneme
+(`*` = explicit spec, `~` = a `/X` split-digraph link, `[?]` = missing, `[!x]` = resolved to an
+unknown phoneme id), flagging a **missing phoneme**, an **invalid phoneme**, a **`/X` link with no
+target box two segments to its left** (`link-no-target`), or a **grapheme/phoneme pair in neither
+registry** (`unknown-pair`) — so the audit always matches runtime behaviour. (Pair validation is
+inactive while both registries are empty; the tool notes this.) It reports
 structural gaps only; judging whether a *valid* resolved phoneme is *correct for RP* — or whether
 a `/X` link is warranted (the vowel is genuinely tensed by the silent e) — is the (LLM/human)
 review step, and **arguable specs are put to the maintainer** (see Judgement notes). A **missing
@@ -98,7 +97,8 @@ to confirm 0 gaps remain.
   *chocolate* /ˈtʃɒklət/).
 - **Same grapheme, context-dependent sound.** `o` is `o` /ɒ/ in *box*, but `A` /ʌ/ in *monkey*,
   *something*; `a` is `ae` /æ/ in *hanging*, `O:` /ɔː/ in *water*, `E` /ə/ in *distance*. Judge
-  by the word, not the letter — the class tag on the entry is for grouping and may differ.
+  by the word, not the letter — the phoneme you set for a segment is exactly what its derived
+  `grapheme/phoneme` class becomes, so a right phoneme is a right class.
 - **Syllabic `l` endings.** A syllabic `-al`/`-el`/`-le`/`-ol` /əl/ (as in *capital*, *portal*,
   *table*, *symbol*, *crystal*) is voiced with the dedicated **`sl`** phoneme ("syllabic l") —
   e.g. `<c=a=p=i=t=al/sl>`, `<t=a=b=le/sl>`. This is the maintainer's standing choice — do not use

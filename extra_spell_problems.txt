@@ -206,3 +206,12 @@ PROBLEMS THAT HAVE THE SEGMENTED EQUIVALENT
 
 
 
+"6|@🗓️|Friday, <Saturday>, <Sunday>|calendar",
+"6|@🗓️|The workweek starts with <Monday>, then it's <Tuesday>|calendar",
+"6|@🗓️|<Thursday>, <Friday>, then it's the weekend|calendar",
+"6|@🗓️|<Monday>, <Tuesday>, Wednesday, Thursday, Friday|calendar",
+"6|@🗓️|Monday, <Tuesday>, <Wednesday>, Thursday, Friday|calendar",
+"6|@🗓️|Monday, Tuesday, Wednesday, <Thursday>, <Friday>|calendar",
+"3|@🗓️|There are seven days in a <week>|calendar",
+
+

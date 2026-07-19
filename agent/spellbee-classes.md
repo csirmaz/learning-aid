@@ -1,43 +1,41 @@
-# spellbee.html — phonics class tags
+# spellbee.html — phonics classes
 
-The **class** field is the 4th pipe-delimited field of a word entry
-(`"level|image_ref|text|class1,class2"`, see [`spellbee-content.md`](spellbee-content.md)).
-A class tag names an **orthographic rule**: a way a phoneme is spelled, written
-`spelling/phoneme`. An entry may carry several comma-separated classes when its target word
-shows more than one pattern.
+A **class** groups word entries that share an orthographic pattern, so a session can drill one
+pattern at a time. A class is named `spelling/phoneme` — the **same `grapheme/phoneme` notation
+used inside segmented words** (`<p/p=e/e=n/n>`), e.g. `ee/i:`, `igh/aI`, `al/sl`.
 
-## What the engine does with a class tag
+## How classes are assigned (`init_wordlist_impl()`)
 
-The tag string is otherwise **opaque** to the engine — the `spelling` and `phoneme` halves
-and the `/` between them are a human naming convention only, never parsed. Only the exact
-full string matters, and it drives two mechanisms:
+Classes are **derived automatically**, so word entries normally carry no class field. For each
+**segmented** entry the engine forms a `grapheme/phoneme` pair from every segment (the grapheme as
+written, lower-cased, plus its resolved phoneme id) and checks it against two registries defined at
+the top of the word section in `spellbee.html`:
 
-1. **Grouping** (`class_to_ix`, built in `init_wordlist_impl()`). After picking a first
-   word, `new_question()` queues up to ~7 words sharing **one** of its classes (chosen at
-   random), so a session drills one orthographic rule at a time. An entry with an empty
-   class field falls into the catch-all `'noclass:'` bucket.
+- **`gp_grouping_pairs`** — pairs that name a pattern worth drilling. A match is added to the
+  entry's class list, and these are the classes that build **groups** (`class_to_ix`): after
+  picking a first word, `new_question()` queues up to ~7 words sharing **one** of the word's
+  classes, chosen at random (see [`question-cycle.md`](question-cycle.md)).
+- **`gp_other_pairs`** — valid pairs deliberately *not* grouped (plain consonants such as `m/m`,
+  `t/t`, `s/s` that occur everywhere and give no useful grouping signal). A match is accepted but
+  adds no class.
 
-2. **Validation** (`known_class_tags`, checked in `init_wordlist_impl()`). This set is the
-   registry of every valid tag; a tag on a word that is missing from it is reported once via
-   `console.error` as a likely typo. It carries no per-tag data — membership is all that matters.
+A pair in **neither** registry is a likely typo — or a new pattern that needs classifying: it is
+reported once via `console.error("Unknown grapheme/phoneme pair", …)` and then added to
+`gp_other_pairs` so the message isn't repeated. **Those two objects are the authoritative list of
+every pair the engine knows** — read them in `spellbee.html` rather than keeping a copy here.
 
-## Tagging multi-target fragments
+An entry left with no class (a non-segmented word, or one whose pairs are all `gp_other_pairs`)
+falls into the catch-all **`noclass`** bucket.
 
-A normal entry usually has one `<word>` target, so its class list describes that single
-word. A **story fragment** (an entry with several `<word>` targets — including demoted
-long-story fragments now living at a normal level) is tagged by the **union of the classes
-applicable to each of its target words**. Conventions:
+## Explicit `class` field (optional, now rare)
 
-- The list **need not be exhaustive** — a fragment with several targets, each showing
-  several patterns, would otherwise accumulate a long, unfocused class list.
-- When choosing which classes to include, **prefer classes that have few example words**.
-  A fragment carrying a rare orthographic feature should be tagged with it so the fragment
-  surfaces when a session happens to drill that rare grapheme; common patterns (the
-  short-vowel tags `e/e`, `i/I`, …, and `common`) are already well covered by ordinary
-  words and can be omitted.
-
-Note this is a grouping convention only: grouping needs the class to be in `class_to_ix`,
-which any tag satisfies.
+An entry may still give an explicit comma-separated `class` field (the optional last pipe-delimited
+field, see [`spellbee-content.md`](spellbee-content.md)). It is added to the class list verbatim —
+**not** validated against the registries — and merged with any derived classes. Use it only where
+auto-derivation doesn't group as wanted; currently just a couple of entries do (`calendar`, the
+days-of-the-week themed set; and `end:ly`). When writing one for a multi-target entry, tag the
+**union of the classes applicable to each `<word>` target**, and prefer rare patterns — common
+short-vowel pairs are already well covered by ordinary words.
 
 ## Naming convention
 
@@ -45,148 +43,18 @@ which any tag satisfies.
 spelling/phoneme
 ```
 
-- **spelling** — the grapheme, the letters as written (`ee`, `igh`, `ck`, `a`, …).
-- **phoneme** — an ascii phoneme id from the `phoneme_sounds` inventory (`i:`, `eI`, `f`,
-  `3:`, `dZ`, …). The `/` mirrors the per-segment phoneme notation used inside segmented
-  words (`<grapheme/phoneme>`), and the ids are the same set.
+- **spelling** — the grapheme as written, lower-cased (`ee`, `igh`, `ck`, `a`, …).
+- **phoneme** — an ascii phoneme id from the `phoneme_sounds` inventory (`i:`, `eI`, `f`, `3:`,
+  `dZ`, …). The `/` and the id set are exactly the per-segment notation of segmented words.
 
-Because the tag pairs *both* halves, it distinguishes the two ways spellings and sounds
-overlap, keeping each spelling its own group:
+Pairing *both* halves keeps each spelling its own group and distinguishes the two ways spellings and
+sounds overlap:
 
-- **One sound, several spellings → several tags.** /iː/ is `ee/i:` (tree), `ea/i:` (eat),
-  `e/i:` (he); /eɪ/ is `a/eI` (snake), `ai/eI` (rain), `ay/eI` (play); /ɜː/ is `or/3:`
-  (work), `ir/3:` (shirt), `ur/3:` (turn), `er/3:` (person).
-- **One spelling, several sounds → several tags.** `a/ae` (cat) vs `a/eI` (snake) vs
-  `a/a:` (bath) vs `a/E` (banana); `o/o` (hot) vs `o/EU` (rose) vs `o/E` (lemon).
+- **One sound, several spellings → several pairs.** /iː/ = `ee/i:` (tree), `ea/i:` (eat),
+  `e/i:` (he); /eɪ/ = `a/eI` (snake), `ai/eI` (rain), `ay/eI` (play).
+- **One spelling, several sounds → several pairs.** `a/ae` (cat) vs `a/eI` (snake) vs `a/a:`
+  (bath) vs `a/E` (banana); `o/o` (hot) vs `o/EU` (rose) vs `o/E` (lemon).
 
-### Legacy tags (kept in the old `category:grapheme` form)
-
-A handful of tags do **not** reduce to a single ascii phoneme, so they keep their original
-names:
-
-- `cons:th` — /θ/ *and* /ð/ share the `th` spelling (two phonemes).
-- `dark:al`, `dark:ol` — a vowel plus dark/velar L (/ɔːl/, /əʊl/).
-- `end:le`, `end:al@`, `end:et`, `end:ot`, `end:ly` — syllabic / vowel+consonant endings
-  (/əl/, /ɪt/, /ət/, /li/).
-- `end:y@`, `end:ey` — the "happy" vowel /i/, which is not in the phoneme inventory.
-- `end:ie` — mixed value (/i/ *cookie* vs /iː/ *shield*).
-- `lax:dbl` — a doubled consonant marking a short vowel (not a phoneme in its own right).
-- `common`, `tricky`, `calendar` — non-phonetic groupings.
-
-## Catalogue
-
-Each row: **tag** · the grapheme it names (`—` = grouping only, no single grapheme) · the
-sound (keyword) · example targets drawn from the word list.
-
-### Short ("lax") vowels
-
-| tag | grapheme | sound | examples |
-|---|---|---|---|
-| `a/ae` | `a` | /æ/ *cat* | cat, bag, hand, bank |
-| `e/e` | `e` | /e/ *pen* | pen, red, bed, nest |
-| `i/I` | `i` | /ɪ/ *fish* | fish, swim, pin, ring |
-| `o/o` | `o` | /ɒ/ *box* | box, hot, fox, dog |
-| `u/A` | `u` | /ʌ/ *sun* | sun, drum, duck, just |
-| `y/I` | `y` | /ɪ/ *gym* | gym, myth, crystal, pyramid |
-| `lax:dbl` | doubled consonant | short-vowel doubling *(legacy)* | smelly, rapper, running, arrest |
-
-### Long ("tense") vowels — split digraph (a–e) or open vowel
-
-| tag | grapheme | sound | examples |
-|---|---|---|---|
-| `a/eI` | `a…e` / final `a` | /eɪ/ *snake* | snake, plane, blaze, inflate |
-| `a/a:` | `a` | /ɑː/ broad-a *bath* | bath, grass, pasta |
-| `e/i:` | `e…e` / final `e` | /iː/ *he* | he, she, video, complete |
-| `i/aI` | `i…e` / final `i` | /aɪ/ *shine* | shine, slime, likes |
-| `o/EU` | `o…e` / final `o` | /əʊ/ *rose* | rose, home, nose, stone |
-| `u/u:` | `u…e` / `u…i/e` | /juː/–/uː/ *cube* | cube, continue, ruler, unit |
-| `y/aI` | `y…e` / final `y` | /aɪ/ *cry* | cry, fly, dry, my |
-
-### Vowel digraphs / diphthongs
-
-| tag | grapheme | sound | examples |
-|---|---|---|---|
-| `ee/i:` | `ee` | /iː/ *tree* | tree, sleep, green, cheese |
-| `ea/i:` | `ea` | /iː/ *eat* | eat, meat, please, heal |
-| `ea/e` | `ea` | /e/ *bread* | bread, head, dead, already |
-| `ai/eI` | `ai` | /eɪ/ *rain* | train, rain, mail |
-| `ay/eI` | `ay` | /eɪ/ *play* | play, tray, away, holiday |
-| `oa/EU` | `oa` | /əʊ/ *boat* | coat, road, goal, coal |
-| `oo/u:` | `oo` | /uː/ *moon* | moon, spoon, food, school |
-| `oo/U` | `oo` | /ʊ/ *book* | foot, book, bookshelf, cookie |
-| `ou/aU` | `ou` | /aʊ/ *mouse* | mouse, house, cloud |
-| `ow/aU` | `ow` | /aʊ/ *cow* | cow, down, crown |
-| `ow/EU` | `ow` | /əʊ/ *snow* | snow, bow, rainbow, follow |
-| `oi/OI` | `oi` | /ɔɪ/ *coin* | coin, poison, noise, toilet |
-| `oy/OI` | `oy` | /ɔɪ/ *toy* | toy, boy, enjoy, annoying |
-| `ew/u:` | `ew` | /uː/–/juː/ *new* | new, few, knew, screw |
-| `aw/O:` | `aw` | /ɔː/ *draw* | draw, raw, spawn |
-| `au/O:` | — | /ɔː/ *pause* | pause, because, dinosaur, cauldron |
-| `igh/aI` | `igh` | /aɪ/ *light* | light, night, right |
-
-### R-controlled ("bossy r") vowels
-
-| tag | grapheme | sound | examples |
-|---|---|---|---|
-| `ar/a:` | `ar` | /ɑː/ *car* | car, shark, card, dark |
-| `or/O:` | `or` | /ɔː/ *corn* | corn, horse, morning, door |
-| `or/3:` | `or` | /ɜː/ *work* | work, world |
-| `ir/3:` | `ir` | /ɜː/ *shirt* | shirt, birthday |
-| `ur/3:` | `ur` | /ɜː/ *turn* | turn, burn, hurt |
-| `er/3:` | `er` | /ɜː/ (stressed) *person* | person, expert, desert |
-| `ea/IE` | `ea` | /ɪə/ *ear* | ear, hear, year |
-| `ai/eE` | `ai` | /eə/ *air* | air, hair, fair, pair |
-
-### Dark L *(legacy — vowel + dark L is not a single phoneme)*
-
-| tag | grapheme | sound | examples |
-|---|---|---|---|
-| `dark:al` | `al` / `all` | /ɔːl/ *call* | small, call, tall, wall |
-| `dark:ol` | `ol` | /əʊl/ *cold* | cold, gold, golf |
-
-### Consonant graphemes
-
-| tag | grapheme | sound | examples |
-|---|---|---|---|
-| `ph/f` | `ph` | /f/ *phone* | phone, dolphin, sulphur |
-| `ck/k` | `ck` | /k/ *duck* | duck, rock, socks, black |
-| `wh/w` | `wh` | /w/ *wheel* | wheel, where, white |
-| `g/dZ` | `g`(before i/e) | soft g /dʒ/ *huge* | huge, edges, change |
-| `dge/dZ` | — | /dʒ/ (dge/ge) *village* | village, package, giraffe |
-| `c/s` | `c`(before i/e) | soft c /s/ *ice* | ice, police, furnace |
-| `ch/S` | `ch`(before i/e) | /ʃ/ "sh" *chef* | chef, machine, moustache |
-| `ch/tS` | `tch` / `ch` | /tʃ/ "ch" *chair* | chips, cheese, teacher, kitchen, church |
-| `ti/S` | `ti` | /ʃ/ "sh" *potion* | potion, competition, destruction |
-| `tur/tS` | `tur` | /tʃ/ "ch" *picture* | picture, structure |
-| `cons:th` | `th` | /θ/–/ð/ *this* *(legacy)* | this, breath, feather |
-
-### Word beginnings & endings
-
-| tag | grapheme | sound | examples |
-|---|---|---|---|
-| `kn/n` | initial `kn` | silent k *knot* | knot, know, knight |
-| `wr/r` | initial `wr` | silent w *wrong* | wrong, write |
-| `er/Er` | final `er` | /ə/ *teacher* | teacher, ruler, river, ladder |
-| `end:y@` | final `y` | /i/ *smelly* *(legacy)* | smelly, baby, mystery |
-| `end:ey` | — | /i/ *monkey* *(legacy)* | monkey, donkey, key |
-| `end:le` | final `le` | /əl/ *table* *(legacy)* | table, jungle, turtle |
-| `end:al@` | final `al` | /əl/ *portal* *(legacy)* | portal, hospital, animal |
-| `end:ly` | final `ly` | /li/ (adverb) *really* *(legacy)* | really, finally, secretly |
-| `end:et` | final `et` | /ɪt/ *toilet* *(legacy)* | toilet, basket, trumpet |
-| `end:ot` | final `ot` | /ət/ *parrot* *(legacy)* | parrot, pilot |
-| `end:ie` | `ie` | *cookie* / *shield* *(legacy)* | cookie, shield |
-
-### Schwa / unstressed
-
-| tag | grapheme | sound | examples |
-|---|---|---|---|
-| `o/E` | `o` | unstressed /ə/ *lemon* | lemon, skeleton, anchor, crayon |
-| `a/E` | `a` | unstressed /ə/ *banana* | banana, pasta, lava |
-
-### Non-phonetic groupings
-
-| tag | purpose | examples |
-|---|---|---|
-| `common` | high-frequency / common-exception words | is, he, she, I, you |
-| `tricky` | irregular spellings | one, love, eye, woman, women |
-| `calendar` | themed set: days of the week | Monday, Tuesday, … Sunday |
+A syllabic `-al`/`-el`/`-le`/`-ol` /əl/ ending uses the dedicated `sl` phoneme, giving the pairs
+`al/sl`, `el/sl`, `le/sl`, `ol/sl` (capital, tunnel, table, symbol) — see the syllabic-l note in
+[`segmented-review.md`](segmented-review.md).

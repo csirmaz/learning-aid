@@ -143,7 +143,7 @@ def scan_words():
             #                        img    |phrase
             match = re.search(r'^\s*"[^\|]*\|([^\|"]+)', line)
             if match:
-                phrase = match.group(2)
+                phrase = match.group(1)
                 phrase = phrase.replace(r"\'", "'")
                 phrase = phrase.replace(r'\"', '"')
                 # Collapse a segmented <a=b> into a single <ab> part (see normalize_markup)
