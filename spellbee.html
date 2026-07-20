@@ -1716,7 +1716,6 @@
                 for(let j=0; j<parts.length; j++) { // bounce every box whose pair is the in-focus one
                     if(parts[j].toLowerCase()+'/'+phonemes[j] === wc) {
                         $boxes.filter('[data-seg="'+j+'"]').addClass('seg_focus_bounce');
-                        any = true;
                     }
                 }
                 // The CSS bounce (~.5s) runs alongside the phoneme; a short pause then the reward.
