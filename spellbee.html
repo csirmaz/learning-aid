@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?471">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?473">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -235,10 +235,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?471">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?473">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?471"></script>
+    <script src="assets/local/beelocal.js?473"></script>
 </head>
 <body>
     <div class="container">
@@ -483,7 +483,7 @@
             "or/E": 1,
             "e/E": 1,
             "o/E": 1,
-            "ur/E": 1
+            "ur/E": 1,
             "ur/Er": 1,
             // digraphs
             "ei/i:": 1,
@@ -1414,7 +1414,7 @@
         };
 
     </script>
-    <script src="assets/common.js?471"></script>
+    <script src="assets/common.js?473"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1712,16 +1712,16 @@
             const parts = bee.processed_word.add_words;
             const phonemes = bee.processed_word.phonemes;
             const $boxes = bee.$input.find('.typebox');
-            let any = false;
-            for(let j=0; j<parts.length; j++) { // bounce every box whose pair is the in-focus one
-                if(parts[j].toLowerCase()+'/'+phonemes[j] === wc) {
-                    $boxes.filter('[data-seg="'+j+'"]').addClass('seg_focus_bounce');
-                    any = true;
+            setTimeout(function() {
+                for(let j=0; j<parts.length; j++) { // bounce every box whose pair is the in-focus one
+                    if(parts[j].toLowerCase()+'/'+phonemes[j] === wc) {
+                        $boxes.filter('[data-seg="'+j+'"]').addClass('seg_focus_bounce');
+                        any = true;
+                    }
                 }
-            }
-            if(!any) { done(); return; }
-            // The CSS bounce (~.5s) runs alongside the phoneme; a short pause then the reward.
-            play_phoneme(phoneme, function() { setTimeout(done, 400); });
+                // The CSS bounce (~.5s) runs alongside the phoneme; a short pause then the reward.
+                play_phoneme(phoneme, function() { setTimeout(done, 750); });
+            }, 750);
         }
 
 
@@ -1738,7 +1738,6 @@
             // built as grapheme+'/'+phoneme in the class derivation; 'noclass' has no '/'.
             const focus_pair = (bee.problem && bee.problem.word_class) || '';
             const is_focus_part = function(ix) {
-                if(bee.help_full_bar) { return false; } // HELP revealed the full bank: drop the focus marking
                 return focus_pair.indexOf('/') >= 0 && parts[ix].toLowerCase()+'/'+phonemes[ix] === focus_pair;
             };
 
@@ -1968,6 +1967,7 @@
         // with narration, then restore the game. callback(true) if shown, callback(false) if there
         // is no grouping pair to introduce.
         function show_group_intro(word_ix, gp_pair, callback) {
+            console.log("show_group_intro", word_ix, gp_pair);
             const word_data = bee.words[word_ix].proc_cache;
             if(!word_data.is_segmented) { if(callback) { callback(false); } return; }
             gp_pair = gp_pair.split('/');
@@ -1984,32 +1984,42 @@
                     '<div class="gi_word">'+render_intro_word(word_data, grapheme)+'</div>' +
                 '</div>'
             ).show();
+            
+            const letters = grapheme.toUpperCase().split('').map(function(c) { return '"' + c + '"'; }).join(' ');
 
             // make_pause takes the NEXT step's index so it resolves lazily (not yet assigned here)
             function make_pause(pause_s, next_ix) {
                 return function() { setTimeout(utterances[next_ix], pause_s*1000); };
             }
+            
+            const sentence = choose_from([
+                ['The sound', 'can be written as'],
+                ['People can write the sound', 'as'],
+                ['You can write the sound', 'as']
+            ]);
 
             const utterances = [];
-            utterances[0] = function() { play_word('The sound', utterances[1]); };
+            utterances[0] = function() { play_word(sentence[0], utterances[1]); };
             utterances[1] = make_pause(.25, 2);
             utterances[2] = function() { play_phoneme(phoneme, utterances[3]); };
             utterances[3] = make_pause(.25, 4);
-            utterances[4] = function() { play_word('can be written as'+'.', utterances[5]); };
-            utterances[5] = make_pause(1.5, 6);
-            utterances[6] = function() { play_phoneme(phoneme, utterances[7]); };
-            utterances[7] = make_pause(.5, 8);
+            utterances[4] = function() { play_word(sentence[1]+' '+letters+'.', utterances[5]); };
+            utterances[5] = make_pause(1.8, 6);
+            utterances[6] = function() { play_word(choose_from(['Listen:', 'So:', 'So this says:', 'So this is:']), utterances[7]); };
+            utterances[7] = make_pause(0.3, 8);
             utterances[8] = function() { play_word(word_data.to_type, utterances[9]); };
-            utterances[9] = make_pause(1.5, 10);
-            utterances[10] = function() { play_word('Tap on the boxes to hear their sound.', utterances[11]); };
-            utterances[11] = function() {
+            utterances[9] = make_pause(.8, 10);
+            utterances[10] = function() { play_phoneme(phoneme, utterances[11]); };
+            utterances[11] = make_pause(1.5, 12);
+            utterances[12] = function() { play_word('Tap on the boxes to hear their sound.', utterances[13]); };
+            utterances[13] = function() {
                 setTimeout(function() {
                     // Hide the intro and bring the game (header, prompt, keyboard) back
                     $('.startmenu').hide().html('');
                     $('.game').show();
                     switch_to_tab('game');
                     if(callback) { callback(true); }
-                }, 500);
+                }, 1000);
             };
             utterances[0]();
         }
@@ -2184,13 +2194,13 @@
                 if(typed_key == 'HELP') {
                     highlight_key('.kbdiv .kbkey[data-key="'+typed_key+'"]');
                     if(bee.processed_word.is_segmented) {
-                        // Switch the word bank to full mode (every segment a plain tile, see
-                        // render_addwords) and drop the in-focus purple marking. Idempotent once full.
+                        // Switch the word bank to full mode: every segment a plain tile (see
+                        // render_addwords). The in-focus box keeps its purple border. Idempotent once full.
                         if(bee.help_full_bar) { playme('notavail'); return; }
                         bee.help_full_bar = true;
                         bee.help_asked++;
                         $('.prompt .addwords').html(render_addwords()).show();
-                        update_input_field(); // re-render the boxes without the purple focus border; re-greys chips
+                        update_completed_chips(); // grey chips of already-completed parts in the new bank
                         return;
                     }
                     if(!bee.can_use_help) { playme('notavail'); return; }
@@ -2257,40 +2267,36 @@
                         disable_typing();
                         bee.$input.addClass('success');
                         
+                        // Reschedule (ASK) only when the child used help (the segmented reveal-bank
+                        // HELP key, or a plain word's reveal - both bump help_asked) or over-corrected;
+                        // a clean solve is marked known, the rest just advance. A repeat never
+                        // reschedules again.
                         let outcome = 'UNSURE';
                         if(bee.problem.is_repeat) {
                             outcome = 'OK';
                         } else if(bee.help_asked > 0) {
-                            outcome = 'ASK_ALL';
-                        } else {
-                            if(bee.processed_word.is_story) {
-                                if(bee.backspace_used <= 2) {
-                                    outcome = 'ADD_KNOWN';
-                                } else if(bee.backspace_used <= 3) {
-                                    outcome = 'OK';
-                                } else if(bee.backspace_used <= 5) {
-                                    outcome = 'ASK_ONCE';
-                                } else {
-                                    outcome = 'ASK_ALL';
-                                }
-                            } else { // Not story
-                                if(bee.backspace_used <= 1) {
-                                    outcome = 'ADD_KNOWN';
-                                } else if(bee.backspace_used <= 2) {
-                                    outcome = 'OK';
-                                } else if(bee.backspace_used <= 3) {
-                                    outcome = 'ASK_ONCE';
-                                } else {
-                                    outcome = 'ASK_ALL';
-                                }
-                            }
+                            outcome = 'ASK';
+                        } else if(bee.processed_word.is_segmented) {
+                            // Reschedule if backspaces exceed a third of the segment count
+                            const num_segments = bee.processed_word.add_words.length;
+                            if(bee.backspace_used > num_segments/3) { outcome = 'ASK'; }
+                            else if(bee.backspace_used <= 1) { outcome = 'ADD_KNOWN'; }
+                            else { outcome = 'OK'; }
+                        } else if(bee.processed_word.is_story) {
+                            if(bee.backspace_used <= 2) { outcome = 'ADD_KNOWN'; }
+                            else if(bee.backspace_used <= 3) { outcome = 'OK'; }
+                            else { outcome = 'ASK'; }
+                        } else { // plain word
+                            if(bee.backspace_used <= 1) { outcome = 'ADD_KNOWN'; }
+                            else if(bee.backspace_used <= 2) { outcome = 'OK'; }
+                            else { outcome = 'ASK'; }
                         }
                         console.log('success help=', bee.help_asked, 'backspace=', bee.backspace_used, 'outcome=', outcome);
                         
                         if(outcome == 'ADD_KNOWN') {
                             queue_success();
                             add_known_word();
-                        } else if(outcome == 'ASK_ONCE' || outcome == 'ASK_ALL') {
+                        } else if(outcome == 'ASK') {
                             reschedule_question(bee.problem);
                         } else { // 'OK'
                             queue_success();
@@ -2818,8 +2824,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?471"></script>
-    <script src="assets/aquarium/js/aquarium.js?471"></script>
+    <script src="assets/aquarium/js/config.js?473"></script>
+    <script src="assets/aquarium/js/aquarium.js?473"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

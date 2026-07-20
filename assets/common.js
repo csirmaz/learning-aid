@@ -283,7 +283,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 471;
+const bee_app_version = 473;
 
 call_local_hook('check_version', []);
 
@@ -980,6 +980,7 @@ function finish_puzzle_with_confetti() {
 // Return values: 'level_complete' | 'gift' | 'period_negative' | 'period'
 // Note: there are two ways to skip adding a score. Either add 'skip_this_score':true to options, or increment the negative score
 function success_common(options) {
+    const wait_factor = 1.2;
     const fast_to_next_question = options.fast_to_next_question;
     const skip_this_score = options.skip_this_score;
     
@@ -998,7 +999,7 @@ function success_common(options) {
                     if(play_video(function(){ new_question('success_common:level:video1'); })) { 
                         new_question('success_common:level:video2');
                     }
-                }, 1500);
+                }, 1500*wait_factor);
             }
             // no need to call the gift logic; gift will be given on next step
         );
@@ -1022,7 +1023,7 @@ function success_common(options) {
     // special logic for working through negative scores
     if(score === '_SKIPPED_' && bee.storage.players[bee.player].lifetime_score !== undefined && bee.storage.players[bee.player].lifetime_score % celebrate_period == 0) {
         if(bee.is_puzzle && bee.is_puzzle.needs <= 0) { finish_puzzle_with_confetti(); return 'period_negative'; }
-        show_animation(function() { setTimeout(function(){ new_question('success_common:negscore:period'); }, 1100); });
+        show_animation(function() { setTimeout(function(){ new_question('success_common:negscore:period'); }, 1100*wait_factor); });
         return 'period_negative';
     }
 
@@ -1030,11 +1031,11 @@ function success_common(options) {
     if(score === '_SKIPPED_' || score % celebrate_period > 0) {
         if(bee.is_puzzle && bee.is_puzzle.needs <= 0) { finish_puzzle_with_confetti(); return 'default'; }
         if(fast_to_next_question) {
-            setTimeout(function(){ new_question('success_common:default:fast'); }, 700);
+            setTimeout(function(){ new_question('success_common:default:fast'); }, 700*wait_factor);
         }
         else {
             play_success_sound();
-            setTimeout(function(){ new_question('success_common:default:slow'); }, 2700);
+            setTimeout(function(){ new_question('success_common:default:slow'); }, 2700*wait_factor);
         }
         return 'default';
     }
@@ -1072,7 +1073,7 @@ function success_common(options) {
         // smaller periodic celebration - see "p" (or the puzzle send-off if a puzzle just finished)
         if(bee.is_puzzle && bee.is_puzzle.needs <= 0) { finish_puzzle_with_confetti(); return 'period'; }
         play_success_sound();
-        show_animation(function() { setTimeout(function(){ new_question('success_common:period:small'); }, 1100); });
+        show_animation(function() { setTimeout(function(){ new_question('success_common:period:small'); }, 1100*wait_factor); });
         return 'period';
     }
     // bigger periodic celebration - see "B": try a reward video (a video is excluded from the puzzle send-off)
@@ -1080,7 +1081,7 @@ function success_common(options) {
     if(play_video(function(){ new_question('success_common:period:video'); })) {
         // no video available - fall back to the smaller celebration (or the puzzle send-off)
         if(bee.is_puzzle && bee.is_puzzle.needs <= 0) { finish_puzzle_with_confetti(); return 'period'; }
-        show_animation(function() { setTimeout(function(){ new_question('success_common:period:small'); }, 1100); });
+        show_animation(function() { setTimeout(function(){ new_question('success_common:period:small'); }, 1100*wait_factor); });
     }
     return 'period';
 }
