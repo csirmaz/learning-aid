@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?473">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?474">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -235,10 +235,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?473">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?474">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?473"></script>
+    <script src="assets/local/beelocal.js?474"></script>
 </head>
 <body>
     <div class="container">
@@ -1414,7 +1414,7 @@
         };
 
     </script>
-    <script src="assets/common.js?473"></script>
+    <script src="assets/common.js?474"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -2505,15 +2505,17 @@
             let log = '';
             let intro_word_ix = undefined; // group intro's example word; undefined = no intro (queue-restored)
 
-            // Once per page-load: if we last played a while ago, re-introduce the group even when
-            // resuming the persisted (anti-cheat) queue. The queue-empty case below shows its own
-            // intro, so we only force one here for a queue-restored problem (no double intro). Routine
-            // reloads (page_update / return-reload) keep last_active recent, so they don't trip this.
+            // Once per page-load: re-introduce the group even when resuming the persisted (anti-cheat)
+            // queue. Always in puzzle mode (a short, freshly launched session should open with the
+            // intro), otherwise only if we last played a while ago. The queue-empty case below shows
+            // its own intro, so we only force one here for a queue-restored problem (no double intro).
+            // Routine reloads (page_update / return-reload) keep last_active recent, so they don't
+            // trip the idle-gap branch.
             let force_intro = false;
             if(!bee.intro_gap_checked) {
                 bee.intro_gap_checked = true;
                 const la = bee.storage.players[bee.player].last_active;
-                if(la === undefined || Date.now() - la > bee.intro_gap_ms) { force_intro = true; }
+                if(bee.is_puzzle || la === undefined || Date.now() - la > bee.intro_gap_ms) { force_intro = true; }
             }
 
             if(problem !== undefined) {
@@ -2823,8 +2825,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?473"></script>
-    <script src="assets/aquarium/js/aquarium.js?473"></script>
+    <script src="assets/aquarium/js/config.js?474"></script>
+    <script src="assets/aquarium/js/aquarium.js?474"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
