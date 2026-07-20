@@ -1336,6 +1336,7 @@
             puzzle_needs: 4, // how many successes before puzzle is dismissed
             max_box_len: 14, // segmented words: once the boxes' proxy length exceeds this, boxes are
                              // sized compactly instead of uniformly (see render_segmented_input)
+            intro_gap_ms: 30*60*1000, // resuming the persisted queue after this idle gap re-shows the group intro
             // State (common)
             storage: {'players': {}},  // storage data that's saved into local storage
             load_time: Date.now(),
@@ -1348,6 +1349,7 @@
             giftlist: -1,  // state: which gift is shown when viewing them
             is_puzzle: false,
             // State (spellbee)
+            intro_gap_checked: false, // per page-load: has new_question run the idle-gap check yet (group-intro-on-return)
             words: [],  // words in the selected level range
             class_to_ix: false, // {wordclass:[word_ix, ...
             problem: false, // current problem {word_ix:, word_class:, is_repeat:, is_reveal:}
@@ -2396,6 +2398,18 @@
         }
         
         
+        // Pick an example word to introduce a class group's grapheme: prefer a word OTHER than
+        // exclude_ix (so the intro doesn't reveal the pending word), else fall back to exclude_ix.
+        function intro_word_for_class(word_class, exclude_ix) {
+            const word_ixs = bee.class_to_ix[word_class];
+            if(word_ixs !== undefined && word_ixs.length > 0) {
+                const choices = word_ixs.filter(function(ix) { return ix != exclude_ix; });
+                if(choices.length > 0) { return choose_from(choices); }
+            }
+            return exclude_ix;
+        }
+
+
         function new_question(reason) {  // also called from common.js on successfully answering a question
             console.log('#new_question05() caller=', reason);
             if(check_dismiss_puzzle()) { return; } // puzzle solved: don't generate/speak the next question
@@ -2411,9 +2425,25 @@
             let problem = get_first_on_queue();
             let log = '';
             let intro_word_ix = undefined; // group intro's example word; undefined = no intro (queue-restored)
+
+            // Once per page-load: if we last played a while ago, re-introduce the group even when
+            // resuming the persisted (anti-cheat) queue. The queue-empty case below shows its own
+            // intro, so we only force one here for a queue-restored problem (no double intro). Routine
+            // reloads (page_update / return-reload) keep last_active recent, so they don't trip this.
+            let force_intro = false;
+            if(!bee.intro_gap_checked) {
+                bee.intro_gap_checked = true;
+                const la = bee.storage.players[bee.player].last_active;
+                if(la === undefined || Date.now() - la > bee.intro_gap_ms) { force_intro = true; }
+            }
+
             if(problem !== undefined) {
                 log += ' from queue';
                 if(problem.word_ix >= bee.words.length) { log += ' invalid'; problem = undefined; }
+                else if(force_intro) { // resuming a group after a gap: introduce it
+                    log += ' gap_intro';
+                    intro_word_ix = intro_word_for_class(problem.word_class, problem.word_ix);
+                }
             }
             if(problem === undefined) { // Get a new word/problem
 
@@ -2601,6 +2631,12 @@
         }
 
         
+        // Record play activity time (persisted with the next save); drives the group-intro-on-return
+        // gap check in new_question. Called wherever the queue is already saved.
+        function mark_active() {
+            if(bee.player !== false) { bee.storage.players[bee.player].last_active = Date.now(); }
+        }
+
         // Store problem on queue, filling up undefineds first
         // Queue is also used to prevent getting a new problem when the page is refreshed
         function store_question11(problem) {
@@ -2614,12 +2650,14 @@
                 }
             }
             if(!added) { s.push(problem); }
+            mark_active();
             save_storage('store_question');
         }
         
         // Called if the question is answered successfully
         function queue_success() {
             get_question_queue().shift();
+            mark_active();
             save_storage('queue_success');
         }
         
@@ -2634,6 +2672,7 @@
                 s.splice(1, 0, {'word_ix':problem.word_ix, 'word_class':problem.word_class, 'is_repeat':true, 'is_reveal':true});
             }
             s.splice(3, 0, {'word_ix':problem.word_ix, 'word_class':problem.word_class, 'is_repeat':true, 'is_reveal':false});
+            mark_active();
             save_storage('schedule_question');
         }
         
