@@ -27,6 +27,17 @@ every pair the engine knows** — read them in `spellbee.html` rather than keepi
 An entry left with no class (a non-segmented word, or one whose pairs are all `gp_other_pairs`)
 falls into the catch-all **`noclass`** bucket.
 
+### `predictable_pairs` — word-bank scaffolding (not a class)
+
+A **third** pair registry in `spellbee.html`, **orthogonal to classes/grouping**: it marks pairs
+whose grapheme is the obvious default spelling of the sound, so the learner produces them unaided.
+It takes no part in class derivation — a pair may be in `predictable_pairs` *and* in
+`gp_grouping_pairs` (drilled in its own group, yet given for free whenever it is *not* the in-focus
+pair). Its only use is the **segmented word bank**: a predictable, non-in-focus segment gets no chip
+(see the word-bank description in [`question-cycle.md`](question-cycle.md)). Conservative by design —
+only unambiguous single consonants + short vowels; anything omitted defaults to "not predictable"
+(shown as a tile), the safe direction.
+
 ## Explicit `class` field (optional, now rare)
 
 An entry may still give an explicit comma-separated `class` field (the optional last pipe-delimited

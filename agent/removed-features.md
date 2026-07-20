@@ -6,6 +6,28 @@ used, its content format, and where it used to be documented, with the removal d
 describes current behaviour** — do not implement or author against it without first re-adding the
 code.
 
+## Segmented reveal repeat (`is_reveal`) — removed 2026-07-20
+
+After a segmented word was answered with enough help, the spaced-repetition scheduler inserted an
+extra **reveal repeat** ahead of the plain repeat: a repeat flagged `is_reveal:true` that showed the
+*full* shuffled word bank (every segment tiled plainly) so the child could copy the answer. Removed
+once the **always-on segmented word bank** plus the **HELP-key full-mode reveal** (see
+[`question-cycle.md`](question-cycle.md)) made an automatic post-error reveal redundant — recovery is
+now child-initiated via HELP, and `reschedule_question` re-inserts the problem **once** only.
+
+### Code symbols removed (restore these to bring it back)
+
+- The `add_reveal` parameter of `reschedule_question(problem, add_reveal)` and its
+  `s.splice(1, 0, {…, is_repeat:true, is_reveal:true})` insert (reveal ~1 slot ahead, before the
+  plain repeat ~3 slots later).
+- The `ASK_ALL` branch calling `reschedule_question(bee.problem, true)` (vs `ASK_ONCE` → `false`);
+  the two success outcomes were merged into one plain reschedule when the reveal went away.
+- Every read of `problem.is_reveal`: in `render_addwords` (full-bank mode is now driven solely by
+  `bee.help_full_bar`), the HELP-key handler guard, and the HELP-key visibility test in
+  `start_question14`.
+- (An earlier, separately-removed part: the grey answer-overlay inside the boxes/underscores —
+  `reveal_totype` — that `is_reveal` showed before the shuffled word bank replaced it.)
+
 ## Long-format ("long") stories — removed 2026-07-19
 
 A multi-prompt story told across many consecutive `spellbee.html` word entries. Removed when the app
