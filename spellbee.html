@@ -5,14 +5,18 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?470">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?471">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
         .prompt { padding-top: 0; }
     
-        .prompt .img {
+        /* Shared emoji font stack for the word-image containers */
+        .emojifont {
             font-family: Apple Color Emoji,Segoe UI Emoji,Noto Color Emoji,Android Emoji,EmojiSymbols,EmojiOne Mozilla,Twemoji Mozilla,Segoe UI Symbol,Noto Color Emoji,EmojiOne Color,emoji;
+        }
+
+        .prompt .img {
             display: inline-block;
             font-size: 3rem;
             text-align: center;
@@ -72,24 +76,18 @@
         }
         
         .prompt .infield .help .help_totype,
-        .prompt .infield_story .story_totype,
-        .prompt .infield .reveal_totype {
+        .prompt .infield_story .story_totype {
             background: #fff; /* #fffaf0; */ /* must match .prompt .infield_story .story_totype color */
             text-decoration: underline solid rgba(119,238,0,.6) .2rem;
             text-underline-offset: .6rem;
         }
 
         .prompt .infield .help { color: #05b; }
-        .prompt .infield .help .help_totype.help_classhighlight { color: #b38; }
         .prompt .infield_story .story_totype { text-underline-offset: .3rem; color: #fff; /* #fffaf0; */ }
-        .prompt .infield .reveal_totype      { color: #ccc; }
-        .prompt .infield .reveal_totype.help_classhighlight { color: #fac; }
-        .prompt .infield_story .reveal_totype  { text-underline-offset: .3rem; }
         
         .prompt .infield .inp { color: #000; }
         .prompt .infield .inp .spacehelp { color: #ccc; }
         body .prompt .infield .success { color: #090; }
-        body .prompt .infield .success .typed_classhighlight { color: #b38; }
         .prompt .infield .helpwait { display: none; }
 
         /* Segmented (phoneme / morpheme) question type: parts typed into boxes */
@@ -98,13 +96,12 @@
             line-height: 2.5rem;
             letter-spacing: .12rem;
             overflow-x: auto;
+            padding-block: .35rem;   /* vertical room so the solve-time bounce (scale) doesn't trip the overflow-x scroller */
         }
         .prompt .infield_segmented .typebox_wrap { white-space: nowrap; }
         .prompt .infield_segmented .typebox {
             display: inline-block;
-            /* content-box so min-width/min-height are the content area: an empty box already
-               reserves room for its part (see render_segmented_input) and a full line box, so it
-               does not grow (in either direction) when the child starts typing */
+            /* content-box: the box is pre-sized to its part and doesn't grow as the child types */
             box-sizing: content-box;
             min-width: 1.5rem;   /* overridden inline per box; see render_segmented_input for the width */
             min-height: 2rem;    /* = line-height, so a typed line box fits without enlarging the box */
@@ -116,18 +113,23 @@
             text-align: left;
             vertical-align: middle;
             background: #fff;
+            cursor: pointer;     /* tap a box to hear its phoneme (delegated handler in the kb init) */
         }
         /* A completed segment turns green (all correct) or red (a mistake somewhere) */
         .prompt .infield_segmented .typebox.typebox_ok  { background: #e2f5d9; border-color: #3a3; }
         .prompt .infield_segmented .typebox.typebox_err { background: #f6d2d2; border-color: #c33; }
-        /* Drop the green underline under the revealed answer inside the boxes (keep the grey text) */
-        .prompt .infield_segmented .reveal_totype { text-decoration: none; }
+        /* The in-focus grapheme/phoneme pair (the group being taught) keeps a purple border - the
+           group-intro .gi_match colour - even once the box is completed; the ok/err background still
+           shows correctness. This rule sits after ok/err so the purple border wins on a completed
+           in-focus box (equal specificity, later in source). */
+        .prompt .infield_segmented .typebox.typebox_focus { border-color: #a0c; }
+        /* On solve, a single inflate-deflate refocuses the in-focus box(es), fired apart from the
+           score/confetti animation (see segmented_focus_refocus). */
+        @keyframes seg_focus_bounce { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .prompt .infield_segmented .typebox.seg_focus_bounce { animation: seg_focus_bounce .5s ease-in-out 1; }
         .prompt .addwords .word.done { color: #ccc; border-color: #ddd; }
-        /* Split-digraph link ('/X' segment): a rounded "bottom half of a box" joining a tensed
-           vowel box to its silent-e box under the single box between them. Drawn once the vowel box
-           is completed correctly, so it is coloured the same green as a correct (typebox_ok)
-           segment's border and runs centre-to-centre between the two boxes (see
-           draw_segment_connectors(), which positions it absolutely inside .inp). */
+        /* Split-digraph link ('/X' segment): a rounded half-box joining a tensed vowel box to its
+           silent-e box; drawn green once the vowel is correct (see draw_segment_connectors) */
         .prompt .infield_segmented .inp { position: relative; }
         .prompt .infield_segmented .segbox_link {
             position: absolute;
@@ -138,6 +140,27 @@
             border-bottom-right-radius: .4rem;
             box-sizing: border-box;
             pointer-events: none;
+        }
+
+        /* Group intro splash (show_group_intro): image + an example word with the group's grapheme
+           highlighted (.gi_match), shown in .startmenu with .game hidden */
+        .groupintro { text-align: center; padding: 2rem 1rem; }
+        .groupintro .gi_image {
+            font-size: 4.5rem;
+            line-height: 1.2;
+            min-height: 5rem;
+            margin-bottom: 2rem;
+        }
+        .groupintro .gi_image img {
+            max-height: 8rem;
+            max-width: 8rem;
+            image-rendering: pixelated;
+        }
+        .groupintro .gi_word { font-size: 2.6rem; line-height: 3.5rem; letter-spacing: .15rem; }
+        .groupintro .gi_match {
+            color: #a0c;
+            text-decoration: underline solid #a0c .2rem;
+            text-underline-offset: .5rem;
         }
 
         @keyframes blink-animation { to { visibility: hidden; } }
@@ -208,10 +231,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?470">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?471">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?470"></script>
+    <script src="assets/local/beelocal.js?471"></script>
 </head>
 <body>
     <div class="container">
@@ -226,7 +249,7 @@
 
         <div class="game tab-panel tab-panel-game">
             <div class="prompt">
-                <span class="img"></span>
+                <span class="img emojifont"></span>
                 <span class="infield"><span class="help"></span><img class="helpwait" src="assets/images/loader.gif"><span class="inp"></span></span>
                 <div class="addwords"></div>
             </div>
@@ -291,20 +314,7 @@
     <script>
 
         // Words, split into sets
-        /*
-            Object properties:
-            - level (int)
-            - emoji (str) optional
-            - ref (str) optional (for referenced emojis)
-            - text (str)
-            
-            Text:
-            - word to spell
-            - text with <> around parts to type
-            
-            - We will attempt to play assets/sounds/words/<word to spell>.mp3 (lowercased and spaces replaced by underscores) or use TTS
-            - If there are multiple regions to type, we use a "story" format question
-        */
+        /* Entry format and behaviour: see agent/spellbee-content.md */
         // Use e.g. https://getemoji.com/
         // Use e.g. https://ttsmp3.com/ to generate TTS
         
@@ -494,16 +504,10 @@
             "r/r": 1,
         };
         
-        // Phonemes we can voice in a segmented word, keyed by an ascii id, with a short
-        // explanation of the sound. (More will be added later as we cover the missing phonemes.)
-        // Valid phoneme ids for segmented words. Every value is 1 - the object is only used as a
-        // set (does this id exist?); the IPA / example for each id is in its line comment.
-        // 'x' = silent, 'ks' is a cluster, 'SEn'/'Id' are whole-morpheme pseudo-phonemes.
+        // Valid phoneme ids for segmented words (a set; value always 1). IPA/example in each line
+        // comment. 'x' = silent; 'ks' a cluster; 'SEn'/'Id' whole-morpheme pseudo-phonemes.
         const phoneme_sounds = {
-            'x': 1,     // silent - no sound (e.g. the "e" of a split digraph). The capital-'X' spec
-                        //          '/X' is the same silent sound but also draws a split-digraph link
-                        //          (see get_processed_word / draw_segment_connectors); it is folded to
-                        //          'x' here, so 'X' itself is not a phoneme id.
+            'x': 1,     // silent (e.g. split-digraph "e"); the '/X' spec folds to 'x' plus a link
             // Consonants
             'b': 1,     // /b/ as in "bat"
             'd': 1,     // /d/ as in "dog"
@@ -1353,12 +1357,11 @@
             $image: $('.prompt .img'),
             $input: $('.prompt .infield .inp'),
             $help: $('.prompt .infield .help'),
-            $helpwait: $('.prompt .infield .helpwait'),
-            word_audio_timeout: false
+            $helpwait: $('.prompt .infield .helpwait')
         };
 
     </script>
-    <script src="assets/common.js?470"></script>
+    <script src="assets/common.js?471"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1440,7 +1443,15 @@
                 process_typing('TYPING', top4, false);
                 return false;
             });
-            
+
+            // Tap a segmented box to (re)hear its phoneme. Delegated on the persistent .inp so it
+            // survives the re-render every keystroke does.
+            bee.$input.on('click', '.typebox', function() {
+                if(!bee.can_type) { return; } // no box-tap phoneme while typing is disabled (e.g. during the success phoneme process)
+                if(!bee.processed_word || !bee.processed_word.is_segmented) { return; }
+                play_phoneme(bee.processed_word.phonemes[$(this).data('seg')]);
+            });
+
         });
 
         /* EXPLANATION OF TYPED, TO_TYPE, etc.
@@ -1472,14 +1483,8 @@
             const phonemes = []; // parallel to add_words: ascii phoneme id to voice each segment (see phoneme_sounds)
             const connectors = []; // parallel to add_words: true if the segment draws a split-digraph link (see '/X' below)
             const full = word_data.text;
-            // In the "segmented" type the <..> region holds '='-separated segments, e.g.
-            // "blue <p=e=n>". A segment may give an explicit phoneme after a '/' (e.g.
-            // "<p/p=e/e=n/n>", or "<m/m=a/eI=k=e/x>"); otherwise the default from
-            // segment_default_phoneme is used. '=' and '/...' are separators/metadata: they are
-            // never displayed or typed. (A plain word or story <..> with no '=' is one segment.)
-            // The special spec '/X' is silent (like '/x') AND flags a split-digraph link: a silent
-            // "e" that lengthens the vowel two boxes to its left (one consonant box between them),
-            // e.g. "<h=o/EU=m=e/X>". It is folded to the silent phoneme 'x' with a connectors[] flag.
+            // Segmented <..>: '='-separated segments, each optionally "grapheme/phoneme" (else
+            // segment_default_phoneme). '/X' = silent + split-digraph link, folded to 'x'.
             const is_segmented = (full.indexOf('=') !== -1);
             let in_type = false;    // inside a <..> region
             let in_phoneme = false; // reading the phoneme id after a '/'
@@ -1561,11 +1566,8 @@
 
         // ---- Multi-part words (stories and segmented) ----
 
-        // Greedy mapping of bee.typed onto the ordered parts (add_words). A part counts as
-        // finished as soon as enough characters have been typed to fill it - so on a segmented
-        // "<p>=<r>=<o>=<ph>..." the first "p" advances to the next part (we assume the child is
-        // typing the right thing), and in a story the count tracks completed words. Returns
-        // {completed: number of parts fully typed, starts: [to_type index each part begins at]}
+        // Greedy map of bee.typed onto the ordered parts (add_words): a part is 'finished' once
+        // enough chars are typed to fill it. Returns {completed, starts:[to_type index per part]}.
         function parts_progress() {
             const parts = bee.processed_word.add_words;
             const starts = [];
@@ -1579,9 +1581,7 @@
             return {'completed': completed, 'starts': starts};
         }
 
-        // Status of a segment (part), given its start index in to_type and its length: 'pending'
-        // (not fully typed yet), 'ok' (fully typed, all correct) or 'error' (fully typed with a
-        // mistake). Used to colour the boxes and to decide whether to grey the chip.
+        // Status of a part (start, len): 'pending', 'ok' (all correct) or 'error'. Colours the boxes.
         function segment_status(start, len) {
             if(bee.typed.length < start + len) { return 'pending'; }
             const to_type = bee.processed_word.to_type;
@@ -1591,11 +1591,8 @@
             return 'ok';
         }
 
-        // Grey out the word-bank chips of correctly-completed parts (story words and segmented
-        // parts alike) - a part entered wrongly is not greyed. With duplicate parts we grey the
-        // first matching (by content) chip that is not yet grey ("first one in the list"). Grey
-        // state is derived from what has been typed, so nothing is persisted - the shuffled order
-        // lives in the DOM.
+        // Grey the word-bank chips of correctly-completed parts (a wrong part isn't greyed; with
+        // duplicates grey the first not-yet-grey match). Derived from bee.typed, nothing persisted.
         function update_completed_chips() {
             const prog = parts_progress();
             const parts = bee.processed_word.add_words;
@@ -1614,10 +1611,10 @@
 
         // ---- Segmented (phoneme / morpheme) question type ----
 
-        // Placeholder: a finished segment could be voiced here. phoneme is its ascii id (a key of
-        // phoneme_sounds; 'x' means silent).
+        // Play the clip for a phoneme (ascii id; 'x' is silent). Audio objects are cached; callback
+        // fires when it finishes.
         const phoneme_sound_objs = {};
-        function speak_completed_part(part, phoneme) {
+        function play_phoneme(phoneme, callback) {
             if(phoneme_sound_objs[phoneme] === undefined) {
                 phoneme_sound_objs[phoneme] = {
                     file: 'assets/sounds/phonemes/ph_' + phoneme.replaceAll(/[^a-zA-Z0-9]/g, '_') + '.mp3',
@@ -1625,26 +1622,60 @@
                     object: false
                 };
             }
-            _play_obj(phoneme_sound_objs[phoneme]);
-            console.log('segmented part completed (TTS placeholder):', part, 'phoneme:', phoneme);
-            // if(phoneme && phoneme != 'x') { play the clip for `phoneme` here }
+            _play_obj(phoneme_sound_objs[phoneme], callback);
+        }
+
+        // Voice a finished segment. phoneme is its ascii id (see play_phoneme).
+        function speak_completed_part(part, phoneme) {
+            play_phoneme(phoneme);
+            console.log('segmented part completed:', part, 'phoneme:', phoneme);
+        }
+
+        // On solving a segmented word, draw attention back to the in-focus grapheme/phoneme pair:
+        // bounce its box(es) once and re-voice the pair's phoneme, then a short pause, then continue.
+        // Kept apart in time from the score/confetti reward so it reads as "here is the bit you just
+        // learned", not decoration. No-op when the word has no in-focus grouping pair (word_class
+        // 'noclass') or the pair has no phoneme clip.
+        function segmented_focus_refocus(callback) {
+            const done = callback || function() {};
+            const wc = (bee.problem && bee.problem.word_class) || '';
+            if(!bee.processed_word || !bee.processed_word.is_segmented || wc.indexOf('/') < 0) { done(); return; }
+            const phoneme = wc.split('/')[1];
+            if(phoneme === undefined || phoneme_sounds[phoneme] === undefined) { done(); return; }
+            const parts = bee.processed_word.add_words;
+            const phonemes = bee.processed_word.phonemes;
+            const $boxes = bee.$input.find('.typebox');
+            let any = false;
+            for(let j=0; j<parts.length; j++) { // bounce every box whose pair is the in-focus one
+                if(parts[j].toLowerCase()+'/'+phonemes[j] === wc) {
+                    $boxes.filter('[data-seg="'+j+'"]').addClass('seg_focus_bounce');
+                    any = true;
+                }
+            }
+            if(!any) { done(); return; }
+            // The CSS bounce (~.5s) runs alongside the phoneme; a short pause then the reward.
+            play_phoneme(phoneme, function() { setTimeout(done, 400); });
         }
 
 
-        // Render the input field for a segmented word: non-typed text (from to_display / mask)
-        // plus one fixed-width box per part (add_words), filling as the child types. Wrong
-        // characters are underlined; on a reveal repeat the answer is shown in grey.
+        // Render a segmented word: non-typed text (to_display/mask) plus one box per part, filling
+        // as the child types; a completed part's box is green (ok) or red (mistake).
         function render_segmented_input() {
             const s = bee.processed_word.to_display;
             const mask = bee.processed_word.mask;
             const to_type = bee.processed_word.to_type;
             const parts = bee.processed_word.add_words;
+            const phonemes = bee.processed_word.phonemes;
 
-            // Decide how wide (in characters) to render each segment's box.
-            // Normally every box is sized to the longest part, so the boxes are uniform and give no
-            // clue about how long each part is. But horizontal space is limited, so for a long
-            // series of boxes we switch to a compact mode that sizes boxes closer to their real
-            // length rather than overflowing the row.
+            // A part is "in focus" if its grapheme/phoneme is the group's taught pair. word_class is
+            // built as grapheme+'/'+phoneme in the class derivation; 'noclass' has no '/'.
+            const focus_pair = (bee.problem && bee.problem.word_class) || '';
+            const is_focus_part = function(ix) {
+                return focus_pair.indexOf('/') >= 0 && parts[ix].toLowerCase()+'/'+phonemes[ix] === focus_pair;
+            };
+
+            // Box width in characters: normally uniform (sized to the longest part) so it leaks no
+            // length clue; a long series switches to compact mode sized to real lengths (below).
             let max_part_len = 0;
             let total_chars = 0;   // characters to render across all boxes
             let has_two_char = false; // is any segment exactly 2 characters?
@@ -1663,10 +1694,8 @@
                 // Enough room: uniform boxes sized to the longest part (no length clue)
                 box_char_len = function(len) { return max_part_len; };
             } else {
-                // Compact: size boxes to their real length. To avoid singling out 1-character
-                // segments when 2-character ones are present, render 1-char boxes at 2 characters
-                // (so they look the same as the 2-char boxes); otherwise render them at 1 character.
-                // Segments of 2+ characters are rendered at exactly their own width.
+                // Compact: size boxes to real length, but render 1-char boxes at 2 chars when any
+                // 2-char segment exists (so they don't stand out).
                 const one_char_len = has_two_char ? 2 : 1;
                 box_char_len = function(len) { return len == 1 ? one_char_len : len; };
             }
@@ -1686,14 +1715,12 @@
                 if(type_ix == part_start) { // open a box at each part start; colour it once the part is completed
                     const st = segment_status(part_start, parts[part_ix].length);
                     const boxstyle = ' style="min-width:'+(box_char_len(parts[part_ix].length)*1.2)+'ch"';
-                    o += '<span class="typebox'+(st == 'ok' ? ' typebox_ok' : (st == 'error' ? ' typebox_err' : ''))+'"'+boxstyle+'>';
+                    o += '<span class="typebox'+(st == 'ok' ? ' typebox_ok' : (st == 'error' ? ' typebox_err' : ''))+(is_focus_part(part_ix) ? ' typebox_focus' : '')+'" data-seg="'+part_ix+'"'+boxstyle+'>';
                 }
                 if(type_ix == bee.typed.length) { o += '<span class="cursor_outer"><span class="cursor"></span></span>'; }
                 if(type_ix < bee.typed.length) { // already typed (no per-character underline - the box colour shows errors)
                     const userchar = bee.typed[type_ix];
                     o += (userchar == ' ' ? '&nbsp;' : esc_html(userchar));
-                } else if(bee.problem.is_reveal) { // reveal repeat: show the answer in grey
-                    o += '<span class="reveal_totype">'+esc_html(to_type[type_ix])+'</span>';
                 }
                 if(type_ix == part_start + parts[part_ix].length - 1) { // close the box at the end of the part
                     o += '</span>';
@@ -1709,15 +1736,9 @@
         }
 
 
-        // Draw the split-digraph link lines for a segmented word. A segment whose phoneme spec is
-        // '/X' (silent + link, see get_processed_word) is a silent "e" that lengthens the vowel two
-        // boxes to its left, with one consonant box between them. Once that vowel box is completed
-        // correctly we draw a rounded "bottom half of a box" (.segbox_link) joining the vowel box to
-        // the silent-e box, passing under the box between them. Boxes may be non-uniform width (see
-        // render_segmented_input's compact mode) but are kept on one line, so the link is measured
-        // centre-to-centre off the rendered DOM rects and works at any box widths. Called after each
-        // re-render of the input; the lines are children of .inp and are dropped when its html is
-        // next replaced.
+        // Draw the split-digraph link line(s): a '/X' segment is a silent "e" lengthening the vowel
+        // two boxes to its left. Once that vowel box is correct, draw a rounded half-box joining the
+        // two, measured centre-to-centre off the DOM rects. Rebuilt after each input re-render.
         function draw_segment_connectors() {
             const connectors = bee.processed_word.connectors;
             if(!connectors || connectors.indexOf(true) < 0) { return; } // nothing to link
@@ -1819,11 +1840,7 @@
                             if(typed_ix == bee.typed.length) { 
                                 o += '<span class="cursor_outer"><span class="cursor"></span></span>';
                             } 
-                            if(bee.problem.is_reveal) {
-                                o += '<span class="reveal_totype">';
-                                o += (s[i] == ' ' && (!bee.processed_word.is_story) ? '&nbsp;' : esc_html(s[i]));
-                                o += '</span>';
-                            } else if(bee.processed_word.is_story) {
+                            if(bee.processed_word.is_story) {
                                 o += '<span class="story_totype">'+esc_html(s[i])+'</span>';
                             } else {
                                 o += (s[i] == ' ' ? '<span class="spacehelp">_</span>' : '_');
@@ -1848,6 +1865,86 @@
             if(bee.processed_word.is_story || bee.processed_word.is_segmented) { update_completed_chips(); }
             if(bee.processed_word.is_segmented) { draw_segment_connectors(); }
         }
+        
+        
+        // HTML for a word's picture (local emoji-ref hook, referenced image, emoji, or empty box).
+        function word_image_html(proc) {
+            if(proc.ref !== undefined && local_hook_has('emoji_ref')) {
+                return bee_local.emoji_ref(proc.ref);
+            }
+            if(proc.imgref !== undefined) {
+                return '<img src="assets/images/words/'+proc.imgref+'">';
+            }
+            if(proc.emoji === undefined) { return ''; } // no image specified: show an empty box
+            let emoji = proc.emoji;
+            // Ensure emoji code ends in picture modifier
+            if(emoji[emoji.length-1] != "️") { emoji += "️"; }
+            return esc_html(emoji);
+        }
+
+
+        // Render a segmented word's parts as a normal word for the group intro, with the part(s)
+        // matching the group's grapheme (already lowercased) highlighted.
+        function render_intro_word(proc, grapheme) {
+            const parts = proc.add_words;
+            let o = '';
+            for(let i=0; i<parts.length; i++) {
+                const match = (parts[i].toLowerCase() == grapheme);
+                o += (match ? '<span class="gi_match">'+esc_html(parts[i])+'</span>' : esc_html(parts[i]));
+            }
+            return o;
+        }
+
+
+        // Full-screen intro to a new problem group: picture + an example word (grapheme highlighted)
+        // with narration, then restore the game. callback(true) if shown, callback(false) if there
+        // is no grouping pair to introduce.
+        function show_group_intro(word_ix, gp_pair, callback) {
+            const word_data = bee.words[word_ix].proc_cache;
+            if(!word_data.is_segmented) { if(callback) { callback(false); } return; }
+            gp_pair = gp_pair.split('/');
+            const grapheme = gp_pair[0];
+            const phoneme = gp_pair[1];
+            // Only grouping grapheme/phoneme pairs (a real phoneme clip) get an intro
+            if(phoneme === undefined || phoneme_sounds[phoneme] === undefined) { if(callback) { callback(false); } return; }
+
+            // Hide the game and splash the picture + highlighted example word into the menu container
+            $('.game').hide();
+            $('.startmenu').html(
+                '<div class="groupintro">' +
+                    '<div class="gi_image emojifont">'+word_image_html(word_data)+'</div>' +
+                    '<div class="gi_word">'+render_intro_word(word_data, grapheme)+'</div>' +
+                '</div>'
+            ).show();
+
+            // make_pause takes the NEXT step's index so it resolves lazily (not yet assigned here)
+            function make_pause(pause_s, next_ix) {
+                return function() { setTimeout(utterances[next_ix], pause_s*1000); };
+            }
+
+            const utterances = [];
+            utterances[0] = function() { play_word('The sound', utterances[1]); };
+            utterances[1] = make_pause(.25, 2);
+            utterances[2] = function() { play_phoneme(phoneme, utterances[3]); };
+            utterances[3] = make_pause(.25, 4);
+            utterances[4] = function() { play_word('can be written as'+'.', utterances[5]); };
+            utterances[5] = make_pause(1.5, 6);
+            utterances[6] = function() { play_phoneme(phoneme, utterances[7]); };
+            utterances[7] = make_pause(.5, 8);
+            utterances[8] = function() { play_word(word_data.to_type, utterances[9]); };
+            utterances[9] = make_pause(1.5, 10);
+            utterances[10] = function() { play_word('Tap on the boxes to hear their sound.', utterances[11]); };
+            utterances[11] = function() {
+                setTimeout(function() {
+                    // Hide the intro and bring the game (header, prompt, keyboard) back
+                    $('.startmenu').hide().html('');
+                    $('.game').show();
+                    switch_to_tab('game');
+                    if(callback) { callback(true); }
+                }, 500);
+            };
+            utterances[0]();
+        }
 
 
         // Display target word briefly
@@ -1858,9 +1955,7 @@
                 bee.$input.show();
                 update_input_field();
                 call_local_hook('keyboard_press_hook', [undefined]);
-                // play_word(text, callback, max_timeout, force): default text (the whole display
-                // string), no callback, default timeout, force past the anti-repeat throttle
-                if(is_initial) { play_word(undefined, undefined, undefined, true); }
+                if(is_initial) { play_word(undefined, undefined, undefined); } // play_word(text, callback, max_timeout)
                 return;
             }
             console.log("Disabling help");
@@ -1907,7 +2002,7 @@
                             }, help_duration_enable);
                         }, help_duration_3);
                     }});
-                }, help_duration_1, is_initial);
+                }, help_duration_1);
             }, is_initial ? 0 : help_duration_loading);
         }
         
@@ -1954,18 +2049,8 @@
 
 
         // Play the mp3 assigned to a word or use TTS
-        function play_word(text, callback, max_timeout, force) {
+        function play_word(text, callback, max_timeout) {
             const s = (text === undefined ? bee.processed_word.to_display : text);
-
-            if(force && bee.word_audio_timeout !== false) {
-                clearTimeout(bee.word_audio_timeout);
-                bee.word_audio_timeout = false;
-            }
-            if(bee.word_audio_timeout !== false) { // prevent playing word too frequently
-                console.log("skipping play_word due to timeout");
-                return; 
-            }
-            bee.word_audio_timeout = setTimeout(function() { bee.word_audio_timeout = false; }, 3000);
             
             const file_base = s.toLowerCase().replaceAll(/ /g, '_').replaceAll(/[^a-z_]/g, '');
             const file = 'assets/sounds/words/'+file_base+'.mp3';
@@ -2073,14 +2158,12 @@
                             if(bee.typed.length < bee.processed_word.to_type.length) {
                                 const word_to_play = bee.processed_word.add_words[addwords_last];
                                 console.log("Speaking story word", word_to_play);
-                                play_word(word_to_play, undefined, undefined, true); /* text, callback, max_timeout, force */
+                                play_word(word_to_play, undefined, undefined); /* text, callback, max_timeout */
                             }
                         }
                         if(bee.processed_word.is_segmented) {
-                            // This keystroke fills at most one part; if it just filled one, voice its
-                            // phoneme - but only if that part was typed correctly (don't voice a wrong
-                            // entry). The final part is voiced too; the success handler below waits for
-                            // it before proceeding.
+                            // A keystroke fills at most one part; voice its phoneme only if that part
+                            // is correct (never a wrong entry). The final part is voiced too.
                             const seg_prog = parts_progress();
                             const seg_completed = seg_prog.completed;
                             const done_ix = seg_completed - 1;
@@ -2146,14 +2229,15 @@
                         };
 
                         // Story / segmented: re-read the whole text before advancing (req 6)
-                        const re_read = (bee.processed_word.is_story || bee.processed_word.is_segmented) && !bee.problem.is_reveal;
+                        const re_read = (bee.processed_word.is_story || bee.processed_word.is_segmented);
                         if(bee.processed_word.is_segmented) {
-                            // The final part's phoneme was just voiced; pause ~1s to let it finish
-                            // before the success actions (re-read the whole word, then success_common)
+                            // The final part's phoneme was just voiced; pause ~1s to let it finish,
+                            // then re-read the whole word, refocus the in-focus pair (bounce + its
+                            // phoneme) apart from the reward, then the success actions.
                             setTimeout(function() {
-                                if(re_read) { play_word(undefined, on_success, undefined, true); } else { on_success(); }
+                                play_word(undefined, function() { segmented_focus_refocus(on_success); }, undefined);
                             }, 1000);
-                        } else if(re_read) { play_word(undefined, on_success, undefined, true); } else { on_success(); }
+                        } else if(re_read) { play_word(undefined, on_success, undefined); } else { on_success(); }
                     }
                 }
                 return;
@@ -2203,21 +2287,7 @@
             bee.processed_word = bee.words[bee.problem.word_ix].proc_cache;
 
             // Show picture
-            if(bee.processed_word.ref !== undefined && local_hook_has('emoji_ref')) {
-                bee.$image.html(bee_local.emoji_ref(bee.processed_word.ref));
-            }
-            else if(bee.processed_word.imgref !== undefined) {
-                bee.$image.html('<img src="assets/images/words/'+bee.processed_word.imgref+'">');
-            }
-            else if(bee.processed_word.emoji === undefined) {
-                bee.$image.html(''); // no image specified: show an empty box
-            }
-            else {
-                let emoji = bee.processed_word.emoji;
-                // Ensure emoji code ends in picture modifier
-                if(emoji[emoji.length-1] != "\ufe0f") { emoji += "\ufe0f"; }
-                bee.$image.html(esc_html(emoji));
-            }
+            bee.$image.html(word_image_html(bee.processed_word));
             
             // Add help & input
             bee.typed = '';
@@ -2229,10 +2299,14 @@
                 $('.prompt .addwords').hide();
                 $('.kbdiv .kbhelp').css({'visibility': 'visible'});
             } else {
-                // Story or segmented: show the (shuffled) word bank below the prompt. Stories force
-                // reading (both help keys hidden); segmented keeps the replay key (💬) but hides the
-                // spelling-reveal key (?)
-                $('.prompt .addwords').html(render_addwords()).show();
+                // Story or reveal repeat: show the shuffled word bank to copy from (a plain
+                // segmented question hides it). Stories hide both help keys; segmented keeps 💬,
+                // hides ? (reveal).
+                if(bee.processed_word.is_story || problem.is_reveal) {
+                    $('.prompt .addwords').html(render_addwords()).show();
+                } else {
+                    $('.prompt .addwords').hide();
+                }
                 $('.kbdiv .kbkey[data-key="HELP"]').css({'visibility': 'hidden'});
                 $('.kbdiv .kbkey[data-key="PLAY_WORD"]').css({'visibility': bee.processed_word.is_segmented ? 'visible' : 'hidden'});
             }
@@ -2335,13 +2409,14 @@
             try{ document.activeElement.blur(); }catch(e){}
             
             let problem = get_first_on_queue();
-            let log = '';            
+            let log = '';
+            let intro_word_ix = undefined; // group intro's example word; undefined = no intro (queue-restored)
             if(problem !== undefined) {
                 log += ' from queue';
                 if(problem.word_ix >= bee.words.length) { log += ' invalid'; problem = undefined; }
             }
             if(problem === undefined) { // Get a new word/problem
-            
+
                 let word_ix = undefined;
                 let warned_no_word = false; // bee_alert() is non-blocking, so only warn once (no modal stacking)
                 while(true) {
@@ -2357,13 +2432,14 @@
             
                 // Word class group
                 let word_class = bee.words[word_ix].class;
-                if(word_class === undefined || word_class.length == 0) { word_class = ['noclass:']; }
+                if(word_class === undefined || word_class.length == 0) { word_class = ['noclass']; }
                 word_class = word_class[Math.floor(Math.random() * word_class.length)]; // choose random class
                 log += ' group_class:'+word_class;
 
                 log += ' first_word:'+word_ix;
                 problem = {'word_ix':word_ix, 'is_repeat':false, 'word_class':word_class};
                 store_question11(problem);
+                intro_word_ix = word_ix; // fallback: the first word, used only if the class has no other
 
                 const word_ixs = bee.class_to_ix[word_class];
                 if(word_ixs !== undefined && word_ixs.length > 0) {
@@ -2376,11 +2452,20 @@
                             store_question11({'word_ix':group_word, 'is_repeat':false, 'word_class':word_class});
                         }
                     }
+
+                    // Prefer a random OTHER class word for the intro (don't reveal word_ix)
+                    const intro_choices = word_ixs.filter(function(ix) { return ix != word_ix; });
+                    if(intro_choices.length > 0) { intro_word_ix = choose_from(intro_choices); }
                 }
-                
+
             }
             console.log("Selecting new word:", log);
-            start_question14(problem); // the first word
+            // New groups get an intro; queue-restored problems (intro_word_ix undefined) skip it
+            if(intro_word_ix !== undefined) {
+                show_group_intro(intro_word_ix, problem.word_class, function() { start_question14(problem); });
+            } else {
+                start_question14(problem); // the first word
+            }
         }
 
         
@@ -2543,11 +2628,12 @@
             console.log('reschedule_question', problem, add_reveal);
             const s = get_question_queue();
             s.shift(); // remove this question
-            while(s.length < 3) { s.push(undefined); }
-            s.splice(3, 0, {'word_ix':problem.word_ix, 'word_class':problem.word_class, 'is_repeat':true, 'is_reveal':false});
+            // Reveal repeat (index 1) before plain (index 3); insert the reveal first so a near-empty
+            // queue keeps reveal-then-plain (splice clamps past-end indices).
             if(add_reveal) {
                 s.splice(1, 0, {'word_ix':problem.word_ix, 'word_class':problem.word_class, 'is_repeat':true, 'is_reveal':true});
             }
+            s.splice(3, 0, {'word_ix':problem.word_ix, 'word_class':problem.word_class, 'is_repeat':true, 'is_reveal':false});
             save_storage('schedule_question');
         }
         
@@ -2624,8 +2710,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?470"></script>
-    <script src="assets/aquarium/js/aquarium.js?470"></script>
+    <script src="assets/aquarium/js/config.js?471"></script>
+    <script src="assets/aquarium/js/aquarium.js?471"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

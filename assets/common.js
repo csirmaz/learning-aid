@@ -283,7 +283,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 470;
+const bee_app_version = 471;
 
 call_local_hook('check_version', []);
 
@@ -1164,14 +1164,25 @@ bee_tts.initialize = function() {
 bee_tts.speaking_time = function(s) {
     return 80*s.length + 250;
 };
-        
+
+
+bee_tts.speak_callback_index = 0;
+bee_tts.speak_callbacks = {};
+
 // Speak an utterance. Returns true if utterance is being spoken; then callback() will be called on end.
 bee_tts.speak = function(s, callback) {
     if(bee_tts.status == 'bridge') {
         try {
-            window.PuzzleAlerter.speak(s);
             if(callback) {
-                setTimeout(callback, bee_tts.speaking_time(s)); // bridge does not support callbacks at the moment, so approximate using text length
+                const cbi = bee_tts.speak_callback_index;
+                bee_tts.speak_callbacks[cbi] = function(success) {
+                    delete bee_tts.speak_callbacks[cbi];
+                    callback(success);
+                };
+                window.PuzzleAlerter.speak(s, 'bee_tts.speak_callbacks['+cbi+']');
+                bee_tts.speak_callback_index++;
+            } else {
+                window.PuzzleAlerter.speak(s);
             }
             return true;
         } catch(e) {
