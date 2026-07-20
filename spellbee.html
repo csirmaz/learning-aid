@@ -69,6 +69,10 @@
             margin: 0 .5rem;
             padding: 0 .5rem;
         }
+        /* The in-focus segment's chip in the segmented word bank: a purple '?' card (render_addwords),
+           matching the in-focus box border (typebox_focus). Sits before the .word.done rule so the
+           grey 'done' style (equal specificity, later in source) still wins once the part is solved. */
+        .prompt .addwords .word.word_focus { color: #a0c; border-color: #a0c; }
         
         .prompt .infield .help,
         .prompt .infield .inp {
@@ -320,89 +324,86 @@
         
         // Which grapheme/phoneme pairs ar taught in groups
         const gp_grouping_pairs = {
+            // groups / morphemes
+            "ing/Ing": 1,
+            "en/En": 1,
+            "et/Et": 1,
+            "ed/t": 1,
+            "ed/d": 1,
+            "ly/lI": 1,
+            "ent/Ent": 1,
+            "ant/Ent": 1,
+            "tion/SEn": 1,
+            "con/kEn": 1,
+            "ity/ItI": 1,
+            "ot/Et": 1,
+            "in/In": 1,
+            
+            // doubling
+            "gg/g": 1,
+            "ll/l": 1,
+            "bb/b": 1,
+            "tt/t": 1,
+            "ss/s": 1,
+            "dd/d": 1,
+            "mm/m": 1,
+            "nn/n": 1,
+            "rr/r": 1,
+            "pp/p": 1,
+
+            "k/k": 1,
+            "c/k": 1,
+
+            "ph/f": 1,
+            "ff/f": 1,
+            "gh/f": 1,
+
+            "d/d": 1,
+            "b/b": 1,
+
+            "th/T": 1,
+            "th/D": 1,
+
             "y/j": 1,
             "ou/A": 1,
             "ng/ng": 1,
             "ar/a:": 1,
-            "k/k": 1,
-            "et/Et": 1,
-            "f/f": 1,
-            "o/o": 1,
             "e/I": 1,
-            "c/k": 1,
-            "l/l": 1,
-            "th/T": 1,
             "oo/U": 1,
-            "ea/i:": 1,
-            "ly/lI": 1,
-            "w/w": 1,
             "al/O:": 1,
-            "ed/t": 1,
-            "u/A": 1,
             "ch/tS": 1,
-            "d/d": 1,
             "er/Er": 1,
-            "i/I": 1,
-            "a/E": 1,
             "ce/s": 1,
             "igh/aI": 1,
             "a/O:": 1,
-            "en/En": 1,
             "wh/w": 1,
-            "e/e": 1,
             "ere/3:": 1,
-            "g/g": 1,
             "ow/EU": 1,
             "s/z": 1,
             "a/o": 1,
             "i/aI": 1,
-            "ed/d": 1,
             "o/EU": 1,
-            "ph/f": 1,
-            "y/I": 1,
-            "ff/f": 1,
             "er/r": 1,
-            "ent/Ent": 1,
-            "ant/Ent": 1,
-            "a/eI": 1,
-            "tion/SEn": 1,
-            "b/b": 1,
-            "gg/g": 1,
-            "ll/l": 1,
-            "v/v": 1,
-            "th/D": 1,
             "x/ks": 1,
-            "ss/s": 1,
             "ai/eI": 1,
             "sh/S": 1,
             "n/ng": 1,
-            "e/E": 1,
             "i/i:": 1,
             "es/z": 1,
             "tch/tS": 1,
             "g/dZ": 1,
             "al/sl": 1,
-            "h/h": 1,
             "ay/eI": 1,
             "o/A": 1,
             "ey/I": 1,
-            "o/x": 1,
-            "e/x": 1,
-            "a/ae": 1,
-            "ing/Ing": 1,
-            "pp/p": 1,
             "are/eE": 1,
             "u/U": 1,
             "ck/k": 1,
             "j/dZ": 1,
-            "in/In": 1,
-            "nn/n": 1,
             "oo/u:": 1,
-            "rr/r": 1,
             "ee/i:": 1,
             "ch/k": 1,
             "ie/I": 1,
-            "o/E": 1,
             "oi/OI": 1,
             "se/z": 1,
             "oy/OI": 1,
@@ -414,9 +415,7 @@
             "el/sl": 1,
             "ou/aU": 1,
             "oa/EU": 1,
-            "ew/u:": 1,
             "oe/u:": 1,
-            "ew/ju:": 1,
             "kn/n": 1,
             "iew/ju:": 1,
             "au/O:": 1,
@@ -425,14 +424,10 @@
             "eigh/aI": 1,
             "eigh/eI": 1,
             "a/a:": 1,
-            "mm/m": 1,
-            "e/i:": 1,
             "mb/m": 1,
-            "ie/i:": 1,
             "de/dI": 1,
             "y/aI": 1,
             "ire/aIE": 1,
-            "or/E": 1,
             "u/ju:": 1,
             "u/u:": 1,
             "ed/Id": 1,
@@ -442,15 +437,8 @@
             "or/O:": 1,
             "oor/O:": 1,
             "es/Iz": 1,
-            "ir/3:": 1,
-            "or/3:": 1,
-            "ur/3:": 1,
             "ture/tSE": 1,
             "air/eE": 1,
-            "dd/d": 1,
-            "ity/ItI": 1,
-            "tt/t": 1,
-            "ot/Et": 1,
             "ia/aI": 1,
             "io/IE": 1,
             "ol/sl": 1,
@@ -461,26 +449,18 @@
             "dge/dZ": 1,
             "ge/dZ": 1,
             "er/eE": 1,
-            "ur/Er": 1,
             "ere/eE": 1,
             "c/s": 1,
             "ow/o": 1,
             "wr/r": 1,
             "ch/S": 1,
-            "ou/E": 1,
-            "con/kEn": 1,
-            "ei/i:": 1,
             "s/Z": 1,
             "ua/U": 1,
-            "bb/b": 1,
             "a/e": 1,
-            "'t/t": 1,
             "oul/U": 1,
             "ere/IE": 1,
-            "ou/u:": 1,
             "o/U": 1,
             "o/I": 1,
-            "gh/f": 1,
             "ai/e": 1,
             "ig/aI": 1,
             "ui/u:": 1,
@@ -490,20 +470,90 @@
             "ey/i:": 1,
             "err/3:": 1,
             "is/aI": 1,
+            // Lax vowels
+            "a/ae": 1,
+            "u/A": 1,
+            "y/I": 1,
+            // Tense vowels
+            "a/eI": 1,
+            "e/i:": 1,
+            // Schwa
+            "a/E": 1,
+            "ou/E": 1,
+            "or/E": 1,
+            "e/E": 1,
+            "o/E": 1,
             "ur/E": 1
+            "ur/Er": 1,
+            // digraphs
+            "ei/i:": 1,
+            "ie/i:": 1,
+            "ea/i:": 1,
+            "ou/u:": 1,
+            "ew/u:": 1,
+            "ew/ju:": 1,
+            // broken
+            "ir/3:": 1,
+            "or/3:": 1,
+            "ur/3:": 1,
         };
         
-        // Other valid grapheme/phoneme pairs for validation
+        // Other valid grapheme/phoneme pairs (only for validation)
         const gp_other_pairs = {
+            "f/f": 1,
+            "g/g": 1,
+            "h/h": 1,
+            "l/l": 1,
             "m/m": 1,
-            "s/s": 1,
-            "t/t": 1,
             "n/n": 1,
             "p/p": 1,
-            "z/z": 1,
             "r/r": 1,
+            "s/s": 1,
+            "t/t": 1,
+            "v/v": 1,
+            "w/w": 1,
+            "z/z": 1,
+            // Silent
+            "o/x": 1,
+            "e/x": 1,
+            // Lax vowels
+            "e/e": 1,
+            "i/I": 1,
+            "o/o": 1,
+            // Tense vowels
+            // other
+            "'t/t": 1,
         };
-        
+
+        // Predictable grapheme/phoneme pairs: the grapheme is the obvious/default spelling of the
+        // sound. Used only for the segmented word bank
+        // (render_addwords): a predictable pair that is NOT in focus gets no chip; an 
+        // unpredictable one is given as a tile to copy.
+        const predictable_pairs = {
+            // Single consonants at their default spelling
+            "b/b": 1, 
+            "d/d": 1, 
+            "f/f": 1, 
+            "g/g": 1, 
+            "h/h": 1, 
+            "l/l": 1, 
+            "m/m": 1, 
+            "n/n": 1,
+            "p/p": 1, 
+            "r/r": 1, 
+            "s/s": 1, 
+            "t/t": 1, 
+            "v/v": 1, 
+            "w/w": 1, 
+            "z/z": 1,
+            // Lax vowels
+            "a/ae": 1, 
+            "e/e": 1, 
+            "i/I": 1, 
+            "o/o": 1, 
+            "u/A": 1,
+        };
+
         // Valid phoneme ids for segmented words (a set; value always 1). IPA/example in each line
         // comment. 'x' = silent; 'ks' a cluster; 'SEn'/'Id' whole-morpheme pseudo-phonemes.
         const phoneme_sounds = {
@@ -1352,10 +1402,11 @@
             intro_gap_checked: false, // per page-load: has new_question run the idle-gap check yet (group-intro-on-return)
             words: [],  // words in the selected level range
             class_to_ix: false, // {wordclass:[word_ix, ...
-            problem: false, // current problem {word_ix:, word_class:, is_repeat:, is_reveal:}
+            problem: false, // current problem {word_ix:, word_class:, is_repeat:}
             processed_word: false,
             help_asked: 0,  // state: how many times help was asked for for the current word
             backspace_used: 0, // state
+            help_full_bar: false, // state: segmented HELP key pressed - show the full (all-segment) word bank
             $image: $('.prompt .img'),
             $input: $('.prompt .infield .inp'),
             $help: $('.prompt .infield .help'),
@@ -1553,16 +1604,33 @@
         }
         
         
-        // Render the word bank: the words to type in a story, or the parts of a segmented word
-        // (both shuffled). update_completed_chips() greys the chips as parts are completed.
+        // Render the word bank below the prompt: the shuffled parts to copy from. Each chip carries
+        // data-seg (its part index) so update_completed_chips() greys it as its part is completed.
+        // Stories tile every word. A segmented question also tiles its parts, but:
+        //   - a predictable pair (predictable_pairs) that is NOT in focus gets no chip - the child
+        //     produces it unaided from the sound;
+        //   - the in-focus pair(s) show as a purple '?' card (word_focus) instead of the grapheme.
+        // The HELP key (bee.help_full_bar) tiles every segment plainly - the child asking to see
+        // everything - so full mode may not depend on the predictability judgement here.
         function render_addwords() {
-            let words = bee.processed_word.add_words.slice(); // clone
-            shuffle(words); // WARNING changes array
-            let o = '';
-            for(let i=0; i<words.length; i++) {
-                o += '<span class="word">'+words[i]+'</span>';
+            const parts = bee.processed_word.add_words;
+            const phonemes = bee.processed_word.phonemes;
+            const segmented = bee.processed_word.is_segmented;
+            const show_all = bee.help_full_bar;
+            const focus_pair = (bee.problem && bee.problem.word_class) || '';
+            const gp_pair = function(ix) { return parts[ix].toLowerCase()+'/'+phonemes[ix]; };
+            const is_focus = function(ix) { return focus_pair.indexOf('/') >= 0 && gp_pair(ix) === focus_pair; };
+
+            const chips = [];
+            for(let i=0; i<parts.length; i++) {
+                if(segmented && !show_all) {
+                    if(is_focus(i)) { chips.push('<span class="word word_focus" data-seg="'+i+'">?</span>'); continue; }
+                    if(predictable_pairs[gp_pair(i)]) { continue; } // predictable pair: no chip, produced unaided
+                }
+                chips.push('<span class="word" data-seg="'+i+'">'+esc_html(parts[i])+'</span>');
             }
-            return o;
+            shuffle(chips); // WARNING changes array
+            return chips.join('');
         }
 
 
@@ -1593,8 +1661,9 @@
             return 'ok';
         }
 
-        // Grey the word-bank chips of correctly-completed parts (a wrong part isn't greyed; with
-        // duplicates grey the first not-yet-grey match). Derived from bee.typed, nothing persisted.
+        // Grey the word-bank chips of correctly-completed parts, matched by data-seg (set in
+        // render_addwords). A wrongly-typed part isn't greyed; a part with no chip (a predictable
+        // segment) simply has nothing to grey. Derived from bee.typed, nothing persisted.
         function update_completed_chips() {
             const prog = parts_progress();
             const parts = bee.processed_word.add_words;
@@ -1602,11 +1671,7 @@
             $chips.removeClass('done');
             for(let k=0; k<prog.completed; k++) {
                 if(segment_status(prog.starts[k], parts[k].length) != 'ok') { continue; } // don't grey a wrongly-typed part
-                const p = parts[k].toLowerCase();
-                for(let i=0; i<$chips.length; i++) {
-                    const $c = $chips.eq(i);
-                    if(!$c.hasClass('done') && $c.text().toLowerCase() == p) { $c.addClass('done'); break; }
-                }
+                $chips.filter('[data-seg="'+k+'"]').addClass('done');
             }
         }
 
@@ -1673,6 +1738,7 @@
             // built as grapheme+'/'+phoneme in the class derivation; 'noclass' has no '/'.
             const focus_pair = (bee.problem && bee.problem.word_class) || '';
             const is_focus_part = function(ix) {
+                if(bee.help_full_bar) { return false; } // HELP revealed the full bank: drop the focus marking
                 return focus_pair.indexOf('/') >= 0 && parts[ix].toLowerCase()+'/'+phonemes[ix] === focus_pair;
             };
 
@@ -2117,6 +2183,16 @@
 
                 if(typed_key == 'HELP') {
                     highlight_key('.kbdiv .kbkey[data-key="'+typed_key+'"]');
+                    if(bee.processed_word.is_segmented) {
+                        // Switch the word bank to full mode (every segment a plain tile, see
+                        // render_addwords) and drop the in-focus purple marking. Idempotent once full.
+                        if(bee.help_full_bar) { playme('notavail'); return; }
+                        bee.help_full_bar = true;
+                        bee.help_asked++;
+                        $('.prompt .addwords').html(render_addwords()).show();
+                        update_input_field(); // re-render the boxes without the purple focus border; re-greys chips
+                        return;
+                    }
                     if(!bee.can_use_help) { playme('notavail'); return; }
                     show_help(false);
                     return;
@@ -2214,10 +2290,8 @@
                         if(outcome == 'ADD_KNOWN') {
                             queue_success();
                             add_known_word();
-                        } else if(outcome == 'ASK_ONCE') {
-                            reschedule_question(bee.problem, false);
-                        } else if(outcome == 'ASK_ALL') {
-                            reschedule_question(bee.problem, true);
+                        } else if(outcome == 'ASK_ONCE' || outcome == 'ASK_ALL') {
+                            reschedule_question(bee.problem);
                         } else { // 'OK'
                             queue_success();
                         }
@@ -2283,7 +2357,7 @@
         
         // Initialize a question
         function start_question14(problem) {
-            bee.problem = problem; // {word_ix:, word_class:, is_repeat:, is_reveal:}
+            bee.problem = problem; // {word_ix:, word_class:, is_repeat:}
             if(bee.help_timeout !== false) { clearTimeout(bee.help_timeout); bee.help_timeout = false; }
 
             bee.processed_word = bee.words[bee.problem.word_ix].proc_cache;
@@ -2295,21 +2369,21 @@
             bee.typed = '';
             bee.help_asked = 0;
             bee.backspace_used = 0;
+            bee.help_full_bar = false;
 
             if(!bee.processed_word.is_story && !bee.processed_word.is_segmented) {
                 bee.$help.html(render_to_html(true));
                 $('.prompt .addwords').hide();
                 $('.kbdiv .kbhelp').css({'visibility': 'visible'});
             } else {
-                // Story or reveal repeat: show the shuffled word bank to copy from (a plain
-                // segmented question hides it). Stories hide both help keys; segmented keeps 💬,
-                // hides ? (reveal).
-                if(bee.processed_word.is_story || problem.is_reveal) {
-                    $('.prompt .addwords').html(render_addwords()).show();
-                } else {
-                    $('.prompt .addwords').hide();
-                }
-                $('.kbdiv .kbkey[data-key="HELP"]').css({'visibility': 'hidden'});
+                // Story or segmented: show the shuffled word bank to copy from. render_addwords()
+                // builds the right variant (story = all words; segmented = tiles minus predictable
+                // pairs with a '?' card for the in-focus pair; HELP then reveals every segment plain).
+                // Hide it only when it comes back empty (e.g. an all-predictable segmented word).
+                // Stories hide both help keys. Segmented keeps 💬 and shows ? (switch bank to full mode).
+                const bank = render_addwords();
+                if(bank) { $('.prompt .addwords').html(bank).show(); } else { $('.prompt .addwords').hide(); }
+                $('.kbdiv .kbkey[data-key="HELP"]').css({'visibility': bee.processed_word.is_segmented ? 'visible' : 'hidden'});
                 $('.kbdiv .kbkey[data-key="PLAY_WORD"]').css({'visibility': bee.processed_word.is_segmented ? 'visible' : 'hidden'});
             }
             bee.$input.html('');
@@ -2661,17 +2735,12 @@
             save_storage('queue_success');
         }
         
-        // Schedule question to be shown N questions later
-        function reschedule_question(problem, add_reveal) {
-            console.log('reschedule_question', problem, add_reveal);
+        // Schedule question to be shown N questions later. Adds the problem back to the queue once.
+        function reschedule_question(problem) {
+            console.log('reschedule_question', problem);
             const s = get_question_queue();
             s.shift(); // remove this question
-            // Reveal repeat (index 1) before plain (index 3); insert the reveal first so a near-empty
-            // queue keeps reveal-then-plain (splice clamps past-end indices).
-            if(add_reveal) {
-                s.splice(1, 0, {'word_ix':problem.word_ix, 'word_class':problem.word_class, 'is_repeat':true, 'is_reveal':true});
-            }
-            s.splice(3, 0, {'word_ix':problem.word_ix, 'word_class':problem.word_class, 'is_repeat':true, 'is_reveal':false});
+            s.splice(3, 0, {'word_ix':problem.word_ix, 'word_class':problem.word_class, 'is_repeat':true});
             mark_active();
             save_storage('schedule_question');
         }
