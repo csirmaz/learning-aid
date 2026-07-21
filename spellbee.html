@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?474">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?475">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -112,7 +112,7 @@
             line-height: 2rem;
             margin: 0 .15rem;
             padding: .1rem .3rem;
-            border: 2px solid #05b;
+            border: 1px solid #05b;
             border-radius: .4rem;
             text-align: left;
             vertical-align: middle;
@@ -125,8 +125,9 @@
         /* The in-focus grapheme/phoneme pair (the group being taught) keeps a purple border - the
            group-intro .gi_match colour - even once the box is completed; the ok/err background still
            shows correctness. This rule sits after ok/err so the purple border wins on a completed
-           in-focus box (equal specificity, later in source). */
-        .prompt .infield_segmented .typebox.typebox_focus { border-color: #a0c; }
+           in-focus box (equal specificity, later in source). It also keeps the full 2px width while
+           the other boxes are thinner (1px), so the in-focus box stands out and directs the eye. */
+        .prompt .infield_segmented .typebox.typebox_focus { border-width: 2px; border-color: #a0c; }
         /* On solve, a single inflate-deflate refocuses the in-focus box(es), fired apart from the
            score/confetti animation (see segmented_focus_refocus). */
         @keyframes seg_focus_bounce { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
@@ -138,12 +139,23 @@
         .prompt .infield_segmented .segbox_link {
             position: absolute;
             height: .6rem;               /* how far the link drops below the boxes */
-            border: 2px solid #3a3;       /* matches the correct (typebox_ok) segment border */
+            border: 2px solid #3a3;       /* the split-digraph connector, kept 2px */
             border-top: none;             /* bottom half of a box only */
             border-bottom-left-radius: .4rem;
             border-bottom-right-radius: .4rem;
             box-sizing: border-box;
             pointer-events: none;
+        }
+        /* Morpheme-boundary bar ('==' in the word text): a thin neutral vertical divider drawn between
+           two adjacent boxes to show a morpheme seam (e.g. micro|scope). Purely visual - inserted into
+           the box run by render_segmented_input, and ignored by draw_segment_connectors' .typebox scan. */
+        .prompt .infield_segmented .morph_bar {
+            display: inline-block;
+            width: .5rem;
+            height: 3rem;
+            background: #f3dcbd;
+            border-radius: 1px;
+            vertical-align: middle;
         }
 
         /* Group intro splash (show_group_intro): image + an example word with the group's grapheme
@@ -235,10 +247,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?474">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?475">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?474"></script>
+    <script src="assets/local/beelocal.js?475"></script>
 </head>
 <body>
     <div class="container">
@@ -338,6 +350,9 @@
             "ity/ItI": 1,
             "ot/Et": 1,
             "in/In": 1,
+            "re/rI": 1,
+            "ful/fUl": 1,
+            "ily/IlI": 1,
             
             // doubling
             "gg/g": 1,
@@ -523,6 +538,10 @@
             // Tense vowels
             // other
             "'t/t": 1,
+            // Rare one-offs (single-word patterns, not drilled)
+            "s/S": 1,    // s = /ʃ/ in "sugar"
+            "ar/Er": 1,  // "ar" as the schwa ending in "sugar"
+            "tu/tSE": 1, // "tu" = /tʃu/~/tʃə/ in "eventually"
         };
 
         // Predictable grapheme/phoneme pairs: the grapheme is the obvious/default spelling of the
@@ -619,17 +638,20 @@
             'ju:': 1,   // /ju:/
             'Ing': 1,   // "-ing" morpheme, /ɪŋ/
             'En': 1,    // /ən/
-            'Et': 1,    // "-et" ending, /ɪt/ or /ət/
-            'SEn': 1,   // "-tion" ending, /ʃən/
+            'Et': 1,    // -et /ɪt/ or /ət/
+            'SEn': 1,   // -tion /ʃən/
             'Id': 1,    // one value of the past tense morpheme, "-ed" ending, /ɪd/
-            'lI': 1,    // value of -ly morpheme, /lɪ/
-            'ItI': 1,   // value of -ity /ɪtɪ/
-            'Ent': 1,   // value of -ant /ənt/
-            'IdZ': 1,   // value of -age /ɪdʒ/
-            'tSE': 1,   // value of -ture /tʃə/
-            'In': 1,    // value of in- /ɪn/
-            'kEn': 1,   // value of con- /kən/
-            'dI': 1,    // value of de- /dɪ/
+            'lI': 1,    // -ly /lɪ/
+            'ItI': 1,   // -ity /ɪtɪ/
+            'Ent': 1,   // -ant /ənt/
+            'IdZ': 1,   // -age /ɪdʒ/
+            'tSE': 1,   // -ture /tʃə/
+            'In': 1,    // in- /ɪn/
+            'kEn': 1,   // con- /kən/
+            'dI': 1,    // de- /dɪ/
+            'rI': 1,    // re- /rɪ/
+            'fUl': 1,   // -ful /fʊl/
+            'IlI': 1,   // -ily /ɪlɪ/
         };
 
         // Default ascii phoneme (a key of phoneme_sounds) for a segment's grapheme when none is
@@ -702,6 +724,8 @@
             'is': 'Iz',
             'ly': 'lI',
             'ture': 'tSE',
+            'ful': 'fUl',
+            'ily': 'IlI'
         };
 
         // Default ascii phoneme for a grapheme, or '' if we have not mapped it yet.
@@ -710,10 +734,63 @@
             return (ph === undefined ? '' : ph);
         }
 
-        // For the format, see process_word_data()
+        // ── Word-entry syntax ───────────────────────────────────────────────────────────────────
+        // Each entry is a pipe-delimited string "image_ref|text|class" (parsed by process_word_data
+        // -> process_word_internals). Deeper detail: agent/spellbee-content.md, spellbee-classes.md,
+        // segmented-review.md.
+        //
+        //   image_ref  local image name; ~name = non-local; @emoji = use an emoji; may be empty.
+        //   class      optional trailing ",class,class" - normally omitted (classes are auto-derived).
+        //   text       the prompt; a <..> region marks what the child types.
+        //
+        // Inside <..> the target splits into '='-separated SEGMENTS, one typed box each:
+        //   grapheme          e.g. <c=a=t>        - phoneme defaults per segment_default_phoneme
+        //   grapheme/phoneme  e.g. <p=r=ai/eI=se/z> - explicit ascii phoneme id; unknown id -> console.error
+        //   /X                silent split-digraph e: folds to silent 'x' and draws a link back to the
+        //                     vowel two boxes to its left (e.g. cake, complete).
+        //   ==                MORPHEME BOUNDARY: behaves as '=' but also draws a vertical divider bar
+        //                     between the two boxes, e.g. <m=i=c=r=o==s=c=o=p=e> renders micro|scope
+        //                     (real entries also carry the per-segment phonemes). It does NOT merge a
+        //                     morpheme into one box - boxes stay per-grapheme; the bar only shows the
+        //                     seam, so segment count (hence level) is unchanged.
+        //
+        // Auto-derived (entries carry neither): level = number of segments; phonics classes = each
+        // segment's grapheme/phoneme pair.
         // [WORDS START]
         const word_repository = [
 
+"sugar|<s/S=u/U=g=ar/Er>", // [sugar] reviewed
+"|<Wh/w=y/aI> is this green?", // [Why] reviewed
+"|I get <p=r=ai/eI=se/z> for my work.", // [praise] reviewed
+"|I am <p=r=ai/eI=s/z=ed/d> for my work.", // [praised] reviewed
+"@🌍|planet <Ear/3:=th/T>", // [Earth] reviewed
+"@🏐|beach <b=all/O:>", // [ball] reviewed
+"@🐾|dog's <p=aw/O:>", // [paw] reviewed
+"|lying <l=a/eI=z=ily>", // [lazily] reviewed
+"|<p=o/o=ss/s=i=b=ly>", // [possibly] reviewed
+"|Is it <p=o/o=ss/s=i=b=le/sl>?", // [possible] reviewed
+"|<E/I=v=e/e=n=tu/tSE=al/sl=ly/lI> the robot was fixed.", // [eventually] reviewed
+"|the <n=o/EU=b=le/sl> prince", // [noble] reviewed
+"|This is <g=r=ea/eI=t>!", // [great] reviewed
+"@✈️|The <p=l=a/eI=n=e/X> took off.", // [plane] reviewed
+"@🌾|flat grassy <p=l=ai/eI=n>", // [plain] reviewed
+"|He <o/o=ff/f=er/Er=ed/d> to help", // [offered] reviewed
+"|Almost <c/k=o/E=m=p=l=e/i:=t=e/X>", // [complete] reviewed
+"|<s=t=r=a/eI=n=ge/dZ> creature", // [strange] reviewed
+"@👽|little green <c=r=ea/i:=ture/tSE>", // [creature] reviewed
+"|planting and <g=ar/a:=d=en/En=ing>", // [gardening] reviewed
+"|<g=ar/a:=d=en/En=er/Er>", // [gardener] reviewed
+"|<d=i/aI=n=ing> table", // [dining] reviewed
+"@🍲|Let's eat <d=i/I=nn/n=er/Er>!", // [dinner] reviewed
+"@🍽️|Let's eat <l=u/A=n=ch/tS>!", // [lunch] reviewed
+"|I <w=o/A=n=d=er/Er> what that is", // [wonder] reviewed
+"@🔬|<m=i/aI=c=r=o/E==s=c/k=o/EU=p=e/X>", // [microscope] reviewed
+"|<p=e/e=r=i/I==s=c/k=o/EU=p=e/X>", // [periscope] reviewed
+"@🔭|<t=e/e=l=e/I==s=c/k=o/EU=p=e/X>", // [telescope] reviewed
+"|<re/rI=s=p=e/e=c/k=t>", // [respect] reviewed
+"|<in/In=s=p=e=c/k=t>", // [inspect] reviewed
+"|<w=o/A=n=d=er/Er=ful/fUl>", // [wonderful] reviewed
+        
 "@🧑|a <y/j=ou/A=ng> man", // [young] reviewed
 "@🛒|go to the <m=ar=k=et>", // [market] reviewed
 "@🌲|the big <f=o/o=r=e/I=s=t>", // [forest] reviewed
@@ -800,7 +877,7 @@
 "@🏖|We are going on a <h=o/o=l=i=d=ay>!", // [holiday] reviewed
 "@🐵|<m=o/A=n/ng=k=ey/I>", // [monkey] reviewed
 "@🍫|<ch=o/o=c=o/x=l=a/E=t=e/x>", // [chocolate] reviewed
-"|<S=o/A=m=e/x=th/T=i=ng> went wrong", // [something] reviewed
+"|<S=o/A=m=e/x==th/T=i=ng> went wrong", // [something] reviewed
 
 
 // a=ae a/ae
@@ -865,7 +942,7 @@
 // oo=U   oo/U
 "@🦶|smelly <f=oo/U=t>", // [foot] reviewed
 "book|<b=oo/U=k>", // [book] reviewed
-"bookshelf|<b=oo/U=k=sh=e/e=l=f>", // [bookshelf] reviewed
+"bookshelf|<b=oo/U=k==sh=e/e=l=f>", // [bookshelf] reviewed
 "@🍪|<c=oo/U=k=ie/I>", // [cookie] reviewed
 "cporkc|<c=oo/U=k=ed/t> porkchop", // [cooked] reviewed
 "@👩🏾‍🍳|<c=oo/U=k>", // [cook] reviewed
@@ -899,7 +976,7 @@
 "@🪆|<t=oy/OI>", // [toy] reviewed
 "@🧑|<b=oy/OI>", // [boy] reviewed
 "@😡|This is so <a/E=nn=oy/OI=ing>!", // [annoying] reviewed
-"@🤠|<c=ow/aU=b=oy>", // [cowboy] reviewed
+"@🤠|<c=ow/aU==b=oy>", // [cowboy] reviewed
 
 // ea=i: ea/i:
 "|I would like a carrot, <p=l=ea=s/z=e/x>.", // [please] reviewed
@@ -908,7 +985,7 @@
 "@👨🏾‍⚕️|<h=ea/i:=l>", // [heal] reviewed
 "|Oh <r=ea=l=ly>?", // [really] reviewed
 "@🦄|Unicorns are <r=ea=l>?", // [real] reviewed
-"@🧑‍🏫|<t=ea=ch=er>", // [teacher] reviewed
+"@🧑‍🏫|<t=ea=ch==er>", // [teacher] reviewed
 "|A bit of time, <p=l=ea=s/z=e/x>", // [please] reviewed
 "cherry|<ch/tS=e=rr=y> leaves", // [cherry] reviewed
 "@🧜🏼‍♂️|I like the <s=ea/i:>", // [sea] reviewed
@@ -929,7 +1006,7 @@
 "@🦻|Dogs can help <d=ea/e=f> people", // [deaf] reviewed
 "@☔️|Bad <w=ea/e=th/D=er/Er> today", // [weather] reviewed
 "|The food is <r=ea/e=d=y/I>", // [ready] reviewed
-"@↔️|<i=n=s=t=ea/e=d>", // [instead] reviewed
+"@↔️|<in/In=s=t=ea/e=d>", // [instead] reviewed
 "feather|Peacock <f=ea/e=th/D=er/Er>", // [feather] reviewed
 "@🌬️|take a <b=r=ea/e=th/T>", // [breath] reviewed
 
@@ -967,7 +1044,7 @@
 
 // ow=o@ ow/EU
 "@❄️|<s=n=ow/EU>", // [snow] reviewed
-"bow|<b=ow/EU>", // [bow] reviewed
+"bow|<b=ow/EU>", // [bow] (weapon) reviewed
 "|Frogs will <f=o/o=ll=ow/EU> you if you hold a slime ball.", // [follow] reviewed
 
 
@@ -1010,8 +1087,8 @@
 "cake|<b=a/eI=k=e/X> a cake", // [bake] reviewed
 "cake|bake a <c=a/eI=k=e/X>", // [cake] reviewed
 "@🌊|<w=a/eI=v=e/X>", // [wave] reviewed
-"@🏷|<n=a/eI=m=e/X=t=a=g>", // [nametag] reviewed
-"chestplate|<ch=e=s=t=p=l=a/eI=t=e/X>", // [chestplate] reviewed
+"@🏷|<n=a/eI=m=e/X==t=a=g>", // [nametag] reviewed
+"chestplate|<ch=e=s=t==p=l=a/eI=t=e/X>", // [chestplate] reviewed
 "arcade|<a/a:=r=c=a/eI=d=e/X> machine", // [arcade] reviewed
 
 
@@ -1071,9 +1148,9 @@
 "cocoa|<c=o/EU=c=oa/EU>", // [cocoa] reviewed
 "@🏤|post <o/o=ff=i=ce/s>", // [office] reviewed
 "badomen|bad <o/EU=m=en/En>", // [omen] reviewed
-"@🛣|<m=o/EU=t=or/E=w=ay/eI>", // [motorway] reviewed
+"@🛣|<m=o/EU=t=or/E==w=ay/eI>", // [motorway] reviewed
 "@🤖|<r=o/EU=b=o/o=t>", // [robot] reviewed
-"@🤏|It was this <c=l=o/EU=s/s=e/X>!", // [close] reviewed
+"@🤏|It was this <c=l=o/EU=s/s=e/X>!", // [close] (not the verb) reviewed
 "|Today he <r=i/aI=d=e/X=s/z> a horse", // [rides] reviewed
 "|Today he rides a horse. Yesterday he <r=o/EU=d=e/X> a donkey.", // [rode] reviewed
 "@🫏|Yesterday he rode a <d=o/o=n/ng=k=ey/I>.", // [donkey] reviewed
@@ -1093,7 +1170,7 @@
 "@📱|<C=all/O:> the phone", // [call] reviewed
 "@🦒|The giraffe is <t=all/O:>.", // [tall] reviewed
 "@🧱|<w=all/O:>", // [wall] reviewed
-"@🚶‍♀️‍➡️|She is <w=al/O:=k=ing>.", // [walking] reviewed
+"@🚶‍♀️‍➡️|She is <w=al/O:=k==ing>.", // [walking] reviewed
 "@🔐|My date of birth is <p=er/3:=s=o/E=n=al/sl>", // [personal] reviewed
 "@🇫🇷|Paris is the <c=a=p=i=t=al/sl> of France.", // [capital] reviewed
 "@🇩🇪|Berlin is the <c=a=p=i=t=al/sl> of Germany.", // [capital] reviewed
@@ -1109,9 +1186,9 @@
 "@🌽|I like <c=or/O:=n>", // [corn] reviewed
 "@🌅|early <m=or=n=ing>", // [morning] reviewed
 "door@🚪|<d=oor/O:>", // [door] reviewed
-"@🍿|<p=o/o=p=c=or=n>", // [popcorn] reviewed
+"@🍿|<p=o/o=p==c=or=n>", // [popcorn] reviewed
 "|I don't want any <m=or=e/x>!", // [more] reviewed
-"cporkc|cooked <p=or=k=ch=o/o=p>", // [porkchop] reviewed
+"cporkc|cooked <p=or=k==ch=o/o=p>", // [porkchop] reviewed
 "@🐴|Carrots can heal <h=or=s=es/Iz>", // [horses] reviewed
 "netherportal|nether <p=or=t=al/sl>", // [portal] reviewed
 
@@ -1123,7 +1200,7 @@
 
 // ir=3:  ir/3:
 "@👕|<sh=ir=t>", // [shirt] reviewed
-"@🎂|It is my <b=ir=th/T=d=ay>!", // [birthday] reviewed
+"@🎂|It is my <b=ir=th/T==d=ay>!", // [birthday] reviewed
 
 // or=3:  or/3:
 "@🧑‍🍳|The chef <w=or/3:=k=s> in the kitchen", // [works] reviewed
@@ -1142,7 +1219,7 @@
 "@🗓️|A <y/j=ear> later", // [year] reviewed
 
 // air = e@   ai/eE
-"@💇🏾‍♂️|Adam needs a <h=air/eE=c=u/A=t>.", // [haircut] reviewed
+"@💇🏾‍♂️|Adam needs a <h=air/eE==c=u/A=t>.", // [haircut] reviewed
 "@☴|<air>|",
 "@👱‍♀️|long <h=air/eE>", // [hair] reviewed
 "@😡|It's not <f=air/eE>!", // [fair] reviewed
@@ -1156,7 +1233,7 @@
 "@🕷|<s=p=i/aI=d=er>", // [spider] reviewed
 "|The village is <u/A=n=d=er/Er> attack!", // [under] reviewed
 "|There's something <u/A=n=d=er/Er> me!", // [under] reviewed
-"|There's <s=o/A=m=e/x=th/T=i=ng> under me!", // [something] reviewed
+"|There's <s=o/A=m=e/x==th/T=i=ng> under me!", // [something] reviewed
 "@😯|<b=e/I=g=i=nn=er/Er>", // [beginner] reviewed
 "@🚁|<h=e=l=i=c=o/o=p=t=er/Er>", // [helicopter] reviewed
 "@📎|<p=a/eI=p=er> clip", // [paper] reviewed
@@ -1217,7 +1294,7 @@
 "|my <u/A=n/ng=c/k=le/sl>", // [uncle] reviewed
 "jungle|<j/dZ=u/A=ng=le/sl> biome", // [jungle] reviewed
 "turtle|<t=ur/3:=t=le/sl>", // [turtle] reviewed
-"@🫥|<in/In=v=i/I=s/z=i/I=b=le/sl>", // [invisible] reviewed
+"@🫥|<in/In==v=i/I=s/z=i/I=b=le/sl>", // [invisible] reviewed
 
 // g=dZ  g/dZ
 "pillager|The <v=i=ll=age/IdZ> is under attack!", // [village] reviewed
@@ -1242,10 +1319,10 @@
 "|It's a <th/T=i=ng>", // [thing] reviewed
 "@👍🏿|<th/T=u/A=mb/m>", // [thumb] reviewed
 "@👄|<m=ou/aU=th/T>", // [mouth] reviewed
-"@🪥|<t=oo/u:=th/T=b=r=u/A=sh>", // [toothbrush] reviewed
+"@🪥|<t=oo/u:=th/T==b=r=u/A=sh>", // [toothbrush] reviewed
 "|<Th/D=er/eE=e/x>'s something under me!", // [there] reviewed
 "@👦|my <b=r=o/A=th/D=er>", // [brother] reviewed
-"|There was <n=o/A=th/T=i=ng> in the tray.", // [nothing] reviewed
+"|There was <n=o/A==th/T=i=ng> in the tray.", // [nothing] reviewed
 
 // ph  ph/f
 "@📱|Call the <ph/f=o/EU=n=e/X>", // [phone] reviewed
@@ -1269,7 +1346,7 @@
 "@🪢|<kn/n=o/o=t>", // [knot] reviewed
 "@🤷🏼|I don't <kn/n=ow/EU>", // [know] reviewed
 "@♞|<kn/n=igh=t>", // [knight] reviewed
-"bookshelf|<kn/n=ow/o=l=e/I=dge/dZ> is power", // [knowledge] reviewed
+"bookshelf|<kn/n=ow/o==l=e/I=dge/dZ> is power", // [knowledge] reviewed
 
 // $wr  wr/r
 "@💥|Something went <wr/r=o/o=ng>", // [wrong] reviewed
@@ -1296,12 +1373,12 @@
 
 
 // ly$   end:ly
-"|He <b=r=a/eI=v=e/X=ly> slid down", // [bravely] reviewed
-"|<F=i/aI=n=a/E=l=ly> the cat had enough to eat", // [finally] reviewed
-"@🤫|We must meet <s=e/i:=c=r=e/E=t=ly>", // [secretly] reviewed
-"|Summers are <u/ju:=s/Z=ua/U=l=ly> sometimes hot", // [usually] reviewed
-"@🤸🏾‍♀️|She can do it <ea=s/z=i=ly>|", // reviewed
-"|Something went <h=o/o=rr=i=b=ly> wrong|end:ly", // reviewed
+"|He <b=r=a/eI=v=e/X==ly> slid down", // [bravely] reviewed
+"|<F=i/aI=n=a/E=l==ly> the cat had enough to eat", // [finally] reviewed
+"@🤫|We must meet <s=e/i:=c=r=e/E=t==ly>", // [secretly] reviewed
+"|Summers are <u/ju:=s/Z=ua/U=l==ly> sometimes hot", // [usually] reviewed
+"@🤸🏾‍♀️|She can do it <ea=s/z=i=ly>|", // [easily] reviewed
+"|Something went <h=o/o=rr=i=b=ly> wrong|end:ly", // [horribly] reviewed
 
 
 // double (closed)  lax:dbl
@@ -1371,8 +1448,8 @@
 "@💬|They <m=e=n=tion> my name", // [mention] reviewed
 
 // calendar
-"@🗓️|The weekend is <S=a=t=ur/E=d=ay> and Sunday|calendar", // [Saturday] reviewed
-"@🗓️|<S=u/A=n=d=ay>|calendar", // [Sunday] reviewed
+"@🗓️|The weekend is <S=a=t=ur/E==d=ay> and Sunday|calendar", // [Saturday] reviewed
+"@🗓️|<S=u/A=n==d=ay>|calendar", // [Sunday] reviewed
 
 ];
 // [WORDS END]
@@ -1414,7 +1491,7 @@
         };
 
     </script>
-    <script src="assets/common.js?474"></script>
+    <script src="assets/common.js?475"></script>
     <script>
     
         const bee_current_data_version = 4; // used for new players
@@ -1525,6 +1602,9 @@
             'They <m>=<e>=<n>=<tion>=<ed> my name'. The '=' is only a separator (never shown
             or typed). Sets is_segmented (instead of is_story); the ordered parts are add_words
             and the layout (surrounding text vs. the typed run) comes from to_display / mask.
+            A '==' separator is a normal separator that additionally marks a morpheme boundary:
+            render draws a vertical divider bar between those two boxes (boundaries[], parallel to
+            add_words). It never merges a morpheme into one box - the boxes stay per-grapheme.
         */
 
         // Extract the to_type string from a word entry
@@ -1535,14 +1615,17 @@
             const add_words = []; // words to type in a story / segments (parts) in a segmented word
             const phonemes = []; // parallel to add_words: ascii phoneme id to voice each segment (see phoneme_sounds)
             const connectors = []; // parallel to add_words: true if the segment draws a split-digraph link (see '/X' below)
+            const boundaries = []; // parallel to add_words: true if a morpheme-boundary bar is drawn before this box (see '==' below)
             const full = word_data.text;
             // Segmented <..>: '='-separated segments, each optionally "grapheme/phoneme" (else
-            // segment_default_phoneme). '/X' = silent + split-digraph link, folded to 'x'.
+            // segment_default_phoneme). '/X' = silent + split-digraph link, folded to 'x'. A '=='
+            // separator additionally marks a morpheme boundary - a divider bar before the next box.
             const is_segmented = (full.indexOf('=') !== -1);
             let in_type = false;    // inside a <..> region
             let in_phoneme = false; // reading the phoneme id after a '/'
             let seg_grapheme = '';  // characters of the current segment (typed + displayed)
             let seg_phoneme = '';   // explicit phoneme id of the current segment, if any
+            let pending_boundary = false; // a '==' was seen: the next flushed segment starts a new morpheme
 
             // Finish the current segment: record its grapheme and its (explicit or default) phoneme
             const flush_segment = function() {
@@ -1554,6 +1637,8 @@
                 add_words.push(seg_grapheme);
                 phonemes.push(ph);
                 connectors.push(has_link);
+                boundaries.push(pending_boundary); // morpheme boundary before this box, set by a preceding '=='
+                pending_boundary = false;
                 // Flag segments whose phoneme is missing from the master list (a typo, or a
                 // grapheme with no default and no explicit /phoneme yet)
                 if(is_segmented && phoneme_sounds[ph] === undefined) {
@@ -1574,7 +1659,11 @@
                 }
                 // Inside a <..> region
                 if(ch == '>') { flush_segment(); in_type = false; continue; }
-                if(ch == '=') { flush_segment(); continue; } // segment separator
+                if(ch == '=') { // segment separator; '==' also opens a new morpheme (a divider bar before the next box)
+                    flush_segment();
+                    if(full[i+1] === '=') { pending_boundary = true; i++; } // consume the second '=' of '=='
+                    continue;
+                }
                 if(ch == '/') { in_phoneme = true; continue; } // explicit phoneme id follows
                 if(in_phoneme) { seg_phoneme += ch; continue; } // phoneme id char (metadata only)
                 // Grapheme character: typed and displayed
@@ -1598,6 +1687,7 @@
                 'add_words': add_words,
                 'phonemes': phonemes,
                 'connectors': connectors,
+                'boundaries': boundaries,
                 'level': word_data.level
             };
             word_data.proc_cache = proc;
@@ -1732,6 +1822,7 @@
             const to_type = bee.processed_word.to_type;
             const parts = bee.processed_word.add_words;
             const phonemes = bee.processed_word.phonemes;
+            const boundaries = bee.processed_word.boundaries; // true => draw a morpheme divider before this box
 
             // A part is "in focus" if its grapheme/phoneme is the group's taught pair. word_class is
             // built as grapheme+'/'+phoneme in the class derivation; 'noclass' has no '/'.
@@ -1779,6 +1870,7 @@
                     o += '<span class="typebox_wrap">';
                 }
                 if(type_ix == part_start) { // open a box at each part start; colour it once the part is completed
+                    if(boundaries[part_ix]) { o += '<span class="morph_bar" aria-hidden="true"></span>'; } // morpheme divider before this box
                     const st = segment_status(part_start, parts[part_ix].length);
                     const boxstyle = ' style="min-width:'+(box_char_len(parts[part_ix].length)*1.2)+'ch"';
                     o += '<span class="typebox'+(st == 'ok' ? ' typebox_ok' : (st == 'error' ? ' typebox_err' : ''))+(is_focus_part(part_ix) ? ' typebox_focus' : '')+'" data-seg="'+part_ix+'"'+boxstyle+'>';
@@ -2007,7 +2099,7 @@
             utterances[6] = function() { play_word(choose_from(['Listen:', 'So:', 'So this says:', 'So this is:']), utterances[7]); };
             utterances[7] = make_pause(0.3, 8);
             utterances[8] = function() { play_word(word_data.to_type, utterances[9]); };
-            utterances[9] = make_pause(.8, 10);
+            utterances[9] = make_pause(1.2, 10);
             utterances[10] = function() { play_phoneme(phoneme, utterances[11]); };
             utterances[11] = make_pause(1.5, 12);
             utterances[12] = function() { play_word('Tap on the boxes to hear their sound.', utterances[13]); };
@@ -2825,8 +2917,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?474"></script>
-    <script src="assets/aquarium/js/aquarium.js?474"></script>
+    <script src="assets/aquarium/js/config.js?475"></script>
+    <script src="assets/aquarium/js/aquarium.js?475"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

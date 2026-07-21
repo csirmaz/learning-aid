@@ -72,7 +72,7 @@ const audit = `
         const p = w.proc_cache;
         if(!p.is_segmented) continue; // review every segmented entry (a '=' in the text)
         const inner = (w.text.match(/<([^>]*)>/) || [])[1] || '';
-        const rawsegs = inner.split('=');
+        const rawsegs = inner.split(/=+/); // '=+' so a '==' morpheme boundary collapses to one split, staying aligned with add_words
         const segs = [];
         let missing = 0, invalid = 0, badLinks = 0;
         const badPairs = [];

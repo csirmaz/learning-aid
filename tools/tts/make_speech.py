@@ -88,7 +88,7 @@ def avoid_tts(text):
     ]
 
 seen = set()
-def check_text(phrase, avoid_alice=False, force=False):
+def check_text(phrase, force=False):
     # print(f"{phrase} checking...")
     filename = phrase.lower().replace(' ', '_')
     filename = re.sub(r'[^a-z_]', '', filename)
@@ -108,11 +108,7 @@ def check_text(phrase, avoid_alice=False, force=False):
         return
     
     print(f"Need to generate: {phrase} -> {filename}")
-    if avoid_alice:
-        voice_ix = np.random.randint(2) + 1
-    else:
-        voice_ix = np.random.randint(3)
-    generate_tts(phrase, filename, voice_ix)
+    generate_tts(phrase, filename, voice_ix=1)
 
 
 def normalize_markup(text):
@@ -148,17 +144,14 @@ def scan_words():
                 phrase = phrase.replace(r'\"', '"')
                 # Collapse a segmented <a=b> into a single <ab> part (see normalize_markup)
                 phrase = normalize_markup(phrase)
-                # Alice is not great with multiple sentences
-                check_text(phrase.replace('<','').replace('>',''), avoid_alice=True)
+                check_text(phrase.replace('<','').replace('>',''))
                 
                 parts = list(re.findall(r'<([^>]+)>', phrase))
-                if len(parts) > 1:
-                    for p in parts:
-                        # Alice is usually not great with individual words
-                        check_text(p, avoid_alice=True)
+                for p in parts:
+                    check_text(p)
             else:
                 raise ValueError(f"Cannot parse line: [{line}]")
 
 scan_words()
-# generate_tts("Eight is a feather", "test0.mp3", 0)
-# generate_tts("Eight is a feather", "test1.mp3", 1)
+# generate_tts("Eight is a feather. Porkchop", "test0.mp3", 0)
+# generate_tts("Eight is a feather. Porkchop", "test1.mp3", 1)

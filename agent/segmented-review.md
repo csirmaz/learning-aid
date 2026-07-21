@@ -40,6 +40,13 @@ For each entry `"image|text|class"` (the `class` field is optional and usually a
      `i:`, `aI`, `EU`, `ju:`, `u:`); leave r-controlled or reduced vowels (horse, come, chocolate)
      as plain `/x`. It folds to `x`, so the audit still sees a valid phoneme — **do not "correct"
      `/X` back to `/x`.**
+   - **Morpheme boundary `==`.** A `==` used in place of a `=` separator marks a morpheme boundary:
+     it splits segments exactly like `=` but also draws a thin vertical divider bar between the two
+     boxes (e.g. `<m=i=c=r=o==s=c=o=p=e>` → `micro|scope`). It is purely presentational — it changes
+     no phoneme, class, segment count or level — so **do not "correct" `==` back to `=`.** Use it only
+     where a morpheme seam falls **between** boxes; a seam that falls *inside* a box (the doubled `nn`
+     of *running* `r=u=nn=ing`, kept whole to preserve `ing`) gets no bar. Boxes stay per-grapheme — a
+     morpheme is never collapsed into one box. The audit treats `==` as one separator (no special work).
 4. **Mark it.** Append an end-of-line comment `// reviewed` so the line is not re-reviewed.
 
 ## Tooling that surfaces gaps
