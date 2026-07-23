@@ -69,3 +69,22 @@ sounds overlap:
 A syllabic `-al`/`-el`/`-le`/`-ol` /əl/ ending uses the dedicated `sl` phoneme, giving the pairs
 `al/sl`, `el/sl`, `le/sl`, `ol/sl` (capital, tunnel, table, symbol) — see the syllabic-l note in
 [`segmented-review.md`](segmented-review.md).
+
+## Class selection & `class_level`
+
+*Which* class is drilled next is **mastery-driven**; the mechanism (per-pair coverage stats, the
+smoothed success rate, the acceptance probabilities) lives in
+[`question-cycle.md`](question-cycle.md). Two load-time products feed it, both built in
+`init_wordlist_impl`:
+
+- **`bee.class_to_ix`** (above) — class → member word indices.
+- **`bee.class_level[class]`** — the mean `level` of the class's **4 lowest-level members**, used to
+  weight the class pick towards easier groups (`choose_class_by_level`, the same `1.5^(-level)` shape
+  as the per-word `choose_using_levels20`).
+
+Every non-empty class is a candidate, including `noclass` and the explicit thematic classes: those
+have no `grapheme/phoneme` in-focus pair, so they accrue no per-pair stats and are **always taught
+when picked** (collecting common irregular / themed words), and their group intro no-ops
+(`show_group_intro` needs a real phoneme). `init_wordlist_impl` also `console.warn`s a **singleton
+pair-class** (a class whose name contains `/` with a single member): one word can't contrast the
+pattern, and its intro would reveal the answer.

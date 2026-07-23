@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?475">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?476">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -247,10 +247,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?475">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?476">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?475"></script>
+    <script src="assets/local/beelocal.js?476"></script>
 </head>
 <body>
     <div class="container">
@@ -455,7 +455,6 @@
             "ture/tSE": 1,
             "air/eE": 1,
             "ia/aI": 1,
-            "io/IE": 1,
             "ol/sl": 1,
             "zz/ts": 1,
             "le/sl": 1,
@@ -542,6 +541,7 @@
             "s/S": 1,    // s = /ʃ/ in "sugar"
             "ar/Er": 1,  // "ar" as the schwa ending in "sugar"
             "tu/tSE": 1, // "tu" = /tʃu/~/tʃə/ in "eventually"
+            "io/IE": 1,  // "io" = /ɪə/ in "opinion"
         };
 
         // Predictable grapheme/phoneme pairs: the grapheme is the obvious/default spelling of the
@@ -769,7 +769,7 @@
 "|lying <l=a/eI=z=ily>", // [lazily] reviewed
 "|<p=o/o=ss/s=i=b=ly>", // [possibly] reviewed
 "|Is it <p=o/o=ss/s=i=b=le/sl>?", // [possible] reviewed
-"|<E/I=v=e/e=n=tu/tSE=al/sl=ly/lI> the robot was fixed.", // [eventually] reviewed
+"|<E/I=v=e/e=n=tu/tSE=al/sl==ly/lI> the robot was fixed.", // [eventually] reviewed
 "|the <n=o/EU=b=le/sl> prince", // [noble] reviewed
 "|This is <g=r=ea/eI=t>!", // [great] reviewed
 "@✈️|The <p=l=a/eI=n=e/X> took off.", // [plane] reviewed
@@ -778,7 +778,7 @@
 "|Almost <c/k=o/E=m=p=l=e/i:=t=e/X>", // [complete] reviewed
 "|<s=t=r=a/eI=n=ge/dZ> creature", // [strange] reviewed
 "@👽|little green <c=r=ea/i:=ture/tSE>", // [creature] reviewed
-"|planting and <g=ar/a:=d=en/En=ing>", // [gardening] reviewed
+"|planting and <g=ar/a:=d=en/En==ing>", // [gardening] reviewed
 "|<g=ar/a:=d=en/En=er/Er>", // [gardener] reviewed
 "|<d=i/aI=n=ing> table", // [dining] reviewed
 "@🍲|Let's eat <d=i/I=nn/n=er/Er>!", // [dinner] reviewed
@@ -789,17 +789,17 @@
 "@🔭|<t=e/e=l=e/I==s=c/k=o/EU=p=e/X>", // [telescope] reviewed
 "|<re/rI=s=p=e/e=c/k=t>", // [respect] reviewed
 "|<in/In=s=p=e=c/k=t>", // [inspect] reviewed
-"|<w=o/A=n=d=er/Er=ful/fUl>", // [wonderful] reviewed
+"|<w=o/A=n=d=er/Er==ful/fUl>", // [wonderful] reviewed
         
 "@🧑|a <y/j=ou/A=ng> man", // [young] reviewed
 "@🛒|go to the <m=ar=k=et>", // [market] reviewed
 "@🌲|the big <f=o/o=r=e/I=s=t>", // [forest] reviewed
 "@🧵|a piece of <c=l=o/o=th/T>", // [cloth] reviewed
 "@🦶|He set out on <f=oo/U=t>", // [foot] reviewed
-"|He got <r=ea/i:=l=ly> hungry", // [really] reviewed
-"@🚶|He <w=al/O:=k=ed/t> until midday", // [walked] reviewed
+"|He got <r=ea/i:=l==ly> hungry", // [really] reviewed
+"@🚶|He <w=al/O:=k==ed/t> until midday", // [walked] reviewed
 "@🍽️|eating <l=u/A=n=ch>", // [lunch] reviewed
-"@🌑|The sky got <d=ar=k=er/Er>", // [darker] reviewed
+"@🌑|The sky got <d=ar=k==er/Er>", // [darker] reviewed
 "@📏|It was far in the <d=i=s=t=a/E=n=ce/s>", // [distance] reviewed
 "@💡|A flickering <l=igh=t>", // [light] reviewed
 "@💧|<w=a/O:=t=er/Er>", // [water] reviewed
@@ -811,7 +811,7 @@
 "@❓|<Wh/w=a/o=t> do you need?", // [what] reviewed
 "@😄|The judges <s=m=i/aI=l=ed/d>.", // [smiled] reviewed
 "@🏆|He won the <t=r=o/EU=ph=y>!", // [trophy] reviewed
-"|Sam felt like a <d=i=ff=er/r=ent/Ent> boy", // [different] reviewed
+"|Sam felt like a <d=i=ff=er/r==ent/Ent> boy", // [different] reviewed
 
 "@🐘|<e=l=e/I=ph/f=ant/Ent>", // [elephant] reviewed
 "@🌍|<n=a/eI=tion>", // [nation] reviewed
@@ -874,7 +874,7 @@
 "fox|<f=o/o=x>", // [fox] reviewed
 "@🐶|<d=o/o=g>", // [dog] reviewed
 "@🛑|<s=t=o/o=p>", // [stop] reviewed
-"@🏖|We are going on a <h=o/o=l=i=d=ay>!", // [holiday] reviewed
+"@🏖|We are going on a <h=o/o=l=i==d=ay>!", // [holiday] reviewed
 "@🐵|<m=o/A=n/ng=k=ey/I>", // [monkey] reviewed
 "@🍫|<ch=o/o=c=o/x=l=a/E=t=e/x>", // [chocolate] reviewed
 "|<S=o/A=m=e/x==th/T=i=ng> went wrong", // [something] reviewed
@@ -887,7 +887,7 @@
 "@🖐️|<h=a/ae=n=d>", // [hand] reviewed
 "@🏦|<b=a/ae=n/ng=k>", // [bank] reviewed
 "@🪤|Careful! It is a <t=r=a/ae=p>!", // [trap] reviewed
-"hangingsign|<h=a/ae=ng=ing> sign", // [hanging] reviewed
+"hangingsign|<h=a/ae=ng==ing> sign", // [hanging] reviewed
 "@👨🏻‍🎤|He is a <r=a/ae=pp=er/Er>", // [rapper] reviewed
 
 "@🎃|<s=c=a/ae=r=y> pumpkin", // [scary] reviewed
@@ -962,7 +962,7 @@
 // ay=eI  ay/eI
 "@▶️|<p=l=ay/eI>", // [play] reviewed
 "@📥|<t=r=ay/eI>", // [tray] reviewed
-"|Bad weather <t=o/E=d=ay/eI>", // [today] reviewed
+"|Bad weather <t=o/E==d=ay/eI>", // [today] reviewed
 "@↔️|Which <w=ay/eI>?", // [way] reviewed
 "@💳|<p=ay/eI> by card", // [pay] reviewed
 
@@ -972,10 +972,10 @@
 "@🚻|Where is the <t=oi/OI=l=et/Et>?", // [toilet] reviewed
 "@🥁|<n=oi/OI=se/z>", // [noise] reviewed
 // oy=oI oy/OI
-"@🤣|<en/En=j/dZ=oy/OI>", // [enjoy] reviewed
+"@🤣|<en/En==j/dZ=oy/OI>", // [enjoy] reviewed
 "@🪆|<t=oy/OI>", // [toy] reviewed
 "@🧑|<b=oy/OI>", // [boy] reviewed
-"@😡|This is so <a/E=nn=oy/OI=ing>!", // [annoying] reviewed
+"@😡|This is so <a/E=nn=oy/OI==ing>!", // [annoying] reviewed
 "@🤠|<c=ow/aU==b=oy>", // [cowboy] reviewed
 
 // ea=i: ea/i:
@@ -983,7 +983,7 @@
 "@🥩|Eat <m=ea=t>", // [meat] reviewed
 "|<Ea=t> meat", // [eat] reviewed
 "@👨🏾‍⚕️|<h=ea/i:=l>", // [heal] reviewed
-"|Oh <r=ea=l=ly>?", // [really] reviewed
+"|Oh <r=ea=l==ly>?", // [really] reviewed
 "@🦄|Unicorns are <r=ea=l>?", // [real] reviewed
 "@🧑‍🏫|<t=ea=ch==er>", // [teacher] reviewed
 "|A bit of time, <p=l=ea=s/z=e/x>", // [please] reviewed
@@ -1001,7 +1001,7 @@
 // ea=e  ea/e
 "bread|slice of <b=r=ea/e=d>", // [bread] reviewed
 "zombiehead|zombie <h=ea/e=d>", // [head] reviewed
-"|zombies are <a/O:=l=r=ea/e=d=y/I> dead", // [already] reviewed
+"|zombies are <a/O:=l==r=ea/e=d=y/I> dead", // [already] reviewed
 "zombiehead|zombies are already <d=ea/e=d>", // [dead] reviewed
 "@🦻|Dogs can help <d=ea/e=f> people", // [deaf] reviewed
 "@☔️|Bad <w=ea/e=th/D=er/Er> today", // [weather] reviewed
@@ -1098,8 +1098,8 @@
 "@🍝|<p=a/a:=s=t=a/E>", // [pasta] reviewed
 "@🍌|<b=a/E=n=a/a:=n=a/E>", // [banana] reviewed
 "@🌋|<l=a/a:=v=a/E> is hot", // [lava] reviewed
-"crafting|<c=r=a/a:=f=t=ing> table", // [crafting] reviewed
-"enchant|<e=n=ch=a/a:=n=t=ing> table", // [enchanting] reviewed
+"crafting|<c=r=a/a:=f=t==ing> table", // [crafting] reviewed
+"enchant|<en/En==ch=a/a:=n=t==ing> table", // [enchanting]
 "command|<c=o/E=mm=a/a:=n=d> block", // [command] reviewed
 "@🧺|<b=a/a:=s=k=et>", // [basket] reviewed
 
@@ -1160,9 +1160,9 @@
 "@📏|<r=u/u:=l=er>", // [ruler] reviewed
 "|Black cats are only born <d=u/ju:=r=ing> full moon.", // [during] reviewed
 "@📏|one <u/ju:=n=i/I=t>", // [unit] reviewed
-"@🇬🇧|<U/ju:=n=i/aI=t=ed/Id> Kingdom", // [united] reviewed
+"@🇬🇧|<U/ju:=n=i/aI=t=ed/Id> Kingdom", // [united] reviewed TODO u=n=i=t=e==d
 "chick|So <c=u/ju:=t=e/X>!", // [cute] reviewed
-"@🔇|The television is <m=u/ju:=t=ed/Id>", // [muted] reviewed
+"@🔇|The television is <m=u/ju:=t=ed/Id>", // [muted] reviewed TODO m=u=t=e==d
 
 // ---- breaking, darkening ------
 
@@ -1189,7 +1189,7 @@
 "@🍿|<p=o/o=p==c=or=n>", // [popcorn] reviewed
 "|I don't want any <m=or=e/x>!", // [more] reviewed
 "cporkc|cooked <p=or=k==ch=o/o=p>", // [porkchop] reviewed
-"@🐴|Carrots can heal <h=or=s=es/Iz>", // [horses] reviewed
+"@🐴|Carrots can heal <h=or=s=es/Iz>", // [horses] reviewed TODO horse==s
 "netherportal|nether <p=or=t=al/sl>", // [portal] reviewed
 
 // ar=(]:  ar/a:
@@ -1239,13 +1239,11 @@
 "@📎|<p=a/eI=p=er> clip", // [paper] reviewed
 "@🪶|light as a <f=ea/e=th/D=er>", // [feather] reviewed
 
-// breaking er=3:  er/3:
 "@🏜️|<d=e/e=s/z=er/Er=t>", // [desert] reviewed
 "@😎|He is an <e/e=x/ks=p=er/3:=t>.", // [expert] reviewed
 "@🌠|<u/ju:=n=i=v=er/3:=s=e/x>", // [universe] reviewed
 "@🎓|He goes to <u/ju:=n=i=v=er/3:=s=ity/ItI>", // [university] reviewed
 
-// y  end:y@
 "@👶|<b=a/eI=b=y/I>", // [baby] reviewed
 "@👨🏻‍🍼|feeding the <b=a/eI=b=y/I>", // [baby] reviewed
 "@🕵️|It's a <m=y/I=s=t=er/Er=y/I>", // [mystery] reviewed
@@ -1254,22 +1252,16 @@
 "@🪫|The machine ran out of <b=a/ae=tt=er/Er=y/I>", // [battery] reviewed
 
 "@🛡|<sh=ie/i:=l=d>", // [shield] reviewed
-
-// end:et
 "@🎺|<t=r=u/A=m=p=et>", // [trumpet] reviewed
 "@🤫|Keep it a <s=e/i:=c=r=et>!", // [secret] reviewed
 "waterbucket|water <b=u/A=ck=et>", // [bucket] reviewed
 
-
-// end:ot
 "@🦜|<p=a/ae=rr=ot/Et>", // [parrot] reviewed
 "@👩‍✈️|<p=i/aI=l=ot/Et>", // [pilot] reviewed
 
 "|The car broke down again. <T=y/I=p=i/I=c=al/sl>.", // [typical] reviewed
 "@🏥|<h=o/o=s=p=i/I=t=al/sl>", // [hospital] reviewed
 "@🐾|<a/ae=n=i/I=m=al/sl>", // [animal] reviewed
-
-// o  o/E
 "@🖍|<c=r=ay/eI=o/E=n>", // [crayon] reviewed
 "@🍋|<l=e=m=o/E=n>", // [lemon] reviewed
 "skeletonskull|<s=k=e/e=l=e/I=t=o/E=n> skull", // [skeleton] reviewed
@@ -1277,7 +1269,7 @@
 "@🎹|play the <p=i/i:=a/ae=n=o/EU>", // [piano] reviewed
 "diamond@💎|<d=ia/aI=m=o/E=n=d>", // [diamond] reviewed
 "@🐇|Rabbits like <c=a/ae=rr/r=o/E=t=s/s>.", // [carrots] reviewed
-"@🇪🇺|European <U/ju:=n=io/IE=n>", // [union] reviewed
+"@🇪🇺|European <U/ju:=n=i/I=o/E=n>", // [union]
 
 "@🪞|<m=i=rr=or/Er>", // [mirror] reviewed
 "@🚜|<t=r=a/ae=c=t=or/Er>", // [tractor] reviewed
@@ -1286,10 +1278,8 @@
 
 "@🔣|<s=y/I=m=b=ol/sl>", // [symbol] reviewed
 
-// a  a/E
 "@🍕|I love <p=i/I=zz/ts=a/E>", // [pizza] reviewed
 
-//  end:le
 "crafting|crafting <t=a/eI=b=le/sl>", // [table] reviewed
 "|my <u/A=n/ng=c/k=le/sl>", // [uncle] reviewed
 "jungle|<j/dZ=u/A=ng=le/sl> biome", // [jungle] reviewed
@@ -1371,17 +1361,13 @@
 "|I <r=e/I=c/s=ei/i:=v=ed/d> an invitation", // [received] reviewed
 "@💌|I received an <i=n=v=i=t=a/eI=tion>", // [invitation] reviewed
 
-
-// ly$   end:ly
 "|He <b=r=a/eI=v=e/X==ly> slid down", // [bravely] reviewed
 "|<F=i/aI=n=a/E=l==ly> the cat had enough to eat", // [finally] reviewed
 "@🤫|We must meet <s=e/i:=c=r=e/E=t==ly>", // [secretly] reviewed
 "|Summers are <u/ju:=s/Z=ua/U=l==ly> sometimes hot", // [usually] reviewed
-"@🤸🏾‍♀️|She can do it <ea=s/z=i=ly>|", // [easily] reviewed
-"|Something went <h=o/o=rr=i=b=ly> wrong|end:ly", // [horribly] reviewed
+"@🤸🏾‍♀️|She can do it <ea=s/z=i=ly>", // [easily] reviewed
+"|Something went <h=o/o=rr=i=b=ly> wrong", // [horribly] reviewed
 
-
-// double (closed)  lax:dbl
 "|<S=i=ll=y> machine!", // [silly] reviewed
 "@🧸|<t=e=dd=y/I>", // [teddy] reviewed
 "@😀|I am <h=a=pp=y>", // [happy] reviewed
@@ -1393,8 +1379,6 @@
 "copperore|<c=o/o=pp=er> ore", // [copper] reviewed
 "@⛔️|Smoking is <f=or/O:=b=i/I=dd=en/En>", // [forbidden] reviewed
 
-
-// Common words  common
 "|I hear <you>|",
 "|I don't want <a/e=n=y/I> more!", // [any] reviewed
 "@🙅🏼‍♂️|I <d=o/EU=n='t/t> want any more!", // [don't] reviewed
@@ -1451,6 +1435,11 @@
 "@🗓️|The weekend is <S=a=t=ur/E==d=ay> and Sunday|calendar", // [Saturday] reviewed
 "@🗓️|<S=u/A=n==d=ay>|calendar", // [Sunday] reviewed
 
+"|In my <o/E=p=i/I=n=io/IE=n>.", // [opinion]
+"|This road is very <r=ou/A=gh/f>.", // [rough]
+"@📝|<p=o/EU=e/E=m>", // [poem]
+"@ℹ️|<in/In=f=or/E=m=a/eI=tion>", // [information]
+
 ];
 // [WORDS END]
 
@@ -1491,10 +1480,10 @@
         };
 
     </script>
-    <script src="assets/common.js?475"></script>
+    <script src="assets/common.js?476"></script>
     <script>
     
-        const bee_current_data_version = 4; // used for new players
+        const bee_current_data_version = 5; // used for new players
 
         function data_migration() {
             if(bee.player === false) { console.warn('no player to migrate'); return; }
@@ -1503,6 +1492,14 @@
             if(version === undefined) { version = 0; }
             
             // [2] Add further migrations here
+
+            if(version < 5) {
+                // Pair-keyed coverage selection: drop the full-text success record (now replaced by
+                // known_words[to_type], see is_known_word) and add the per-pair coverage stats.
+                delete pstore.known_questions;
+                if(!pstore.pair_stats) { pstore.pair_stats = {}; }
+                version = 5;
+            }
             
             if(pstore.data_version != version) {
                 pstore.data_version = version;
@@ -1721,6 +1718,20 @@
             }
             shuffle(chips); // WARNING changes array
             return chips.join('');
+        }
+
+
+        // Classify a segment for the per-pair coverage stats (see pair_stat). Mirrors the word-bank
+        // logic in render_addwords: the in-focus pair is produced unaided ('focus'); a predictable
+        // non-focus pair is given no chip ('obvious'); any other non-focus pair is shown as a tile
+        // ('revealed'). Returns {pair, kind}.
+        function classify_segment(i) {
+            const pw = bee.processed_word;
+            const pair = pw.add_words[i].toLowerCase()+'/'+pw.phonemes[i];
+            const focus = (bee.problem && bee.problem.word_class) || '';
+            if(focus.indexOf('/') >= 0 && pair === focus) { return {'pair':pair, 'kind':'focus'}; }
+            if(predictable_pairs[pair]) { return {'pair':pair, 'kind':'obvious'}; }
+            return {'pair':pair, 'kind':'revealed'};
         }
 
 
@@ -2182,14 +2193,9 @@
             data_migration();
             const pstore = bee.storage.players[bee.player];
             
-            // TODO remove known_words
             const word = bee.processed_word.to_type;
             if(!pstore.known_words) { pstore.known_words = {}; }
             if(pstore.known_words[word] === undefined) { pstore.known_words[word] = 1; } else { pstore.known_words[word]++; }
-            
-            const q = bee.words[bee.problem.word_ix].text;
-            if(!pstore.known_questions) { pstore.known_questions = {}; }
-            if(pstore.known_questions[q] === undefined) { pstore.known_questions[q] = 1; } else { pstore.known_questions[q]++; }
             save_storage('add_known_word');
         }
         
@@ -2197,23 +2203,33 @@
         function reset_known_words() {
             const pstore = bee.storage.players[bee.player];
             if(pstore.known_words) { pstore.known_words = {}; }
-            if(pstore.known_questions) { pstore.known_questions = {}; }
+            if(pstore.pair_stats) { pstore.pair_stats = {}; }
             save_storage('reset_known_words');
             bee_alert('List of known words reset');
         }
         
         
-        // Return the count of successful entries of a word
+        // Return the count of successful entries of a word, keyed on its to_type string
+        // (the same key add_known_word writes).
         function is_known_word(word_ix) {
-            data_migration();
-            const q = bee.words[word_ix].text;
-            
-            if(bee.storage.players[bee.player].known_questions) {
-                const c = bee.storage.players[bee.player].known_questions[q];
-                if(c === undefined) { return 0; }
-                return c;
-            }
-            return 0;
+            const kw = bee.storage.players[bee.player].known_words;
+            if(!kw) { return 0; }
+            const key = bee.words[word_ix].proc_cache.to_type;
+            const c = kw[key];
+            return c === undefined ? 0 : c;
+        }
+
+
+        // ---- Per-pair coverage stats (pstore.pair_stats) ----
+        // Keyed by "grapheme/phoneme". Six counters per pair:
+        //   [0]/[1] successes/asks while IN FOCUS (purple '?', produced unaided)
+        //   [2]/[3] successes/asks while not in focus and NOT shown in the bank (obvious/predictable)
+        //   [4]/[5] successes/asks while not in focus and initially shown in the bank (revealed)
+        // Only [0]/[1] drive class selection; the rest are collected for future use / validation.
+        function pair_stat(cls) {
+            const ps = bee.storage.players[bee.player].pair_stats;
+            if(!ps[cls]) { ps[cls] = [0, 0, 0, 0, 0, 0]; }
+            return ps[cls];
         }
 
 
@@ -2277,6 +2293,13 @@
                         bee.typed = bee.typed.substring(0, bee.typed.length-1);
                         update_input_field();
                         bee.backspace_used++;
+                        // Coverage stats: a backspace into a segment means it was not a clean first
+                        // attempt - lock the segment now holding the cursor so it cannot score.
+                        if(bee.processed_word.is_segmented) {
+                            const parts = bee.processed_word.add_words;
+                            let acc = 0;
+                            for(let k=0; k<parts.length; k++) { acc += parts[k].length; if(bee.typed.length < acc) { bee.seg_locked[k] = true; break; } }
+                        }
                         highlight_key('.kbdiv .kbkey[data-key="'+typed_key+'"]');
                     }
                     return;
@@ -2348,6 +2371,15 @@
                             const done_ix = seg_completed - 1;
                             if(seg_completed > seg_completed_before && segment_status(seg_prog.starts[done_ix], bee.processed_word.add_words[done_ix].length) == 'ok') {
                                 speak_completed_part(bee.processed_word.add_words[done_ix], bee.processed_word.phonemes[done_ix]);
+                                // Coverage stats: a clean first-attempt segment (no help, no in-segment
+                                // backspace, not a repeat, not already counted) is a success for its pair.
+                                if(!bee.problem.is_repeat && bee.help_asked === 0
+                                   && !bee.seg_locked[done_ix] && bee.seg_class[done_ix]) {
+                                    const num_ix = {'focus':0, 'obvious':2, 'revealed':4};
+                                    const pair = bee.processed_word.add_words[done_ix].toLowerCase()+'/'+bee.processed_word.phonemes[done_ix];
+                                    pair_stat(pair)[num_ix[bee.seg_class[done_ix]]]++;
+                                    bee.seg_locked[done_ix] = true;
+                                }
                             }
                         }
                     }
@@ -2467,6 +2499,19 @@
             bee.help_asked = 0;
             bee.backspace_used = 0;
             bee.help_full_bar = false;
+            bee.seg_class = [];    // per-segment classification (focus/obvious/revealed), set below
+            bee.seg_locked = [];   // per-segment: can no longer score (already scored, or a backspace disqualified it)
+
+            // Per-pair coverage stats: classify each segment once, when first shown, and count the
+            // "ask" (the odd counters). Repeats must not move the stats.
+            if(bee.processed_word.is_segmented && !bee.problem.is_repeat) {
+                const denom_ix = {'focus':1, 'obvious':3, 'revealed':5};
+                for(let i=0; i<bee.processed_word.add_words.length; i++) {
+                    const c = classify_segment(i);
+                    bee.seg_class[i] = c.kind;
+                    pair_stat(c.pair)[denom_ix[c.kind]]++;
+                }
+            }
 
             if(!bee.processed_word.is_story && !bee.processed_word.is_segmented) {
                 bee.$help.html(render_to_html(true));
@@ -2513,6 +2558,7 @@
             let trials = 50;
 
             let word_ix = undefined;
+            let last_ok_ix = undefined; // last candidate that cleared the duplicate check
             let log = 'needclass:'+word_class;
             const queue = get_question_queue();            
             
@@ -2528,13 +2574,12 @@
                     word_ix = choose_using_levels20(ixs);
                     log += ' wix:'+word_ix+" lev:"+bee.words[word_ix].level;
                     // ensure we choose a new word (check the queue)
-                    if(trials > 0) {
-                        let dupl = false;
-                        for(let i=0; i<queue.length; i++) {
-                            if(queue[i] !== undefined && queue[i] !== null && queue[i].word_ix == word_ix) { dupl = true; break; }
-                        }
-                        if(dupl) { log += ' norep'; continue; }
+                    let dupl = false;
+                    for(let i=0; i<queue.length; i++) {
+                        if(queue[i] !== undefined && queue[i] !== null && queue[i].word_ix == word_ix) { dupl = true; break; }
                     }
+                    if(dupl && trials > 0) { log += ' norep'; continue; } // retry for a non-duplicate while we can
+                    if(!dupl) { last_ok_ix = word_ix; } // remember the last genuine non-duplicate (may still be 'known')
                     // Avoid already known words (typed without help)
                     const known_count = is_known_word(word_ix);
                     log += " known:"+known_count;
@@ -2564,7 +2609,7 @@
 
             }
             console.log('try_get_new_word: '+log);
-            if(trials == 0) { return undefined; }
+            if(trials == 0) { return last_ok_ix; } // known / last-resort word on exhaustion, not undefined
             return word_ix;
         }
         
@@ -2620,24 +2665,29 @@
             }
             if(problem === undefined) { // Get a new word/problem
 
-                let word_ix = undefined;
-                let warned_no_word = false; // bee_alert() is non-blocking, so only warn once (no modal stacking)
+                // Pick a taught class first (so coverage doesn't skew to classes with many words),
+                // weighted towards easier classes and biased towards classes not yet consolidated.
+                // Non-pair classes (noclass and thematic classes) carry no pair_stats, so they are
+                // always accepted when picked - collecting common irregular words.
+                const candidate_classes = Object.keys(bee.class_to_ix).filter(function(c) { return bee.class_to_ix[c].length > 0; });
+                let word_class = undefined;
+                let class_picks = 0;
                 while(true) {
-                    word_ix = try_get_new_word10(undefined); // first word in class group
-                    if(word_ix === undefined) {
-                        if(!warned_no_word) { bee_alert('No first word found, trying again'); warned_no_word = true; }
-                        continue;
-                    }
-                    break;
+                    word_class = choose_class_by_level(candidate_classes);
+                    class_picks++;
+                    const st = bee.storage.players[bee.player].pair_stats[word_class];
+                    if(!st || st[1] === 0) { break; } // never asked - teach it
+                    const rate = st[0] / (st[1] + 0.4); // smoothed success rate
+                    if(rate > 0.9) { if(Math.random() < 0.2) { break; } }
+                    else if(rate > 0.75) { if(Math.random() < 0.5) { break; } }
+                    else { break; } // <= 75% success - always teach
+                    if(class_picks >= 100) { break; } // safety cap - finish with the current pick
                 }
-                
-                // Normal mode: choose more words from one of the same word group(s)
-            
-                // Word class group
-                let word_class = bee.words[word_ix].class;
-                if(word_class === undefined || word_class.length == 0) { word_class = ['noclass']; }
-                word_class = word_class[Math.floor(Math.random() * word_class.length)]; // choose random class
-                log += ' group_class:'+word_class;
+                log += ' group_class:'+word_class+' picks:'+class_picks;
+
+                // First word of the group, from the chosen class. A non-empty class always returns
+                // one (a known word if every word is already known, see try_get_new_word10).
+                const word_ix = try_get_new_word10(word_class);
 
                 log += ' first_word:'+word_ix;
                 problem = {'word_ix':word_ix, 'is_repeat':false, 'word_class':word_class};
@@ -2728,6 +2778,24 @@
             if(word_ix_chosen === undefined) { console.error("choose_using_levels20", list_of_wordix, weight_point, ix_chosen); }
             return word_ix_chosen;
         }
+
+
+        // Weighted random choice of a class name, biased towards classes whose easiest members are
+        // low-level (bee.class_level, set in init_wordlist_impl) - the same 1.5^(-level) weighting as
+        // choose_using_levels20, but over classes rather than words.
+        function choose_class_by_level(classes) {
+            const cumulative = [];
+            let sum = 0;
+            for(let i=0; i<classes.length; i++) {
+                sum += Math.pow(1.5, -bee.class_level[classes[i]]);
+                cumulative.push(sum);
+            }
+            const point = Math.random() * sum;
+            for(let i=0; i<classes.length; i++) {
+                if(point < cumulative[i]) { return classes[i]; }
+            }
+            return classes[classes.length - 1];
+        }
         
         
         function init_wordlist() {
@@ -2738,6 +2806,7 @@
             const r = init_wordlist_impl(min_wordset, max_wordset);
             bee.words = r.words;
             bee.class_to_ix = r.class_to_ix;
+            bee.class_level = r.class_level;
             
             $('.d_wordsets').html(
                 esc_html(min_wordset) + " to " + esc_html(max_wordset)
@@ -2785,7 +2854,22 @@
                     }
                     cllist.push(i);
                 }
-            }            
+            }
+
+            // Class level = mean level of a class's 4 lowest-level members - used to weight class
+            // selection towards easier groups (see choose_class_by_level). Warn about pair-classes
+            // too small to drill (a singleton's group intro would also reveal the answer).
+            out.class_level = {};
+            for(const cls in out.class_to_ix) {
+                const ixs = out.class_to_ix[cls];
+                if(ixs.length <= 1 && cls.indexOf('/') >= 0) {
+                    console.warn("0 or 1 long pair-class (intro reveals answer / cannot drill across words):", cls, ixs.length);
+                }
+                const levels = ixs.map(function(ix) { return out.words[ix].level; }).sort(function(a, b) { return a-b; });
+                const lowest = levels.slice(0, 4);
+                out.class_level[cls] = lowest.reduce(function(a, b) { return a+b; }, 0) / (lowest.length || 1);
+            }
+
             return out;
         }
 
@@ -2910,15 +2994,16 @@
                     'data_version': bee_current_data_version,
                     'score': 0,
                     'min_wordset': wordsets[0],
-                    'wordsets': wordsets[1]
+                    'wordsets': wordsets[1],
+                    'pair_stats': {}
                 };
                 if(callback) { callback(); }
             });
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?475"></script>
-    <script src="assets/aquarium/js/aquarium.js?475"></script>
+    <script src="assets/aquarium/js/config.js?476"></script>
+    <script src="assets/aquarium/js/aquarium.js?476"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
