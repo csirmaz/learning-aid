@@ -283,7 +283,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 477;
+const bee_app_version = 478;
 
 call_local_hook('check_version', []);
 
@@ -1103,8 +1103,11 @@ const bee_tts = {
     voice: false,  // selected voice
     voice_points: -1,  // scoring to select voice
     synth: window.speechSynthesis,
-    init_trials: 6,
-    available_voices: []
+    init_trials: 12,
+    available_voices: [],
+    scheduled: [],
+    speak_callback_index: 0, // global callbacks for the bridge
+    speak_callbacks: {}, // global callbacks for the bridge
 };
         
 bee_tts.test = function() {
@@ -1118,24 +1121,26 @@ bee_tts.test = function() {
 bee_tts.initialize = function() {
     if(window.PuzzleAlerter && typeof window.PuzzleAlerter.speak === 'function') {
         bee_tts.status = 'bridge';
+        bee_tts.process_scheduled();
         return;
     }
     if(!bee_tts.synth) {
         console.log("TTS failed (not available)");
         bee_tts.status = 'fail';
+        bee_tts.process_scheduled();
         return;
     }
     bee_tts.init_trials--;
     if(bee_tts.init_trials <= 0) {
         console.log("TTS init failed (after tries)");
         bee_tts.status = 'fail';
+        bee_tts.process_scheduled();
         return;
     }
-    console.log("TTS init, trial=", bee_tts.init_trials);
     try {
         const voices = bee_tts.synth.getVoices();
         if(!voices.length) {
-            setTimeout(bee_tts.initialize, 1000);
+            setTimeout(bee_tts.initialize, 500);
             return;
         }
         for (const voice of voices) {
@@ -1149,14 +1154,17 @@ bee_tts.initialize = function() {
         if(bee_tts.voice_points < 100) {
             console.log("TTS init failed (no English voice)");
             bee_tts.status = 'fail';
+            bee_tts.process_scheduled();
             return;
         }
         console.log("TTS ready - selected voice", bee_tts.voice);
         bee_tts.status = 'ready';
+        bee_tts.process_scheduled();
         return;
     } catch(e) {
         console.log("TTS init: error", e);
         bee_tts.status = 'fail';
+        bee_tts.process_scheduled();
         return;                
     }
 };
@@ -1166,9 +1174,17 @@ bee_tts.speaking_time = function(s) {
     return 80*s.length + 250;
 };
 
-
-bee_tts.speak_callback_index = 0;
-bee_tts.speak_callbacks = {};
+bee_tts.process_scheduled = function() {
+    const nxt = function() {
+        const d = bee_tts.scheduled.shift();
+        if(d === undefined) { return; }
+        bee_tts.speak(d.s, function() {
+            if(d.callback) { d.callback(); }
+            nxt();
+        });
+    };
+    nxt();
+};
 
 // Speak an utterance. Returns true if utterance is being spoken; then callback() will be called on end.
 bee_tts.speak = function(s, callback) {
@@ -1192,11 +1208,18 @@ bee_tts.speak = function(s, callback) {
         }
     }
     
-    if(bee_tts.status != 'ready') {
-        console.log("TTS speak: not ready");
-        setTimeout(callback, 1000);
+    if(bee_tts.status == 'fail') {
+        console.error("TTS not available");
+        if(callback) { setTimeout(callback, 1000); }
         return false;
     }
+    
+    if(bee_tts.status == 'init') {
+        console.log("TTS speak: not ready yet");
+        bee_tts.scheduled.push({s: s, callback: callback});
+        return false;
+    }
+    
     try {
         const utterThis = new SpeechSynthesisUtterance(s);
         utterThis.voice = bee_tts.voice;
@@ -1215,7 +1238,7 @@ bee_tts.speak = function(s, callback) {
     }
 };
 
-setTimeout(bee_tts.initialize, 500);
+setTimeout(bee_tts.initialize, 10);
         
 
 const licences = `
