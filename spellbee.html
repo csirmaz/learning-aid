@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?476">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?477">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -247,10 +247,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?476">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?477">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?476"></script>
+    <script src="assets/local/beelocal.js?477"></script>
 </head>
 <body>
     <div class="container">
@@ -353,6 +353,8 @@
             "re/rI": 1,
             "ful/fUl": 1,
             "ily/IlI": 1,
+            "ture/tSE": 1,
+            "age/IdZ": 1,
             
             // doubling
             "gg/g": 1,
@@ -379,35 +381,41 @@
             "th/T": 1,
             "th/D": 1,
 
+            "a/a:": 1,
+            "a/ae": 1,
+            "a/eI": 1,
+            "a/o": 1,
+            "a/O:": 1,
+            "ai/eI": 1,
+            "al/sl": 1,
+            "al/O:": 1,
+            "ar/a:": 1,
+
+            "e/I": 1,
+            "e/i:": 1,
+            "er/Er": 1,
+            "es/z": 1,
+
+            "i/aI": 1,
+            "i/i:": 1,
+
             "y/j": 1,
             "ou/A": 1,
             "ng/ng": 1,
-            "ar/a:": 1,
-            "e/I": 1,
             "oo/U": 1,
-            "al/O:": 1,
             "ch/tS": 1,
-            "er/Er": 1,
             "ce/s": 1,
             "igh/aI": 1,
-            "a/O:": 1,
             "wh/w": 1,
-            "ere/3:": 1,
             "ow/EU": 1,
             "s/z": 1,
-            "a/o": 1,
-            "i/aI": 1,
             "o/EU": 1,
             "er/r": 1,
             "x/ks": 1,
-            "ai/eI": 1,
             "sh/S": 1,
             "n/ng": 1,
-            "i/i:": 1,
-            "es/z": 1,
             "tch/tS": 1,
             "g/dZ": 1,
-            "al/sl": 1,
             "ay/eI": 1,
             "o/A": 1,
             "ey/I": 1,
@@ -432,13 +440,9 @@
             "oa/EU": 1,
             "oe/u:": 1,
             "kn/n": 1,
-            "iew/ju:": 1,
             "au/O:": 1,
-            "aur/O:": 1,
             "aw/O:": 1,
-            "eigh/aI": 1,
             "eigh/eI": 1,
-            "a/a:": 1,
             "mb/m": 1,
             "de/dI": 1,
             "y/aI": 1,
@@ -452,45 +456,30 @@
             "or/O:": 1,
             "oor/O:": 1,
             "es/Iz": 1,
-            "ture/tSE": 1,
             "air/eE": 1,
             "ia/aI": 1,
             "ol/sl": 1,
-            "zz/ts": 1,
             "le/sl": 1,
-            "age/IdZ": 1,
             "r/Er": 1,
             "dge/dZ": 1,
             "ge/dZ": 1,
             "er/eE": 1,
             "ere/eE": 1,
             "c/s": 1,
-            "ow/o": 1,
             "wr/r": 1,
             "ch/S": 1,
             "s/Z": 1,
             "ua/U": 1,
-            "a/e": 1,
             "oul/U": 1,
             "ere/IE": 1,
-            "o/U": 1,
-            "o/I": 1,
             "ai/e": 1,
             "ig/aI": 1,
             "ui/u:": 1,
             "ear/3:": 1,
-            "ear/a:": 1,
             "ea/eI": 1,
-            "ey/i:": 1,
-            "err/3:": 1,
-            "is/aI": 1,
-            // Lax vowels
-            "a/ae": 1,
+            "err/3:": 1, 
             "u/A": 1,
             "y/I": 1,
-            // Tense vowels
-            "a/eI": 1,
-            "e/i:": 1,
             // Schwa
             "a/E": 1,
             "ou/E": 1,
@@ -512,7 +501,7 @@
             "ur/3:": 1,
         };
         
-        // Other valid grapheme/phoneme pairs (only for validation)
+        // Other valid grapheme/phoneme pairs (not taught - only for validation)
         const gp_other_pairs = {
             "f/f": 1,
             "g/g": 1,
@@ -542,6 +531,20 @@
             "ar/Er": 1,  // "ar" as the schwa ending in "sugar"
             "tu/tSE": 1, // "tu" = /tʃu/~/tʃə/ in "eventually"
             "io/IE": 1,  // "io" = /ɪə/ in "opinion"
+            // Rare in English: correspondence spells its sound in only ~1-3 word-types across the
+            // whole language, so it never makes a useful drill group. Moved from gp_grouping_pairs.
+            "zz/ts": 1,    // "zz" = /ts/ in "pizza"
+            "aur/O:": 1,   // "aur" = /ɔː/ in "dinosaur"
+            "iew/ju:": 1,  // "iew" = /juː/ in "view"
+            "ow/o": 1,     // "ow" = /ɒ/ in "knowledge"
+            "o/I": 1,      // "o" = /ɪ/ in "women"
+            "is/aI": 1,    // "is" = /aɪ/ in "island"
+            "ear/a:": 1,   // "ear" = /ɑː/ in "heart"
+            "eigh/aI": 1,  // "eigh" = /aɪ/ in "height"
+            "o/U": 1,      // "o" = /ʊ/ in "woman"
+            "a/e": 1,      // "a" = /e/ in "any", "many"
+            "ere/3:": 1,   // "ere" = /ɜː/ in "were"
+            "ey/i:": 1,    // "ey" = /iː/ in "key"
         };
 
         // Predictable grapheme/phoneme pairs: the grapheme is the obvious/default spelling of the
@@ -1288,7 +1291,7 @@
 
 // g=dZ  g/dZ
 "pillager|The <v=i=ll=age/IdZ> is under attack!", // [village] reviewed
-"pillager|<p=i=ll=age/IdZ=r/Er>", // [pillager] reviewed
+"pillager|<p=i=ll=age/IdZ=r/r>", // [pillager] reviewed
 "@📦|A <p=a=ck=age/IdZ> arrived.", // [package] reviewed
 "@🦒|The <g/dZ=i=r=a/a:=ff=e/x> is tall.", // [giraffe] reviewed
 "□|<e/e=dge/dZ>", // [edge] reviewed
@@ -1310,7 +1313,7 @@
 "@👍🏿|<th/T=u/A=mb/m>", // [thumb] reviewed
 "@👄|<m=ou/aU=th/T>", // [mouth] reviewed
 "@🪥|<t=oo/u:=th/T==b=r=u/A=sh>", // [toothbrush] reviewed
-"|<Th/D=er/eE=e/x>'s something under me!", // [there] reviewed
+"|<Th/D=ere/eE>'s something under me!", // [there] reviewed
 "@👦|my <b=r=o/A=th/D=er>", // [brother] reviewed
 "|There was <n=o/A==th/T=i=ng> in the tray.", // [nothing] reviewed
 
@@ -1480,7 +1483,7 @@
         };
 
     </script>
-    <script src="assets/common.js?476"></script>
+    <script src="assets/common.js?477"></script>
     <script>
     
         const bee_current_data_version = 5; // used for new players
@@ -2669,7 +2672,7 @@
                 // weighted towards easier classes and biased towards classes not yet consolidated.
                 // Non-pair classes (noclass and thematic classes) carry no pair_stats, so they are
                 // always accepted when picked - collecting common irregular words.
-                const candidate_classes = Object.keys(bee.class_to_ix).filter(function(c) { return bee.class_to_ix[c].length > 0; });
+                const candidate_classes = Object.keys(bee.class_to_ix).filter(function(c) { return bee.class_to_ix[c].length > 1; });
                 let word_class = undefined;
                 let class_picks = 0;
                 while(true) {
@@ -3002,8 +3005,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?476"></script>
-    <script src="assets/aquarium/js/aquarium.js?476"></script>
+    <script src="assets/aquarium/js/config.js?477"></script>
+    <script src="assets/aquarium/js/aquarium.js?477"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
