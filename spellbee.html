@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?479">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?480">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -247,10 +247,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?479">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?480">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?479"></script>
+    <script src="assets/local/beelocal.js?480"></script>
 </head>
 <body>
     <div class="container">
@@ -440,7 +440,6 @@
             "u/U": 1,
             "u/ju:": 1,
             "u/u:": 1,
-            "ua/UE": 1,
 
             "y/j": 1,
             "ng/ng": 1,
@@ -528,13 +527,13 @@
             // Tense vowels
             // other
             "'t/t": 1,
-            // Rare one-offs (single-word patterns, not drilled)
+            // Rare in English: correspondence spells its sound in only ~1-3 word-types across the
+            // whole language, so it never makes a useful drill group. Moved from gp_grouping_pairs.
             "s/S": 1,    // s = /ʃ/ in "sugar"
             "ar/Er": 1,  // "ar" as the schwa ending in "sugar"
             "tu/tSE": 1, // "tu" = /tʃu/~/tʃə/ in "eventually"
             "io/IE": 1,  // "io" = /ɪə/ in "opinion"
-            // Rare in English: correspondence spells its sound in only ~1-3 word-types across the
-            // whole language, so it never makes a useful drill group. Moved from gp_grouping_pairs.
+            "ua/UE": 1, // only [usual] [usually]
             "zz/ts": 1,    // "zz" = /ts/ in "pizza"
             "aur/O:": 1,   // "aur" = /ɔː/ in "dinosaur"
             "iew/ju:": 1,  // "iew" = /juː/ in "view"
@@ -809,7 +808,7 @@
 "@💧|<w=a/O:=t=er/Er>", // [water] reviewed
 "@🪵|<w=oo/U=d=en/En> planks", // [wooden] reviewed
 "@🕐|<Wh/w=e=n> is your birthday?", // [when] reviewed
-"|The walls <w=ere/3:> covered in moss", // [were] reviewed
+"|The walls <w=ere/3:> covered in moss|tricky", // [were] reviewed
 "@🌻|<g=ar/a:=d=en/En>", // [garden] reviewed
 "@🪟|The <w=i=n=d=ow/EU=s/z> were broken", // [windows] reviewed
 "@❓|<Wh/w=a/o=t> do you need?", // [what] reviewed
@@ -1011,7 +1010,7 @@
 "feather@🪶|<l=igh/aI=t> as a feather", // [light] reviewed
 "@🌃|Good <n=igh/aI=t>!", // [night] reviewed
 "@➡️|turn <r=igh/aI=t>", // [right] reviewed
-"@↕️|<h=eigh/aI=t>", // [height] reviewed
+"@↕️|<h=eigh/aI=t>|tricky", // [height] reviewed
 "@🗼|This is way too <h=igh/aI>", // [high] reviewed
 "@8️⃣|<eigh/eI=t>", // [eight] reviewed
 "@🐍|<s=n=a/eI=k=e/X>", // [snake] reviewed
@@ -1251,8 +1250,8 @@
 "copperore|<c=o/o=pp=er> ore", // [copper] reviewed
 "@⛔️|Smoking is <f=or/O:=b=i/I=dd=en/En>", // [forbidden] reviewed
 "|I hear <you>|tricky",
-"|I don't want <a/e=n=y/I> more!", // [any] reviewed
-"@🙅🏼‍♂️|I <d=o/EU=n='t/t> want any more!", // [don't] reviewed
+"|I don't want <a/e=n=y/I> more!|tricky", // [any] reviewed
+"@🙅🏼‍♂️|I <d=o/EU=n='t/t> want any more!|tricky", // [don't] reviewed
 "@🤷🏼|I <don't> know|tricky",
 "|<W=e/i:> are going", // [we] reviewed
 "|I <w=oul/U=d> like a carrot.", // [would] reviewed
@@ -1285,13 +1284,13 @@
 "witch|<w=i=tch>", // [witch] reviewed
 "pickaxe@⛏|It can <b=r=ea/eI=k> stone", // [break] reviewed
 "@👯‍♀️|a <g=r=ou/u:=p> of people", // [group] reviewed
-"@🔑|<k=ey/i:>", // [key] reviewed
+"@🔑|<k=ey/i:>|tricky", // [key] reviewed
 "@😾|This cat is <a/ae=ng=r=y/I>.", // [angry] reviewed
 "@☑️|<p=r=e/I=f=err/3:=ed/d>", // [preferred] reviewed
 "enderpearl|ender <p=ear/3:=l>", // [pearl] reviewed
 "@📏|<l=e=ng=th/T>", // [length] reviewed
 "@❗|This is very <i=m=p=or/O:=t=ant/Ent>.", // [important] reviewed
-"@🏝️|pirate <is/aI=l=a/E=n=d>", // [island] reviewed
+"@🏝️|pirate <is/aI=l=a/E=n=d>|tricky", // [island] reviewed
 "@📜|<H=i=s/s=t=o/E=r=y> happened a long time ago.", // [history] reviewed
 "@💬|They <m=e=n=tion> my name", // [mention] reviewed
 
@@ -1381,7 +1380,7 @@
         };
 
     </script>
-    <script src="assets/common.js?479"></script>
+    <script src="assets/common.js?480"></script>
     <script>
     
         const bee_current_data_version = 5; // used for new players
@@ -2903,8 +2902,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?479"></script>
-    <script src="assets/aquarium/js/aquarium.js?479"></script>
+    <script src="assets/aquarium/js/config.js?480"></script>
+    <script src="assets/aquarium/js/aquarium.js?480"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
