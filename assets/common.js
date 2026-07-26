@@ -962,15 +962,24 @@ function present_gift(img_src, callback, code_data) {
 }
 
 
-// Celebratory send-off when a puzzle session is completed on a plain success (i.e. one with no
-// gift, end-of-level or video reward of its own): a random puzzle_end sound plus confetti, then
-// dismiss the host webview. Called just before the puzzle is dismissed. We wait for BOTH the
-// send-off sound and the confetti to finish before dismissing, because dismissing tears down the
-// page and would otherwise cut the audio off mid-play (play_rnd_sound has its own fallback timeout,
-// so the join always completes even if the 'ended' event never fires).
+// Celebratory send-off when a puzzle session is completed: a random puzzle_end sound plus confetti,
+// then dismiss the host webview. We wait for BOTH the send-off sound and the confetti to finish
+// before proceeding, because dismissing tears down the page and would otherwise cut the audio off
+// mid-play (play_rnd_sound has its own fallback timeout, so the join always completes even if the
+// 'ended' event never fires). If a reward video was earned during the puzzle it was deferred (never
+// shown mid-session, to keep the phoneme priming intact) and is played here as the final step -
+// after the sound + confetti - then the host is dismissed when it ends or is closed early.
 function finish_puzzle_with_confetti() {
     let pending = 2;
-    const done = function() { if(--pending <= 0) { dismiss_puzzle_alert(); } };
+    const done = function() {
+        if(--pending > 0) { return; }
+        if(bee.is_puzzle && bee.is_puzzle.deferred_video) {
+            bee.is_puzzle.deferred_video = false;
+            if(play_video(dismiss_puzzle_alert)) { dismiss_puzzle_alert(); } // nothing to show -> dismiss now
+            return;
+        }
+        dismiss_puzzle_alert();
+    };
     play_rnd_sound('puzzle_end', done);
     show_animation(done);
 }
@@ -996,7 +1005,17 @@ function success_common(options) {
         bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 300}).then(
             function() { 
                 setTimeout(function(){
-                    if(play_video(function(){ new_question('success_common:level:video1'); })) { 
+                    if(bee.is_puzzle) {
+                        // Never show a reward video inline during a puzzle - it would flush the
+                        // phoneme priming. Record that one was earned; the send-off plays it, with
+                        // play_video the sole authority on whether a video actually shows. A
+                        // completing answer runs the send-off; mid-puzzle we advance to the next word.
+                        bee.is_puzzle.deferred_video = true;
+                        if(bee.is_puzzle.needs <= 0) { finish_puzzle_with_confetti(); }
+                        else { new_question('success_common:level:puzzle'); }
+                        return;
+                    }
+                    if(play_video(function(){ new_question('success_common:level:video1'); })) {
                         new_question('success_common:level:video2');
                     }
                 }, 1500*wait_factor);
@@ -1013,6 +1032,15 @@ function success_common(options) {
         play_success_sound();
         give_gift(function() {
             update_score_ui(false);
+            // A deferred reward video is played only by finish_puzzle_with_confetti, and every
+            // completing-answer branch funnels through it on needs<=0 EXCEPT this one: a gift reveal
+            // is itself the puzzle send-off, so the gift branch dismisses through the normal
+            // check_dismiss_puzzle path (inside new_question), not finish_puzzle_with_confetti - by
+            // design we don't stack a puzzle-end confetti/video on top of the gift. Consequence: a
+            // video earned on an earlier word (deferred_video set on a previous success_common call;
+            // the gift branch never sets it, and branches are mutually exclusive so it can't be this
+            // answer) is intentionally NOT shown when the completing answer awards a gift - the gift
+            // is the reward shown, and the puzzle then dismisses.
             new_question('success_common:gift:give');
         }, false);
         return 'gift';
@@ -1076,11 +1104,20 @@ function success_common(options) {
         show_animation(function() { setTimeout(function(){ new_question('success_common:period:small'); }, 1100*wait_factor); });
         return 'period';
     }
-    // bigger periodic celebration - see "B": try a reward video (a video is excluded from the puzzle send-off)
+    // bigger periodic celebration - see "B": a reward video.
     play_success_sound();
+    if(bee.is_puzzle) {
+        // Never show a reward video inline during a puzzle - it would flush the phoneme priming.
+        // Record that one was earned; the send-off plays it, with play_video the sole authority on
+        // whether a video actually shows. A completing answer finishes; mid-puzzle only the flag is
+        // set and we advance to the next word (no inline celebration).
+        bee.is_puzzle.deferred_video = true;
+        if(bee.is_puzzle.needs <= 0) { finish_puzzle_with_confetti(); return 'period'; }
+        setTimeout(function(){ new_question('success_common:period:puzzle'); }, 1100*wait_factor);
+        return 'period';
+    }
     if(play_video(function(){ new_question('success_common:period:video'); })) {
-        // no video available - fall back to the smaller celebration (or the puzzle send-off)
-        if(bee.is_puzzle && bee.is_puzzle.needs <= 0) { finish_puzzle_with_confetti(); return 'period'; }
+        // no video available - fall back to the smaller celebration
         show_animation(function() { setTimeout(function(){ new_question('success_common:period:small'); }, 1100*wait_factor); });
     }
     return 'period';
