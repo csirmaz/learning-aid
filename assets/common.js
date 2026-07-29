@@ -127,144 +127,138 @@ function load_local_data() {
 }
 
 
-// Initial function
+// Initial function.
+//
+// Both startup paths - the URL-named player of a puzzle session, and the regular player menu -
+// run the same steps: settle on a player, refresh that player from the server, make sure a
+// record exists, show a start screen, play. Each step is one of the helpers below, and each
+// takes a completion callback because the load and every dialog are asynchronous, so the two
+// paths at the bottom read as the sequence of steps they run.
 function bootstrap() {
 
-    const pre_chosen_player = get_player_from_url();
+    // Swap the start screen for the game and play - the last step of every path
+    const start_game = function() {
+        $('.startmenu').hide();
+        $('.game').show();
+        main();
+    };
 
-    // Apps with bee.no_welcome (videolearn) autostart with the URL-named player: no welcome
-    // screen, no session sound and no button to press. Server data is loaded first when the
-    // load_data hook is present, otherwise we run on browser-local data.
-    if(pre_chosen_player && bee.no_welcome) {
-        bee.player = pre_chosen_player;
-        bee.is_puzzle = {needs: bee.puzzle_needs};
+    // Refresh bee.player's record from the server, when the data-load hook is registered.
+    // next(found) reports whether the server held a record; with no hook there is nobody to
+    // ask, so found is false and whatever this browser holds stands.
+    // If the server is down, load_data never calls back and we stay on "Loading...", for safety
+    const refresh_player = function(next) {
+        if(!local_hook_has('load_data')) { next(false); return; }
         $('.game').hide();
         $('.startmenu').html('Loading...');
-        load_local_data(); // keep the full list of users
-        const start = function() {
-            const go = function() {
-                $('.startmenu').hide();
-                $('.game').show();
-                main();
-            };
-            // Make sure a player record exists (init_player_data is non-interactive here)
-            if(!bee.storage.players[bee.player]) { init_player_data(go); }
-            else { go(); }
-        };
-        if(local_hook_has('load_data')) {
-            // If the server is down, load_data never calls back and we stay on "Loading...", for safety
-            bee_local.load_data(bee.app_name, pre_chosen_player, function(success) { start(); });
-        }
-        else {
-            start();
-        }
-        return;
-    }
+        bee_local.load_data(bee.app_name, bee.player, next);
+    };
 
-    if(pre_chosen_player && local_hook_has('load_data')) {
-        bee.player = pre_chosen_player;
-        bee.is_puzzle = {needs: bee.puzzle_needs};
-        
-        // Load player data
-        $('.game').hide();
-        $('.startmenu').html('Loading...');
-        load_local_data(); // if we don't populate the full list of users, they get lost
-        // Load data from server
-        // If the server is down, we get stuck here, for safety
-        bee_local.load_data(bee.app_name, pre_chosen_player, function(success) {
-            if(!success && !bee.storage.players[pre_chosen_player]) {
-                // init_player_data() is asynchronous (it may prompt the user); the
-                // start menu below renders meanwhile, kept covered by the modal
-                bee_alert("Player data not found (remote or local), starting new", function() {
-                    init_player_data();
-                });
-            }
-            // Render stub menu
-            // We could likely play audio even before a user event, but let's keep this
-            $('.startmenu').html('<div class="startbutton" style="padding:1rem">'+'🪙'+"\ufe0f"+' Let\'s earn<br>some coins!</div>');
-            // We need both the sound to end and the button to be tapped to start
-            let start_game_condition = {button: false, sound: false};
-            const try_start_game = function(reason) {
-                if(start_game_condition === false) { return; }
-                start_game_condition[reason] = true;
-                if(!(start_game_condition.button && start_game_condition.sound)) { return; }
-                start_game_condition = false; // do not start game multiple times                
-                $('.startmenu').hide();
-                $('.game').show();
-                main();
-            };
-            setTimeout(function() {  // allow time for rendering
-                $('.startbutton').on('click', function() {
-                    try_start_game('button');
-                    $(this).css({background: '#777'});
-                    return false;
-                });
-                try { bee_confetti.addConfetti({emojis: ['🪙'+"\ufe0f"], confettiNumber: 40}); } catch(e) {}
-                play_rnd_sound('session', function(){ try_start_game('sound'); });
-            }, 200);
+    // Does bee.player have a record on either side? found is what refresh_player reported
+    const have_player = function(found) {
+        return (found || bee.storage.players[bee.player] !== undefined);
+    };
+
+    // Create a fresh record for bee.player. Only ever called once refresh_player has reported
+    // back: creating first would save a stub record that can reach the backend after (or instead
+    // of) the load and mask the real data. init_player_data() is asynchronous - it may prompt for
+    // the word/problem range - so next() fires once the record exists.
+    const create_player = function(next) {
+        init_player_data(function() {
+            save_storage('init');
+            if(next) { next(); }
         });
-        return;
-    }
-    
-    // Regular menu with choice of users
-    // Audio can only be played after a user event on the page, so we require a click
-    load_local_data(); // only the local data has a list of users
-    let menu = "<p>Choose player</p>";
-    for (const [key, value] of Object.entries(bee.storage.players)) {
-        menu += '<div class="startbutton" data-player="'+esc_html(key)+'">'+esc_html(key)+'</div>';
-    }
-    menu += '<div class="startbutton" data-playernew="1">New user<br><span style="font-size:60%">All player data is stored in the browser only</span></div>';
-    $('.game').hide();
-    $('.startmenu').html(menu);
+    };
 
-    // Start menu - logic
-    setTimeout(function() {  // allow time for rendering
-        $('.startbutton').on('click', function() {
+    // Welcome screen of a puzzle session: a start button plus the session sound, both of which
+    // must complete before next() runs.
+    // We could likely play audio even before a user event, but let's keep this
+    const show_welcome = function(next) {
+        $('.startmenu').html('<div class="startbutton" style="padding:1rem">'+'🪙'+"️"+' Let\'s earn<br>some coins!</div>');
+        // We need both the sound to end and the button to be tapped to start
+        let start_condition = {button: false, sound: false};
+        const try_start = function(reason) {
+            if(start_condition === false) { return; }
+            start_condition[reason] = true;
+            if(!(start_condition.button && start_condition.sound)) { return; }
+            start_condition = false; // do not start the game multiple times
+            next();
+        };
+        setTimeout(function() {  // allow time for rendering
+            $('.startbutton').on('click', function() {
+                try_start('button');
+                $(this).css({background: '#777'});
+                return false;
+            });
+            try { bee_confetti.addConfetti({emojis: ['🪙'+"️"], confettiNumber: 40}); } catch(e) {}
+            play_rnd_sound('session', function(){ try_start('sound'); });
+        }, 200);
+    };
 
-            const is_new = $(this).data('playernew');
-            const chosen = $(this).data('player');
+    // Player menu: one button per browser-local player, plus "New user". Each button settles on
+    // a player and then runs the same refresh -> create-if-missing -> play sequence.
+    const show_player_menu = function() {
+        let menu = "<p>Choose player</p>";
+        for (const [key, value] of Object.entries(bee.storage.players)) {
+            menu += '<div class="startbutton" data-player="'+esc_html(key)+'">'+esc_html(key)+'</div>';
+        }
+        menu += '<div class="startbutton" data-playernew="1">New user<br><span style="font-size:60%">All player data is stored in the browser only</span></div>';
+        $('.game').hide();
+        $('.startmenu').html(menu);
 
-            // Once a player is settled, refresh from the server (if available) and start
-            const proceed = function() {
-                if(local_hook_has('load_data')) {
-                    $('.startmenu').html('Loading...');
-                    // Refresh player data from the server
-                    // If the server is down, we get stuck here, for safety
-                    bee_local.load_data(bee.app_name, bee.player, function(success) {
-                        $('.startmenu').hide();
-                        $('.game').show();
-                        main();
-                    });
+        setTimeout(function() {  // allow time for rendering
+            $('.startbutton').on('click', function() {
+
+                const is_new = $(this).data('playernew');
+                const chosen = $(this).data('player');
+
+                // A listed player is settled already: refresh and play
+                if(!is_new) {
+                    bee.player = chosen;
+                    refresh_player(function(found) { start_game(); });
+                    return false;
                 }
-                else {
-                    $('.startmenu').hide();
-                    $('.game').show();
-                    main();
-                }
-            };
 
-            if(is_new) {
+                // A typed name this browser does not list may still exist on the server, so
+                // refresh first and create only what neither side has
                 bee_prompt("What is the name of the player?", function(name) {
                     if(name === null || name === '') { return; }
                     bee.player = name;
-                    // Initialize
-                    if(!bee.storage.players[bee.player]) {
-                        init_player_data(function() {
-                            save_storage('init');
-                            proceed();
-                        });
-                    } else {
-                        bee_alert("That player already exists. Loading player data", proceed);
-                    }
+                    refresh_player(function(found) {
+                        if(have_player(found)) { bee_alert("That player already exists. Loading player data", start_game); }
+                        else { create_player(start_game); }
+                    });
                 });
-            } else {
-                bee.player = chosen;
-                proceed();
-            }
 
-            return false;
+                return false;
+            });
+        }, 200);
+    };
+
+    // ---------------------------- Startup paths ----------------------------
+
+    const pre_chosen_player = get_player_from_url();
+
+    // URL-named player (a puzzle-alerter session): the player is settled already, so no menu
+    if(pre_chosen_player && local_hook_has('load_data')) {
+        bee.player = pre_chosen_player;
+        bee.is_puzzle = {needs: bee.puzzle_needs};
+        load_local_data(); // if we don't populate the full list of users, they get lost
+        refresh_player(function(found) {
+            if(!have_player(found)) {
+                // create_player() is asynchronous (it may prompt the user); the welcome screen
+                // renders meanwhile, kept covered by the modal
+                bee_alert("Player data not found (remote or local), starting new", create_player);
+            }
+            show_welcome(start_game);
         });
-    }, 200);
+        return;
+    }
+
+    // Regular menu with choice of users
+    // Audio can only be played after a user event on the page, so we require a click
+    load_local_data(); // only the local data has a list of users
+    show_player_menu();
 
 }
 
@@ -283,7 +277,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 484;
+const bee_app_version = 488;
 
 call_local_hook('check_version', []);
 
@@ -499,22 +493,17 @@ function show_animation(callback) {
         
         
 // Play a video full-screen, then call callback() when it ends (or is closed early).
-// video_list (optional) is the catalogue to choose from; it defaults to the reward `videos`.
-// A video the player has not seen yet is picked at random and recorded as seen, which is
-// persisted via save_storage (so the server keeps the per-player history too). Once every
-// video in the list has been seen, the earliest-seen ones are re-enabled (the oldest entries
-// are dropped from videos_seen) so the rotation can carry on. The videolearn app drives this
-// with its own catalogue. Returns true if no video could be shown (so the caller can fall back
-// to another reward, or dismiss), false if a video is now playing.
-function play_video(callback, video_list) {
-    const reward_videos = (video_list === undefined);
-    if(reward_videos) { video_list = videos; }
-
+// A video the player has not seen yet is picked at random from the reward catalogue `videos`
+// and recorded as seen, which is persisted via save_storage (so the server keeps the per-player
+// history too). Once every video has been seen, the earliest-seen ones are re-enabled (the
+// oldest entries are dropped from videos_seen) so the rotation can carry on. Returns true if no
+// video could be shown (so the caller can fall back to another reward, or dismiss), false if a
+// video is now playing.
+function play_video(callback) {
     let video_file = undefined;
-    // The reward-video override hook only applies to the reward catalogue
-    if(reward_videos && local_hook_has('choose_video')) { video_file = bee_local.choose_video(); }
+    if(local_hook_has('choose_video')) { video_file = bee_local.choose_video(); }
     if(video_file === undefined) {
-        if(video_list.length == 0) { return true; } // true: no video to show
+        if(videos.length == 0) { return true; } // true: no video to show
         // Choose a video the player has not seen yet
         if(bee.storage.players[bee.player].videos_seen === undefined) {
             bee.storage.players[bee.player].videos_seen = [];
@@ -522,7 +511,7 @@ function play_video(callback, video_list) {
         const videos_seen = bee.storage.players[bee.player].videos_seen;
         let videos_remaining;
         while(true) {
-            videos_remaining = video_list.filter((v) => videos_seen.indexOf(v) == -1);
+            videos_remaining = videos.filter((v) => videos_seen.indexOf(v) == -1);
             if(videos_remaining.length == 0) {
                 // Everything has been seen: re-enable the earliest-seen ones and try again
                 for(let i=0; i<8; i++) { videos_seen.shift(); }

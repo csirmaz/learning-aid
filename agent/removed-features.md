@@ -6,6 +6,39 @@ used, its content format, and where it used to be documented, with the removal d
 describes current behaviour** — do not implement or author against it without first re-adding the
 code.
 
+## `videolearn.html` and the `no_welcome` autostart — removed 2026-07-29
+
+A third app beside `spellbee.html` and `count.html`: a deliberately tiny page that played one
+learning video to the URL-named player and then dismissed the host webview. No questions, scoring,
+gifts, keyboard or aquarium. It was documented in the root `CLAUDE.md` under
+*"`videolearn.html` — play one video and dismiss"*.
+
+### Code symbols removed (restore these to bring it back)
+
+- **`videolearn.html`** — a black-background page with `.game` / `.startmenu` containers and the
+  usual smallprint tools; a `bee` config of `app_name:'videolearn'`, `no_welcome:true`,
+  `puzzle_needs:1` (marking a puzzle-alerter session) and `score_goal:20` (unused, kept only for the
+  shared score helpers); a `learn_videos` list that started empty and was extended from an optional
+  local hook, the same way the reward `videos` list is; a `main()` that called
+  `play_video(function(){ dismiss_puzzle_alert(); }, learn_videos)` and dismissed immediately when
+  that returned true; and a non-interactive `init_player_data(callback)` creating
+  `{videos_seen: []}`.
+- **The `bee.no_welcome` branch of `bootstrap()`** (`assets/common.js`, first branch, ahead of the
+  URL-player/puzzle path). With `no_welcome` set *and* a `?player=` present it skipped the welcome
+  screen, session sound and start button entirely: set `bee.player` and
+  `bee.is_puzzle = {needs: bee.puzzle_needs}`, hid `.game`, showed "Loading…", called
+  `load_local_data()` to keep the full user list, then loaded the player from the server when the
+  data-load hook was registered (staying on "Loading…" for ever if it failed, as elsewhere) or
+  proceeded straight from browser-local data, created the record via `init_player_data()` if absent,
+  and called `main()`.
+- **The optional second parameter of `play_video(callback, video_list)`.** It defaulted to the
+  reward `videos` catalogue, and the reward-video override hook was consulted **only** for that
+  default (`const reward_videos = (video_list === undefined)`). Everything else — the unseen-video
+  pick, `videos_seen` recording and the earliest-seen re-enable rotation — was already shared, so
+  restoring the parameter is a two-line change.
+- **`tools/update_version.pl`** — its `procfile('videolearn.html', 'HTML');` line, needed for the
+  page's cache-busting query strings to track the version chain.
+
 ## Segmented reveal repeat (`is_reveal`) — removed 2026-07-20
 
 After a segmented word was answered with enough help, the spaced-repetition scheduler inserted an

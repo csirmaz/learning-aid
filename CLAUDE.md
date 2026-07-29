@@ -8,9 +8,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 - **`spellbee.html`** — spelling game with an on-screen keyboard, phonics-based word list, and TTS pronunciation
 - **`count.html`** — arithmetic game with an on-screen numeric keypad
-- **`videolearn.html`** — a minimal app that plays a single learning video for the URL-named player and then dismisses the host webview (no questions, score or keyboard); see the architecture note below
 
-All apps are vanilla JS + jQuery, require no build step, and can be served from any static web server.
+Both apps are vanilla JS + jQuery, require no build step, and can be served from any static web server.
 
 ## Agent knowledge files
 
@@ -87,10 +86,14 @@ The aquarium widget keeps its **own** state under a separate `localStorage` key 
 
 Both HTML files end with `<script> bootstrap(); </script>` (after every other script has loaded), so `bootstrap()` in `common.js` is the single entry point. The per-app inline script supplies two helpers `bootstrap()` calls: `init_player_data(callback)` (creates a fresh `bee.storage.players[bee.player]` in the app-specific shape) and `main()` (starts gameplay once a player is chosen). `init_player_data` is **asynchronous** — it prompts the user for the starting word/problem range via `bee_prompt` (through the per-app `choose_wordsets(cb)` / `choose_problemset(cb)` helpers, which are likewise callback-based) — so it takes an optional completion `callback` that fires once the player record exists; `bootstrap()` waits on it before continuing.
 
+Both paths are built from the same callback-taking step helpers defined at the top of `bootstrap()`, so each path is just the order it runs them in: `refresh_player(next)` (pull the player from the server when the data-load hook is registered; `next(found)` says whether the server held a record), `have_player(found)` (does the player exist on either side?), `create_player(next)` (`init_player_data()` + `save_storage('init')`), `show_welcome(next)` / `show_player_menu()` (the two start screens) and `start_game()` (hide the menu, run `main()`).
+
+**Creation always follows the refresh**, on both paths: saving a fresh record first can put a stub on the backend that lands after — or instead of — the load and masks the real data.
+
 Two paths:
 
-- **URL player / puzzle mode** — if the URL carries `?player=<name>` (`get_player_from_url()`) *and* an optional server-backed data-load hook is present, the menu is skipped: `bee.player` is set, `bee.is_puzzle = {needs: bee.puzzle_needs}` is marked, and the player record is loaded and refreshed before play. This is the embedding used by an external **puzzle alerter** host: each correct answer's `add_score` save-callback decrements `bee.is_puzzle.needs`, and at zero `dismiss_puzzle_alert()` calls `window.PuzzleAlerter.solved()`.
-- **Regular menu** — otherwise it renders "Choose player" / "New user" buttons from `bee.storage.players`; selecting (or creating, via `init_player_data()`) a player then refreshes it through the optional data-load hook (when present) before calling `main()`.
+- **URL player / puzzle mode** — if the URL carries `?player=<name>` (`get_player_from_url()`) *and* an optional server-backed data-load hook is present, the menu is skipped: `bee.player` is set, `bee.is_puzzle = {needs: bee.puzzle_needs}` is marked, then `refresh_player` → (when neither side has the player) an alert plus `create_player` → `show_welcome` → play. This is the embedding used by an external **puzzle alerter** host: each correct answer's `add_score` save-callback decrements `bee.is_puzzle.needs`, and at zero `dismiss_puzzle_alert()` calls `window.PuzzleAlerter.solved()`.
+- **Regular menu** — otherwise `show_player_menu()` renders "Choose player" / "New user" buttons from `bee.storage.players` (browser-local names only). A listed player is settled, so it is `refresh_player` → play. **New user** prompts for a name and then runs the same `refresh_player` first, because a name this browser has never seen may still exist on the server: a name either side has is announced and loaded, and only one neither has goes to `create_player`. With no hook registered `refresh_player` reports `found` false immediately, so the name is created straight away as before.
 
 > Startup blocks on the backend **by design**: when the data-load hook is present, `bootstrap()` waits for it and will not proceed unless the load is confirmed, so a backend failure strands the page on "Loading…" rather than risk running with stale/wrong data. This path is only reachable when the optional data-load hook is registered; without it, the app always uses the regular menu and browser-local data.
 
@@ -101,14 +104,6 @@ Words live between `// [WORDS START]` and `// [WORDS END]` comments as pipe-deli
 ### `count.html` — problem generators
 
 Arithmetic problems are produced by generator functions in the `PRBL` object, chosen via `PROBLEMSETS` (a difficulty index → weighted generator list); each returns a `{problem, solution, hint}` object. The generators, the `hint` object's fields, and the full play loop are in [`agent/question-cycle.md`](agent/question-cycle.md).
-
-### `videolearn.html` — play one video and dismiss
-
-A deliberately tiny app: it shows a single learning video to the URL-named player, then dismisses the host webview. There are no questions, scoring, gifts, keyboard or aquarium.
-
-- **Autostart.** Its `bee` config sets `no_welcome: true`. `bootstrap()` honours that flag (when a `?player=` is present) by skipping the welcome screen, session sound and start button entirely — it loads the player's data (from the server when that hook is available, else browser-local), ensures a player record exists via the app's non-interactive `init_player_data()`, and goes straight into `main()`.
-- **Video selection.** `main()` calls the shared `play_video(callback, video_list)` with its own catalogue, `learn_videos`. That catalogue starts empty and is extended by the local layer the same way the reward `videos` list is. `play_video` was generalised to take an optional `video_list` (defaulting to the reward `videos`): it picks a video the player hasn't seen, records it in the player's `videos_seen` (persisted by `save_storage`, so the server keeps the history too), and once all are seen re-enables the earliest-seen ones — the same rotation the reward videos use. The reward-video override hook is only consulted for the default reward catalogue.
-- **Dismissal.** The `play_video` callback (and an immediate call when no video is available) is `dismiss_puzzle_alert()`, so the host webview is dismissed when the video ends or if there is nothing to play.
 
 ### Aquarium (`assets/aquarium/`)
 
