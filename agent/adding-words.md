@@ -104,13 +104,18 @@ Split the target into `=`-separated **segments**, one typed box each — either 
 
 Both fold to the silent phoneme `x`; the difference is the **link**:
 
-- **`/X` (capital)** — a silent **split-digraph "magic e"**: silent **and draws a link back to the
-  vowel two boxes to its left**. Use for a_e / i_e / o_e / u_e: `face` `<f=a/eI=c/s=e/X>`,
-  `plane` `<p=l=a/eI=n=e/X>`, `cute` `<c=u/ju:=t=e/X>`.
+- **`/X` (capital)** — a silent final e that **marks the preceding vowel's free (tense) value**, and
+  draws a link back to it two boxes to its left: `face` `<f=a/eI=c/s=e/X>`, `plane`
+  `<p=l=a/eI=n=e/X>`, `cute` `<c=u/ju:=t=e/X>`. The e is a **marker**; it is not part of the vowel's
+  grapheme, which stays the single letter (Venezky 1967's *free*/*checked* alternates and markers).
 - **`/x` (lowercase)** — a **plain silent letter**, no link. Use for every other silent letter: a
   silent final e after a digraph vowel (`cheese …s/z=e/x`, `mouse …s/s=e/x`, `horse …s=e/x`), a silent
   o (`chocolate …c=o/x…`), a silent t (`Christmas …s=t/x==m…`).
-- **Test:** is the silent e a magic-e modifying the vowel exactly two boxes back? → `/X`. Else → `/x`.
+- **Test — all three, else `/x`:** the segment two boxes back is (1) a **single primary vowel
+  letter** (a, e, i, o, u — not a digraph, not r-controlled), (2) voicing that letter's **free
+  alternate** — `a/eI`, `e/i:`, `i/aI`, `o/EU`, `u/ju:` or `u/u:` — and (3) separated from the e by
+  exactly **one consonant box**. Test (2) is the one that catches lookalikes: *machine* has `i/i:`,
+  not `i`'s free alternate `i/aI`, so its e marks nothing → `<m=a/E=ch/S=i/i:=n=e/x>`.
 
 ## 6. Morpheme-first segmentation
 

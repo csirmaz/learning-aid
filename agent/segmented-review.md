@@ -33,13 +33,15 @@ For each entry `"image|text|class"` (the `class` field is optional and usually a
    `/ɑː/`→`a:`, `/ə/`→`E` (`Er` for an `-er` ending), `/ʌ/`→`A`, `/eɪ/`→`eI`, silent→`x`). **Always override a wrong
    default** — the defaults are broad and frequently wrong in context (see below); never leave a
    segment voicing the wrong sound just because a default supplied one.
-   - **Split-digraph link `/X`.** A silent split-digraph "e" that lengthens the vowel **two boxes
-     to its left** (one consonant box between them, e.g. `<h=o/EU=m=e/X>`) may be spec'd `/X`
-     (capital) instead of `/x`: it is silent exactly like `/x` but also draws a linking line back
-     to the vowel box in the UI. Use `/X` only when the vowel is genuinely tensed by the e (`eI`,
-     `i:`, `aI`, `EU`, `ju:`, `u:`); leave r-controlled or reduced vowels (horse, come, chocolate)
-     as plain `/x`. It folds to `x`, so the audit still sees a valid phoneme — **do not "correct"
-     `/X` back to `/x`.**
+   - **Marker link `/X`.** A silent final e that **marks the preceding vowel's free (tense)
+     value** — the vowel sitting **two boxes to its left** (one consonant box between them, e.g.
+     `<h=o/EU=m=e/X>`) — may be spec'd `/X` (capital) instead of `/x`: it is silent exactly like
+     `/x` but also draws a linking line back to that vowel box in the UI. Use `/X` only where that
+     box is a **single primary vowel letter voicing its free alternate**: `a/eI`, `e/i:`, `i/aI`,
+     `o/EU`, `u/ju:`, `u/u:`. Everything else is plain `/x` — r-controlled or reduced vowels
+     (horse, come, chocolate), a vowel digraph that is already free by itself (cheese, mouse), and
+     a vowel whose value the e cannot be marking (*machine* is `i/i:`, not `i/aI`). It folds to
+     `x`, so the audit still sees a valid phoneme — **do not "correct" `/X` back to `/x`.**
    - **Morpheme boundary `==`.** A `==` used in place of a `=` separator marks a morpheme boundary:
      it splits segments exactly like `=` but also draws a thin vertical divider bar between the two
      boxes (e.g. `<m=i=c=r=o==s=c=o=p=e>` → `micro|scope`). It is purely presentational — it changes
@@ -69,13 +71,13 @@ node agent/segmented-audit.js [html-file]   # default: spellbee.html
 It loads the app's own `word_repository` / `process_word_data()` (which caches the processed word on
 `word_data.proc_cache`) / `phoneme_sounds` / `gp_grouping_pairs` / `gp_other_pairs` and lists, for
 **every** segmented entry (any whose text contains a `=`), every segment resolved to its phoneme
-(`*` = explicit spec, `~` = a `/X` split-digraph link, `[?]` = missing, `[!x]` = resolved to an
+(`*` = explicit spec, `~` = a `/X` marker link, `[?]` = missing, `[!x]` = resolved to an
 unknown phoneme id), flagging a **missing phoneme**, an **invalid phoneme**, a **`/X` link with no
 target box two segments to its left** (`link-no-target`), or a **grapheme/phoneme pair in neither
 registry** (`unknown-pair`) — so the audit always matches runtime behaviour. (Pair validation is
 inactive while both registries are empty; the tool notes this.) It reports
 structural gaps only; judging whether a *valid* resolved phoneme is *correct for RP* — or whether
-a `/X` link is warranted (the vowel is genuinely tensed by the silent e) — is the (LLM/human)
+a `/X` link is warranted (that vowel is voicing its free alternate) — is the (LLM/human)
 review step, and **arguable specs are put to the maintainer** (see Judgement notes). A **missing
 image is not a gap** and is not flagged: for a non-picturable word (step 1) an empty image is the
 correct final state, so judging picturability is the review step's job, not the audit's.

@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?482">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?484">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -133,13 +133,13 @@
         @keyframes seg_focus_bounce { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
         .prompt .infield_segmented .typebox.seg_focus_bounce { animation: seg_focus_bounce .5s ease-in-out 1; }
         .prompt .addwords .word.done { color: #ccc; border-color: #ddd; }
-        /* Split-digraph link ('/X' segment): a rounded half-box joining a tensed vowel box to its
-           silent-e box; drawn green once the vowel is correct (see draw_segment_connectors) */
+        /* Marker link ('/X' segment): a rounded half-box joining a vowel box to the silent e that
+           marks its free (tense) value; drawn green once the vowel is correct (see draw_segment_connectors) */
         .prompt .infield_segmented .inp { position: relative; }
         .prompt .infield_segmented .segbox_link {
             position: absolute;
             height: .6rem;               /* how far the link drops below the boxes */
-            border: 2px solid #3a3;       /* the split-digraph connector, kept 2px */
+            border: 2px solid #3a3;       /* the marker link, kept 2px */
             border-top: none;             /* bottom half of a box only */
             border-bottom-left-radius: .4rem;
             border-bottom-right-radius: .4rem;
@@ -247,10 +247,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?482">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?484">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?482"></script>
+    <script src="assets/local/beelocal.js?484"></script>
 </head>
 <body>
     <div class="container">
@@ -583,7 +583,7 @@
         // Valid phoneme ids for segmented words (a set; value always 1). IPA/example in each line
         // comment. 'x' = silent; 'ks' a cluster; 'SEn'/'Id' whole-morpheme pseudo-phonemes.
         const phoneme_sounds = {
-            'x': 1,     // silent (e.g. split-digraph "e"); the '/X' spec folds to 'x' plus a link
+            'x': 1,     // silent (e.g. a marker "e"); the '/X' spec folds to 'x' plus a link
             // Consonants
             'b': 1,     // /b/ as in "bat"
             'd': 1,     // /d/ as in "dog"
@@ -754,8 +754,8 @@
         // Inside <..> the target splits into '='-separated SEGMENTS, one typed box each:
         //   grapheme          e.g. <c=a=t>        - phoneme defaults per segment_default_phoneme
         //   grapheme/phoneme  e.g. <p=r=ai/eI=se/z> - explicit ascii phoneme id; unknown id -> console.error
-        //   /X                silent split-digraph e: folds to silent 'x' and draws a link back to the
-        //                     vowel two boxes to its left (e.g. cake, complete).
+        //   /X                silent MARKER e: folds to silent 'x' and draws a link back to the vowel
+        //                     two boxes to its left, whose free (tense) value it marks (e.g. cake, complete).
         //   ==                MORPHEME BOUNDARY: behaves as '=' but also draws a vertical divider bar
         //                     between the two boxes, e.g. <m=i=c=r=o==s=c=o=p=e> renders micro|scope
         //                     (real entries also carry the per-segment phonemes). It does NOT merge a
@@ -1213,7 +1213,7 @@
 "@💥|Something went <wr/r=o/o=ng>", // [wrong]
 "quill|<wr/r=i/aI=t=e/X> a book", // [write]
 "@🧑‍🍳|The <ch/S=e=f> works in the kitchen", // [chef]
-"@🪫|The <m=a/E=ch/S=i/i:=n=e/X> ran out of battery", // [machine]
+"@🪫|The <m=a/E=ch/S=i/i:=n=e/x> ran out of battery", // [machine]
 "@🤖|<m=a/E=ch/S=i/i:=n=e/x>", // [machine]
 "@🥸|<m=ou/E=s=t=a/a:=ch/S=e/x>", // [moustache]
 "@🥸|The <s=p=y/aI> put on a fake moustache", // [spy]
@@ -1336,8 +1336,8 @@
 "|I like <e/e=v=er/r=y/I> book.",            // [every]  er/r (~different)
 "|I have <m=a/e=n=y> toys.",                 // [many]   a/e (~any)
 "|How <m=u/A=ch> is it?",                    // [much]
-"@😀|<f=a/eI=c/s=e/X>",                      // [face]   e/X magic-e over "a"
-"@🎄|<Ch/k=r=i=s=t/x==m=a/E=s>",              // [Christmas]  silent t/x (plain, not magic-e); Christ==mas
+"@😀|<f=a/eI=c/s=e/X>",                      // [face]   e/X marker e over "a"
+"@🎄|<Ch/k=r=i=s=t/x==m=a/E=s>",              // [Christmas]  silent t/x (plain, not a marker); Christ==mas
 "|Can I <h/h=a/ae=v/v=e/x> this?",           // [have]
 "|The tree had <b=are/eE> branches.",        // [bare] reviewed
 "@🐇|The <h=are/eE> hopped away",             // [hare] reviewed
@@ -1390,7 +1390,7 @@
         };
 
     </script>
-    <script src="assets/common.js?482"></script>
+    <script src="assets/common.js?484"></script>
     <script>
     
         const bee_current_data_version = 5; // used for new players
@@ -1521,11 +1521,11 @@
             let mask_str = '';
             const add_words = []; // words to type in a story / segments (parts) in a segmented word
             const phonemes = []; // parallel to add_words: ascii phoneme id to voice each segment (see phoneme_sounds)
-            const connectors = []; // parallel to add_words: true if the segment draws a split-digraph link (see '/X' below)
+            const connectors = []; // parallel to add_words: true if the segment draws a marker link (see '/X' below)
             const boundaries = []; // parallel to add_words: true if a morpheme-boundary bar is drawn before this box (see '==' below)
             const full = word_data.text;
             // Segmented <..>: '='-separated segments, each optionally "grapheme/phoneme" (else
-            // segment_default_phoneme). '/X' = silent + split-digraph link, folded to 'x'. A '=='
+            // segment_default_phoneme). '/X' = silent + marker link, folded to 'x'. A '=='
             // separator additionally marks a morpheme boundary - a divider bar before the next box.
             const is_segmented = (full.indexOf('=') !== -1);
             let in_type = false;    // inside a <..> region
@@ -1537,7 +1537,7 @@
             // Finish the current segment: record its grapheme and its (explicit or default) phoneme
             const flush_segment = function() {
                 let ph = seg_phoneme.length ? seg_phoneme : default_phoneme(seg_grapheme);
-                // '/X' = silent + split-digraph link: fold to the silent phoneme 'x' and record the
+                // '/X' = silent + marker link: fold to the silent phoneme 'x' and record the
                 // link so render draws a line back to the vowel box two boxes to the left.
                 const has_link = (ph === 'X');
                 if(has_link) { ph = 'x'; }
@@ -1815,8 +1815,8 @@
         }
 
 
-        // Draw the split-digraph link line(s): a '/X' segment is a silent "e" lengthening the vowel
-        // two boxes to its left. Once that vowel box is correct, draw a rounded half-box joining the
+        // Draw the marker link line(s): a '/X' segment is a silent "e" marking the free (tense) value
+        // of the vowel two boxes to its left. Once that vowel box is correct, draw a rounded half-box joining the
         // two, measured centre-to-centre off the DOM rects. Rebuilt after each input re-render.
         function draw_segment_connectors() {
             const connectors = bee.processed_word.connectors;
@@ -2568,6 +2568,14 @@
             if(problem !== undefined) {
                 log += ' from queue';
                 if(problem.word_ix >= bee.words.length) { log += ' invalid'; problem = undefined; }
+                else if(force_intro && count_question_queue() <= 1) {
+                    // Returning to a group that has only its last word left: there is not enough of it
+                    // to be worth re-introducing, so drop it and let the branch below open a fresh
+                    // group - whose own intro then introduces the group we are actually about to play.
+                    log += ' purged_tail';
+                    purge_question_queue(); // persisted by the store_question11 calls below
+                    problem = undefined;
+                }
                 else if(force_intro) { // resuming a group after a gap: introduce it
                     log += ' gap_intro';
                     intro_word_ix = intro_word_for_class(problem.word_class, problem.word_ix);
@@ -2797,6 +2805,18 @@
             bee.storage.players[bee.player].scheduled_questions = [];
         }
 
+
+        // How many real problems are waiting. Empty slots are skipped: store_question11 refills
+        // them, and JSON storage turns an undefined into a null.
+        function count_question_queue() {
+            const s = get_question_queue();
+            let n = 0;
+            for(let i=0; i<s.length; i++) {
+                if(s[i] !== undefined && s[i] !== null) { n++; }
+            }
+            return n;
+        }
+
         
         // Record play activity time (persisted with the next save); drives the group-intro-on-return
         // gap check in new_question. Called wherever the queue is already saved.
@@ -2912,8 +2932,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?482"></script>
-    <script src="assets/aquarium/js/aquarium.js?482"></script>
+    <script src="assets/aquarium/js/config.js?484"></script>
+    <script src="assets/aquarium/js/aquarium.js?484"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

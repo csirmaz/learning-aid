@@ -7,8 +7,8 @@
 // Entry format is "<image>|<phrase>" or "<image>|<phrase>|<class>" (there is no level field). For
 // every segmented entry (any word whose <…> region contains a '=') it prints the target text with
 // each segment resolved to its phoneme (marking an explicit '/phoneme' spec with '*', a missing
-// phoneme as '[?]', a segment that resolved to an UNKNOWN phoneme id as '[!x]', and a split-digraph
-// link '/X' with a trailing '~'), and flags a missing phoneme, an invalid phoneme, a split-digraph
+// phoneme as '[?]', a segment that resolved to an UNKNOWN phoneme id as '[!x]', and a marker
+// link '/X' with a trailing '~'), and flags a missing phoneme, an invalid phoneme, a marker
 // link with no target box two segments to its left ('link-no-target'), and — once the pair
 // registries are populated — a grapheme/phoneme pair that is in neither gp_grouping_pairs nor
 // gp_other_pairs ('unknown-pair', mirroring the app's own check in init_wordlist_impl).
@@ -21,7 +21,7 @@
 //
 // A '/X' link folds to the silent phoneme 'x' at runtime, so it is a valid phoneme, not a gap;
 // this audit only checks its structure (that a vowel box exists two segments to its left). Whether
-// '/X' is the right call - i.e. the vowel is genuinely tensed by the silent e - is the human/LLM
+// '/X' is the right call - i.e. that vowel is voicing its free alternate - is the human/LLM
 // review step (see agent/segmented-review.md), same as judging any phoneme's RP correctness.
 //
 // It loads the app's own parser out of the HTML — word_repository, process_word_data (which caches
@@ -78,7 +78,7 @@ const audit = `
         const badPairs = [];
         for(let i = 0; i < p.add_words.length; i++) {
             const explicit = (rawsegs[i] || '').indexOf('/') >= 0;
-            const link = !!(p.connectors && p.connectors[i]); // '/X' split-digraph link
+            const link = !!(p.connectors && p.connectors[i]); // '/X' marker link
             if(link && i < 2) { badLinks++; }                 // link needs a vowel box two segments to its left
             const ph = p.phonemes[i];
             let tag;
@@ -121,5 +121,5 @@ for(const r of rows) {
     console.log(r.display);
     console.log('    ' + r.segs + (flags ? '   <<< ' + flags : ''));
 }
-console.log('\n' + rows.length + ' segmented entries; ' + needWork + ' need work.  (* = explicit /phoneme, ~ = split-digraph link /X, [?] = missing, [!x] = unknown phoneme)'
+console.log('\n' + rows.length + ' segmented entries; ' + needWork + ' need work.  (* = explicit /phoneme, ~ = marker link /X, [?] = missing, [!x] = unknown phoneme)'
     + (result.pairs_active ? '' : '\nNote: gp_grouping_pairs / gp_other_pairs are empty — grapheme/phoneme pair validation is inactive.'));
