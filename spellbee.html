@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?488">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?490">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -247,10 +247,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?488">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?490">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?488"></script>
+    <script src="assets/local/beelocal.js?490"></script>
 </head>
 <body>
     <div class="container">
@@ -346,6 +346,7 @@
             "ent/Ent": 1,
             "ant/Ent": 1,
             "tion/SEn": 1,
+            "sion/ZEn": 1,  // the -tion/-sion choice is the point: drill them as counterparts
             "con/kEn": 1,
             "ity/ItI": 1,
             "ot/Et": 1,
@@ -371,9 +372,11 @@
             "nn/n": 1,
             "rr/r": 1,
             "pp/p": 1,
+            "cc/k": 1,
 
             "k/k": 1,
             "c/k": 1,
+            "gu/g": 1,  // "u" carries no sound of its own: "guard", "guide", "guess", "guitar"
 
             "ph/f": 1,
             "ff/f": 1,
@@ -398,6 +401,9 @@
             "ay/eI": 1,
             "au/O:": 1,
             "aw/O:": 1,
+            // One box per phoneme: the silent "gh" belongs to the vowel unit rather than getting a
+            // soundless box of its own. Contrast gh/f below, which does have a sound.
+            "augh/O:": 1,  // "augh" = /ɔː/ in "naughty", "caught", "taught"
 
             "e/I": 1,
             "e/i:": 1,
@@ -549,6 +555,11 @@
             "a/e": 1,      // "a" = /e/ in "any", "many"
             "ere/3:": 1,   // "ere" = /ɜː/ in "were"
             "ey/i:": 1,    // "ey" = /iː/ in "key"
+            // Silent "gh" inside the vowel unit, like augh/O: above - but the only word so spelled
+            "aigh/eI": 1,  // "aigh" = /eɪ/ in "straight"
+            // Valid, but only one word-family each in the corpus - too few to drill as a group
+            "ine/En": 1,   // "ine" = /ən/ in "medicine"
+            "e/IE": 1,     // "e" = /ɪə/ in "material"
         };
 
         // Predictable grapheme/phoneme pairs: the grapheme is the obvious/default spelling of the
@@ -647,6 +658,7 @@
             'En': 1,    // /ən/
             'Et': 1,    // -et /ɪt/ or /ət/
             'SEn': 1,   // -tion /ʃən/
+            'ZEn': 1,   // -sion /ʒən/, the voiced counterpart of SEn
             'Id': 1,    // one value of the past tense morpheme, "-ed" ending, /ɪd/
             'lI': 1,    // -ly /lɪ/
             'ItI': 1,   // -ity /ɪtɪ/
@@ -782,7 +794,7 @@
 "|This is <g=r=ea/eI=t>!", // [great]
 "@✈️|The <p=l=a/eI=n=e/X> took off.", // [plane]
 "@🌾|flat grassy <p=l=ai/eI=n>", // [plain]
-"|He <o/o=ff/f=er/Er=ed/d> to help", // [offered]
+"|He <o/o=ff/f=er/Er==ed/d> to help", // [offered]
 "|Almost <c/k=o/E=m=p=l=e/i:=t=e/X>", // [complete]
 "|<s=t=r=a/eI=n=ge/dZ> creature", // [strange]
 "@👽|little green <c=r=ea/i:=ture/tSE>", // [creature]
@@ -1350,6 +1362,34 @@
 "|The cat has soft <f=ur/3:>.",              // [fur] reviewed
 "@✌️|world <p=ea=ce/s>",                      // [peace] reviewed
 "|Prices <in/In=c=r=ea=s/s=e/x> every year.", // [increase] in/In syllable reviewed
+"|I have an <i=n=t=er/Er=e=s=t> in space.",  // [interest] reviewed
+"@🗓️|<F=e=b=r=u/u:=a/E=r=y/I> is a cold month|calendar", // [February] reviewed
+"|Take one step <f=or/O:=w=ar/Er=d>.",       // [forward] silent r; ar/Er as in "sugar" reviewed
+"@💂|The <gu/g=ar=d> stood very still.",      // [guard] gu/g reviewed
+"|I will <gu/g=i/aI=d=e/X> you home.",       // [guide] gu/g reviewed
+"@📚|I borrow books from the <l=i/aI=b=r=a/E=r=y/I>.", // [library] reviewed
+"|What <m=a/E=t=e/IE=r=i/i:=al/sl> is this made of?", // [material] e/IE reviewed
+"@💊|Take your <m=e=d=i=c/s=ine/En>.",        // [medicine] ine/En reviewed
+"|The <n=augh/O:=t=y/I> puppy chewed my shoe.", // [naughty] augh/O: one unit reviewed
+"|Did you <n=o/EU=t=i=ce/s> my new shoes?",  // [notice] reviewed
+"@🎉|A birthday is a special <o/E=cc/k=a/eI=sion/ZEn>.", // [occasion] cc/k, sion/ZEn reviewed
+"|We <o/E=cc/k=a/eI=sion/ZEn==al/sl==ly/lI> go to the sea.", // [occasionally] reviewed
+"|Draw a <s=t=r=aigh/eI=t> line.",           // [straight] aigh/eI one unit reviewed
+"@🫐|The bird ate a <b=e=rr/r=y/I>.",         // [berry] reviewed
+"|This puzzle is very <s=i=m=p=le/sl>.",     // [simple] reviewed
+"|It is <s=i=m=p=ly/lI> the best.",          // [simply] reviewed
+"|Be <g/dZ=e=n=t=le/sl> with the kitten.",   // [gentle] reviewed
+"|Stroke the cat <g/dZ=e=n=t=ly/lI>.",       // [gently] reviewed
+"|It is <b=a/eI=s=i=c/k==al/sl==ly/lI> a big box.", // [basically] reviewed
+"|<T=r=a=g/dZ=i=c/k==al/sl==ly/lI>, the plant died.", // [tragically] reviewed
+"|I <b=e/I=l=ie/i:=v=e/x> you.",             // [believe] ie/i: reviewed
+"|Tickets are <l=i=m=i=t==ed/Id>.",          // [limited] reviewed
+"|He is <o/o=ff/f=er/Er==ing> to help",      // [offering] reviewed
+"|I <c/k=augh/O:=t> the ball.",              // [caught] augh/O: reviewed
+"|My teacher <t=augh/O:=t> me to swim.",     // [taught] augh/O: reviewed
+"@👧|a son and a <d=augh/O:=t=er/Er>",       // [daughter] augh/O: reviewed
+"|Owls have good <v=i=sion/ZEn> at night.",  // [vision] sion/ZEn reviewed
+"|I made my <de/dI=c/s=i=sion/ZEn>.",        // [decision] sion/ZEn reviewed
 ];
 // [WORDS END]
 
@@ -1363,6 +1403,7 @@
             max_box_len: 14, // segmented words: once the boxes' proxy length exceeds this, boxes are
                              // sized compactly instead of uniformly (see render_segmented_input)
             intro_gap_ms: 30*60*1000, // resuming the persisted queue after this idle gap re-shows the group intro
+            level_weight_base: 1.35, // easier-first selection weight, base^(-level) - see choose_using_levels20
             // State (common)
             storage: {'players': {}},  // storage data that's saved into local storage
             load_time: Date.now(),
@@ -1390,7 +1431,7 @@
         };
 
     </script>
-    <script src="assets/common.js?488"></script>
+    <script src="assets/common.js?490"></script>
     <script>
     
         const bee_current_data_version = 5; // used for new players
@@ -2010,6 +2051,13 @@
                 ['You can write the sound', 'as']
             ]);
 
+            // The sentence the example word sits in, if the entry gives one: to_display differs
+            // from the word itself by more than punctuation/case (a bare entry can still carry
+            // punctuation, e.g. "Wait!"). Spoken as "<word> as in <context>".
+            let context = word_data.to_display;
+            const bare = function(s) { return s.toLowerCase().replaceAll(/[^a-z]/g, ''); };
+            if(bare(context) == bare(word_data.to_type)) { context = undefined; }
+
             const utterances = [];
             utterances[0] = function() { play_word(sentence[0], utterances[1]); };
             utterances[1] = make_pause(.25, 2);
@@ -2020,11 +2068,17 @@
             utterances[6] = function() { play_word(choose_from(['Listen:', 'So:', 'So this says:', 'So this is:']), utterances[7]); };
             utterances[7] = make_pause(0.3, 8);
             utterances[8] = function() { play_word(word_data.to_type, utterances[9]); };
-            utterances[9] = make_pause(1.2, 10);
-            utterances[10] = function() { play_phoneme(phoneme, utterances[11]); };
-            utterances[11] = make_pause(1.5, 12);
-            utterances[12] = function() { play_word('Tap on the boxes to hear their sound.', utterances[13]); };
-            utterances[13] = function() {
+            // With a context, steps 10-13 add "as in <context>" - a pause either side of the
+            // connector, as in slow speech; without one we jump straight on to the phoneme
+            utterances[9] = (context === undefined) ? make_pause(1.2, 14) : make_pause(0.5, 10);
+            utterances[10] = function() { play_word('as in', utterances[11]); };
+            utterances[11] = make_pause(0.5, 12);
+            utterances[12] = function() { play_word(context, utterances[13]); };
+            utterances[13] = make_pause(1.2, 14);
+            utterances[14] = function() { play_phoneme(phoneme, utterances[15]); };
+            utterances[15] = make_pause(1.5, 16);
+            utterances[16] = function() { play_word('Tap on the boxes to hear their sound.', utterances[17]); };
+            utterances[17] = function() {
                 setTimeout(function() {
                     // Hide the intro and bring the game (header, prompt, keyboard) back
                     $('.startmenu').hide().html('');
@@ -2671,7 +2725,11 @@
         }
 
 
-        // Choose an item using the levels from the list of word indices or all words if undefined
+        // Choose an item using the levels from the list of word indices or all words if undefined.
+        // Weight is bee.level_weight_base^(-level), so each extra segment makes a word that much
+        // less likely; the base is deliberately mild because the adaptive machinery
+        // (known_score_to_choice20 here, the pair_stats gate in new_question) is what should be
+        // regulating difficulty - this is only a static prior.
         function choose_using_levels20(list_of_wordix) {
             const word_weights_cumulative = [];
             let word_weight_sum = 0;
@@ -2680,7 +2738,7 @@
             const loop_limit = (list_of_wordix === undefined ? bee.words.length : list_of_wordix.length);
             for(let i=0; i<loop_limit; i++) {
                 const word_ix = (list_of_wordix === undefined ? i : list_of_wordix[i]);
-                const w = Math.pow(1.5, -bee.words[word_ix].level);
+                const w = Math.pow(bee.level_weight_base, -bee.words[word_ix].level);
                 word_weight_sum += w;
                 word_weights_cumulative.push(word_weight_sum);
             }
@@ -2699,13 +2757,15 @@
 
 
         // Weighted random choice of a class name, biased towards classes whose easiest members are
-        // low-level (bee.class_level, set in init_wordlist_impl) - the same 1.5^(-level) weighting as
-        // choose_using_levels20, but over classes rather than words.
+        // low-level (bee.class_level, set in init_wordlist_impl) - the same bee.level_weight_base
+        // weighting as choose_using_levels20, but over classes rather than words. Note class_level
+        // is the mean of a class's 4 lowest members, which compresses its range, so the bias here is
+        // weak whatever the base - class choice is meant to be driven by the pair_stats gate.
         function choose_class_by_level(classes) {
             const cumulative = [];
             let sum = 0;
             for(let i=0; i<classes.length; i++) {
-                sum += Math.pow(1.5, -bee.class_level[classes[i]]);
+                sum += Math.pow(bee.level_weight_base, -bee.class_level[classes[i]]);
                 cumulative.push(sum);
             }
             const point = Math.random() * sum;
@@ -2932,8 +2992,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?488"></script>
-    <script src="assets/aquarium/js/aquarium.js?488"></script>
+    <script src="assets/aquarium/js/config.js?490"></script>
+    <script src="assets/aquarium/js/aquarium.js?490"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

@@ -79,7 +79,7 @@ smoothed success rate, the acceptance probabilities) lives in
 
 - **`bee.class_to_ix`** (above) — class → member word indices.
 - **`bee.class_level[class]`** — the mean `level` of the class's **4 lowest-level members**, used to
-  weight the class pick towards easier groups (`choose_class_by_level`, the same `1.5^(-level)` shape
+  weight the class pick towards easier groups (`choose_class_by_level`, the same `bee.level_weight_base^(-level)` shape
   as the per-word `choose_using_levels20`).
 
 Every non-empty class is a candidate, including `noclass` and the explicit thematic classes: those
