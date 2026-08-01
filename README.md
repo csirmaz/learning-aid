@@ -7,11 +7,9 @@ Reusable web-based tools to help KS1 and KS2 children (5 years and up) with math
 - Literacy: https://csirmaz.github.io/learning-aid/spellbee.html
 - Arithmetic: https://csirmaz.github.io/learning-aid/count.html
 
-![screenshot](https://csirmaz.github.io/learning-aid/assets/spell-sample.png)
-
-![screenshot](https://csirmaz.github.io/learning-aid/assets/count-sample.png)
-
 ## Literacy
+
+![screenshot](https://csirmaz.github.io/learning-aid/assets/spell-sample2.png)
 
 The Spellbee game has been designed to help consolidate how English sounds are written, which can be problematic
 with some readers with dyslexia, whose spoken phonology is often secure long before the orthography is.
@@ -52,6 +50,8 @@ The phonology and pronunciation reflects UK English (RP). Note that Spellbee is 
 
 
 ## Maths
+
+![screenshot](https://csirmaz.github.io/learning-aid/assets/count-sample.png)
 
 - Multiple problem generators
 - Relative frequencies of problem types set by difficulty level
