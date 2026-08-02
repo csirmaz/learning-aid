@@ -172,7 +172,17 @@
             max-width: 8rem;
             image-rendering: pixelated;
         }
-        .groupintro .gi_word { font-size: 2.6rem; line-height: 3.5rem; letter-spacing: .15rem; }
+        /* The example word starts out blurred and comes into focus as the splash appears */
+        .groupintro .gi_word {
+            font-size: 2.6rem;
+            line-height: 3.5rem;
+            letter-spacing: .15rem;
+            animation: gi-focus-animation .8s ease-out both;
+        }
+        @keyframes gi-focus-animation {
+            from { filter: blur(.6rem); }
+            to { filter: blur(0); }
+        }
         .groupintro .gi_match {
             color: #a0c;
             text-decoration: underline solid #a0c .2rem;
@@ -2077,8 +2087,7 @@
             utterances[13] = make_pause(1.2, 14);
             utterances[14] = function() { play_phoneme(phoneme, utterances[15]); };
             utterances[15] = make_pause(1.5, 16);
-            utterances[16] = function() { play_word('Tap on the boxes to hear their sound.', utterances[17]); };
-            utterances[17] = function() {
+            utterances[16] = function() {
                 setTimeout(function() {
                     // Hide the intro and bring the game (header, prompt, keyboard) back
                     $('.startmenu').hide().html('');

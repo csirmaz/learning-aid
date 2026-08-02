@@ -25,7 +25,7 @@ scaffolding the rest of the word with a visible word segment bank.
 It tracks success rates per pair and returns to segments as needed with spaced training, which
 again was shown to have the best effect on learning.
 
-The phonology and pronunciation reflects UK English (RP). Note that Spellbee is a practice aid for home use, not a clinical intervention.
+The phonology and pronunciation reflects UK English (SSBE). Note that Spellbee is a practice aid for home use, not a clinical intervention.
 
 **Further features**
 
