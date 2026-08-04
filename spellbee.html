@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?490">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?491">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -257,10 +257,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?490">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?491">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?490"></script>
+    <script src="assets/local/beelocal.js?491"></script>
 </head>
 <body>
     <div class="container">
@@ -1441,7 +1441,7 @@
         };
 
     </script>
-    <script src="assets/common.js?490"></script>
+    <script src="assets/common.js?491"></script>
     <script>
     
         const bee_current_data_version = 5; // used for new players
@@ -2160,15 +2160,24 @@
         }
         
                 
+        // ---- Per-word score (pstore.known_words) ----
+        // Keyed by the target's to_type string, each value is a pair of counters:
+        //   [0] successful types - the word was entered without help (add_known_word)
+        //   [1] all asks - every time the word was shown other than as a repeat (start_question14)
+        // A missing value, or an older single-count (non-array) one, is initialised to [0, 0].
+        function word_stat(word) {
+            const pstore = bee.storage.players[bee.player];
+            if(!pstore.known_words) { pstore.known_words = {}; }
+            if(!Array.isArray(pstore.known_words[word])) { pstore.known_words[word] = [0, 0]; }
+            return pstore.known_words[word];
+        }
+
+
         // Mark a word as known, and count how many times it was successfully entered
         // A word is known if it could be typed without help
         function add_known_word() {
             data_migration();
-            const pstore = bee.storage.players[bee.player];
-            
-            const word = bee.processed_word.to_type;
-            if(!pstore.known_words) { pstore.known_words = {}; }
-            if(pstore.known_words[word] === undefined) { pstore.known_words[word] = 1; } else { pstore.known_words[word]++; }
+            word_stat(bee.processed_word.to_type)[0]++;
             save_storage('add_known_word');
         }
         
@@ -2183,13 +2192,14 @@
         
         
         // Return the count of successful entries of a word, keyed on its to_type string
-        // (the same key add_known_word writes).
+        // (the same key add_known_word writes). Reads without initialising, so merely considering
+        // a word doesn't give it a known_words entry; an uninitialised value counts as 0.
         function is_known_word(word_ix) {
             const kw = bee.storage.players[bee.player].known_words;
             if(!kw) { return 0; }
             const key = bee.words[word_ix].proc_cache.to_type;
             const c = kw[key];
-            return c === undefined ? 0 : c;
+            return Array.isArray(c) ? c[0] : 0;
         }
 
 
@@ -2474,6 +2484,12 @@
             bee.help_full_bar = false;
             bee.seg_class = [];    // per-segment classification (focus/obvious/revealed), set below
             bee.seg_locked = [];   // per-segment: can no longer score (already scored, or a backspace disqualified it)
+
+            // Per-word score: count the ask. A repeat is excluded, as it can never be marked known
+            // (its outcome is always OK) and so could only dilute the rate; the success half is
+            // counted by add_known_word. Like the pair stats below, this is left to be persisted by
+            // the next save_storage rather than saving on every question.
+            if(!bee.problem.is_repeat) { word_stat(bee.processed_word.to_type)[1]++; }
 
             // Per-pair coverage stats: classify each segment once, when first shown, and count the
             // "ask" (the odd counters). Repeats must not move the stats.
@@ -3001,8 +3017,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?490"></script>
-    <script src="assets/aquarium/js/aquarium.js?490"></script>
+    <script src="assets/aquarium/js/config.js?491"></script>
+    <script src="assets/aquarium/js/aquarium.js?491"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
