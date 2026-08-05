@@ -330,7 +330,7 @@
             | <a href="#" onclick="window.location.reload(true); return false">Switch player</a>
             | <a href="#" onclick="modify_level_range(); return false">Update level range</a>
             | <a href="#" onclick="reduce_score(); return false">Reduce score</a>
-            | <a href="#" onclick="reset_known_wordtts(); return false">Reset known words-to-type</a>
+            | <a href="#" onclick="reset_coverage_stats(); return false">Reset coverage stats</a>
             | <a href="#" onclick="delete_user(); return false">Delete user</a>
         </span>
         | <a href="https://icons8.com">I</a>cons8
@@ -483,7 +483,6 @@
             "all/O:": 1,
             "er/3:": 1,
             "air/eE": 1,
-            "ia/aI": 1,
             "ol/sl": 1,
             "le/sl": 1,
             "r/Er": 1,
@@ -511,7 +510,6 @@
             "ie/i:": 1,
             "ea/i:": 1,
             "ou/u:": 1,
-            "ew/u:": 1,
             "ew/ju:": 1,
             // broken
             "ir/3:": 1,
@@ -785,6 +783,11 @@
         //
         // Auto-derived (entries carry neither): level = number of segments; phonics CLASSES = each
         // segment's GP pair.
+        //
+        // An entry may also be the literal `false` instead of a string: the problem is DISABLED and
+        // is never selected, but it still occupies its index, so every other problem keeps the index
+        // it already had. Use this to retire a problem - deleting the entry would shift the indices
+        // below it and silently repoint players' persisted question queues at the wrong problems.
         // [PROBLEMS START]
         const problem_repository = [
 
@@ -1019,12 +1022,12 @@
 "@❄️|<s=n=ow/EU>", // [snow]
 "bow|<b=ow/EU>", // [bow] (weapon) reviewed
 "|Frogs will <f=o/o=ll=ow/EU> you if you hold a slime ball.", // [follow]
-"@🔩|<s=c=r=ew/u:>", // [screw]
-"@📰|good <n=ew/u:=s/z>", // [news]
-"@👟|<n=ew/u:> shoes", // [new]
+"@🔩|<s=c=r=ew/ju:>", // [screw]
+"@📰|good <n=ew/ju:=s/z>", // [news]
+"@👟|<n=ew/ju:> shoes", // [new]
 "@👟|new <sh=oe/u:=s/z>", // [shoes]
 "@📚|a <f=ew/ju:> books", // [few]
-"|I <kn/n=ew/u:> you could do it!", // [knew]
+"|I <kn/n=ew/ju:> you could do it!", // [knew]
 "@🏞️|What a nice <v=iew/ju:>!", // [view]
 "@🎞️|Let's <p=au/O:=se/z> the video", // [pause]
 "@🦕|<d=i/aI=n=o/E=s=aur/O:>", // [dinosaur]
@@ -1182,8 +1185,8 @@
 "skeletonskull|<s=k=e/e=l=e/I=t=o/E=n> skull", // [skeleton]
 "melons|<m=e=l=o/E=n>", // [melon]
 "@🎹|play the <p=i/i:=a/ae=n=o/EU>", // [piano]
-"diamond@💎|<d=ia/aI=m=o/E=n=d>", // [diamond]
-"@🐇|Rabbits like <c=a/ae=rr/r=o/E=t=s/s>.", // [carrots]
+false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
+"@🐇|Rabbits like <c=a/ae=rr/r=ot/Et=s/s>.", // [carrots]
 "@🇪🇺|European <U/ju:=n=i/I=o/E=n>", // [union]
 "@🪞|<m=i=rr=or/Er>", // [mirror]
 "@🚜|<t=r=a/ae=c=t=or/Er>", // [tractor]
@@ -1310,7 +1313,7 @@
 "@💬|They <m=e=n=tion> my name", // [mention]
 
 // calendar
-"@🗓️|The weekend is <S=a=t=ur/E==d=ay> and Sunday|calendar", // [Saturday]
+"@🗓️|The weekend is <S=a=t=ur/E==d=ay> and Sunday", // [Saturday]
 "@🗓️|<S=u/A=n==d=ay>|calendar", // [Sunday]
 
 "|In my <o/E=p=i/I=n=io/IE=n>.", // [opinion]
@@ -1372,7 +1375,7 @@
 "@✌️|world <p=ea=ce/s>",                      // [peace] reviewed
 "|Prices <in/In=c=r=ea=s/s=e/x> every year.", // [increase] in/In syllable reviewed
 "|I have an <i=n=t=er/Er=e=s=t> in space.",  // [interest] reviewed
-"@🗓️|<F=e=b=r=u/u:=a/E=r=y/I> is a cold month|calendar", // [February] reviewed
+"@🗓️|<F=e=b=r=u/u:=a/E=r=y/I> is a cold month", // [February] reviewed
 "|Take one step <f=or/O:=w=ar/Er=d>.",       // [forward] silent r; ar/Er as in "sugar" reviewed
 "@💂|The <gu/g=ar=d> stood very still.",      // [guard] gu/g reviewed
 "|I will <gu/g=i/aI=d=e/X> you home.",       // [guide] gu/g reviewed
@@ -1399,6 +1402,123 @@
 "@👧|a son and a <d=augh/O:=t=er/Er>",       // [daughter] augh/O: reviewed
 "|Owls have good <v=i=sion/ZEn> at night.",  // [vision] sion/ZEn reviewed
 "|I made my <de/dI=c/s=i=sion/ZEn>.",        // [decision] sion/ZEn reviewed
+"|I <w=a/o=n=t> a turn", // [want]
+"@⌚|a new <w=a/o=tch/tS>", // [watch]
+"@🦢|a white <s=w=a/o=n>", // [swan]
+"@🧂|add some <s=a/O:=l=t>", // [salt]
+"|I <a/O:=l==w=ay=s/z> win", // [always]
+"@🚶|go for a <w=al/O:=k>", // [walk]
+"|let's <t=al/O:=k>", // [talk]
+"@🖍️|a stick of <ch=al/O:=k>", // [chalk]
+"@💧|morning <d=ew/ju:>", // [dew]
+"@👦|my <n=e=ph=ew/ju:>", // [nephew]
+"@🧥|wear a <h=oo/U=d=ie/I>", // [hoodie]
+"@🧞|a magic <g/dZ=e/i:=n=ie/I>", // [genie]
+"@🦜|a pet <b=u/A=dge/dZ=ie/I>", // [budgie]
+"@🎨|a nice <de/dI==s/z=ig/aI=n>", // [design]
+"|I will <re/rI==s/z=ig/aI=n> from the team", // [resign]
+"|Please <a/E=s/s==s/s=ig/aI=n> the jobs", // [assign]
+"@⛽|a <p=e=t=r=ol/sl> station", // [petrol]
+"@🎄|sing a <c=a=r=ol/sl>", // [carol]
+"@🌟|a pop <i/aI=d=ol/sl>", // [idol]
+"@⭐|a <f=a/eI=m=ou/E=s/s> singer", // [famous]
+"@😰|I feel <n=er/3:=v=ou/E=s/s>", // [nervous]
+"@😒|do not be <j/dZ=ea/e=l=ou/E=s/s>", // [jealous]
+"@🔓|<un/An==l=o/o=ck/k> the door", // [unlock]
+"@🧳|<un/An==p=a=ck/k> your bag", // [unpack]
+"|do not be <un/An==k=i/aI=n=d>", // [unkind]
+"@🎁|a big <s=ur/E=p=r=i/aI=se/z>", // [surprise]
+"|plants need water to <s=ur/E=v=i/aI=v=e/X>", // [survive]
+"|trees <s=ur/E==r=ou/aU=n=d> the house", // [surround]
+"|I <re/rI==f=err/3:=ed/d> to the map", // [referred]
+"|the match was <de/dI==f=err/3:=ed/d>", // [deferred]
+"|I <t=r=a=n=s==f=err/3:=ed/d> the water", // [transferred]
+"|I leaned <a/E=g=ai/e=n=s=t> the wall", // [against]
+"|a <d=i=s=t=ant/Ent> star", // [distant]
+"|in an <i=n=s=t=ant/Ent> it was gone", // [instant]
+"@👑|a royal <s=er/3:=v=ant/Ent>", // [servant]
+"@🍅|tomato <s=au/O:=ce/s>", // [sauce]
+"@📖|the book's <au/O:=th/T=or/Er>", // [author]
+"@⚽|a game of <s=o/o=cc/k=er>", // [soccer]
+"@🥦|eat your <b=r=o/o=cc/k=o/E=l=i/I>", // [broccoli]
+"@🦝|a <r=a/E=cc/k=oo/u:=n> in the bin", // [raccoon]
+"@🌉|cross the <b=r=i=dge/dZ>", // [bridge]
+"@🧊|milk in the <f=r=i=dge/dZ>", // [fridge]
+"@🎖️|a shiny <b=a=dge/dZ>", // [badge]
+"@🥩|a juicy <s=t=ea/eI=k>", // [steak]
+"|the frog <j/dZ=u/A=m=p==ed/t>", // [jumped]
+"|she <h=e=l=p==ed/t> me", // [helped]
+"@⚽|he <k=i=ck/k==ed/t> the ball", // [kicked]
+"|I <re/rI==c/s=ei/i:=v=e/x> a letter", // [receive]
+"@🌊|big <w=a/eI=v=e/X==s/z>", // [waves]
+"@💰|lots of <m=o/A=n=ey/I>", // [money]
+"@🍯|sweet <h=o/A=n=ey/I>", // [honey]
+"@🦃|a big <t=ur=k=ey/I>", // [turkey]
+"|a <t=ou/A=gh/f> job", // [tough]
+"|this puzzle is <t=ou/A=gh/f==er>", // [tougher]
+"|take a <gu/g=e=ss/s>", // [guess]
+"@🎸|play the <gu/g=i=t=ar>", // [guitar]
+"|a special <gu/g=e=s=t>", // [guest]
+"@🐦|a little <b=ir=d>", // [bird]
+"@👧|a happy <g=ir=l>", // [girl]
+"@🥇|you came <f=ir=s=t>", // [first]
+"@🐑|a baby <l=a=mb/m>", // [lamb]
+"@💈|<c=o/EU=mb/m> your hair", // [comb]
+"@🍞|a bread <c=r=u/A=mb/m>", // [crumb]
+"@🛶|paddle a <c=a/E=n=oe/u:>", // [canoe]
+"@👟|tie your <sh=oe/u:==l=a/eI=ce/s>", // [shoelace]
+"@✋|<h=ol/EU=d> my hand", // [hold]
+"|I <t=ol/EU=d> you so", // [told]
+"@🏠|an <i=n==d=oor/O:> game", // [indoor]
+"@🌳|an <ou/aU=t==d=oor/O:> picnic", // [outdoor]
+"|a new <w=or/3:=d>", // [word]
+"@🪱|a wiggly <w=or/3:=m>", // [worm]
+"|it is <w=or/3:=th/T> it", // [worth]
+"|do not <f=or/E==g=e=t>", // [forget]
+"|I <f=or/E==g=o/o=t> my hat", // [forgot]
+"@🐎|a horse pulls the <ch=a=r=i=ot/Et>", // [chariot]
+"@🪱|a wriggly <m=a=gg/g=ot/Et>", // [maggot]
+"@🍜|a bowl of <s=ou/u:=p>", // [soup]
+"|a <y/j=ou/u:=th/T> club", // [youth]
+"@📏|<m=ea/e=s/Z=ur/Er=e/x> it with a ruler", // [measure]
+"@🏴‍☠️|buried <t=r=ea/e=s/Z=ur/Er=e/x>", // [treasure]
+"|<p=u/U=t> it down", // [put]
+"@🚪|<p=u/U=sh> the door", // [push]
+"|<p=u/U=ll> the rope", // [pull]
+"@🤵|a smart <s=ui/u:=t>", // [suit]
+"@🚢|a <c=r=ui/u:=se/z> ship", // [cruise]
+"@🎁|<wr/r=a=p> the present", // [wrap]
+"@⌚|a watch on my <wr/r=i=s=t>", // [wrist]
+"@🥬|a green <c=a=bb/b=age/IdZ>", // [cabbage]
+"@🤝|<sh=are/eE> your toys", // [share]
+"@📅|<M=o/A=n==d=ay> is a school day|calendar", // [Monday]
+"|shout to hear the <e=ch/k=o/EU>", // [echo]
+"@🪂|jump with a <p=a=r=a/E==ch/S=u/u:=t=e/x>", // [parachute]
+"|do not <con/kEn==f=u/ju:=se/z> me", // [confuse]
+"@🐷|<m=u/A=dd/d=y/I> boots", // [muddy]
+"|I <s=w=ear/eE> it is true", // [swear]
+"|I <w=a/o=n=t==ed/Id> to help", // [wanted]
+"@🔢|count to <eigh/eI=t=y/I>", // [eighty]
+"@📦|a <p=ar=c/s=el/sl> in the post", // [parcel]
+"@🎓|a hard-working <s=t=u/ju:=d=ent/Ent>", // [student]
+"@🍽️|wash the <d=i=sh==es/Iz>", // [dishes]
+"@💪|a <p=ow/aU=er==ful/fUl> engine", // [powerful]
+"@📄|turn the <p=a/eI=ge/dZ>", // [page]
+"@😄|a happy <g=i=gg/g=le/sl>", // [giggle]
+"@🌾|a green <f=ie/i:=l=d>", // [field]
+"@|my whole <f=a=m=ily/IlI>", // [family]
+"@😴|I am very <t=ire/aIE=d>", // [tired]
+"|a fun <a=c/k=t=i=v=ity/ItI>", // [activity]
+"@🔨|bang with a <h=a=mm/m=er>", // [hammer]
+"@🧈|bread and <b=u/A=tt/t=er>", // [butter]
+"@🌳|explore <n=a/eI=ture/tSE>", // [nature]
+"@🟡|the sun is <y/j=e=ll=ow/EU>", // [yellow]
+"@📷|take a photo with the <c=a=m=er/r=a/E>", // [camera]
+"|I saw it <s=e=v=er/r=al/sl> times", // [several]
+"|it is <s=o/A=m=e/x==wh/w=ere/eE> here", // [somewhere]
+"|you can go <a/e=n=y/I==wh/w=ere/eE>", // [anywhere]
+"@🌍|Earth's <a=t=m=o/E==s=ph=ere/IE>", // [atmosphere]
+"|a <s=e/I=v=ere/IE> storm", // [severe]
 ];
 // [PROBLEMS END]
 
@@ -1443,7 +1563,7 @@
     <script src="assets/common.js?492"></script>
     <script>
     
-        const bee_current_data_version = 5; // used for new players
+        const bee_current_data_version = 6; // used for new players
 
         function data_migration() {
             if(bee.player === false) { console.warn('no player to migrate'); return; }
@@ -1454,13 +1574,20 @@
             // [2] Add further migrations here
 
             if(version < 5) {
-                // GP-pair-keyed coverage selection: drop the full-text success record (now replaced
-                // by known_words[wordtt], see is_known_wordtt) and add the per-pair coverage stats.
+                // GP-pair-keyed coverage selection: drop the old full-text success record and add
+                // the per-pair coverage stats.
                 delete pstore.known_questions;
                 if(!pstore.pair_stats) { pstore.pair_stats = {}; }
                 version = 5;
             }
-            
+
+            if(version < 6) {
+                // The per-wordtt "known words" success record and its selection gate were removed;
+                // the per-pair coverage stats now regulate selection on their own.
+                delete pstore.known_words;
+                version = 6;
+            }
+
             if(pstore.data_version != version) {
                 pstore.data_version = version;
                 save_storage('data migration');
@@ -2162,47 +2289,11 @@
         }
         
                 
-        // ---- Per-word-to-type score (pstore.known_words) ----
-        // Note: `known_words` is a persisted user-data key, so it keeps its historical name.
-        // Keyed by the wordtt string, each value is a pair of counters:
-        //   [0] successful types - the wordtt was entered without help (add_known_wordtt)
-        //   [1] all asks - every time the wordtt was shown other than as a repeat (start_question14)
-        // A missing value, or an older single-count (non-array) one, is initialised to [0, 0].
-        function wordtt_stat(wordtt) {
+        function reset_coverage_stats() {
             const pstore = bee.storage.players[bee.player];
-            if(!pstore.known_words) { pstore.known_words = {}; }
-            if(!Array.isArray(pstore.known_words[wordtt])) { pstore.known_words[wordtt] = [0, 0]; }
-            return pstore.known_words[wordtt];
-        }
-
-
-        // Mark a wordtt as known, and count how many times it was successfully entered
-        // A wordtt is known if it could be typed without help
-        function add_known_wordtt() {
-            data_migration();
-            wordtt_stat(bee.processed_problem.wordtt)[0]++;
-            save_storage('add_known_wordtt');
-        }
-        
-        
-        function reset_known_wordtts() {
-            const pstore = bee.storage.players[bee.player];
-            if(pstore.known_words) { pstore.known_words = {}; }
             if(pstore.pair_stats) { pstore.pair_stats = {}; }
-            save_storage('reset_known_wordtts');
-            bee_alert('List of known words-to-type reset');
-        }
-
-
-        // Return the count of successful entries of a problem, keyed on its wordtt string
-        // (the same key add_known_wordtt writes). Reads without initialising, so merely considering
-        // a problem doesn't give it a known_words entry; an uninitialised value counts as 0.
-        function is_known_wordtt(problem_ix) {
-            const kw = bee.storage.players[bee.player].known_words;
-            if(!kw) { return 0; }
-            const key = bee.problem_list[problem_ix].proc_cache.wordtt;
-            const c = kw[key];
-            return Array.isArray(c) ? c[0] : 0;
+            save_storage('reset_coverage_stats');
+            bee_alert('Coverage stats reset');
         }
 
 
@@ -2379,9 +2470,8 @@
                         
                         // Reschedule (ASK) only when the child used help (the segmented reveal-bank
                         // HELP key, or a plain problem's reveal - both bump help_asked) or over-corrected;
-                        // a clean solve is marked known, the rest just advance. A repeat never
-                        // reschedules again.
-                        let outcome = 'UNSURE';
+                        // otherwise just advance (OK). A repeat never reschedules again.
+                        let outcome = 'OK';
                         if(bee.problem.is_repeat) {
                             outcome = 'OK';
                         } else if(bee.help_asked > 0) {
@@ -2390,23 +2480,14 @@
                             // Reschedule if backspaces exceed a third of the segment count
                             const num_segments = bee.processed_problem.segments.length;
                             if(bee.backspace_used > num_segments/3) { outcome = 'ASK'; }
-                            else if(bee.backspace_used <= 1) { outcome = 'ADD_KNOWN'; }
-                            else { outcome = 'OK'; }
                         } else if(bee.processed_problem.is_story) {
-                            if(bee.backspace_used <= 2) { outcome = 'ADD_KNOWN'; }
-                            else if(bee.backspace_used <= 3) { outcome = 'OK'; }
-                            else { outcome = 'ASK'; }
+                            if(bee.backspace_used > 3) { outcome = 'ASK'; }
                         } else { // plain (unsegmented) problem
-                            if(bee.backspace_used <= 1) { outcome = 'ADD_KNOWN'; }
-                            else if(bee.backspace_used <= 2) { outcome = 'OK'; }
-                            else { outcome = 'ASK'; }
+                            if(bee.backspace_used > 2) { outcome = 'ASK'; }
                         }
                         console.log('success help=', bee.help_asked, 'backspace=', bee.backspace_used, 'outcome=', outcome);
-                        
-                        if(outcome == 'ADD_KNOWN') {
-                            queue_success();
-                            add_known_wordtt();
-                        } else if(outcome == 'ASK') {
+
+                        if(outcome == 'ASK') {
                             reschedule_question(bee.problem);
                         } else { // 'OK'
                             queue_success();
@@ -2489,12 +2570,6 @@
             bee.seg_kind = [];     // per-segment aid kind (focus/obvious/revealed), set below
             bee.seg_locked = [];   // per-segment: can no longer score (already scored, or a backspace disqualified it)
 
-            // Per-wordtt score: count the ask. A repeat is excluded, as it can never be marked known
-            // (its outcome is always OK) and so could only dilute the rate; the success half is
-            // counted by add_known_wordtt. Like the GP-pair stats below, this is left to be persisted
-            // by the next save_storage rather than saving on every question.
-            if(!bee.problem.is_repeat) { wordtt_stat(bee.processed_problem.wordtt)[1]++; }
-
             // Per-GP-pair coverage stats: classify each segment once, when first shown, and count the
             // "ask" (the odd counters). Repeats must not move the stats.
             if(bee.processed_problem.is_segmented && !bee.problem.is_repeat) {
@@ -2533,20 +2608,6 @@
         }
         
         
-        // Returns whether to use this item (true) or choose another one (false)
-        // based on the user's success history
-        function known_score_to_choice20(score) {
-            let limit = 0;
-            if(score < 2) { return true; }
-            if(score == 2) { limit = .8; }
-            else if(score == 3) { limit = .9; }
-            else if(score == 4) { limit = .95; }
-            else { limit = .99; }
-            return (Math.random() > limit);
-        }
-        
-        
-
         function try_get_new_problem10(problem_class) {
             let trials = 50;
 
@@ -2569,33 +2630,25 @@
                     // ensure we choose a new problem (check the queue)
                     const dupl = queue_holds_problem(queue, problem_ix);
                     if(dupl && trials > 0) { log += ' norep'; continue; } // retry for a non-duplicate while we can
-                    if(!dupl) { last_ok_ix = problem_ix; } // remember the last genuine non-duplicate (may still be 'known')
-                    // Avoid already known words-to-type (typed without help)
-                    const known_count = is_known_wordtt(problem_ix);
-                    log += " known:"+known_count;
-                    if(!known_score_to_choice20(known_count)) { log += ' no'; continue; }
+                    if(!dupl) { last_ok_ix = problem_ix; } // remember the last genuine non-duplicate
                     break;
                 }
 
                 if(problem_class === undefined) { // first problem
                     // Choose using levels
                     problem_ix = choose_using_levels20(undefined); // undefined: from all problems
+                    if(problem_ix === undefined) { log += ' none_available'; break; } // every problem is disabled
                     log += " pix:"+problem_ix+" lev:"+bee.problem_list[problem_ix].level;
                     // ensure we choose a new problem (check the queue)
                     if(bee.problem_list.length > 1 && trials > 0) {
                         if(queue_holds_problem(queue, problem_ix)) { log += ' norep'; continue; }
                     }
-
-                    // Avoid already known words-to-type (typed without help)
-                    const known_count = is_known_wordtt(problem_ix);
-                    log += " known:"+known_count;
-                    if(!known_score_to_choice20(known_count)) { log += ' no'; continue; }
                     break;
                 }
 
             }
             console.log('try_get_new_problem: '+log);
-            if(trials == 0) { return last_ok_ix; } // known / last-resort problem on exhaustion, not undefined
+            if(trials == 0) { return last_ok_ix; } // last-resort problem on exhaustion, not undefined
             return problem_ix;
         }
 
@@ -2615,8 +2668,10 @@
         function new_question(reason) {  // also called from common.js on successfully answering a question
             console.log('#new_question05() caller=', reason);
             if(check_dismiss_puzzle()) { return; } // puzzle solved: don't generate/speak the next question
-            // No problems match the selected level range: warn instead of crashing while picking one
-            if(bee.problem_list.length == 0) {
+            // No problems to play: warn instead of crashing while picking one. Every enabled problem
+            // joins a class ('noclass' at worst), so an empty class_to_ix means an empty or
+            // entirely disabled problem list.
+            if(Object.keys(bee.class_to_ix).length == 0) {
                 bee_alert('No problems found for the selected level range. Please choose a different range with "Update level range".');
                 return;
             }
@@ -2643,7 +2698,8 @@
 
             if(problem !== undefined) {
                 log += ' from queue';
-                if(problem.problem_ix >= bee.problem_list.length) { log += ' invalid'; problem = undefined; }
+                // Out of range, or a problem disabled since the queue was stored
+                if(problem.problem_ix >= bee.problem_list.length || bee.problem_list[problem.problem_ix] === false) { log += ' invalid'; problem = undefined; }
                 else if(force_intro && count_question_queue() <= 1) {
                     // Returning to a class that has only its last problem left: there is not enough of
                     // it to be worth re-introducing, so drop it and let the branch below open a fresh
@@ -2660,14 +2716,16 @@
             if(problem === undefined) { // Get a new problem
 
                 // Pick a taught class first (so coverage doesn't skew to classes with many problems),
-                // weighted towards easier classes and biased towards classes not yet consolidated.
+                // uniformly at random and biased towards classes not yet consolidated. Classes carry
+                // no difficulty of their own - the per-problem level weighting in
+                // try_get_new_problem10 is what keeps the problems within a class easier-first.
                 // Classes that are not GP pairs (noclass and thematic classes) carry no pair_stats, so
                 // they are always accepted when picked - collecting common irregular words.
                 const candidate_classes = Object.keys(bee.class_to_ix).filter(function(c) { return bee.class_to_ix[c].length > 1; });
                 let problem_class = undefined;
                 let class_picks = 0;
                 while(true) {
-                    problem_class = choose_class_by_level(candidate_classes);
+                    problem_class = choose_from(candidate_classes);
                     class_picks++;
                     const st = bee.storage.players[bee.player].pair_stats[problem_class];
                     if(!st || st[1] === 0) { break; } // never asked - teach it
@@ -2749,28 +2807,31 @@
 
         // Choose an item using the levels, from a list of problem indices or all problems if undefined.
         // Weight is bee.level_weight_base^(-level), so each extra segment makes a problem that much
-        // less likely; the base is deliberately mild because the adaptive machinery
-        // (known_score_to_choice20 here, the pair_stats gate in new_question) is what should be
-        // regulating difficulty - this is only a static prior.
+        // less likely; the base is deliberately mild because the adaptive machinery (the pair_stats
+        // class gate in new_question) is what should be regulating difficulty - this is only a
+        // static prior.
         function choose_using_levels20(list_of_problem_ix) {
             const weights_cumulative = [];
             let weight_sum = 0;
+            let last_eligible = undefined; // last slot with a non-zero weight, for the rounding fallback
 
             // Get list of cumulative weights
             const loop_limit = (list_of_problem_ix === undefined ? bee.problem_list.length : list_of_problem_ix.length);
             for(let i=0; i<loop_limit; i++) {
                 const problem_ix = (list_of_problem_ix === undefined ? i : list_of_problem_ix[i]);
-                const w = Math.pow(bee.level_weight_base, -bee.problem_list[problem_ix].level);
+                // A disabled problem gets zero weight; the strict '<' below then never lands on it
+                const w = (bee.problem_list[problem_ix] === false ? 0 : Math.pow(bee.level_weight_base, -bee.problem_list[problem_ix].level));
+                if(w > 0) { last_eligible = i; }
                 weight_sum += w;
                 weights_cumulative.push(weight_sum);
             }
-            
+
             const weight_point = Math.random() * weight_sum;
             let ix_chosen = undefined;
             for(let i=0; i<loop_limit; i++) {
                 if(weight_point < weights_cumulative[i]) { ix_chosen = i; break; }
             }
-            if(ix_chosen === undefined) { ix_chosen = loop_limit - 1; }
+            if(ix_chosen === undefined) { ix_chosen = last_eligible; } // undefined if nothing was eligible
             
             const problem_ix_chosen = (list_of_problem_ix === undefined ? ix_chosen : list_of_problem_ix[ix_chosen]);
             if(problem_ix_chosen === undefined) { console.error("choose_using_levels20", list_of_problem_ix, weight_point, ix_chosen); }
@@ -2778,26 +2839,6 @@
         }
 
 
-        // Weighted random choice of a class name, biased towards classes whose easiest members are
-        // low-level (bee.class_level, set in init_problem_list_impl) - the same bee.level_weight_base
-        // weighting as choose_using_levels20, but over classes rather than problems. Note class_level
-        // is the mean of a class's 4 lowest members, which compresses its range, so the bias here is
-        // weak whatever the base - class choice is meant to be driven by the pair_stats gate.
-        function choose_class_by_level(classes) {
-            const cumulative = [];
-            let sum = 0;
-            for(let i=0; i<classes.length; i++) {
-                sum += Math.pow(bee.level_weight_base, -bee.class_level[classes[i]]);
-                cumulative.push(sum);
-            }
-            const point = Math.random() * sum;
-            for(let i=0; i<classes.length; i++) {
-                if(point < cumulative[i]) { return classes[i]; }
-            }
-            return classes[classes.length - 1];
-        }
-        
-        
         function init_problem_list() {
             // min_wordset / wordsets are persisted user-data keys, so they keep their historical names
             let min_level = bee.storage.players[bee.player].min_wordset;
@@ -2807,7 +2848,6 @@
             const r = init_problem_list_impl(min_level, max_level);
             bee.problem_list = r.problem_list;
             bee.class_to_ix = r.class_to_ix;
-            bee.class_level = r.class_level;
 
             $('.d_problemrange').html(
                 esc_html(min_level) + " to " + esc_html(max_level)
@@ -2819,17 +2859,21 @@
             // TODO min_level and max_level are unused - we load all entries (levels are also not available at this point)
             const out = {};
             
-            out.problem_list = []; // problem index -> problem data
+            out.problem_list = []; // problem index -> problem data, or false for a disabled problem
             for(let i=0; i<problem_repository.length; i++) {
+                // A `false` entry is a disabled problem: keep its slot so the indices of the others
+                // (which players' queues refer to) do not move, but do not process or offer it
+                if(problem_repository[i] === false) { out.problem_list.push(false); continue; }
                 const pdata = process_problem_data(problem_repository[i]);
                 // Derive level from the number of phonemes
                 pdata.level = pdata.proc_cache.segments.length;
                 out.problem_list.push(pdata);
             }
 
-            // Classes
+            // Classes - a disabled problem joins none, so it is unreachable through class_to_ix
             out.class_to_ix = {};
             for(let i=0; i<out.problem_list.length; i++) {
+                if(out.problem_list[i] === false) { continue; }
                 const pd = out.problem_list[i].proc_cache;
                 const cl = out.problem_list[i].class;
                 if(pd.is_segmented) {
@@ -2857,18 +2901,13 @@
                 }
             }
 
-            // Class level = mean level of a class's 4 lowest-level members - used to weight class
-            // selection towards easier classes (see choose_class_by_level). Warn about GP-pair classes
-            // too small to drill (a singleton's class intro would also reveal the answer).
-            out.class_level = {};
+            // Warn about GP-pair classes too small to drill (a singleton's class intro would also
+            // reveal the answer).
             for(const cls in out.class_to_ix) {
                 const ixs = out.class_to_ix[cls];
                 if(ixs.length <= 1 && cls.indexOf('/') >= 0) {
                     console.warn("0 or 1 long GP-pair class (intro reveals answer / cannot drill across problems):", cls, ixs.length);
                 }
-                const levels = ixs.map(function(ix) { return out.problem_list[ix].level; }).sort(function(a, b) { return a-b; });
-                const lowest = levels.slice(0, 4);
-                out.class_level[cls] = lowest.reduce(function(a, b) { return a+b; }, 0) / (lowest.length || 1);
             }
 
             return out;

@@ -20,12 +20,12 @@ These four terms are the vocabulary of the spellbee code, comments and knowledge
 | Term | Meaning | In code |
 |---|---|---|
 | **PROBLEM** | One thing presented to the player: a word to type, optionally in a context sentence. | `problem_repository`, `problem_ix`, `bee.problem_list`, `bee.processed_problem`, `process_problem_data()` |
-| **WORD-TO-TYPE** (`wordtt`) | The portion of a problem the player must actually type — the concatenated `<…>` regions, often split into segments. Success stats are per WORDTT, not per PROBLEM. | `proc_cache.wordtt`, `wordtt_stat()`, `add_known_wordtt()`, `is_known_wordtt()` |
-| **CLASS** | A set of problems drilled together, derived either from an entry's trailing `class` field or from a GP pair its word-to-type contains. | `problem_class`, `bee.class_to_ix`, `class_gp_pairs`, `show_class_intro()`, `choose_class_by_level()` |
+| **WORD-TO-TYPE** (`wordtt`) | The portion of a problem the player must actually type — the concatenated `<…>` regions, often split into segments. | `proc_cache.wordtt` |
+| **CLASS** | A set of problems drilled together, derived either from an entry's trailing `class` field or from a GP pair its word-to-type contains. | `problem_class`, `bee.class_to_ix`, `class_gp_pairs`, `show_class_intro()` |
 | **GP PAIR** | A `grapheme/phoneme` pair (grapheme-group / phoneme-group), written `ee/i:`. A GP pair in `class_gp_pairs` also names a CLASS. | `gp_pair`, `class_gp_pairs`, `other_gp_pairs`, `predictable_gp_pairs`, `gp_pair_stat()` |
 
 **Persisted keys keep their historical names** for backwards compatibility, so a few old names
-survive in `bee.storage` only: `known_words` (keyed by wordtt), `pair_stats` (keyed by GP pair),
+survive in `bee.storage` only: `pair_stats` (keyed by GP pair),
 `min_wordset` / `wordsets` (the level range), and the queue entries' `word_ix` / `word_class` — the
 latter translated at the boundary by `to_stored()` / `from_stored()` (see
 [`agent/question-cycle.md`](agent/question-cycle.md)). Never rename a persisted key.
@@ -37,7 +37,7 @@ Deeper references live under `agent/` and are loaded on demand — read the rele
 - [`agent/question-cycle.md`](agent/question-cycle.md) — the question→answer→reward→next play loop: the shared `success_common()` reward step, per-app `new_question()` selection (spellbee's is mastery-driven per-GP-pair coverage), the anti-cheat / spaced-repetition queue (and its stored-key translation boundary), count problem generators, and puzzle-mode sessions.
 - [`agent/spellbee-content.md`](agent/spellbee-content.md) — the `spellbee.html` problem-entry format, image-ref forms, auto-derived level & classes, and MP3 resolution.
 - [`agent/adding-problems.md`](agent/adding-problems.md) — **the complete procedure for adding a spellbee PROBLEM**; read it before adding or reviewing problems. Covers corpus fit, entry format, segmentation, phonemes, GP-pair registration, the reviewed marker and audio.
-- [`agent/spellbee-classes.md`](agent/spellbee-classes.md) — the phonics **CLASSES**: how they are auto-derived from each segment's GP pair, the two registries that drive it (`class_gp_pairs` = GP pairs that form classes via `class_to_ix`; `other_gp_pairs` = valid pairs forming no class; an unknown pair is a `console.error`), the optional explicit `class` field, and the load-time `class_level` feeding mastery-driven class selection.
+- [`agent/spellbee-classes.md`](agent/spellbee-classes.md) — the phonics **CLASSES**: how they are auto-derived from each segment's GP pair, the two registries that drive it (`class_gp_pairs` = GP pairs that form classes via `class_to_ix`; `other_gp_pairs` = valid pairs forming no class; an unknown pair is a `console.error`), the optional explicit `class` field, and why classes carry no difficulty of their own.
 - [`agent/segmented-review.md`](agent/segmented-review.md) — reviewing **segmented** problem entries (a problem whose `<…>` word-to-type splits into `=`-separated `grapheme/phoneme` segments, e.g. `<e=l=e/I=ph=a/E=n=t>`): the per-entry checklist (image, class tag, and an RP-correct phoneme on every segment — always overriding wrong defaults), the `console.error` gap-detectors, and the reusable [`agent/segmented-audit.js`](agent/segmented-audit.js) extractor.
 - [`agent/removed-features.md`](agent/removed-features.md) — features **removed** from the apps but preserved for possible restoration (currently the long-format story mechanism, removed 2026-07-19).
 

@@ -70,17 +70,17 @@ A syllabic `-al`/`-el`/`-le`/`-ol` /əl/ ending uses the dedicated `sl` phoneme,
 `al/sl`, `el/sl`, `le/sl`, `ol/sl` (capital, tunnel, table, symbol) — see the syllabic-l note in
 [`segmented-review.md`](segmented-review.md).
 
-## Class selection & `class_level`
+## Class selection
 
 *Which* class is drilled next is **mastery-driven**; the mechanism (per-GP-pair coverage stats, the
 smoothed success rate, the acceptance probabilities) lives in
-[`question-cycle.md`](question-cycle.md). Two load-time products feed it, both built in
-`init_problem_list_impl`:
+[`question-cycle.md`](question-cycle.md). It draws on one load-time product built in
+`init_problem_list_impl`: **`bee.class_to_ix`** (above), class → member problem indices.
 
-- **`bee.class_to_ix`** (above) — class → member problem indices.
-- **`bee.class_level[class]`** — the mean `level` of the class's **4 lowest-level members**, used to
-  weight the class pick towards easier classes (`choose_class_by_level`, the same
-  `bee.level_weight_base^(-level)` shape as the per-problem `choose_using_levels20`).
+**A class carries no difficulty of its own** — the pick among candidate classes is uniformly random
+(`choose_from`). Difficulty is a property of individual problems only, applied when choosing
+*within* the class (`choose_using_levels20`); do not reintroduce a per-class level, as the classes
+are not meaningfully ordered by difficulty.
 
 Every non-empty class is a candidate, including `noclass` and the explicit thematic classes: those
 are not GP pairs, so they have no in-focus pair, accrue no per-pair stats and are **always taught
