@@ -6,20 +6,39 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 `learning-aid` is a set of static web-based tools for KS1/KS2 children (ages 5+) to practise spelling and arithmetic. The apps are:
 
-- **`spellbee.html`** — spelling game with an on-screen keyboard, phonics-based word list, and TTS pronunciation
+- **`spellbee.html`** — spelling game with an on-screen keyboard, phonics-based problem list, and TTS pronunciation
 - **`count.html`** — arithmetic game with an on-screen numeric keypad
 
 Both apps are vanilla JS + jQuery, require no build step, and can be served from any static web server.
+
+## Nomenclature (spellbee)
+
+These four terms are the vocabulary of the spellbee code, comments and knowledge files. Use them; do
+**not** use the ambiguous "word", "group" or "pair" for any of them. (If the maintainer says "word",
+"group" or "pair", ask which is meant rather than assuming.)
+
+| Term | Meaning | In code |
+|---|---|---|
+| **PROBLEM** | One thing presented to the player: a word to type, optionally in a context sentence. | `problem_repository`, `problem_ix`, `bee.problem_list`, `bee.processed_problem`, `process_problem_data()` |
+| **WORD-TO-TYPE** (`wordtt`) | The portion of a problem the player must actually type — the concatenated `<…>` regions, often split into segments. Success stats are per WORDTT, not per PROBLEM. | `proc_cache.wordtt`, `wordtt_stat()`, `add_known_wordtt()`, `is_known_wordtt()` |
+| **CLASS** | A set of problems drilled together, derived either from an entry's trailing `class` field or from a GP pair its word-to-type contains. | `problem_class`, `bee.class_to_ix`, `class_gp_pairs`, `show_class_intro()`, `choose_class_by_level()` |
+| **GP PAIR** | A `grapheme/phoneme` pair (grapheme-group / phoneme-group), written `ee/i:`. A GP pair in `class_gp_pairs` also names a CLASS. | `gp_pair`, `class_gp_pairs`, `other_gp_pairs`, `predictable_gp_pairs`, `gp_pair_stat()` |
+
+**Persisted keys keep their historical names** for backwards compatibility, so a few old names
+survive in `bee.storage` only: `known_words` (keyed by wordtt), `pair_stats` (keyed by GP pair),
+`min_wordset` / `wordsets` (the level range), and the queue entries' `word_ix` / `word_class` — the
+latter translated at the boundary by `to_stored()` / `from_stored()` (see
+[`agent/question-cycle.md`](agent/question-cycle.md)). Never rename a persisted key.
 
 ## Agent knowledge files
 
 Deeper references live under `agent/` and are loaded on demand — read the relevant one before working in that area:
 
-- [`agent/question-cycle.md`](agent/question-cycle.md) — the question→answer→reward→next play loop: the shared `success_common()` reward step, per-app `new_question()` selection (spellbee's is mastery-driven per-pair coverage), the anti-cheat / spaced-repetition queue, count problem generators, and puzzle-mode sessions.
-- [`agent/spellbee-content.md`](agent/spellbee-content.md) — the `spellbee.html` word-list entry format, image-ref forms, auto-derived level & classes, and MP3 resolution.
-- [`agent/adding-words.md`](agent/adding-words.md) — **the complete procedure for adding a spellbee word/problem**; read it before adding or reviewing words. Covers corpus fit, entry format, segmentation, phonemes, pair registration, the reviewed marker and audio.
-- [`agent/spellbee-classes.md`](agent/spellbee-classes.md) — the phonics **classes**: how they are auto-derived from each segment's `grapheme/phoneme` pair, the two registries that drive it (`gp_grouping_pairs` = pairs that form drill groups via `class_to_ix`; `gp_other_pairs` = valid-but-ungrouped pairs; an unknown pair is a `console.error`), the optional explicit `class` field, and the load-time `class_level` feeding mastery-driven class selection.
-- [`agent/segmented-review.md`](agent/segmented-review.md) — reviewing **segmented** problem entries (a word whose `<…>` region splits into `=`-separated `grapheme/phoneme` segments, e.g. `<e=l=e/I=ph=a/E=n=t>`): the per-entry checklist (image, class tag, and an RP-correct phoneme on every segment — always overriding wrong defaults), the `console.error` gap-detectors, and the reusable [`agent/segmented-audit.js`](agent/segmented-audit.js) extractor.
+- [`agent/question-cycle.md`](agent/question-cycle.md) — the question→answer→reward→next play loop: the shared `success_common()` reward step, per-app `new_question()` selection (spellbee's is mastery-driven per-GP-pair coverage), the anti-cheat / spaced-repetition queue (and its stored-key translation boundary), count problem generators, and puzzle-mode sessions.
+- [`agent/spellbee-content.md`](agent/spellbee-content.md) — the `spellbee.html` problem-entry format, image-ref forms, auto-derived level & classes, and MP3 resolution.
+- [`agent/adding-problems.md`](agent/adding-problems.md) — **the complete procedure for adding a spellbee PROBLEM**; read it before adding or reviewing problems. Covers corpus fit, entry format, segmentation, phonemes, GP-pair registration, the reviewed marker and audio.
+- [`agent/spellbee-classes.md`](agent/spellbee-classes.md) — the phonics **CLASSES**: how they are auto-derived from each segment's GP pair, the two registries that drive it (`class_gp_pairs` = GP pairs that form classes via `class_to_ix`; `other_gp_pairs` = valid pairs forming no class; an unknown pair is a `console.error`), the optional explicit `class` field, and the load-time `class_level` feeding mastery-driven class selection.
+- [`agent/segmented-review.md`](agent/segmented-review.md) — reviewing **segmented** problem entries (a problem whose `<…>` word-to-type splits into `=`-separated `grapheme/phoneme` segments, e.g. `<e=l=e/I=ph=a/E=n=t>`): the per-entry checklist (image, class tag, and an RP-correct phoneme on every segment — always overriding wrong defaults), the `console.error` gap-detectors, and the reusable [`agent/segmented-audit.js`](agent/segmented-audit.js) extractor.
 - [`agent/removed-features.md`](agent/removed-features.md) — features **removed** from the apps but preserved for possible restoration (currently the long-format story mechanism, removed 2026-07-19).
 
 ## Running Locally
@@ -58,7 +77,7 @@ cd tools/tts
 python make_speech.py
 ```
 
-The script reads all word entries from `spellbee.html`, derives the expected filename (`assets/sounds/words/<phrase>.mp3`), and only generates files that are absent. If a word is in the `avoid_tts()` list the model handles it poorly — add entries there as needed.
+The script reads all problem entries from `spellbee.html`, derives the expected filename (`assets/sounds/words/<phrase>.mp3`), and only generates files that are absent. If a phrase is in the `avoid_tts()` list the model handles it poorly — add entries there as needed.
 
 ## Architecture
 
@@ -84,7 +103,7 @@ The aquarium widget keeps its **own** state under a separate `localStorage` key,
 
 ### Startup & player selection (`bootstrap()`)
 
-Both HTML files end with `<script> bootstrap(); </script>` (after every other script has loaded), so `bootstrap()` in `common.js` is the single entry point. The per-app inline script supplies two helpers `bootstrap()` calls: `init_player_data(callback)` (creates a fresh `bee.storage.players[bee.player]` in the app-specific shape) and `main()` (starts gameplay once a player is chosen). `init_player_data` is **asynchronous** — it prompts the user for the starting word/problem range via `bee_prompt` (through the per-app `choose_wordsets(cb)` / `choose_problemset(cb)` helpers, which are likewise callback-based) — so it takes an optional completion `callback` that fires once the player record exists; `bootstrap()` waits on it before continuing.
+Both HTML files end with `<script> bootstrap(); </script>` (after every other script has loaded), so `bootstrap()` in `common.js` is the single entry point. The per-app inline script supplies two helpers `bootstrap()` calls: `init_player_data(callback)` (creates a fresh `bee.storage.players[bee.player]` in the app-specific shape) and `main()` (starts gameplay once a player is chosen). `init_player_data` is **asynchronous** — it prompts the user for the starting problem range via `bee_prompt` (through the per-app `choose_level_range(cb)` / `choose_problemset(cb)` helpers, which are likewise callback-based) — so it takes an optional completion `callback` that fires once the player record exists; `bootstrap()` waits on it before continuing.
 
 Both paths are built from the same callback-taking step helpers defined at the top of `bootstrap()`, so each path is just the order it runs them in: `refresh_player(next)` (pull the player from the server when the data-load hook is registered; `next(found)` says whether the server held a record), `have_player(found)` (does the player exist on either side?), `create_player(next)` (`init_player_data()` + `save_storage('init')`), `show_welcome(next)` / `show_player_menu()` (the two start screens) and `start_game()` (hide the menu, run `main()`).
 
@@ -97,9 +116,9 @@ Two paths:
 
 > Startup blocks on the backend **by design**: when the data-load hook is present, `bootstrap()` waits for it and will not proceed unless the load is confirmed, so a backend failure strands the page on "Loading…" rather than risk running with stale/wrong data. This path is only reachable when the optional data-load hook is registered; without it, the app always uses the regular menu and browser-local data.
 
-### `spellbee.html` — word list format
+### `spellbee.html` — problem list format
 
-Words live between `// [WORDS START]` and `// [WORDS END]` comments as pipe-delimited `"image_ref|text|class"` strings; angle-bracket regions `<word>` in the text mark what the child must type. Difficulty (**level**) and phonics **classes** are both derived automatically — level from the segment count, classes from each segment's grapheme/phoneme pair — so entries carry neither field (the trailing `class` field is optional and now rarely used). The full entry format, image-ref forms, and MP3 resolution are in [`agent/spellbee-content.md`](agent/spellbee-content.md). (Long-format stories were removed — see [`agent/removed-features.md`](agent/removed-features.md).)
+PROBLEMS live between `// [PROBLEMS START]` and `// [PROBLEMS END]` comments as pipe-delimited `"image_ref|text|class"` strings; an angle-bracket region `<…>` in the text marks the **word-to-type** (`wordtt`) the child must produce. Difficulty (**level**) and phonics **CLASSES** are both derived automatically — level from the segment count, classes from each segment's **GP pair** — so entries carry neither field (the trailing `class` field is optional and now rarely used). The full entry format, image-ref forms, and MP3 resolution are in [`agent/spellbee-content.md`](agent/spellbee-content.md). (Long-format stories were removed — see [`agent/removed-features.md`](agent/removed-features.md).)
 
 ### `count.html` — problem generators
 

@@ -1,6 +1,6 @@
 
-# Process spellbee.html, extract words
-# make sure sounds exist for them; if not,
+# Process spellbee.html, extract the problem entries
+# make sure sounds exist for the phrases and words-to-type; if not,
 # produce mp3 files
 
 # INSTALLATION
@@ -114,25 +114,25 @@ def check_text(phrase, force=False):
 def normalize_markup(text):
     """Collapse a segmented region like <p/p=e/e=n/n> into a single to-type part <pen>: drop
     each segment's '/phoneme' spec and the '=' separators, keeping just the graphemes. A
-    segmented problem then looks like an ordinary one-part word, so its full phrase is spoken
-    but its individual phoneme segments are not turned into speech. Plain words and multi-word
-    stories (no '=') come through unchanged."""
+    segmented problem then looks like an ordinary one-part word-to-type, so its full phrase is spoken
+    but its individual phoneme segments are not turned into speech. Plain words-to-type and
+    multi-word stories (no '=') come through unchanged."""
     def merge(m):
         segments = m.group(1).split('=')
         return '<' + ''.join(seg.split('/', 1)[0] for seg in segments) + '>'
     return re.sub(r'<([^>]+)>', merge, text)
 
 
-def scan_words():
-    word_area = False
+def scan_problems():
+    in_problems = False
     for line in open(html_file, 'r'):
-        if '[WORDS START]' in line:
-            word_area = True
+        if "[PROBLEMS START]" in line:
+            in_problems = True
             continue
-        if '[WORDS END]' in line:
-            word_area = False
+        if "[PROBLEMS END]" in line:
+            in_problems = False
             continue
-        if word_area:
+        if in_problems:
             match = re.search(r'^\s*"[^"]+",', line)
             if not match:
                 continue
@@ -152,6 +152,6 @@ def scan_words():
             else:
                 raise ValueError(f"Cannot parse line: [{line}]")
 
-scan_words()
+scan_problems()
 # generate_tts("Eight is a feather. Porkchop", "test0.mp3", 0)
 # generate_tts("Eight is a feather. Porkchop", "test1.mp3", 1)

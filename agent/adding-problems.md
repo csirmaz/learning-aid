@@ -1,13 +1,13 @@
-# Adding a word to spellbee.html
+# Adding a problem to spellbee.html
 
-The complete guide to adding a spellbee word/problem. This is meant to be self-sufficient; deeper
+The complete guide to adding a spellbee PROBLEM. This is meant to be self-sufficient; deeper
 internals live in [`spellbee-content.md`](spellbee-content.md) (format), [`spellbee-classes.md`](spellbee-classes.md)
-(class derivation & pair registries) and [`segmented-review.md`](segmented-review.md) (review tooling).
+(class derivation & GP-pair registries) and [`segmented-review.md`](segmented-review.md) (review tooling).
 
 ## 1. Entry format
 
-Entries are pipe-delimited strings in the `word_repository` array, between `// [WORDS START]` and
-`// [WORDS END]`. **Append new entries to the end** (ignore any section structure):
+Entries are pipe-delimited strings in the `problem_repository` array, between `// [PROBLEMS START]`
+and `// [PROBLEMS END]`. **Append new entries to the end** (ignore any section structure):
 
 ```
 "image_ref|text|class"
@@ -18,12 +18,12 @@ Entries are pipe-delimited strings in the `word_repository` array, between `// [
   - `word@emoji` — a named image key, with the emoji as fallback.
   - `word` — resolved to an image at runtime by the app's image resolver (a named key).
   - `~word` — loads `assets/images/words/<word>` directly, bypassing the resolver.
-  - *empty* — no image (correct for non-picturable words).
-- **text** — the prompt sentence. A `<…>` region marks what the child types. **Multiple** `<…>`
-  regions trigger "story" layout; a single `<…>` split into `=`-separated segments is a **segmented**
-  entry. A plain `<word>` (no `=`) is a whole-word show → hide → reproduce problem.
-- **class** *(optional, trailing)* — **normally omit it.** Classes are auto-derived from the segments'
-  grapheme/phoneme pairs; give an explicit comma-list only where extra classes are desired or for non-segmented problems.
+  - *empty* — no image (correct for non-picturable problems).
+- **text** — the prompt sentence. A `<…>` region marks the **word-to-type** (`wordtt`). **Multiple**
+  `<…>` regions trigger "story" layout; a single `<…>` split into `=`-separated segments is a
+  **segmented** entry. A plain `<…>` (no `=`) is a whole-wordtt show → hide → reproduce problem.
+- **class** *(optional, trailing)* — **normally omit it.** CLASSES are auto-derived from the segments'
+  GP pairs; give an explicit comma-list only where extra classes are desired or for non-segmented problems.
 
 ## 2. Procedure (checklist)
 
@@ -31,7 +31,7 @@ Entries are pipe-delimited strings in the `word_repository` array, between `// [
    (e.g. a fresh context sentence for an existing word).
 2. **Worth a place in the corpus?** The list is **curated, not exhaustive.** A word earns its place if
    it is **high-frequency** (worth making automatic) **or** it drills a **pattern the corpus needs** —
-   a new / under-covered grapheme/phoneme pair or segment, a **generative morpheme** (a recurring
+   a new / under-covered GP pair or segment, a **generative morpheme** (a recurring
    prefix / suffix / root), or an **ambiguity gap** the pattern-drill cannot teach (silent letters,
    doubled letters, which-grapheme choices, morpheme spellings). **Warn the maintainer** if the
    candidate is **low-frequency AND brings none of these** (its pairs and morphemes are already well
@@ -42,11 +42,11 @@ Entries are pipe-delimited strings in the `word_repository` array, between `// [
 4. **Input shape** — a single word (the target) or a phrase with the target in `<…>`.
 5. **Pronunciation** — UK **Received Pronunciation (RP)**.
 6. **Picture OR context** — §3.
-7. **Segment** multi-phoneme words (§4–6); **single-phoneme words are NOT segmented** (§7).
-8. **Register any new grapheme/phoneme pair** (§8) — an unregistered pair is a `console.error`.
+7. **Segment** multi-phoneme words-to-type (§4–6); **single-phoneme ones are NOT segmented** (§7).
+8. **Register any new GP pair** (§8) — an unregistered pair is a `console.error`.
 9. **Ambiguity → ask** the maintainer for genuinely arguable phoneme specs (weak vowel /ɪ/=`I` vs
    /ə/=`E`, variant pronunciations); fix unambiguous specs directly.
-10. **Audio** — new words fall back to TTS until an MP3 is generated (§9).
+10. **Audio** — new entries fall back to TTS until an MP3 is generated (§9).
 
 ## 3. Picture or context
 
@@ -59,7 +59,7 @@ Every entry needs one:
 
 ## 4. Segmenting: boxes, phonemes, defaults
 
-Split the target into `=`-separated **segments**, one typed box each — either `grapheme` or
+Split the word-to-type into `=`-separated **segments**, one typed box each — either `grapheme` or
 `grapheme/phoneme` (explicit ascii phoneme id after `/`).
 
 - **Write `/phoneme` only when the sound differs from the grapheme's default.** A bare grapheme uses
@@ -97,8 +97,8 @@ Split the target into `=`-separated **segments**, one typed box each — either 
 
   Plus whole-morpheme pseudo-phonemes: `Ing` (-ing), `En` (-en /ən/), `Et` (-et), `SEn` (-tion),
   `Id` (-ed /ɪd/), `lI` (-ly), `tSE` (-ture), `IdZ` (-age), `In`/`kEn`/`de`/`re` prefixes, etc.
-- **Capitalisation** — grapheme case is lowercased for pair/phoneme lookup but preserved in the
-  displayed word: *Christmas* → `Ch/k=…`, *Earth* → `Ear/3:=…`.
+- **Capitalisation** — grapheme case is lowercased for GP-pair/phoneme lookup but preserved in the
+  displayed wordtt: *Christmas* → `Ch/k=…`, *Earth* → `Ear/3:=…`.
 
 ## 5. Silent segments: `/x` vs `/X` — easy to get wrong
 
@@ -135,25 +135,25 @@ Both fold to the silent phoneme `x`; the difference is the **link**:
   ("syllabic l"): `table` `<t=a=b=le/sl>`. Not plain `l`/`E`/`O:` (`O:` only for true `all` /ɔːl/ words
   like tall/call). Watch the transposition typo `ls` (invalid; the audit flags `[!ls]`).
 
-## 7. Single-phoneme words → unsegmented
+## 7. Single-phoneme words-to-type → unsegmented
 
-A word that is **one phoneme** — including a diphthong spelled as a unit (*eye* /aɪ/, *ear* /ɪə/) — is
-entered as a **plain `<word>`** (no `=`), a whole-word show → hide → reproduce problem. Segmenting it
-would make a single pointless box.
+A wordtt that is **one phoneme** — including a diphthong spelled as a unit (*eye* /aɪ/, *ear* /ɪə/) —
+is entered as a **plain `<…>`** (no `=`), a whole-wordtt show → hide → reproduce problem. Segmenting
+it would make a single pointless box.
 
-## 8. Grapheme/phoneme pair registries
+## 8. GP-pair registries
 
-Every segment's `grapheme/phoneme` pair must be registered, or it is a `console.error`:
+Every segment's GP pair (`grapheme/phoneme`) must be registered, or it is a `console.error`:
 
-- **`gp_grouping_pairs`** — *taught* pairs; each forms a drill group / class (via `class_to_ix`).
-- **`gp_other_pairs`** — valid but *ungrouped* (never a useful drill group).
-- **`predictable_pairs`** — the *obvious/default* spellings (single consonants, lax vowels at their
-  default letter). In the segmented word-bank a predictable, not-in-focus pair gets **no chip** (the
-  child produces it unaided); an unpredictable one is shown as a tile to copy. This is a separate list
-  used only for the bank, not for validation.
+- **`class_gp_pairs`** — *taught* pairs; each forms a CLASS (via `class_to_ix`).
+- **`other_gp_pairs`** — valid but forming no class (never a useful drill set).
+- **`predictable_gp_pairs`** — the *obvious/default* spellings (single consonants, lax vowels at their
+  default letter). In the segment bank a predictable, not-in-focus pair gets **no chip** (the child
+  produces it unaided); an unpredictable one is shown as a tile to copy. This is a separate list used
+  only for the bank, not for validation.
 
-Add a genuinely new pair to `gp_grouping_pairs` if it should be drilled as a group, else
-`gp_other_pairs`. (Example: the silent `t/x` in *Christmas* was added to `gp_other_pairs`.)
+Add a genuinely new pair to `class_gp_pairs` if it should be drilled as a class, else
+`other_gp_pairs`. (Example: the silent `t/x` in *Christmas* was added to `other_gp_pairs`.)
 
 ## 9. Audio (MP3 / TTS)
 
@@ -173,5 +173,5 @@ A **reviewed** entry has an end-of-line comment **ending in the word `reviewed`*
 grep -nE '^"[^"]*\|[^"]*=' spellbee.html | grep -v 'reviewed'
 ```
 
-Tools: `agent/segmented-audit.js` (extract/validate pairs & phonemes), `agent/apply-line-edits.js`
+Tools: `agent/segmented-audit.js` (extract/validate GP pairs & phonemes), `agent/apply-line-edits.js`
 (batch line edits).

@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?491">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?492">
     <style>
         body {
             /* Disables pull-to-refresh but allows overscroll glow effects. */
@@ -160,10 +160,10 @@
         }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?491">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?492">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?491"></script>
+    <script src="assets/local/beelocal.js?492"></script>
 </head>
 <body>
     <div class="container">
@@ -245,7 +245,7 @@
     <p class="smallprint">
         v<span class="d_version"></span>
         Player: <span class="d_player"></span>
-        | Problem range: <span class="d_wordsets"></span>
+        | Problem range: <span class="d_problemrange"></span>
         | <a href="#" class="handle">T</a>ools &amp; Licences
         <span class="expand_tools">
             | <a href="#" onclick="dismiss_puzzle_alert(); return false;">Dismiss puzzle</a>
@@ -846,7 +846,7 @@
         };
 
     </script>
-    <script src="assets/common.js?491"></script>
+    <script src="assets/common.js?492"></script>
     <script>
 
         
@@ -1345,7 +1345,7 @@
         function init_problemset() {
             let p = bee.storage.players[bee.player].problemset;
             if(p === undefined) { p = 0; }
-            $('.d_wordsets').html(esc_html(p));
+            $('.d_problemrange').html(esc_html(p));
             bee.problemset = p;
         }
 
@@ -1405,8 +1405,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?491"></script>
-    <script src="assets/aquarium/js/aquarium.js?491"></script>
+    <script src="assets/aquarium/js/config.js?492"></script>
+    <script src="assets/aquarium/js/aquarium.js?492"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

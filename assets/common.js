@@ -162,7 +162,7 @@ function bootstrap() {
     // Create a fresh record for bee.player. Only ever called once refresh_player has reported
     // back: creating first would save a stub record that can reach the backend after (or instead
     // of) the load and mask the real data. init_player_data() is asynchronous - it may prompt for
-    // the word/problem range - so next() fires once the record exists.
+    // the problem range - so next() fires once the record exists.
     const create_player = function(next) {
         init_player_data(function() {
             save_storage('init');
@@ -277,7 +277,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 491;
+const bee_app_version = 492;
 
 call_local_hook('check_version', []);
 
@@ -998,7 +998,7 @@ function success_common(options) {
                         // Never show a reward video inline during a puzzle - it would flush the
                         // phoneme priming. Record that one was earned; the send-off plays it, with
                         // play_video the sole authority on whether a video actually shows. A
-                        // completing answer runs the send-off; mid-puzzle we advance to the next word.
+                        // completing answer runs the send-off; mid-puzzle we advance to the next problem.
                         bee.is_puzzle.deferred_video = true;
                         if(bee.is_puzzle.needs <= 0) { finish_puzzle_with_confetti(); }
                         else { new_question('success_common:level:puzzle'); }
@@ -1026,7 +1026,7 @@ function success_common(options) {
             // is itself the puzzle send-off, so the gift branch dismisses through the normal
             // check_dismiss_puzzle path (inside new_question), not finish_puzzle_with_confetti - by
             // design we don't stack a puzzle-end confetti/video on top of the gift. Consequence: a
-            // video earned on an earlier word (deferred_video set on a previous success_common call;
+            // video earned on an earlier problem (deferred_video set on a previous success_common call;
             // the gift branch never sets it, and branches are mutually exclusive so it can't be this
             // answer) is intentionally NOT shown when the completing answer awards a gift - the gift
             // is the reward shown, and the puzzle then dismisses.
@@ -1099,7 +1099,7 @@ function success_common(options) {
         // Never show a reward video inline during a puzzle - it would flush the phoneme priming.
         // Record that one was earned; the send-off plays it, with play_video the sole authority on
         // whether a video actually shows. A completing answer finishes; mid-puzzle only the flag is
-        // set and we advance to the next word (no inline celebration).
+        // set and we advance to the next problem (no inline celebration).
         bee.is_puzzle.deferred_video = true;
         if(bee.is_puzzle.needs <= 0) { finish_puzzle_with_confetti(); return 'period'; }
         setTimeout(function(){ new_question('success_common:period:puzzle'); }, 1100*wait_factor);
