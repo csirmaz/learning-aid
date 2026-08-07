@@ -24,7 +24,7 @@ keeps its slot in `bee.problem_list` (as `false`), gives it no classes and zero 
 the entry — deletion shifts every index below it, and players' persisted question queues store
 indices.
 
-**Level (difficulty) is derived, not written.** `init_problem_list_impl()` sets each entry's `level` to its number of segments (`proc_cache.segments.length`); `choose_using_levels20` then weights selection by `bee.level_weight_base^(-level)`, so shorter words-to-type come up more often. There is no longer a `level` field, and the player's level range no longer filters the list (`init_problem_list_impl`'s `min`/`max` args are currently unused — see its TODO).
+**Level (difficulty) is derived, not written.** `init_problem_list_impl()` sets each entry's `level` to its number of segments (`proc_cache.segments.length`); it no longer weights selection (the former level-weighting was removed). There is no longer a `level` field, and the player's level range no longer filters the list (`init_problem_list_impl`'s `min`/`max` args are currently unused — see its TODO).
 
 MP3 files are resolved as `assets/sounds/words/<phrase_lowercased_spaces_as_underscores>.mp3`. If absent, TTS is used.
 

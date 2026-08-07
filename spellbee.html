@@ -5,7 +5,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?492">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?494">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -257,10 +257,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?492">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?494">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?492"></script>
+    <script src="assets/local/beelocal.js?494"></script>
 </head>
 <body>
     <div class="container">
@@ -1522,6 +1522,11 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
 ];
 // [PROBLEMS END]
 
+        // Precomputed GP-pair drill order, most frequent first (by English token frequency of
+        // each pair's words). Consumed by sched_frequency_order. Regenerate with
+        // tools/gen_gp_pair_order.js after editing the problem list.
+        const gp_pair_order = ["th/D","e/E","d/d","s/z","c/k","a/ae","y/j","i/aI","ou/u:","b/b","e/i:","u/A","a/eI","y/I","o/EU","k/k","ew/ju:","er/Er","wh/w","o/A","or/O:","ere/eE","ea/i:","u/ju:","a/E","y/aI","o/E","ge/dZ","ay/eI","oul/U","a/o","tion/SEn","sh/S","ou/aU","in/In","oo/U","e/I","ee/i:","igh/aI","th/T","or/E","ow/aU","ng/ng","al/sl","ar/a:","c/s","ity/ItI","ir/3:","ig/aI","ing/Ing","ce/s","a/O:","or/3:","ow/EU","ere/IE","ly/lI","ch/tS","ai/e","ea/e","er/3:","oo/u:","er/r","ck/k","re/rI","ear/IE","j/dZ","ff/f","ai/eI","ed/Id","au/O:","kn/n","ch/k","le/sl","de/dI","ent/Ent","ea/eI","gu/g","se/z","ur/3:","or/Er","i/i:","all/O:","x/ks","ear/3:","ph/f","ily/IlI","air/eE","ture/tSE","ol/EU","en/En","ss/s","et/Et","ll/l","ou/A","oa/EU","ey/I","ed/d","u/u:","ie/i:","wr/r","u/U","ei/i:","a/a:","ant/Ent","dge/dZ","oor/O:","al/O:","con/kEn","ire/aIE","rr/r","tch/tS","n/ng","s/Z","ch/S","oy/OI","nn/n","are/eE","sion/ZEn","pp/p","age/IdZ","ful/fUl","gh/f","oe/u:","tt/t","ur/E","ui/u:","mm/m","ear/eE","augh/O:","err/3:","g/dZ","es/z","es/Iz","cc/k","aw/O:","oi/OI","ed/t","ol/sl","ur/Er","ou/E","eigh/eI","bb/b","el/sl","gg/g","ot/Et","mb/m","dd/d","ie/I","un/An"];
+
         // Application data
         const bee = {
             // Configuration
@@ -1529,10 +1534,10 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             score_goal: 30,        // controls the bar under the score and gifts
             max_negative_score: 4, // maximum "negative" score where question doesn't give point
             puzzle_needs: 4, // how many successes before puzzle is dismissed
+            drill_problems: 11, // scheduler: choose GP pairs until sum(min(problems, puzzle_needs)) reaches this (see sched_start_cycle)
             max_box_len: 14, // segmented problems: once the boxes' proxy length exceeds this, boxes are
                              // sized compactly instead of uniformly (see render_segmented_input)
             intro_gap_ms: 30*60*1000, // resuming the persisted queue after this idle gap re-shows the class intro
-            level_weight_base: 1.35, // easier-first selection weight, base^(-level) - see choose_using_levels20
             // State (common)
             storage: {'players': {}},  // storage data that's saved into local storage
             load_time: Date.now(),
@@ -1560,10 +1565,10 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         };
 
     </script>
-    <script src="assets/common.js?492"></script>
+    <script src="assets/common.js?494"></script>
     <script>
     
-        const bee_current_data_version = 6; // used for new players
+        const bee_current_data_version = 7; // used for new players
 
         function data_migration() {
             if(bee.player === false) { console.warn('no player to migrate'); return; }
@@ -1582,11 +1587,11 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             }
 
             if(version < 6) {
-                // The per-wordtt "known words" success record and its selection gate were removed;
-                // the per-pair coverage stats now regulate selection on their own.
                 delete pstore.known_words;
                 version = 6;
             }
+            
+            if(version < 7) { version = 7; }
 
             if(pstore.data_version != version) {
                 pstore.data_version = version;
@@ -2190,13 +2195,6 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                 ['You can write the sound', 'as']
             ]);
 
-            // The sentence the example sits in, if the entry gives one: to_display differs from the
-            // word-to-type itself by more than punctuation/case (a bare entry can still carry
-            // punctuation, e.g. "Wait!"). Spoken as "<wordtt> as in <context>".
-            let context = problem_data.to_display;
-            const bare = function(s) { return s.toLowerCase().replaceAll(/[^a-z]/g, ''); };
-            if(bare(context) == bare(problem_data.wordtt)) { context = undefined; }
-
             const utterances = [];
             utterances[0] = function() { play_text(sentence[0], utterances[1]); };
             utterances[1] = make_pause(.25, 2);
@@ -2207,13 +2205,9 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             utterances[6] = function() { play_text(choose_from(['Listen:', 'So:', 'So this says:', 'So this is:']), utterances[7]); };
             utterances[7] = make_pause(0.3, 8);
             utterances[8] = function() { play_text(problem_data.wordtt, utterances[9]); };
-            // With a context, steps 10-13 add "as in <context>" - a pause either side of the
-            // connector, as in slow speech; without one we jump straight on to the phoneme
-            utterances[9] = (context === undefined) ? make_pause(1.2, 14) : make_pause(0.5, 10);
-            utterances[10] = function() { play_text('as in', utterances[11]); };
-            utterances[11] = make_pause(0.5, 12);
-            utterances[12] = function() { play_text(context, utterances[13]); };
-            utterances[13] = make_pause(1.2, 14);
+            // The example word-to-type is spoken alone, then straight on to the phoneme. (The former
+            // "as in <context>" carrier utterance was removed - new-scheduling.)
+            utterances[9] = make_pause(1.2, 14);
             utterances[14] = function() { play_phoneme(phoneme, utterances[15]); };
             utterances[15] = make_pause(1.5, 16);
             utterances[16] = function() {
@@ -2292,6 +2286,8 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         function reset_coverage_stats() {
             const pstore = bee.storage.players[bee.player];
             if(pstore.pair_stats) { pstore.pair_stats = {}; }
+            delete pstore.sched;     // scheduler cycle state
+            delete pstore.pairsched; // per-pair drill / learnt / block state
             save_storage('reset_coverage_stats');
             bee_alert('Coverage stats reset');
         }
@@ -2303,7 +2299,9 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         //   [0]/[1] successes/asks while IN FOCUS (purple '?', produced unaided)
         //   [2]/[3] successes/asks while not in focus and NOT shown in the bank (obvious/predictable)
         //   [4]/[5] successes/asks while not in focus and initially shown in the bank (revealed)
-        // Only [0]/[1] drive class selection; the rest are collected for future use / validation.
+        // All six accumulate for the player's lifetime (never reset per episode). The scheduler keeps its
+        // own episode-relative in-focus counts in pairsched (asks/succ, bumped alongside [0]/[1] and
+        // zeroed on drill-set entry); the rest are collected for future use / validation.
         function gp_pair_stat(gp_pair) {
             const ps = bee.storage.players[bee.player].pair_stats;
             if(!ps[gp_pair]) { ps[gp_pair] = [0, 0, 0, 0, 0, 0]; }
@@ -2456,6 +2454,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                                     const num_ix = {'focus':0, 'obvious':2, 'revealed':4};
                                     const gp_pair = bee.processed_problem.segments[done_ix].toLowerCase()+'/'+bee.processed_problem.phonemes[done_ix];
                                     gp_pair_stat(gp_pair)[num_ix[bee.seg_kind[done_ix]]]++;
+                                    if(bee.seg_kind[done_ix] === 'focus') { pairsched(gp_pair).succ++; bee.focus_solved++; } // episode success + this problem's clean-focus count
                                     bee.seg_locked[done_ix] = true;
                                 }
                             }
@@ -2467,7 +2466,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                     if(bee.typed.toLowerCase() == bee.processed_problem.wordtt.toLowerCase()) { // Success!
                         disable_typing();
                         bee.$input.addClass('success');
-                        
+
                         // Reschedule (ASK) only when the child used help (the segmented reveal-bank
                         // HELP key, or a plain problem's reveal - both bump help_asked) or over-corrected;
                         // otherwise just advance (OK). A repeat never reschedules again.
@@ -2486,6 +2485,10 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                             if(bee.backspace_used > 2) { outcome = 'ASK'; }
                         }
                         console.log('success help=', bee.help_asked, 'backspace=', bee.backspace_used, 'outcome=', outcome);
+                        // Window/learnt signal: '1' iff the in-focus segment(s) were entered cleanly and unaided -
+                        // deliberately NOT `outcome === 'OK'` (which folds in non-focus backspaces / the whole-word budget).
+                        const focus_clean = bee.help_asked === 0 && bee.focus_shown > 0 && bee.focus_solved === bee.focus_shown;
+                        sched_record_focus_outcome(focus_clean);
 
                         if(outcome == 'ASK') {
                             reschedule_question(bee.problem);
@@ -2569,6 +2572,8 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             bee.help_full_bar = false;
             bee.seg_kind = [];     // per-segment aid kind (focus/obvious/revealed), set below
             bee.seg_locked = [];   // per-segment: can no longer score (already scored, or a backspace disqualified it)
+            bee.focus_shown = 0;   // per-problem: in-focus segments presented (denominator for the clean-solve check)
+            bee.focus_solved = 0;  // per-problem: in-focus segments entered cleanly & unaided (bumped alongside succ)
 
             // Per-GP-pair coverage stats: classify each segment once, when first shown, and count the
             // "ask" (the odd counters). Repeats must not move the stats.
@@ -2578,6 +2583,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                     const c = segment_aid_kind(i);
                     bee.seg_kind[i] = c.kind;
                     gp_pair_stat(c.gp_pair)[denom_ix[c.kind]]++;
+                    if(c.kind === 'focus') { pairsched(c.gp_pair).asks++; bee.focus_shown++; } // episode ask + this problem's focus-segment count
                 }
             }
 
@@ -2624,9 +2630,9 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                     const ixs = bee.class_to_ix[problem_class];
                     if(ixs === undefined) { log += ' class_not_found'; break; }
                     if(ixs.length == 0) { log += ' class_empty'; break; }
-                    // Choose using levels
-                    problem_ix = choose_using_levels20(ixs);
-                    log += ' pix:'+problem_ix+" lev:"+bee.problem_list[problem_ix].level;
+                    // Choose a problem at random (not by level)
+                    problem_ix = choose_from(ixs);
+                    log += ' pix:'+problem_ix;
                     // ensure we choose a new problem (check the queue)
                     const dupl = queue_holds_problem(queue, problem_ix);
                     if(dupl && trials > 0) { log += ' norep'; continue; } // retry for a non-duplicate while we can
@@ -2635,10 +2641,12 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                 }
 
                 if(problem_class === undefined) { // first problem
-                    // Choose using levels
-                    problem_ix = choose_using_levels20(undefined); // undefined: from all problems
-                    if(problem_ix === undefined) { log += ' none_available'; break; } // every problem is disabled
-                    log += " pix:"+problem_ix+" lev:"+bee.problem_list[problem_ix].level;
+                    // Choose a problem at random from all enabled problems (not by level)
+                    const enabled = [];
+                    for(let k=0; k<bee.problem_list.length; k++) { if(bee.problem_list[k] !== false) { enabled.push(k); } }
+                    if(enabled.length === 0) { log += ' none_available'; break; } // every problem is disabled
+                    problem_ix = choose_from(enabled);
+                    log += " pix:"+problem_ix;
                     // ensure we choose a new problem (check the queue)
                     if(bee.problem_list.length > 1 && trials > 0) {
                         if(queue_holds_problem(queue, problem_ix)) { log += ' norep'; continue; }
@@ -2665,6 +2673,177 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         }
 
 
+        // ============================================================================
+        // Puzzle-cycle scheduler (see new-scheduling). Drills a small, frequency-ordered
+        // set of teachable GP pairs to mastery, plus a "joker" review slot, spaced across
+        // puzzle sessions. State persists in pstore.sched (the cycle) and pstore.pairsched
+        // (per pair). A CYCLE = the shuffled drill set + one joker; a SLOT = one pair's (or
+        // the joker's) run of <= puzzle_needs problems, built by new_question when the queue
+        // drains. window/asks/succ/chosen_at reset when a pair enters the drill set; the
+        // learnt flag and block_until (park / too-difficult rest windows) persist.
+        // ----------------------------------------------------------------------------
+
+        const SCHED = {
+            learnt_fast_asks: 8, learnt_fast_succ: 7, // >=7 of the latest 8 -> learnt (~2 days)
+            learnt_asks: 12, learnt_succ: 10,         // >=10 of the latest 12 -> learnt (~3 days)
+            hard_asks: 4, hard_rate: 0.25,            // >=4 asks and <25% success -> too difficult
+            hard_block_days: 14,
+            park_asks: 16, park_block_days: 7,        // >16 asks without resolving -> park (rest & retry)
+            relapse_succ: 6,                          // learnt pair <6 of latest 12 in joker -> un-learn
+            joker_tricky_p: 0.3, joker_learnt_p: 0.3  // joker branch probabilities (remainder = random class)
+        };
+
+        // Per-pair scheduler record (persisted, lazily created).
+        function pairsched(pair) {
+            const p = bee.storage.players[bee.player];
+            if(!p.pairsched) { p.pairsched = {}; }
+            if(!p.pairsched[pair]) {
+                p.pairsched[pair] = {
+                    window: '',    // latest <=12 in-focus problem outcomes ('1' clean solve / '0' aided-or-over-corrected); drives learnt & relapse
+                    asks: 0,       // in-focus asks THIS drill episode; bumped alongside pair_stats[pair][1], zeroed on entry; drives too-difficult & park
+                    succ: 0,       // in-focus successes THIS drill episode; bumped alongside pair_stats[pair][0], zeroed on entry; drives the too-difficult rate
+                    chosen_at: 0,  // when the pair last entered the drill set (ms UTC); telemetry
+                    learnt: false, // consolidated: drilled no more, resurfaces only via the joker until relapse
+                    block_until: 0 // rest-window end (ms UTC): too-difficult (14d) or parked (7d); ineligible for the drill set until then
+                };
+            }
+            return p.pairsched[pair];
+        }
+        function sched_is_learnt(pair) { const p = bee.storage.players[bee.player].pairsched; return !!(p && p[pair] && p[pair].learnt); }
+        function sched_is_blocked(pair) { const p = bee.storage.players[bee.player].pairsched; return !!(p && p[pair] && p[pair].block_until > Date.now()); }
+        function sched_recent_succ(win, n) {
+            const s = win.slice(-n); let c = 0;
+            for(let i=0; i<s.length; i++) { if(s[i] === '1') { c++; } }
+            return c;
+        }
+
+        // Teachable GP pairs in drill order (most frequent first), from the precomputed gp_pair_order,
+        // limited to pairs that currently have problems loaded. The order is computed offline by
+        // tools/gen_gp_pair_order.js. Any teachable pair
+        // missing from the precomputed order (e.g. added since it was last regenerated) is appended
+        // last, so it is still drilled rather than silently skipped.
+        function sched_frequency_order() {
+            const loaded = function(c) { return bee.class_to_ix[c] && bee.class_to_ix[c].length >= 1; };
+            const order = gp_pair_order.filter(loaded);
+            const seen = {};
+            for(let i=0; i<gp_pair_order.length; i++) { seen[gp_pair_order[i]] = true; }
+            for(const c in bee.class_to_ix) {
+                if(seen[c]) { continue; }
+                if(c.indexOf('/') < 0 || !class_gp_pairs[c] || !loaded(c)) { continue; }
+                order.push(c);
+            }
+            return order;
+        }
+
+        // (Re)build the drill set for a new cycle: keep still-eligible members, pull in the next
+        // frequency-ordered pairs to reach drill_problems, reset stats for the newcomers, shuffle.
+        function sched_start_cycle() {
+            const p = bee.storage.players[bee.player];
+            if(!p.sched) {
+                p.sched = {
+                    set: [],    // string[]: the cycle's shuffled drill set - GP-pair/class keys (e.g. 'ee/i:'), one drill slot each in cursor order
+                    cursor: 0,  // int: position in the cycle - < set.length is that drill slot, == set.length is the joker slot, > means start a new cycle
+                    cur: null   // null | {cls:string, pair:string|null, joker:bool}: the slot sched_next_slot last dispensed (cls = its class), kept for its end-of-slot check
+                };
+            }
+            const order = sched_frequency_order();
+            const eligible = function(pair) { return bee.class_to_ix[pair] && !sched_is_learnt(pair) && !sched_is_blocked(pair); };
+            const contributed = function(s) { let n = 0; for(let i=0;i<s.length;i++){ n += Math.min(bee.class_to_ix[s[i]].length, bee.puzzle_needs); } return n; };
+            let set = (p.sched.set || []).filter(eligible); // keep members still worth drilling
+            for(let i=0; i<order.length && contributed(set) < bee.drill_problems; i++) {
+                const pair = order[i];
+                if(set.indexOf(pair) >= 0 || !eligible(pair)) { continue; }
+                set.push(pair);
+                const rec = pairsched(pair); // fresh drill episode for the newcomer
+                // asks/succ zeroed here and re-accumulated per focus segment; pair_stats[pair][0]/[1] keep growing as lifetime coverage
+                rec.window = ''; rec.asks = 0; rec.succ = 0; rec.chosen_at = Date.now(); rec.learnt = false; rec.block_until = 0;
+            }
+            shuffle(set); // in-place, from common.js
+            p.sched.set = set;
+            p.sched.cursor = 0;
+            console.log('sched_start_cycle', set);
+        }
+
+        // Pick the joker slot's class: 30% tricky, 30% a random learnt pair, else a random
+        // non-drilled class; with no learnt pairs, 30% tricky / 70% random. Excludes the drill
+        // set and blocked/parked pairs (a not-yet-drilled pair may surface as preview).
+        function sched_pick_joker() {
+            const p = bee.storage.players[bee.player];
+            const inset = (p.sched && p.sched.set) ? p.sched.set : [];
+            const random_class = function() {
+                const cand = Object.keys(bee.class_to_ix).filter(function(c) {
+                    if(!bee.class_to_ix[c] || bee.class_to_ix[c].length < 1) { return false; }
+                    if(inset.indexOf(c) >= 0) { return false; }
+                    if(c.indexOf('/') >= 0 && sched_is_blocked(c)) { return false; }
+                    return true;
+                });
+                return cand.length ? choose_from(cand) : choose_from(Object.keys(bee.class_to_ix));
+            };
+            const tricky_ok = bee.class_to_ix['tricky'] && bee.class_to_ix['tricky'].length > 0;
+            const learnt = Object.keys(p.pairsched || {}).filter(function(pair) {
+                return sched_is_learnt(pair) && bee.class_to_ix[pair] && inset.indexOf(pair) < 0;
+            });
+            const r = Math.random();
+            if(r < SCHED.joker_tricky_p && tricky_ok) { return 'tricky'; }
+            if(learnt.length > 0 && r < SCHED.joker_tricky_p + SCHED.joker_learnt_p) { return choose_from(learnt); }
+            return random_class();
+        }
+
+        // Advance to the next cycle slot, recording it in sched.cur (its .cls is the slot's class;
+        // read it from there); start a new cycle when the cursor runs past the joker.
+        function sched_next_slot() {
+            const p = bee.storage.players[bee.player];
+            if(!p.sched || !p.sched.set || p.sched.cursor === undefined || p.sched.cursor > p.sched.set.length) {
+                sched_start_cycle();
+            }
+            let cls, cur;
+            if(p.sched.cursor < p.sched.set.length) {
+                cls = p.sched.set[p.sched.cursor];
+                cur = {cls: cls, pair: cls, joker: false};
+            } else { // joker slot (cursor == set.length)
+                cls = sched_pick_joker();
+                cur = {cls: cls, pair: (cls.indexOf('/') >= 0 && sched_is_learnt(cls)) ? cls : null, joker: true};
+            }
+            p.sched.cursor++;
+            p.sched.cur = cur;
+        }
+
+        // Learnt / park / too-difficult check (drill slot) or relapse check (joker slot) for the
+        // slot that just finished. No-op at startup (cur null) or a non-pair joker slot.
+        function sched_slot_end_check(cur) {
+            if(!cur) { return; }
+            const now = Date.now();
+            if(cur.joker) {
+                if(cur.pair && sched_is_learnt(cur.pair)) {
+                    const rec = pairsched(cur.pair);
+                    if(sched_recent_succ(rec.window, 12) < SCHED.relapse_succ) { rec.learnt = false; console.log('sched relapse', cur.pair); }
+                }
+                return;
+            }
+            const pair = cur.pair;
+            if(!pair) { return; }
+            const rec = pairsched(pair);
+            if(rec.window.length >= SCHED.learnt_fast_asks && sched_recent_succ(rec.window, SCHED.learnt_fast_asks) >= SCHED.learnt_fast_succ) { rec.learnt = true; console.log('sched learnt (fast)', pair); return; }
+            if(rec.window.length >= SCHED.learnt_asks && sched_recent_succ(rec.window, SCHED.learnt_asks) >= SCHED.learnt_succ) { rec.learnt = true; console.log('sched learnt', pair); return; }
+            if(rec.asks >= SCHED.hard_asks && rec.succ / rec.asks < SCHED.hard_rate) { rec.block_until = now + SCHED.hard_block_days*86400000; console.log('sched too-difficult', pair); return; }
+            if(rec.asks > SCHED.park_asks) { rec.block_until = now + SCHED.park_block_days*86400000; console.log('sched parked', pair); return; }
+        }
+
+        // Record one in-focus PROBLEM outcome (the window char) for the current problem's taught pair,
+        // at completion. asks/succ are NOT touched here - they accumulate per focus segment alongside
+        // pair_stats[pc][1]/[0] (the [1]/[0] increments in the setup / keystroke paths). The window gets
+        // one char per problem: '1' iff the in-focus segment(s) were entered cleanly and unaided (no help,
+        // no in-segment backspace) - never from the whole-word `outcome`, so a non-focus slip can't spoil it.
+        // Skips repeats and non-GP-pair (joker thematic) slots.
+        function sched_record_focus_outcome(clean) {
+            if(bee.problem.is_repeat || !bee.processed_problem.is_segmented) { return; }
+            const pc = bee.problem.problem_class;
+            if(!pc || pc.indexOf('/') < 0) { return; }
+            const rec = pairsched(pc);
+            rec.window = (rec.window + (clean ? '1' : '0')).slice(-12);
+        }
+
+
         function new_question(reason) {  // also called from common.js on successfully answering a question
             console.log('#new_question05() caller=', reason);
             if(check_dismiss_puzzle()) { return; } // puzzle solved: don't generate/speak the next question
@@ -2683,17 +2862,23 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             let log = '';
             let intro_problem_ix = undefined; // class intro's example problem; undefined = no intro (queue-restored)
 
-            // Once per page-load: re-introduce the class even when resuming the persisted (anti-cheat)
-            // queue. Always in puzzle mode (a short, freshly launched session should open with the
-            // intro), otherwise only if we last played a while ago. The queue-empty case below shows
-            // its own intro, so we only force one here for a queue-restored problem (no double intro).
-            // Routine reloads (page_update / return-reload) keep last_active recent, so they don't
-            // trip the idle-gap branch.
+            // Once per page-load, decide how to open. In puzzle mode we always start a fresh cycle
+            // slot: purge the (leftover) queue so the queue-empty branch below builds and introduces
+            // the next slot (the previous slot is checked and advanced past - option (a)). The child
+            // cannot close the puzzle host, so nothing is dodged. Otherwise (regular menu play) we keep
+            // the persisted anti-cheat queue and only re-introduce the resumed class after an idle gap.
+            // Routine reloads (page_update / return-reload) keep last_active recent, so they don't trip it.
             let force_intro = false;
             if(!bee.intro_gap_checked) {
                 bee.intro_gap_checked = true;
-                const la = bee.storage.players[bee.player].last_active;
-                if(bee.is_puzzle || la === undefined || Date.now() - la > bee.intro_gap_ms) { force_intro = true; }
+                if(bee.is_puzzle) {
+                    log += ' puzzle_purge';
+                    purge_question_queue();
+                    problem = undefined;
+                } else {
+                    const la = bee.storage.players[bee.player].last_active;
+                    if(la === undefined || Date.now() - la > bee.intro_gap_ms) { force_intro = true; }
+                }
             }
 
             if(problem !== undefined) {
@@ -2713,34 +2898,17 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                     intro_problem_ix = intro_problem_for_class(problem.problem_class, problem.problem_ix);
                 }
             }
-            if(problem === undefined) { // Get a new problem
+            if(problem === undefined) { // Need a new cycle slot
+                // The slot that just finished (sched.cur) gets its learnt / park / too-difficult
+                // check (or joker relapse check), then we advance to the next slot in the cycle.
+                const pstore = bee.storage.players[bee.player];
+                sched_slot_end_check(pstore.sched ? pstore.sched.cur : null);
+                sched_next_slot();
+                const problem_class = pstore.sched.cur.cls;
+                log += ' slot:'+problem_class+' cursor:'+pstore.sched.cursor;
 
-                // Pick a taught class first (so coverage doesn't skew to classes with many problems),
-                // uniformly at random and biased towards classes not yet consolidated. Classes carry
-                // no difficulty of their own - the per-problem level weighting in
-                // try_get_new_problem10 is what keeps the problems within a class easier-first.
-                // Classes that are not GP pairs (noclass and thematic classes) carry no pair_stats, so
-                // they are always accepted when picked - collecting common irregular words.
-                const candidate_classes = Object.keys(bee.class_to_ix).filter(function(c) { return bee.class_to_ix[c].length > 1; });
-                let problem_class = undefined;
-                let class_picks = 0;
-                while(true) {
-                    problem_class = choose_from(candidate_classes);
-                    class_picks++;
-                    const st = bee.storage.players[bee.player].pair_stats[problem_class];
-                    if(!st || st[1] === 0) { break; } // never asked - teach it
-                    const rate = st[0] / (st[1] + 0.85); // smoothed success rate
-                    if(rate > 0.9) { if(Math.random() < 0.2) { break; } }
-                    else if(rate > 0.75) { if(Math.random() < 0.5) { break; } }
-                    else { break; } // <= 75% success - always teach
-                    if(class_picks >= 100) { break; } // safety cap - finish with the current pick
-                }
-                log += ' class:'+problem_class+' picks:'+class_picks;
-
-                // First problem of the class run. A non-empty class always returns one (a known
-                // problem if every one of them is already known, see try_get_new_problem10).
+                // First problem of the slot's run. A non-empty class always returns one.
                 const problem_ix = try_get_new_problem10(problem_class);
-
                 log += ' first_problem:'+problem_ix;
                 problem = {'problem_ix':problem_ix, 'is_repeat':false, 'problem_class':problem_class};
                 store_question11(problem);
@@ -2748,21 +2916,21 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
 
                 const problem_ixs = bee.class_to_ix[problem_class];
                 if(problem_ixs !== undefined && problem_ixs.length > 0) {
-                    const desired_number_of_problems = Math.min(6, problem_ixs.length); // Aim for runs of 7
-                    log += ' desired:'+desired_number_of_problems;
-                    for(let j=0; j<desired_number_of_problems; j++) {
+                    // At most puzzle_needs problems per slot (new-scheduling line 48); a shorter pair
+                    // simply spills into the next slot when this run drains (a later new_question
+                    // rebuilds from the queue-empty path).
+                    const run = Math.min(bee.puzzle_needs, problem_ixs.length);
+                    for(let j=1; j<run; j++) { // the first is already queued
                         const class_problem_ix = try_get_new_problem10(problem_class);
                         log += ' class_problem_ix:'+class_problem_ix;
                         if(class_problem_ix !== undefined) {
                             store_question11({'problem_ix':class_problem_ix, 'is_repeat':false, 'problem_class':problem_class});
                         }
                     }
-
                     // Prefer a random OTHER problem of the class for the intro (don't reveal problem_ix)
                     const intro_choices = problem_ixs.filter(function(ix) { return ix != problem_ix; });
                     if(intro_choices.length > 0) { intro_problem_ix = choose_from(intro_choices); }
                 }
-
             }
             console.log("Selecting new problem:", log);
             // A new class run gets an intro; queue-restored problems (intro_problem_ix undefined) skip it
@@ -2802,40 +2970,6 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             if(img[1] !== undefined && img[1].length) { out.emoji = img[1]; }
             process_problem_internals(out);
             return out;
-        }
-
-
-        // Choose an item using the levels, from a list of problem indices or all problems if undefined.
-        // Weight is bee.level_weight_base^(-level), so each extra segment makes a problem that much
-        // less likely; the base is deliberately mild because the adaptive machinery (the pair_stats
-        // class gate in new_question) is what should be regulating difficulty - this is only a
-        // static prior.
-        function choose_using_levels20(list_of_problem_ix) {
-            const weights_cumulative = [];
-            let weight_sum = 0;
-            let last_eligible = undefined; // last slot with a non-zero weight, for the rounding fallback
-
-            // Get list of cumulative weights
-            const loop_limit = (list_of_problem_ix === undefined ? bee.problem_list.length : list_of_problem_ix.length);
-            for(let i=0; i<loop_limit; i++) {
-                const problem_ix = (list_of_problem_ix === undefined ? i : list_of_problem_ix[i]);
-                // A disabled problem gets zero weight; the strict '<' below then never lands on it
-                const w = (bee.problem_list[problem_ix] === false ? 0 : Math.pow(bee.level_weight_base, -bee.problem_list[problem_ix].level));
-                if(w > 0) { last_eligible = i; }
-                weight_sum += w;
-                weights_cumulative.push(weight_sum);
-            }
-
-            const weight_point = Math.random() * weight_sum;
-            let ix_chosen = undefined;
-            for(let i=0; i<loop_limit; i++) {
-                if(weight_point < weights_cumulative[i]) { ix_chosen = i; break; }
-            }
-            if(ix_chosen === undefined) { ix_chosen = last_eligible; } // undefined if nothing was eligible
-            
-            const problem_ix_chosen = (list_of_problem_ix === undefined ? ix_chosen : list_of_problem_ix[ix_chosen]);
-            if(problem_ix_chosen === undefined) { console.error("choose_using_levels20", list_of_problem_ix, weight_point, ix_chosen); }
-            return problem_ix_chosen;
         }
 
 
@@ -3081,8 +3215,8 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?492"></script>
-    <script src="assets/aquarium/js/aquarium.js?492"></script>
+    <script src="assets/aquarium/js/config.js?494"></script>
+    <script src="assets/aquarium/js/aquarium.js?494"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
