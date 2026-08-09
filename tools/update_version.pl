@@ -1,4 +1,6 @@
 #!/usr/bin/perl
+# Copyright (C) 2025-2026 Elod Pal Csirmaz
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 my $newver;
 

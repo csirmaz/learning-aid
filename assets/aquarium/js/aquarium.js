@@ -1,5 +1,8 @@
 /* ===========================================================================
  * aquarium.js  --  A lightweight, static 2D aquarium widget.
+ *
+ * Copyright (C) 2025-2026 Elod Pal Csirmaz
+ * SPDX-License-Identifier: GPL-3.0-or-later
  * options: { basePath, storageKey, startEmpty }
  * ========================================================================= */
 

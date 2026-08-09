@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// Copyright (C) 2025-2026 Elod Pal Csirmaz
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Audit segmented problem entries for review (see agent/segmented-review.md).
 //
 // Usage:  node agent/segmented-audit.js [html-file]

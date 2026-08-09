@@ -1,4 +1,6 @@
 #!/usr/bin/env node
+// Copyright (C) 2025-2026 Elod Pal Csirmaz
+// SPDX-License-Identifier: GPL-3.0-or-later
 // Apply a set of exact string replacements to a file (see agent/segmented-review.md).
 //
 // Usage:  node agent/apply-line-edits.js <target-file> [edits.json] [--dry-run]

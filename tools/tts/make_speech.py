@@ -1,3 +1,5 @@
+# Copyright (C) 2025-2026 Elod Pal Csirmaz
+# SPDX-License-Identifier: GPL-3.0-or-later
 
 # Process spellbee.html, extract the problem entries
 # make sure sounds exist for the phrases and words-to-type; if not,

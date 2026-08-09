@@ -1,6 +1,9 @@
 /* ===========================================================================
  * config.js  --  Aquarium game catalogue & tuning.
  *
+ * Copyright (C) 2025-2026 Elod Pal Csirmaz
+ * SPDX-License-Identifier: GPL-3.0-or-later
+ *
  * To add a new fish or item:
  *   1. Drop an SVG (facing RIGHT for fish) into assets/.
  *   2. Add an entry below.

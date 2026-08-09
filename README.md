@@ -79,3 +79,13 @@ Use the common modules to implement new learning tools:
 ![screenshot](https://csirmaz.github.io/learning-aid/assets/aquarium.png)
 
 
+## License
+
+Copyright (C) 2025-2026 Elod Pal Csirmaz.
+
+This project is free software, licensed under the GNU General Public License
+version 3 or later (GPL-3.0-or-later); see [LICENSE](LICENSE). Bundled
+third-party libraries (jQuery, JSConfetti, fireworks-js) retain their own
+MIT licenses.
+
+

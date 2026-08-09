@@ -1,4 +1,5 @@
-
+// Copyright (C) 2025-2026 Elod Pal Csirmaz
+// SPDX-License-Identifier: GPL-3.0-or-later
 
 function local_hook_has(hook_name) {
     return (typeof(bee_local) !== 'undefined' && bee_local[hook_name]);
