@@ -9,7 +9,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?495">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?497">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -178,9 +178,13 @@
         }
         /* The example word-to-type starts out blurred and comes into focus as the splash appears */
         .classintro .gi_wordtt {
+            /* Fixed-width font so each glyph is exactly 1ch: lets the split-digraph link (.gi_split)
+               centre its legs on the vowel and marker "e" in pure CSS. letter-spacing MUST stay 0
+               to keep one glyph == 1ch. */
+            font-family: ui-monospace, "DejaVu Sans Mono", "Courier New", monospace;
             font-size: 2.6rem;
             line-height: 3.5rem;
-            letter-spacing: .15rem;
+            letter-spacing: 0;
             animation: gi-focus-animation .8s ease-out both;
         }
         @keyframes gi-focus-animation {
@@ -192,6 +196,33 @@
             text-decoration: underline solid #a0c .2rem;
             text-underline-offset: .5rem;
         }
+        /* Split-digraph intro (e.g. "i.e/aI"): the vowel and its silent marker "e" (with the
+           consonant between them) are joined by a rounded half-box that HANGS BELOW the letters,
+           echoing the game's marker link (.segbox_link) - short downward legs on the two glyph
+           centres, rounded bottom, no top - rather than boxing the letters in. Relies on the
+           fixed-width .gi_wordtt font (one glyph == 1ch). The two letters stay purple via .gi_match;
+           their underline is dropped so only the hanging link decorates them. */
+        .classintro .gi_split {
+            display: inline-block;
+            position: relative;
+            line-height: 1;
+            padding: 0 0 .7rem;        /* no side padding: content edge == first/last glyph edge, so .5ch lands on a glyph centre */
+        }
+        .classintro .gi_split::after {
+            content: "";
+            position: absolute;
+            /* Legs centred on the vowel (first glyph) and marker "e" (last glyph): each glyph is 1ch
+               wide, so its centre sits .5ch in from that edge; -.1rem shifts the .2rem leg onto it. */
+            left: calc(.5ch - .1rem);
+            right: calc(.5ch - .1rem);
+            bottom: .1rem;
+            height: .5rem;             /* how far the link drops below the letters (cf. .segbox_link) */
+            border: .2rem solid #a0c;
+            border-top: none;          /* bottom half of a box only */
+            border-bottom-left-radius: .4rem;
+            border-bottom-right-radius: .4rem;
+        }
+        .classintro .gi_split .gi_match { text-decoration: none; }
 
         @keyframes blink-animation { to { visibility: hidden; } }
         
@@ -261,10 +292,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?495">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?497">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?495"></script>
+    <script src="assets/local/beelocal.js?497"></script>
 </head>
 <body>
     <div class="container">
@@ -436,6 +467,7 @@
             "err/3:": 1, 
 
             "i/aI": 1,
+            "ie/aI": 1,  // pie, die, lie, tie
             "i/i:": 1,
             "ie/I": 1,
 
@@ -451,6 +483,7 @@
             "or/Er": 1,
             "ou/aU": 1,
             "oa/EU": 1,
+            "oe/EU": 1,   // toe, foe, hoe, Joe (contrast oe/u: in "shoe")
             "oe/u:": 1,
             "ol/EU": 1,
             "or/O:": 1,
@@ -468,6 +501,7 @@
             "ce/s": 1,
             "igh/aI": 1,
             "wh/w": 1,
+            "qu/kw": 1,   // queen, quick, quit, quiet, question
             "s/z": 1,
             "x/ks": 1,
             "sh/S": 1,
@@ -514,6 +548,15 @@
             "ea/i:": 1,
             "ou/u:": 1,
             "ew/ju:": 1,
+            "ue/ju:": 1,  // due, cue, hue, fuel, value, argue
+            // split digraphs: a vowel + silent marker "e" ("magic e"), spanning two boxes with a
+            // consonant between them, marked in the problem text by a '/X' e (see seg_gp_pair). The
+            // vowel voices its free (tense) value, so the class name joins the two letters with a dot.
+            "a.e/eI": 1,  // snake, cake, wave
+            "e.e/i:": 1,  // complete, Steve
+            "i.e/aI": 1,  // tide, time, slide
+            "o.e/EU": 1,  // home, bone, rose
+            "u.e/ju:": 1, // cube, cute
             // broken
             "ir/3:": 1,
             "or/3:": 1,
@@ -1522,13 +1565,111 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
 "|you can go <a/e=n=y/I==wh/w=ere/eE>", // [anywhere]
 "@🌍|Earth's <a=t=m=o/E==s=ph=ere/IE>", // [atmosphere]
 "|a <s=e/I=v=ere/IE> storm", // [severe]
+
+// a.e/eI
+"|the <d=a/eI=t=e/X> today", // [date]
+"|swim in the <l=a/eI=k=e/X>", // [lake]
+"|Don't be <l=a/eI=t=e/X>!", // [late]
+"|sticky <t=a/eI=p=e/X>", // [tape]
+"|<w=a/eI=k=e/X> up!", // [wake]
+// ai/eI
+"|the cat's <t=ai/eI=l>", // [tail]
+"|a sharp <p=ai/eI=n>", // [pain]
+"|the <m=ai/eI=n> road", // [main]
+"|<g=ai/eI=n> ten points", // [gain]
+// ay/eI
+"|a sunny <d=ay/eI>", // [day]
+"|horses eat <h=ay/eI>", // [hay]
+"|You <m=ay/eI> go now", // [may]
+// aw/O:
+"|What an <aw/O:==ful/fUl> smell!", // [awful]
+"|the cat's sharp <c=l=aw/O:>", // [claw]
+"|a tiny <f=l=aw/O:> in the plan", // [flaw]
+// ea/i:
+"|the <h=ea/i:=t> of the sun", // [heat]
+"@🍃|<l=ea/i:=f>", // [leaf]
+"|too <w=ea/i:=k> to stand", // [weak]
+// e.e/i:
+"|<d=e/I=l=e/i:=t=e/X> the file", // [delete]
+"|My friend <P=e/i:=t=e/X> waved", // [Pete]
+"|<th/D=e/i:=s/z=e/X> are mine", // [these]
+// ee/i:
+"@👣|I have two <f=ee/i:=t>", // [feet]
+"|plant a <s=ee/i:=d>", // [seed]
+"|seven days in a <w=ee/i:=k>", // [week]
+// i.e/aI
+"|take a <b=i/aI=t=e/X> of apple", // [bite]
+"|<h=i/aI=d=e/X> behind the tree", // [hide]
+"@🪁|<k=i/aI=t=e/X>", // [kite]
+"|<r=i/aI=d=e/X> a bike", // [ride]
+"|the sea <t=i/aI=d=e/X> comes in", // [tide]
+"|a <w=i/aI=d=e/X> river", // [wide]
+// ie/aI
+"@🥧|<p=ie/aI>", // [pie]
+"|plants <d=ie/aI> without water", // [die]
+"|Do not tell a <l=ie/aI>", // [lie]
+"@👔|<t=ie/aI>", // [tie]
+// igh/aI
+"|Do not <f=igh/aI=t>", // [fight]
+"|a lovely <s=igh/aI=t>", // [sight]
+"|the lid is too <t=igh/aI=t>", // [tight]
+// mb/m
+"|an arm is a <l=i=mb/m>", // [limb]
+// oa/EU
+"@🧼|<s=oa/EU=p>", // [soap]
+// o.e/EU
+"@🍦|an ice cream <c=o/EU=n=e/X>", // [cone]
+"|I <h=o/EU=p=e/X> you win", // [hope]
+"|<v=o/EU=t=e/X> for me", // [vote]
+// oe/EU
+"|I hurt my big <t=oe/EU>", // [toe]
+"|a friend or a <f=oe/EU>", // [foe]
+"|dig with a <h=oe/EU>", // [hoe]
+"|My friend <J/dZ=oe/EU> is tall", // [Joe]
+"|She <g=o/EU=es/z> to school", // [goes] go+es: o/EU + es/z, not oe/EU
+// oi/OI
+"|cooking <oi/OI=l>", // [oil]
+"|<b=oi/OI=l> the water", // [boil]
+"|wrap it in <f=oi/OI=l>", // [foil]
+"|a sharp <p=oi/OI=n=t>", // [point]
+// ou/aU
+"@🛋️|<c=ou/aU=ch>", // [couch]
+"|a loud <s=ou/aU=n=d>", // [sound]
+// oy/OI
+"|<s=oy/OI> sauce", // [soy]
+"|Do not <a/E=nn=oy/OI> me", // [annoy]
+// qu/kw
+"|the king and <qu/kw=ee/i:=n>", // [queen]
+"|a <qu/kw=i=ck> run", // [quick]
+"|please be <qu/kw=i/aI=e/E=t>", // [quiet]
+"|I want to <qu/kw=i=t> the game", // [quit]
+// ue/ju:
+"|Let's not <ar/a:=g=ue/ju:>", // [argue]
+"|Wait for your <c=ue/ju:>", // [cue]
+"|The book is <d=ue/ju:> today", // [due]
+"|The car needs <f=ue/ju:=l>", // [fuel]
+"|a bright <h=ue/ju:> of blue", // [hue]
+"|the <v=a=l=ue/ju:> of the coin", // [value]
+// u.e/ju:
+"|<u/ju:=s/z=e/X> a spoon", // [use]
+"|The <m=u/ju:=l=e/X> carried the bags", // [mule]
+"|press <m=u/ju:=t=e/X> to stop the sound", // [mute]
+"|hum a happy <t=u/ju:=n=e/X>", // [tune]
+// ui (suit-type ui/u:; ruin & fluid are u/u:+i, two vowels)
+"|water is a <f=l=u/u:=i=d>", // [fluid]
+"|do not <r=u/u:=i=n> the game", // [ruin]
+"@🧳|<s=ui/u:=t==c=a/eI=s=e/X>", // [suitcase]
+// wh/w
+"@🐋|<wh/w=a/eI=l=e/X>", // [whale]
+"@🌾|<wh/w=ea/i:=t>", // [wheat]
+"|<wh/w=i=s=k> the eggs", // [whisk]
 ];
 // [PROBLEMS END]
 
         // Precomputed GP-pair drill order, most frequent first (by English token frequency of
         // each pair's words). Consumed by sched_frequency_order. Regenerate with
         // tools/gen_gp_pair_order.js after editing the problem list.
-        const gp_pair_order = ["th/D","e/E","d/d","s/z","c/k","a/ae","y/j","i/aI","ou/u:","b/b","e/i:","u/A","a/eI","y/I","o/EU","k/k","ew/ju:","er/Er","wh/w","o/A","or/O:","ere/eE","ea/i:","u/ju:","a/E","y/aI","o/E","ge/dZ","ay/eI","oul/U","a/o","tion/SEn","sh/S","ou/aU","in/In","oo/U","e/I","ee/i:","igh/aI","a/O:","th/T","or/E","ow/aU","ng/ng","al/sl","ar/a:","c/s","ity/ItI","ir/3:","ig/aI","ing/Ing","ce/s","or/3:","ow/EU","ere/IE","ly/lI","ch/tS","ai/e","ea/e","er/3:","oo/u:","ll/l","er/r","ck/k","re/rI","ear/IE","j/dZ","ff/f","ai/eI","ed/Id","au/O:","kn/n","ch/k","le/sl","de/dI","ent/Ent","ea/eI","gu/g","se/z","ur/3:","or/Er","i/i:","x/ks","ear/3:","ph/f","ily/IlI","air/eE","ture/tSE","ol/EU","en/En","ss/s","et/Et","ou/A","oa/EU","ey/I","ed/d","u/u:","ie/i:","wr/r","u/U","ei/i:","a/a:","ant/Ent","dge/dZ","oor/O:","al/O:","con/kEn","ire/aIE","rr/r","tch/tS","n/ng","s/Z","ch/S","oy/OI","nn/n","are/eE","sion/ZEn","pp/p","age/IdZ","ful/fUl","gh/f","oe/u:","tt/t","ur/E","ui/u:","mm/m","ear/eE","augh/O:","err/3:","g/dZ","es/z","es/Iz","cc/k","aw/O:","oi/OI","ed/t","ol/sl","ur/Er","ou/E","eigh/eI","bb/b","el/sl","gg/g","ot/Et","mb/m","dd/d","ie/I","un/An"];
+        const gp_pair_order = ["th/D","e/E","d/d","s/z","a/ae","c/k","y/j","ou/u:","b/b","u/A","k/k","e/i:","a/eI","y/I","i.e/aI","ay/eI","ew/ju:","er/Er","wh/w","o/A","or/O:","o.e/EU","ea/i:","ere/eE","u/ju:","a/E","y/aI","o/E","ge/dZ","ee/i:","oul/U","ou/aU","a/o","tion/SEn","sh/S","o/EU","e/I","in/In","igh/aI","oo/U","i/aI","a/O:","th/T","or/E","ow/aU","a.e/eI","e.e/i:","ng/ng","al/sl","ar/a:","c/s","ai/eI","ity/ItI","ir/3:","u.e/ju:","ig/aI","ing/Ing","ce/s","or/3:","ow/EU","ere/IE","ck/k","ly/lI","ch/tS","ai/e","ea/e","er/3:","oo/u:","j/dZ","ll/l","er/r","re/rI","ear/IE","ff/f","ed/Id","au/O:","kn/n","ch/k","le/sl","de/dI","ent/Ent","ea/eI","gu/g","se/z","ur/3:","or/Er","ue/ju:","i/i:","x/ks","oi/OI","ear/3:","ph/f","ily/IlI","air/eE","ture/tSE","ol/EU","en/En","ss/s","oa/EU","et/Et","u/u:","ou/A","ey/I","ed/d","ie/i:","wr/r","u/U","ei/i:","a/a:","ant/Ent","dge/dZ","oor/O:","al/O:","con/kEn","ire/aIE","rr/r","tch/tS","oy/OI","n/ng","s/Z","ch/S","nn/n","qu/kw","are/eE","sion/ZEn","pp/p","age/IdZ","ful/fUl","gh/f","es/z","oe/u:","tt/t","ur/E","ie/aI","ui/u:","mm/m","ear/eE","augh/O:","err/3:","g/dZ","aw/O:","es/Iz","oe/EU","cc/k","ed/t","ol/sl","ur/Er","ou/E","eigh/eI","bb/b","el/sl","gg/g","ot/Et","mb/m","dd/d","ie/I","un/An"];
 
         // Application data
         const bee = {
@@ -1568,7 +1709,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         };
 
     </script>
-    <script src="assets/common.js?495"></script>
+    <script src="assets/common.js?497"></script>
     <script>
     
         const bee_current_data_version = 7; // used for new players
@@ -1787,23 +1928,29 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             };
             problem_data.proc_cache = proc;
         }
-        
-        
-        // Render the segment bank below the prompt: the wordtt's shuffled parts to copy from. Each
-        // chip carries data-seg (its part index) so update_completed_chips() greys it as its part is
-        // completed. Stories tile every word. A segmented problem also tiles its parts, but:
-        //   - a predictable GP pair (predictable_gp_pairs) that is NOT in focus gets no chip - the
-        //     child produces it unaided from the sound;
-        //   - the in-focus pair(s) show as a purple '?' card (segchip_focus) instead of the grapheme.
-        // The HELP key (bee.help_full_bar) tiles every segment plainly - the child asking to see
-        // everything - so full mode may not depend on the predictability judgement here.
+
+
+        // A segment's GP pair, split-digraph aware: normally "<grapheme>/<phoneme>"
+        // (lower-cased), e.g. "i/aI", but a vowel whose silent marker "e" sits two boxes
+        // right (connectors[i+2]) is a SPLIT DIGRAPH written "<vowel>.e/<phoneme>", e.g.
+        // "i.e/aI" (tide). Only place a pair string is formed; split pairs live in class_gp_pairs.
+        function seg_gp_pair(proc, i) {
+            let grapheme = proc.segments[i].toLowerCase();
+            if(proc.connectors[i+2]) { grapheme += '.' + proc.segments[i+2].toLowerCase(); }
+            return grapheme + '/' + proc.phonemes[i];
+        }
+
+
+        // Render the segment bank: the wordtt's shuffled parts to copy. Each chip has
+        // data-seg (its part index) for greying by update_completed_chips(). Stories tile
+        // every word; a segmented problem tiles its parts too, except a non-focus
+        // predictable pair (no chip) and the in-focus pair (a purple '?'). HELP tiles all.
         function render_segment_bank() {
             const parts = bee.processed_problem.segments;
-            const phonemes = bee.processed_problem.phonemes;
             const segmented = bee.processed_problem.is_segmented;
             const show_all = bee.help_full_bar;
             const focus_gp_pair = (bee.problem && bee.problem.problem_class) || '';
-            const gp_pair = function(ix) { return parts[ix].toLowerCase()+'/'+phonemes[ix]; };
+            const gp_pair = function(ix) { return seg_gp_pair(bee.processed_problem, ix); };
             const is_focus = function(ix) { return focus_gp_pair.indexOf('/') >= 0 && gp_pair(ix) === focus_gp_pair; };
 
             const chips = [];
@@ -1825,7 +1972,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         // pair is shown as a tile ('revealed'). Returns {gp_pair, kind}.
         function segment_aid_kind(i) {
             const pw = bee.processed_problem;
-            const gp_pair = pw.segments[i].toLowerCase()+'/'+pw.phonemes[i];
+            const gp_pair = seg_gp_pair(pw, i);
             const focus = (bee.problem && bee.problem.problem_class) || '';
             if(focus.indexOf('/') >= 0 && gp_pair === focus) { return {'gp_pair':gp_pair, 'kind':'focus'}; }
             if(predictable_gp_pairs[gp_pair]) { return {'gp_pair':gp_pair, 'kind':'obvious'}; }
@@ -1909,11 +2056,10 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             const phoneme = wc.split('/')[1];
             if(phoneme === undefined || phoneme_sounds[phoneme] === undefined) { done(); return; }
             const parts = bee.processed_problem.segments;
-            const phonemes = bee.processed_problem.phonemes;
             const $boxes = bee.$input.find('.typebox');
             setTimeout(function() {
                 for(let j=0; j<parts.length; j++) { // bounce every box whose pair is the in-focus one
-                    if(parts[j].toLowerCase()+'/'+phonemes[j] === wc) {
+                    if(seg_gp_pair(bee.processed_problem, j) === wc) {
                         $boxes.filter('[data-seg="'+j+'"]').addClass('seg_focus_bounce');
                     }
                 }
@@ -1930,14 +2076,14 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             const mask = bee.processed_problem.mask;
             const wordtt = bee.processed_problem.wordtt;
             const parts = bee.processed_problem.segments;
-            const phonemes = bee.processed_problem.phonemes;
             const boundaries = bee.processed_problem.boundaries; // true => draw a morpheme divider before this box
 
             // A part is "in focus" if its GP pair is the class's taught pair. problem_class is
-            // built as grapheme+'/'+phoneme in the class derivation; 'noclass' has no '/'.
+            // built as grapheme+'/'+phoneme in the class derivation; 'noclass' has no '/'. A split
+            // digraph's vowel matches its "<vowel>.e/<phoneme>" pair via seg_gp_pair.
             const focus_gp_pair = (bee.problem && bee.problem.problem_class) || '';
             const is_focus_part = function(ix) {
-                return focus_gp_pair.indexOf('/') >= 0 && parts[ix].toLowerCase()+'/'+phonemes[ix] === focus_gp_pair;
+                return focus_gp_pair.indexOf('/') >= 0 && seg_gp_pair(bee.processed_problem, ix) === focus_gp_pair;
             };
 
             // Box width in characters: normally uniform (sized to the longest part) so it leaks no
@@ -2151,13 +2297,20 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
 
 
         // Render a segmented problem's parts as a plain word-to-type for the class intro, with the
-        // part(s) matching the class's grapheme (already lowercased) highlighted.
-        function render_intro_wordtt(proc, grapheme) {
+        // part(s) whose GP pair is the class's (gp_pair, e.g. "ee/i:") highlighted (.gi_match). A
+        // split-digraph class ("i.e/aI") highlights BOTH the vowel and its silent marker "e" two
+        // boxes on, wrapping the run from the vowel through that "e" in a .gi_split bracket that
+        // echoes the game's marker link (the connector drawn under the boxes during play).
+        function render_intro_wordtt(proc, gp_pair) {
             const parts = proc.segments;
             let o = '';
+            let close_bracket = -1; // segment index (the marker "e") at which an open .gi_split closes
             for(let i=0; i<parts.length; i++) {
-                const match = (parts[i].toLowerCase() == grapheme);
-                o += (match ? '<span class="gi_match">'+esc_html(parts[i])+'</span>' : esc_html(parts[i]));
+                const match = (seg_gp_pair(proc, i) === gp_pair);
+                if(match && gp_pair.indexOf('.') >= 0) { o += '<span class="gi_split">'; close_bracket = i + 2; }
+                const highlight = match || (i === close_bracket); // the vowel, or its marker "e"
+                o += (highlight ? '<span class="gi_match">'+esc_html(parts[i])+'</span>' : esc_html(parts[i]));
+                if(i === close_bracket) { o += '</span>'; close_bracket = -1; }
             }
             return o;
         }
@@ -2170,9 +2323,9 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             console.log("show_class_intro", problem_ix, gp_pair);
             const problem_data = bee.problem_list[problem_ix].proc_cache;
             if(!problem_data.is_segmented) { if(callback) { callback(false); } return; }
-            gp_pair = gp_pair.split('/');
-            const grapheme = gp_pair[0];
-            const phoneme = gp_pair[1];
+            const gp_halves = gp_pair.split('/'); // keep gp_pair itself intact for render_intro_wordtt
+            const grapheme = gp_halves[0];
+            const phoneme = gp_halves[1];
             // Only GP-pair classes (a real phoneme clip) get an intro
             if(phoneme === undefined || phoneme_sounds[phoneme] === undefined) { if(callback) { callback(false); } return; }
 
@@ -2181,11 +2334,13 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             $('.startmenu').html(
                 '<div class="classintro">' +
                     '<div class="gi_image emojifont">'+problem_image_html(problem_data)+'</div>' +
-                    '<div class="gi_wordtt">'+render_intro_wordtt(problem_data, grapheme)+'</div>' +
+                    '<div class="gi_wordtt">'+render_intro_wordtt(problem_data, gp_pair)+'</div>' +
                 '</div>'
             ).show();
-            
-            const letters = grapheme.toUpperCase().split('').map(function(c) { return '"' + c + '"'; }).join(' ');
+
+            // A split digraph's grapheme joins its two letters with a '.' (e.g. "i.e"); the narration
+            // names the letters only, so drop it - "i.e" is spoken as "I" "E".
+            const letters = grapheme.replace('.', '').toUpperCase().split('').map(function(c) { return '"' + c + '"'; }).join(' ');
 
             // make_pause takes the NEXT step's index so it resolves lazily (not yet assigned here)
             function make_pause(pause_s, next_ix) {
@@ -2296,15 +2451,10 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         }
 
 
-        // ---- Per-GP-pair coverage stats (pstore.pair_stats) ----
-        // Note: `pair_stats` is a persisted user-data key, so it keeps its historical name.
-        // Keyed by the GP pair "grapheme/phoneme". Six counters per pair:
-        //   [0]/[1] successes/asks while IN FOCUS (purple '?', produced unaided)
-        //   [2]/[3] successes/asks while not in focus and NOT shown in the bank (obvious/predictable)
-        //   [4]/[5] successes/asks while not in focus and initially shown in the bank (revealed)
-        // All six accumulate for the player's lifetime (never reset per episode). The scheduler keeps its
-        // own episode-relative in-focus counts in pairsched (asks/succ, bumped alongside [0]/[1] and
-        // zeroed on drill-set entry); the rest are collected for future use / validation.
+        // ---- Per-GP-pair coverage stats (pstore.pair_stats; persisted key, historical name) ----
+        // Keyed by GP pair. Six lifetime counters (never reset): [0]/[1] succ/asks IN FOCUS,
+        // [2]/[3] succ/asks obvious (not shown), [4]/[5] succ/asks revealed (shown in bank).
+        // The scheduler's episode-relative in-focus counts live separately in pairsched.
         function gp_pair_stat(gp_pair) {
             const ps = bee.storage.players[bee.player].pair_stats;
             if(!ps[gp_pair]) { ps[gp_pair] = [0, 0, 0, 0, 0, 0]; }
@@ -2455,7 +2605,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                                 if(!bee.problem.is_repeat && bee.help_asked === 0
                                    && !bee.seg_locked[done_ix] && bee.seg_kind[done_ix]) {
                                     const num_ix = {'focus':0, 'obvious':2, 'revealed':4};
-                                    const gp_pair = bee.processed_problem.segments[done_ix].toLowerCase()+'/'+bee.processed_problem.phonemes[done_ix];
+                                    const gp_pair = seg_gp_pair(bee.processed_problem, done_ix);
                                     gp_pair_stat(gp_pair)[num_ix[bee.seg_kind[done_ix]]]++;
                                     if(bee.seg_kind[done_ix] === 'focus') { pairsched(gp_pair).succ++; bee.focus_solved++; } // episode success + this problem's clean-focus count
                                     bee.seg_locked[done_ix] = true;
@@ -2676,15 +2826,11 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         }
 
 
-        // ============================================================================
-        // Puzzle-cycle scheduler (see new-scheduling). Drills a small, frequency-ordered
-        // set of teachable GP pairs to mastery, plus a "joker" review slot, spaced across
-        // puzzle sessions. State persists in pstore.sched (the cycle) and pstore.pairsched
-        // (per pair). A CYCLE = the shuffled drill set + one joker; a SLOT = one pair's (or
-        // the joker's) run of <= puzzle_needs problems, built by new_question when the queue
-        // drains. window/asks/succ/chosen_at reset when a pair enters the drill set; the
-        // learnt flag and block_until (park / too-difficult rest windows) persist.
-        // ----------------------------------------------------------------------------
+        // ==== Puzzle-cycle scheduler (see new-scheduling) ====
+        // Drills a small frequency-ordered set of GP pairs to mastery, plus a "joker" review
+        // slot, spaced across sessions. A CYCLE = shuffled drill set + one joker; a SLOT = one
+        // pair's run of <= puzzle_needs problems. State persists in pstore.sched (cycle) and
+        // pstore.pairsched (per pair): window/asks/succ/chosen_at reset on entry; learnt+block_until persist.
 
         const SCHED = {
             learnt_fast_asks: 8, learnt_fast_succ: 7, // >=7 of the latest 8 -> learnt (~2 days)
@@ -2832,12 +2978,10 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             if(rec.asks > SCHED.park_asks) { rec.block_until = now + SCHED.park_block_days*86400000; console.log('sched parked', pair); return; }
         }
 
-        // Record one in-focus PROBLEM outcome (the window char) for the current problem's taught pair,
-        // at completion. asks/succ are NOT touched here - they accumulate per focus segment alongside
-        // pair_stats[pc][1]/[0] (the [1]/[0] increments in the setup / keystroke paths). The window gets
-        // one char per problem: '1' iff the in-focus segment(s) were entered cleanly and unaided (no help,
-        // no in-segment backspace) - never from the whole-word `outcome`, so a non-focus slip can't spoil it.
-        // Skips repeats and non-GP-pair (joker thematic) slots.
+        // Record one in-focus PROBLEM outcome (a window char) for the taught pair at completion:
+        // '1' iff the in-focus segment(s) were entered cleanly and unaided (no help, no backspace) -
+        // not from the whole-word outcome, so a non-focus slip can't spoil it. asks/succ are bumped
+        // elsewhere (per focus segment). Skips repeats and non-GP-pair (joker) slots.
         function sched_record_focus_outcome(clean) {
             if(bee.problem.is_repeat || !bee.processed_problem.is_segmented) { return; }
             const pc = bee.problem.problem_class;
@@ -2865,12 +3009,9 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             let log = '';
             let intro_problem_ix = undefined; // class intro's example problem; undefined = no intro (queue-restored)
 
-            // Once per page-load, decide how to open. In puzzle mode we always start a fresh cycle
-            // slot: purge the (leftover) queue so the queue-empty branch below builds and introduces
-            // the next slot (the previous slot is checked and advanced past - option (a)). The child
-            // cannot close the puzzle host, so nothing is dodged. Otherwise (regular menu play) we keep
-            // the persisted anti-cheat queue and only re-introduce the resumed class after an idle gap.
-            // Routine reloads (page_update / return-reload) keep last_active recent, so they don't trip it.
+            // Once per page-load, decide how to open. Puzzle mode always starts a fresh cycle slot:
+            // purge the leftover queue so the queue-empty branch builds + introduces the next slot.
+            // Regular play keeps the persisted anti-cheat queue, re-introducing the class after an idle gap.
             let force_intro = false;
             if(!bee.intro_gap_checked) {
                 bee.intro_gap_checked = true;
@@ -3016,7 +3157,10 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                 if(pd.is_segmented) {
                     // Add classes from the segments' GP pairs
                     for(let j=0; j<pd.segments.length; j++) {
-                        const gp_pair = pd.segments[j].toLowerCase()+'/'+pd.phonemes[j];
+                        // Split-digraph aware: a vowel marked by a silent "e" (its '/X' box two to the
+                        // right) yields "<vowel>.e/<phoneme>" (e.g. "i.e/aI" for "tide"), which the
+                        // class_gp_pairs split-digraph entries make its own drillable class.
+                        const gp_pair = seg_gp_pair(pd, j);
                         if(class_gp_pairs[gp_pair]) {
                             cl.push(gp_pair);
                         }
@@ -3052,11 +3196,9 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
 
         
         // ---- Problem queue (persisted as pstore.scheduled_questions) ----
-        // The queue is user data, so its entries keep their historical key names (word_ix /
-        // word_class). to_stored() / from_stored() translate between that shape and the problem
-        // objects the rest of the code passes around, {problem_ix, problem_class, is_repeat}.
-        // get_question_queue() returns the RAW stored array - anything reading an entry out of it
-        // must go through from_stored().
+        // Entries keep historical key names (word_ix / word_class); to_stored()/from_stored()
+        // convert to/from {problem_ix, problem_class, is_repeat}. get_question_queue() returns
+        // the RAW array - read entries through from_stored().
 
         function to_stored(problem) {
             return {'word_ix': problem.problem_ix, 'word_class': problem.problem_class, 'is_repeat': problem.is_repeat};
@@ -3218,8 +3360,8 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?495"></script>
-    <script src="assets/aquarium/js/aquarium.js?495"></script>
+    <script src="assets/aquarium/js/config.js?497"></script>
+    <script src="assets/aquarium/js/aquarium.js?497"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

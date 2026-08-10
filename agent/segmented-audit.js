@@ -87,10 +87,12 @@ const audit = `
             if(ph === '') { missing++; tag = '?'; }                                    // unmapped: no default and no spec
             else if(phoneme_sounds[ph] === undefined) { invalid++; tag = '!' + ph; }   // resolved to an unknown phoneme id (typo)
             else tag = ph;
-            // GP pair, exactly as the app derives it for class assignment / validation
-            // (grapheme lower-cased, matching init_problem_list_impl, so sentence-initial capitals
-            // like "S" in "Saturday" resolve to the same GP pair as mid-sentence)
-            const gp_pair = p.segments[i].toLowerCase() + "/" + ph;
+            // GP pair, exactly as the app derives it for class assignment / validation, via the
+            // app's own seg_gp_pair (in scope from the concatenated script). Grapheme lower-cased
+            // (so sentence-initial capitals like "S" in "Saturday" resolve to the same pair as
+            // mid-sentence) and split-digraph aware: a vowel marked by a '/X' silent "e" two boxes
+            // on becomes "<vowel>.e/<phoneme>", e.g. "i.e/aI" for "tide" - matching init_problem_list_impl.
+            const gp_pair = seg_gp_pair(p, i);
             if(pairs_active && class_gp_pairs[gp_pair] === undefined && other_gp_pairs[gp_pair] === undefined) { badPairs.push(gp_pair); }
             segs.push(p.segments[i] + '[' + tag + ']' + (explicit ? '*' : '') + (link ? '~' : ''));
         }
