@@ -278,7 +278,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 497;
+const bee_app_version = 498;
 
 call_local_hook('check_version', []);
 

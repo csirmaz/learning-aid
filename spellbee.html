@@ -9,7 +9,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?497">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?498">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -292,10 +292,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?497">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?498">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?497"></script>
+    <script src="assets/local/beelocal.js?498"></script>
 </head>
 <body>
     <div class="container">
@@ -1709,7 +1709,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         };
 
     </script>
-    <script src="assets/common.js?497"></script>
+    <script src="assets/common.js?498"></script>
     <script>
     
         const bee_current_data_version = 7; // used for new players
@@ -1941,10 +1941,20 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         }
 
 
+        // True when segment i is the silent marker "e" of the split digraph currently in focus:
+        // a '/X' box (connectors[i]) whose vowel two boxes left (i-2) carries the drilled GP pair.
+        // Such a marker is treated as part of the in-focus pattern - withheld from the segment bank
+        // (no chip) and given the in-focus purple border - so the child supplies the "magic e".
+        function is_focus_split_marker(proc, i, focus_gp_pair) {
+            return proc.connectors[i] && seg_gp_pair(proc, i-2) === focus_gp_pair;
+        }
+
+
         // Render the segment bank: the wordtt's shuffled parts to copy. Each chip has
         // data-seg (its part index) for greying by update_completed_chips(). Stories tile
-        // every word; a segmented problem tiles its parts too, except a non-focus
-        // predictable pair (no chip) and the in-focus pair (a purple '?'). HELP tiles all.
+        // every word; a segmented problem tiles its parts too, except a non-focus predictable
+        // pair (no chip), the in-focus pair (a purple '?'), and - when a split digraph is drilled -
+        // its silent marker "e" (no chip). HELP tiles all.
         function render_segment_bank() {
             const parts = bee.processed_problem.segments;
             const segmented = bee.processed_problem.is_segmented;
@@ -1956,6 +1966,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             const chips = [];
             for(let i=0; i<parts.length; i++) {
                 if(segmented && !show_all) {
+                    if(is_focus_split_marker(bee.processed_problem, i, focus_gp_pair)) { continue; } // silent marker of the drilled split digraph: no chip
                     if(is_focus(i)) { chips.push('<span class="segchip segchip_focus" data-seg="'+i+'">?</span>'); continue; }
                     if(predictable_gp_pairs[gp_pair(i)]) { continue; } // predictable pair: no chip, produced unaided
                 }
@@ -1968,13 +1979,15 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
 
         // Classify how much aid a segment gets, for the per-GP-pair coverage stats (see gp_pair_stat).
         // Mirrors the segment-bank logic in render_segment_bank: the in-focus pair is produced unaided
-        // ('focus'); a predictable non-focus pair is given no chip ('obvious'); any other non-focus
-        // pair is shown as a tile ('revealed'). Returns {gp_pair, kind}.
+        // ('focus'); a predictable non-focus pair, and the withheld silent marker "e" of a drilled
+        // split digraph, are given no chip ('obvious'); any other non-focus pair is shown as a tile
+        // ('revealed'). Returns {gp_pair, kind}.
         function segment_aid_kind(i) {
             const pw = bee.processed_problem;
             const gp_pair = seg_gp_pair(pw, i);
             const focus = (bee.problem && bee.problem.problem_class) || '';
             if(focus.indexOf('/') >= 0 && gp_pair === focus) { return {'gp_pair':gp_pair, 'kind':'focus'}; }
+            if(is_focus_split_marker(pw, i, focus)) { return {'gp_pair':gp_pair, 'kind':'obvious'}; } // marker withheld: produced unaided
             if(predictable_gp_pairs[gp_pair]) { return {'gp_pair':gp_pair, 'kind':'obvious'}; }
             return {'gp_pair':gp_pair, 'kind':'revealed'};
         }
@@ -2058,8 +2071,8 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             const parts = bee.processed_problem.segments;
             const $boxes = bee.$input.find('.typebox');
             setTimeout(function() {
-                for(let j=0; j<parts.length; j++) { // bounce every box whose pair is the in-focus one
-                    if(seg_gp_pair(bee.processed_problem, j) === wc) {
+                for(let j=0; j<parts.length; j++) { // bounce every in-focus box - the pair's box(es) plus a split digraph's silent marker "e"
+                    if(seg_gp_pair(bee.processed_problem, j) === wc || is_focus_split_marker(bee.processed_problem, j, wc)) {
                         $boxes.filter('[data-seg="'+j+'"]').addClass('seg_focus_bounce');
                     }
                 }
@@ -2080,10 +2093,13 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
 
             // A part is "in focus" if its GP pair is the class's taught pair. problem_class is
             // built as grapheme+'/'+phoneme in the class derivation; 'noclass' has no '/'. A split
-            // digraph's vowel matches its "<vowel>.e/<phoneme>" pair via seg_gp_pair.
+            // digraph's vowel matches its "<vowel>.e/<phoneme>" pair via seg_gp_pair; its silent
+            // marker "e" counts as in-focus too (is_focus_split_marker), so the purple border spans
+            // the whole magic-e pattern.
             const focus_gp_pair = (bee.problem && bee.problem.problem_class) || '';
             const is_focus_part = function(ix) {
-                return focus_gp_pair.indexOf('/') >= 0 && seg_gp_pair(bee.processed_problem, ix) === focus_gp_pair;
+                return (focus_gp_pair.indexOf('/') >= 0 && seg_gp_pair(bee.processed_problem, ix) === focus_gp_pair)
+                    || is_focus_split_marker(bee.processed_problem, ix, focus_gp_pair);
             };
 
             // Box width in characters: normally uniform (sized to the longest part) so it leaks no
@@ -3360,8 +3376,8 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?497"></script>
-    <script src="assets/aquarium/js/aquarium.js?497"></script>
+    <script src="assets/aquarium/js/config.js?498"></script>
+    <script src="assets/aquarium/js/aquarium.js?498"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
