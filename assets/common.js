@@ -278,7 +278,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 498;
+const bee_app_version = 499;
 
 call_local_hook('check_version', []);
 
@@ -1341,8 +1341,26 @@ $('.smallprint .handle').on('click', function() {
         smallprint_expanded = !smallprint_expanded;
     };
     if(!smallprint_expanded) {
-        bee_prompt("Age verification: What is the capital of Finland?", function(answer) {
-            if(answer === null || answer.toLowerCase() != 'helsinki') { return; }
+        // Age gate: a squares/roots maths question plus a "which country is this city in?"
+        // question. The expected answer is the two answers run together; we compare after
+        // stripping all whitespace and case-insensitively.
+        let math_q, math_a;
+        if(Math.random() < 0.5) {
+            const x = choose_from([2, 3, 4, 5, 6, 7, 8, 9]);
+            math_q = x + " squared";
+            math_a = x * x;
+        }
+        else {
+            const x = choose_from([4, 9, 16, 25, 36, 49, 64, 81]);
+            math_q = "square root of " + x;
+            math_a = Math.sqrt(x);
+        }
+        const countries = {Warsaw: 'Poland', Munich: 'Germany', Vienna: 'Austria', Venice: 'Italy'};
+        const city = choose_from(Object.keys(countries));
+        const normalise = function(s){ return ('' + s).replace(/\s/g, '').toLowerCase(); };
+        const expected = normalise('' + math_a + countries[city]);
+        bee_prompt("Type " + math_q + " and the country of " + city, function(answer) {
+            if(answer === null || normalise(answer) != expected) { return; }
             toggle_smallprint();
         }, undefined, true);
         return false;
