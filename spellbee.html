@@ -9,7 +9,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?501">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?503">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -292,10 +292,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?501">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?503">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?501"></script>
+    <script src="assets/local/beelocal.js?503"></script>
 </head>
 <body>
     <div class="container">
@@ -1709,7 +1709,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         };
 
     </script>
-    <script src="assets/common.js?501"></script>
+    <script src="assets/common.js?503"></script>
     <script>
     
         const bee_current_data_version = 7; // used for new players
@@ -2868,7 +2868,14 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             joker_tricky_p: 0.3, joker_learnt_p: 0.3  // joker branch probabilities (remainder = random class)
         };
 
-        // Per-pair scheduler record (persisted, lazily created).
+        // Per-CLASS scheduler record (persisted, lazily created). Keyed by the drilled class - always a
+        // GP-pair-shaped string, but a CLASS, not necessarily a bare GP pair: it may be a plain GP-pair
+        // class ("ee/i:"), a split-phoneme class spanning two boxes ("i.e/aI"), or a GP pair that recurs
+        // across several segments of one word. Every field below is per class / per in-focus problem.
+        // The `pair` parameter is a historical name - read it as "class". Callers always pass a drilled
+        // class: problem_class (sched_record_focus_outcome), a drill-set entry (sched_start_cycle), or a
+        // slot's class (sched_slot_end_check). The persisted key `pairsched` and its sub-fields keep
+        // their names for backwards compatibility - do not rename them.
         function pairsched(pair) {
             const p = bee.storage.players[bee.player];
             if(!p.pairsched) { p.pairsched = {}; }
@@ -2877,7 +2884,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                     window: '',    // latest <=12 in-focus problem outcomes ('1' clean solve / '0' aided-or-over-corrected); drives learnt & relapse
                     asks: 0,       // in-focus PROBLEMS this drill episode (one per problem, not per segment); zeroed on entry; drives too-difficult & park
                     succ: 0,       // cleanly-solved in-focus problems this drill episode; zeroed on entry; drives the too-difficult rate
-                    chosen_at: 0,  // when the pair last entered the drill set (ms UTC); telemetry
+                    chosen_at: 0,  // when the class last entered the drill set (ms UTC); telemetry
                     learnt: false, // consolidated: drilled no more, resurfaces only via the joker until relapse
                     block_until: 0 // rest-window end (ms UTC): too-difficult (14d) or parked (7d); ineligible for the drill set until then
                 };
@@ -2929,7 +2936,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                 const pair = order[i];
                 if(set.indexOf(pair) >= 0 || !eligible(pair)) { continue; }
                 set.push(pair);
-                const rec = pairsched(pair); // fresh drill episode for the newcomer
+                const rec = pairsched(pair); // fresh drill episode for the newcomer; `pair` is a drill class (may be a split-phoneme class)
                 // asks/succ/window zeroed here and re-accumulated per in-focus problem; pair_stats[pair][0]/[1] keep growing as lifetime coverage
                 rec.window = ''; rec.asks = 0; rec.succ = 0; rec.chosen_at = Date.now(); rec.learnt = false; rec.block_until = 0;
             }
@@ -2995,10 +3002,12 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                 }
                 return;
             }
-            const pair = cur.pair;
+            const pair = cur.pair; // the slot's drilled class (may be a split-phoneme class, e.g. "i.e/aI"), not a bare GP pair
             if(!pair) { return; }
             const rec = pairsched(pair);
-            if(rec.window.length >= SCHED.learnt_fast_asks && sched_recent_succ(rec.window, SCHED.learnt_fast_asks) >= SCHED.learnt_fast_succ) { rec.learnt = true; console.log('sched learnt (fast)', pair); return; }
+            // Fast route disabled: 7/8 could graduate a pair on its first ~2-day episode, with no spaced
+            // retrieval - too thin a basis for our consolidation-profile learner. Require the full window. TODO: spaced retest.
+            // if(rec.window.length >= SCHED.learnt_fast_asks && sched_recent_succ(rec.window, SCHED.learnt_fast_asks) >= SCHED.learnt_fast_succ) { rec.learnt = true; console.log('sched learnt (fast)', pair); return; }
             if(rec.window.length >= SCHED.learnt_asks && sched_recent_succ(rec.window, SCHED.learnt_asks) >= SCHED.learnt_succ) { rec.learnt = true; console.log('sched learnt', pair); return; }
             if(rec.asks >= SCHED.hard_asks && rec.succ / rec.asks < SCHED.hard_rate) { rec.block_until = now + SCHED.hard_block_days*86400000; console.log('sched too-difficult', pair); return; }
             if(rec.asks > SCHED.park_asks) { rec.block_until = now + SCHED.park_block_days*86400000; console.log('sched parked', pair); return; }
@@ -3392,8 +3401,8 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?501"></script>
-    <script src="assets/aquarium/js/aquarium.js?501"></script>
+    <script src="assets/aquarium/js/config.js?503"></script>
+    <script src="assets/aquarium/js/aquarium.js?503"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

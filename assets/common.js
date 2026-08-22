@@ -278,7 +278,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 501;
+const bee_app_version = 503;
 
 call_local_hook('check_version', []);
 
@@ -580,7 +580,7 @@ function update_score_ui(do_animate) {
         // Start the fill at 10% rather than empty, so zero progress still shows a sliver.
         const pct = total > 0 ? 10 + done / total * 90. : 10;
         $('.score').addClass('puzzle');
-        $('.score .icontext').html(''); // no level number in puzzle mode
+        $('.score .icontext').html(score < bee.score_goal ? '' : esc_html(Math.floor(score / bee.score_goal))); // level number stays on the coin
         $('.score .needed')
             .html(esc_html(done + ' done of ' + total))
             .css('background', 'linear-gradient(to right, #d2c500 '+pct+'%, #a70 '+pct+'%)');
