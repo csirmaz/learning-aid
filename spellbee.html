@@ -9,7 +9,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?503">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?504">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -223,6 +223,8 @@
             border-bottom-right-radius: .4rem;
         }
         .classintro .gi_split .gi_match { text-decoration: none; }
+        /* Unobtrusive tip: taught on the intro, applies to the game's tappable boxes */
+        .classintro .gi_hint { margin-top: 5rem; font-size: .95rem; color: #999; }
 
         @keyframes blink-animation { to { visibility: hidden; } }
         
@@ -292,10 +294,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?503">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?504">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?503"></script>
+    <script src="assets/local/beelocal.js?504"></script>
 </head>
 <body>
     <div class="container">
@@ -979,7 +981,7 @@
 "|I <n=ee/i:=d> a towel", // [need]
 "|<K=ee=p> it a secret!", // [keep]
 "@🤝|We must <m=ee=t> secretly", // [meet]
-"@👨🏻‍🍼|<f=ee=d=ing> the baby", // [feeding]
+"@👨🏻‍🍼|<f=ee=d==ing> the baby", // [feeding]
 "bee|busy <b=ee>", // [bee]
 "@🥄|<s=p=oo/u:=n>", // [spoon]
 "@🌜|<m=oo/u:=n>", // [moon]
@@ -1709,7 +1711,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         };
 
     </script>
-    <script src="assets/common.js?503"></script>
+    <script src="assets/common.js?504"></script>
     <script>
     
         const bee_current_data_version = 7; // used for new players
@@ -2353,6 +2355,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                 '<div class="classintro">' +
                     '<div class="gi_image emojifont">'+problem_image_html(problem_data)+'</div>' +
                     '<div class="gi_wordtt">'+render_intro_wordtt(problem_data, gp_pair)+'</div>' +
+                    '<div class="gi_hint">Tap on the boxes to hear their sound</div>' +
                 '</div>'
             ).show();
 
@@ -3385,9 +3388,12 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             new_question('main');
         }
         
-        // Asynchronous: choose_level_range() prompts the user. callback() (optional) fires once done.
+        // callback() (optional) fires once done.
         function init_player_data(callback) {
-            choose_level_range(function(levels) {
+            // The level range is unused for problem selection (see init_problem_list_impl), so we no
+            // longer prompt for it on new-user creation; assume the full 0..100 range.
+            // choose_level_range(function(levels) {
+                const levels = [0, 100];
                 bee.storage.players[bee.player] = {
                     'data_version': bee_current_data_version,
                     'score': 0,
@@ -3397,12 +3403,12 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
                     'pair_stats': {}
                 };
                 if(callback) { callback(); }
-            });
+            // });
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?503"></script>
-    <script src="assets/aquarium/js/aquarium.js?503"></script>
+    <script src="assets/aquarium/js/config.js?504"></script>
+    <script src="assets/aquarium/js/aquarium.js?504"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
