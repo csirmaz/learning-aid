@@ -9,7 +9,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?504">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?506">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -294,10 +294,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?504">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?506">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?504"></script>
+    <script src="assets/local/beelocal.js?506"></script>
 </head>
 <body>
     <div class="container">
@@ -1668,10 +1668,12 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
 ];
 // [PROBLEMS END]
 
-        // Precomputed GP-pair drill order, most frequent first (by English token frequency of
-        // each pair's words). Consumed by sched_frequency_order. Regenerate with
-        // tools/gen_gp_pair_order.js after editing the problem list.
-        const gp_pair_order = ["th/D","e/E","d/d","s/z","a/ae","c/k","y/j","ou/u:","b/b","u/A","k/k","e/i:","a/eI","y/I","i.e/aI","ay/eI","ew/ju:","er/Er","wh/w","o/A","or/O:","o.e/EU","ea/i:","ere/eE","u/ju:","a/E","y/aI","o/E","ge/dZ","ee/i:","oul/U","ou/aU","a/o","tion/SEn","sh/S","o/EU","e/I","in/In","igh/aI","oo/U","i/aI","a/O:","th/T","or/E","ow/aU","a.e/eI","e.e/i:","ng/ng","al/sl","ar/a:","c/s","ai/eI","ity/ItI","ir/3:","u.e/ju:","ig/aI","ing/Ing","ce/s","or/3:","ow/EU","ere/IE","ck/k","ly/lI","ch/tS","ai/e","ea/e","er/3:","oo/u:","j/dZ","ll/l","er/r","re/rI","ear/IE","ff/f","ed/Id","au/O:","kn/n","ch/k","le/sl","de/dI","ent/Ent","ea/eI","gu/g","se/z","ur/3:","or/Er","ue/ju:","i/i:","x/ks","oi/OI","ear/3:","ph/f","ily/IlI","air/eE","ture/tSE","ol/EU","en/En","ss/s","oa/EU","et/Et","u/u:","ou/A","ey/I","ed/d","ie/i:","wr/r","u/U","ei/i:","a/a:","ant/Ent","dge/dZ","oor/O:","al/O:","con/kEn","ire/aIE","rr/r","tch/tS","oy/OI","n/ng","s/Z","ch/S","nn/n","qu/kw","are/eE","sion/ZEn","pp/p","age/IdZ","ful/fUl","gh/f","es/z","oe/u:","tt/t","ur/E","ie/aI","ui/u:","mm/m","ear/eE","augh/O:","err/3:","g/dZ","aw/O:","es/Iz","oe/EU","cc/k","ed/t","ol/sl","ur/Er","ou/E","eigh/eI","bb/b","el/sl","gg/g","ot/Et","mb/m","dd/d","ie/I","un/An"];
+        // Precomputed GP-pair drill order: frequency-ranked (by English token frequency of each pair's
+        // words), then reordered so no two classes sharing a main vowel LETTER fall within a sliding
+        // 3-wide window. The scheduler pulls the next few classes into one concurrent drill set, so this
+        // keeps look-alike vowel spellings (o/A, or/O:, o.e/EU) out of the same set. Consumed by
+        // sched_frequency_order. Regenerate with tools/gen_gp_pair_order.js after editing the problem list.
+        const gp_pair_order = ["th/D","e/E","d/d","s/z","a/ae","c/k","y/j","ou/u:","b/b","u/A","k/k","e/i:","a/eI","y/I","i.e/aI","ay/eI","ew/ju:","wh/w","o/A","er/Er","u/ju:","or/O:","ea/i:","a/E","o.e/EU","ere/eE","y/aI","o/E","ge/dZ","a/o","oul/U","ee/i:","tion/SEn","ou/aU","sh/S","e/I","o/EU","in/In","a/O:","oo/U","igh/aI","th/T","or/E","i/aI","a.e/eI","ow/aU","e.e/i:","ng/ng","al/sl","c/s","ity/ItI","ar/a:","u.e/ju:","ir/3:","ai/eI","ce/s","ig/aI","or/3:","ere/IE","ing/Ing","ow/EU","ck/k","ly/lI","ch/tS","ai/e","ea/e","oo/u:","j/dZ","er/3:","ll/l","ff/f","er/r","au/O:","kn/n","re/rI","ch/k","gu/g","ear/IE","or/Er","ur/3:","ed/Id","i/i:","ue/ju:","le/sl","x/ks","oi/OI","de/dI","ph/f","ily/IlI","ent/Ent","air/eE","ture/tSE","ea/eI","ol/EU","ss/s","se/z","oa/EU","u/u:","ear/3:","ou/A","ie/i:","en/En","wr/r","u/U","et/Et","a/a:","oor/O:","ey/I","ant/Ent","con/kEn","ed/d","al/O:","ire/aIE","ei/i:","rr/r","tch/tS","dge/dZ","oy/OI","n/ng","s/Z","ch/S","nn/n","qu/kw","are/eE","sion/ZEn","pp/p","age/IdZ","ful/fUl","gh/f","es/z","oe/u:","tt/t","ur/E","ie/aI","mm/m","ui/u:","ear/eE","augh/O:","g/dZ","err/3:","aw/O:","oe/EU","es/Iz","cc/k","ol/sl","ed/t","ur/Er","ou/E","eigh/eI","bb/b","gg/g","el/sl","ot/Et","mb/m","dd/d","ie/I","un/An"];
 
         // Application data
         const bee = {
@@ -1711,7 +1713,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         };
 
     </script>
-    <script src="assets/common.js?504"></script>
+    <script src="assets/common.js?506"></script>
     <script>
     
         const bee_current_data_version = 7; // used for new players
@@ -2868,7 +2870,8 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             hard_block_days: 14,
             park_asks: 16, park_block_days: 7,        // >16 asks without resolving -> park (rest & retry)
             relapse_succ: 6,                          // learnt pair <6 of latest 12 in joker -> un-learn
-            joker_tricky_p: 0.3, joker_learnt_p: 0.3  // joker branch probabilities (remainder = random class)
+            joker_tricky_p: 0.3, joker_learnt_p: 0.3, // joker branch probabilities (remainder = random class)
+            joker_maint_min_learnt: 8                 // >= this many loaded learnt classes -> joker fallback drops future (not-yet-drilled) pairs
         };
 
         // Per-CLASS scheduler record (persisted, lazily created). Keyed by the drilled class - always a
@@ -2922,6 +2925,8 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
 
         // (Re)build the drill set for a new cycle: keep still-eligible members, pull in the next
         // frequency-ordered pairs to reach drill_problems, reset stats for the newcomers, shuffle.
+        // (The look-alike-vowel spacing is baked into gp_pair_order by tools/gen_gp_pair_order.js, so
+        // the next few frequency-ordered pairs already differ in main vowel letter - see that const.)
         function sched_start_cycle() {
             const p = bee.storage.players[bee.player];
             if(!p.sched) {
@@ -2949,25 +2954,31 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             console.log('sched_start_cycle', set);
         }
 
-        // Pick the joker slot's class: 30% tricky, 30% a random learnt pair, else a random
-        // non-drilled class; with no learnt pairs, 30% tricky / 70% random. Excludes the drill
-        // set and blocked/parked pairs (a not-yet-drilled pair may surface as preview).
+        // Pick the joker slot's class: 30% tricky, 30% a random learnt pair, else a random non-drilled
+        // class; with no learnt pairs, 30% tricky / 70% random. Excludes the drill set and blocked/parked
+        // pairs. Once the player has a solid review bank (>= joker_maint_min_learnt loaded learnt classes),
+        // the 40% fallback pool also drops not-yet-drilled ("future") GP pairs, so it reviews only learnt
+        // pairs + never-drilled classes (tricky, calendar, noclass, thematic) instead of cold-previewing.
         function sched_pick_joker() {
             const p = bee.storage.players[bee.player];
             const inset = (p.sched && p.sched.set) ? p.sched.set : [];
+            const loaded = function(c) { return bee.class_to_ix[c] && bee.class_to_ix[c].length >= 1; };
+            // Mastered classes still worth reviewing (learnt pairs are never in the drill set).
+            const learnt = Object.keys(p.pairsched || {}).filter(function(pair) {
+                return sched_is_learnt(pair) && loaded(pair) && inset.indexOf(pair) < 0;
+            });
+            const maint = learnt.length >= SCHED.joker_maint_min_learnt; // fallback drops future pairs
             const random_class = function() {
                 const cand = Object.keys(bee.class_to_ix).filter(function(c) {
-                    if(!bee.class_to_ix[c] || bee.class_to_ix[c].length < 1) { return false; }
+                    if(!loaded(c)) { return false; }
                     if(inset.indexOf(c) >= 0) { return false; }
                     if(c.indexOf('/') >= 0 && sched_is_blocked(c)) { return false; }
+                    if(maint && c.indexOf('/') >= 0 && !sched_is_learnt(c)) { return false; } // drop not-yet-drilled pairs
                     return true;
                 });
                 return cand.length ? choose_from(cand) : choose_from(Object.keys(bee.class_to_ix));
             };
             const tricky_ok = bee.class_to_ix['tricky'] && bee.class_to_ix['tricky'].length > 0;
-            const learnt = Object.keys(p.pairsched || {}).filter(function(pair) {
-                return sched_is_learnt(pair) && bee.class_to_ix[pair] && inset.indexOf(pair) < 0;
-            });
             const r = Math.random();
             if(r < SCHED.joker_tricky_p && tricky_ok) { return 'tricky'; }
             if(learnt.length > 0 && r < SCHED.joker_tricky_p + SCHED.joker_learnt_p) { return choose_from(learnt); }
@@ -3407,8 +3418,8 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?504"></script>
-    <script src="assets/aquarium/js/aquarium.js?504"></script>
+    <script src="assets/aquarium/js/config.js?506"></script>
+    <script src="assets/aquarium/js/aquarium.js?506"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
