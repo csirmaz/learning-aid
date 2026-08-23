@@ -9,7 +9,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?506">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?507">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -294,10 +294,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?506">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?507">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?506"></script>
+    <script src="assets/local/beelocal.js?507"></script>
 </head>
 <body>
     <div class="container">
@@ -1665,6 +1665,71 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
 "@🐋|<wh/w=a/eI=l=e/X>", // [whale]
 "@🌾|<wh/w=ea/i:=t>", // [wheat]
 "|<wh/w=i=s=k> the eggs", // [whisk]
+
+// ── NEW_WORDS batch: consonant clusters + r-controlled vowels ──
+// spl / spr / str clusters
+"|a <s=p=l=i/I=n=t=er/Er> in my thumb", // [splinter]
+"@💦|a big <s=p=l=a/ae=sh>", // [splash]
+"@🌸|flowers bloom in <s=p=r=i/I=ng>", // [spring]
+"|<s=p=r=ea/e=d> jam on the toast", // [spread]
+"|<s=p=r=ay/eI> the plants with water", // [spray]
+"@💪|very <s=t=r=o/o=ng>", // [strong]
+"@🏙️|walk down the <s=t=r=ee/i:=t>", // [street]
+"@🥤|drink through a <s=t=r=aw/O:>", // [straw]
+"|<s=t=r=e/e=tch> your arms", // [stretch]
+// squ / scr / shr / thr clusters
+"@🟦|draw a <s=qu/kw=are/eE>", // [square]
+"@🐿️|<s=qu/kw=i/I=rr/r=el/sl>", // [squirrel]
+"@🦑|<s=qu/kw=i/I=d>", // [squid]
+"@📜|read the <s=c=r=o/EU=ll/l>", // [scroll]
+"@🖥️|look at the <s=c=r=ee/i:=n>", // [screen]
+"|the jumper will <sh=r=i/I=n/ng=k> in the wash", // [shrink]
+"@🦐|<sh=r=i/I=m=p>", // [shrimp]
+"@3️⃣|<th/T=r=ee/i:>", // [three]
+"@🧵|a <th/T=r=ea/e=d> of cotton", // [thread]
+"|the king sat on the <th/T=r=o/EU=n=e/X>", // [throne]
+"|<th/T=r=ow/EU> the ball", // [throw]
+"|I have a sore <th/T=r=oa/EU=t>", // [throat]
+// tch / dge
+"|<c=a/ae=tch> the ball", // [catch]
+"@🧑‍⚖️|the <j/dZ=u/A=dge/dZ> in court", // [judge]
+// air/eE, ear/IE
+"@🪑|sit on the <ch/tS=air/eE>", // [chair]
+"|climb the <s=t=air/eE==s/z>", // [stairs]
+"@😨|shaking with <f=ear/IE>", // [fear]
+"|the water is <c=l=ear/IE>", // [clear]
+"@🧔|a bushy <b=ear/IE=d>", // [beard]
+// r-controlled: ar / er / ir / or / ur
+"@⭐|a bright <s=t=ar/a:>", // [star]
+"@🐕|the dog is <b=ar/a:=k==ing/Ing>", // [barking]
+"@✉️|post a <l=e/e=tt/t=er/Er>", // [letter]
+"|the <c=o/A=v=er/Er> of the book", // [cover]
+"|plants grow in the <d=ir/3:=t>", // [dirt]
+"@⭕|draw a <c/s=ir/3:=c=le/sl>", // [circle]
+"@🍴|eat with a <f=or/O:=k>", // [fork]
+"@⛈️|a <s=t=or/O:=m==y/I> day", // [stormy]
+"|the hot pan will <b=ur/3:=n> you", // [burn]
+"|my leg <h=ur/3:=t==s/s>", // [hurts]
+// short vowels + assorted
+"|I <h=a/ae=d> a good day", // [had]
+"@😡|so <m=a/ae=d>", // [mad]
+"@🗺️|read the <m=a/ae=p>", // [map]
+"@👨|<m=a/ae=n>", // [man]
+"|two <m=e/e=n>", // [men]
+"@🚢|<sh=i/I=p>", // [ship]
+"@🏃|<j/dZ=o/o=gg/g=ing/Ing>", // [jogging]
+"@⏰|the <c=l=o/o=ck> ticks", // [clock]
+"@🥊|stop <f=igh/aI=t==ing/Ing>", // [fighting]
+"|a huge <g/dZ=i/aI=a/E=n=t>", // [giant]
+"@🎭|sing on the <s=t=a/eI=ge/dZ>", // [stage]
+"|I <a/E=c=c/s=e/e=p=t> the gift", // [accept]
+"|the king ruled his <r=ea/e=l=m>", // [realm]
+"|I did it all by <m=y/aI==s=e/e=l=f>", // [myself]
+"|my fingers went <n=u/A=mb/m> with cold", // [numb]
+"@🏊|swim in the <p=oo/u:=l>", // [pool]
+"@🌳|a tree's <r=oo/u:=t>", // [root]
+"@📷|take a <ph/f=o/EU=t=o/EU>", // [photo]
+"@⛪|<ch/tS=ur/3:=ch/tS>", // [church]
 ];
 // [PROBLEMS END]
 
@@ -1713,7 +1778,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         };
 
     </script>
-    <script src="assets/common.js?506"></script>
+    <script src="assets/common.js?507"></script>
     <script>
     
         const bee_current_data_version = 7; // used for new players
@@ -3418,8 +3483,8 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?506"></script>
-    <script src="assets/aquarium/js/aquarium.js?506"></script>
+    <script src="assets/aquarium/js/config.js?507"></script>
+    <script src="assets/aquarium/js/aquarium.js?507"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
