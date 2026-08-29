@@ -9,7 +9,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>SpellBee</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?508">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?511">
     <style>
         body { margin: .5rem 0; }
         .container { padding: 0; }
@@ -294,10 +294,10 @@
         body .kbdiv.kbdisabled .kbkey { color: rgba(255,255,255,0.7); }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?508">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?511">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?508"></script>
+    <script src="assets/local/beelocal.js?511"></script>
 </head>
 <body>
     <div class="container">
@@ -1774,7 +1774,7 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         };
 
     </script>
-    <script src="assets/common.js?508"></script>
+    <script src="assets/common.js?511"></script>
     <script>
     
         const bee_current_data_version = 7; // used for new players
@@ -2984,10 +2984,20 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             return order;
         }
 
+        // Main vowel LETTER of a class key: its grapheme (before '/') scanned for the first a/e/i/o/u
+        // (also picks a split digraph's vowel, e.g. "o.e" -> 'o'), else 'y', else null for a consonant
+        // grapheme (no vowel letter - never clashes). Used to keep look-alike vowel spellings out of one
+        // drill set (see sched_start_cycle); mirrors class_main_vowel in tools/gen_gp_pair_order.js.
+        function class_main_vowel(cls) {
+            const g = cls.split('/')[0].toLowerCase();
+            for(let i=0; i<g.length; i++) { if('aeiou'.indexOf(g[i]) >= 0) { return g[i]; } }
+            return g.indexOf('y') >= 0 ? 'y' : null;
+        }
+
         // (Re)build the drill set for a new cycle: keep still-eligible members, pull in the next
         // frequency-ordered pairs to reach drill_problems, reset stats for the newcomers, shuffle.
-        // (The look-alike-vowel spacing is baked into gp_pair_order by tools/gen_gp_pair_order.js, so
-        // the next few frequency-ordered pairs already differ in main vowel letter - see that const.)
+        // The newcomer pull-in avoids putting two same-main-vowel-letter classes in one set (look-alike
+        // spellings like o/A + or/O: + o.e/EU), falling back to a clash only when no alternative remains.
         function sched_start_cycle() {
             const p = bee.storage.players[bee.player];
             if(!p.sched) {
@@ -3001,9 +3011,27 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
             const eligible = function(pair) { return bee.class_to_ix[pair] && !sched_is_learnt(pair) && !sched_is_blocked(pair); };
             const contributed = function(s) { let n = 0; for(let i=0;i<s.length;i++){ n += Math.min(bee.class_to_ix[s[i]].length, bee.puzzle_needs); } return n; };
             let set = (p.sched.set || []).filter(eligible); // keep members still worth drilling
-            for(let i=0; i<order.length && contributed(set) < bee.drill_problems; i++) {
-                const pair = order[i];
-                if(set.indexOf(pair) >= 0 || !eligible(pair)) { continue; }
+            // Pull in the next frequency-ordered pairs to reach drill_problems, but avoid two classes
+            // sharing a main vowel LETTER in one concurrent drill set (o/A + or/O: + o.e/EU look alike).
+            // Each step takes the most-frequent eligible newcomer whose vowel is still free; only when NO
+            // free-vowel newcomer is left do we fall back to the most-frequent same-vowel one - so the
+            // guard never strands the set short when there is no alternative. (gp_pair_order is already
+            // vowel-spaced offline, but runtime filtering - learnt/blocked/unloaded classes - can bunch
+            // same-vowel pairs back together, so re-check here.)
+            while(contributed(set) < bee.drill_problems) {
+                const used = {};
+                for(let i=0; i<set.length; i++) { const v = class_main_vowel(set[i]); if(v !== null) { used[v] = true; } }
+                let pick = -1, clash = -1;
+                for(let i=0; i<order.length; i++) {
+                    const pair = order[i];
+                    if(set.indexOf(pair) >= 0 || !eligible(pair)) { continue; }
+                    const v = class_main_vowel(pair);
+                    if(v === null || !used[v]) { pick = i; break; } // free vowel: take the most frequent
+                    if(clash < 0) { clash = i; } // remember the most-frequent same-vowel fallback
+                }
+                if(pick < 0) { pick = clash; } // no free-vowel newcomer left -> allow a same-vowel one
+                if(pick < 0) { break; } // no eligible newcomers left at all
+                const pair = order[pick];
                 set.push(pair);
                 const rec = pairsched(pair); // fresh drill episode for the newcomer; `pair` is a drill class (may be a split-phoneme class)
                 // asks/succ/window zeroed here and re-accumulated per in-focus problem; pair_stats[pair][0]/[1] keep growing as lifetime coverage
@@ -3479,8 +3507,8 @@ false, // "diamond@💎|<d=i/aI=a/x=m=o/E=n=d>", // [diamond]
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?508"></script>
-    <script src="assets/aquarium/js/aquarium.js?508"></script>
+    <script src="assets/aquarium/js/config.js?511"></script>
+    <script src="assets/aquarium/js/aquarium.js?511"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>

@@ -9,7 +9,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?508">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?511">
     <style>
         body {
             /* Disables pull-to-refresh but allows overscroll glow effects. */
@@ -164,10 +164,10 @@
         }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?508">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?511">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?508"></script>
+    <script src="assets/local/beelocal.js?511"></script>
 </head>
 <body>
     <div class="container">
@@ -568,7 +568,7 @@
                 return {problem: a+'+'+b+'=', solution:(a+b), hint:{longform: [a, b]}};
             },
             multiply_small_factors: function() { // e.g. 3x2=
-                const a = RND(2, 5);
+                const a = RND(2, 3);
                 const b = RND(0, 5);
                 return get_multiplication_problem(a, b);
             },
@@ -765,15 +765,15 @@
                 // [PRBL.subtract_from_five_allow_negative, 1],
                 [PRBL.subtract_from_ten_allow_negative, 10],
                 [PRBL.add_teen_plus_single_digit, 20],
-                [PRBL.add_two_digit_plus_single_digit, 20],
-                [PRBL.add_two_digit_no_carry, 20],
-                [PRBL.add_two_digit_with_carry, 20],
+                // [PRBL.add_two_digit_plus_single_digit, 20],
+                // [PRBL.add_two_digit_no_carry, 20],
+                // [PRBL.add_two_digit_with_carry, 20],
                 [PRBL.subtract_two_within_ten, 5],
-                [PRBL.subtract_single_digit_from_teen, 10],
+                // [PRBL.subtract_single_digit_from_teen, 10],
                 // [PRBL.add_whole_hundreds, 10],
-                // [PRBL.multiply_small_factors, 20],
-                [PRBL.half_of_number, 10],
-                [PRBL.third_of_number, 5],
+                [PRBL.multiply_small_factors, 20],
+                [PRBL.half_of_number, 5],
+                [PRBL.third_of_number, 10],
                 [PRBL.unknown_times_two, 5],
                 // [PRBL.two_times_unknown, 5],
                 // [PRBL.unknown_times_three, 5],
@@ -850,7 +850,7 @@
         };
 
     </script>
-    <script src="assets/common.js?508"></script>
+    <script src="assets/common.js?511"></script>
     <script>
 
         
@@ -1409,8 +1409,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?508"></script>
-    <script src="assets/aquarium/js/aquarium.js?508"></script>
+    <script src="assets/aquarium/js/config.js?511"></script>
+    <script src="assets/aquarium/js/aquarium.js?511"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
