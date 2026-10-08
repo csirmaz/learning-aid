@@ -278,7 +278,7 @@ function save_storage(msg, callback) {
 }
 
 
-const bee_app_version = 512;
+const bee_app_version = 516;
 
 call_local_hook('check_version', []);
 
@@ -632,7 +632,8 @@ function add_negative_score(v, is_absolute) {
         
 // Add one to the score. Returns the new score or
 // '_SKIPPED_' if we're working through the negative scores or skip_this_score is set
-function add_score(skip_this_score) {
+// no_puzzle_count: don't count this answer towards the puzzle (see below)
+function add_score(skip_this_score, no_puzzle_count) {
     let skipped_score = false;
     init_lifetime_score();
     if(bee.storage.players[bee.player].negative_score !== undefined && bee.storage.players[bee.player].negative_score >= 1) {
@@ -646,10 +647,11 @@ function add_score(skip_this_score) {
         bee.storage.players[bee.player].score++;
     }
     bee.storage.players[bee.player].lifetime_score++;
-    // In puzzle mode every correct answer counts towards completion — including repeats and
-    // answers skipped by the negative-score penalty — so wrong or repeat answers don't
-    // lengthen the fixed-length puzzle session (add_score only runs on a correct answer).
-    if(bee.is_puzzle) { bee.is_puzzle.needs--; }
+    // In puzzle mode a correct answer counts towards completion (add_score only runs on a correct
+    // answer) — including repeats and answers skipped by the negative-score penalty, so these don't
+    // lengthen the session — unless the app passes no_puzzle_count, which makes a missed question
+    // cost an extra one (count does this for the immediate re-ask of a missed question).
+    if(bee.is_puzzle && !no_puzzle_count) { bee.is_puzzle.needs--; }
     save_storage('add_score');
     return (skipped_score ? '_SKIPPED_' : bee.storage.players[bee.player].score);
 }
@@ -978,13 +980,15 @@ function finish_puzzle_with_confetti() {
 // Implements common operations when a task is solved
 // Return values: 'level_complete' | 'gift' | 'period_negative' | 'period'
 // Note: there are two ways to skip adding a score. Either add 'skip_this_score':true to options, or increment the negative score
+// Add 'no_puzzle_count':true to options to not count this answer towards the puzzle (see add_score)
 function success_common(options) {
     const wait_factor = 1.2;
     const fast_to_next_question = options.fast_to_next_question;
     const skip_this_score = options.skip_this_score;
+    const no_puzzle_count = options.no_puzzle_count;
     
     console.log('#success_common()');
-    const score = add_score(skip_this_score);  // the new score or "_SKIPPED_"
+    const score = add_score(skip_this_score, no_puzzle_count);  // the new score or "_SKIPPED_"
     const new_next_gift_at = decide_gift(); // precede update_score_ui() to update remaining-to-gift display
     update_score_ui();
 
