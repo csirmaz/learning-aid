@@ -1143,12 +1143,13 @@ const bee_tts = {
         
 bee_tts.test = function() {
     bee_tts.speak('This is what text to speach sounds like: '+Math.floor(Math.random()*100), function(){
-        bee_alert(bee_tts.voice.name+' '+bee_tts.voice.lang+' '+bee_tts.voice.localService, function() {
+        const v = bee_tts.voice;
+        bee_alert('Status: '+bee_tts.status+"\n"+(v ? v.name+' '+v.lang+' '+v.localService : 'No voice selected'), function() {
             bee_alert(bee_tts.available_voices.join("\n"));
         });
     });
 };
-        
+
 bee_tts.initialize = function() {
     if(window.PuzzleAlerter && typeof window.PuzzleAlerter.speak === 'function') {
         bee_tts.status = 'bridge';
@@ -1161,6 +1162,16 @@ bee_tts.initialize = function() {
         bee_tts.process_scheduled();
         return;
     }
+    // The browser fills the voice list asynchronously, and after a (forced) reload this can
+    // outlast poll_voices(); pick it up whenever it arrives
+    try {
+        bee_tts.synth.addEventListener('voiceschanged', bee_tts.voices_changed);
+    } catch(e) { console.log("TTS: no voiceschanged event", e); }
+    bee_tts.poll_voices();
+};
+
+bee_tts.poll_voices = function() {
+    if(bee_tts.status != 'init') { return; } // already settled by voices_changed()
     bee_tts.init_trials--;
     if(bee_tts.init_trials <= 0) {
         console.log("TTS init failed (after tries)");
@@ -1169,35 +1180,51 @@ bee_tts.initialize = function() {
         return;
     }
     try {
-        const voices = bee_tts.synth.getVoices();
-        if(!voices.length) {
-            setTimeout(bee_tts.initialize, 500);
+        if(!bee_tts.select_voice()) {
+            setTimeout(bee_tts.poll_voices, 500);
             return;
         }
-        for (const voice of voices) {
-            let p = 0;
-            if(voice.lang.startsWith('en')) { p += 100; bee_tts.available_voices.push("["+voice.name+"]"); }
-            if(voice.lang.toLowerCase().endsWith('gb')) { p += 2; }
-            if(voice.name.indexOf('female') == -1) { p += 1; }
-            if(voice.localService) { p += 5; }
-            if(p > bee_tts.voice_points) { bee_tts.voice_points = p; bee_tts.voice = voice; }
-        }
-        if(bee_tts.voice_points < 100) {
-            console.log("TTS init failed (no English voice)");
-            bee_tts.status = 'fail';
-            bee_tts.process_scheduled();
-            return;
-        }
-        console.log("TTS ready - selected voice", bee_tts.voice);
-        bee_tts.status = 'ready';
-        bee_tts.process_scheduled();
-        return;
     } catch(e) {
         console.log("TTS init: error", e);
         bee_tts.status = 'fail';
-        bee_tts.process_scheduled();
-        return;                
     }
+    bee_tts.process_scheduled();
+};
+
+bee_tts.voices_changed = function() {
+    if(bee_tts.status == 'ready') { return; }
+    const was_init = (bee_tts.status == 'init');
+    try {
+        if(!bee_tts.select_voice()) { return; }
+    } catch(e) { console.log("TTS voiceschanged: error", e); return; }
+    // When 'fail', process_scheduled() is already draining the queue
+    if(was_init) { bee_tts.process_scheduled(); }
+};
+
+// Select the best voice from the browser's current list and set the status accordingly.
+// Returns false (status unchanged) if the list is still empty.
+bee_tts.select_voice = function() {
+    const voices = bee_tts.synth.getVoices();
+    if(!voices.length) { return false; }
+    bee_tts.voice = false;
+    bee_tts.voice_points = -1;
+    bee_tts.available_voices = [];
+    for (const voice of voices) {
+        let p = 0;
+        if(voice.lang.startsWith('en')) { p += 100; bee_tts.available_voices.push("["+voice.name+"]"); }
+        if(voice.lang.toLowerCase().endsWith('gb')) { p += 2; }
+        if(voice.name.indexOf('female') == -1) { p += 1; }
+        if(voice.localService) { p += 5; }
+        if(p > bee_tts.voice_points) { bee_tts.voice_points = p; bee_tts.voice = voice; }
+    }
+    if(bee_tts.voice_points < 100) {
+        console.log("TTS init failed (no English voice)");
+        bee_tts.status = 'fail';
+        return true;
+    }
+    console.log("TTS ready - selected voice", bee_tts.voice);
+    bee_tts.status = 'ready';
+    return true;
 };
 
 // Returns approximate speaking time based on a string
@@ -1239,6 +1266,11 @@ bee_tts.speak = function(s, callback) {
         }
     }
     
+    if(bee_tts.status == 'fail' && bee_tts.synth && !bee_tts.voice) {
+        // The voice list may have arrived since without a voiceschanged event
+        try { bee_tts.select_voice(); } catch(e) {}
+    }
+
     if(bee_tts.status == 'fail') {
         console.error("TTS not available");
         if(callback) { setTimeout(callback, 1000); }
