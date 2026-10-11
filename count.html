@@ -391,8 +391,8 @@
             return {in_group:(b==5?b:a), groups:(b==5?a:b), row_length:(b==5||a==5?2:1)};
         }
 
-        function get_multiplication_problem(a, b, retype_on_fail) {
-            return {problem: a+'*'+b+'=', solution:(a*b), retype_on_fail:!!retype_on_fail, hint:{
+        function get_multiplication_problem(a, b, announce_on_fail) {
+            return {problem: a+'*'+b+'=', solution:(a*b), announce_on_fail:!!announce_on_fail, hint:{
                 speak_prompt: ''+a+' times '+b+'',
                 speak_solution: speak_multiplication(a, b, true),
                 speak_failed: speak_multiplication(a, b, false),
@@ -418,6 +418,7 @@
                 [placeholder:true]  // add if the question has a variable/placeholder
                 [use_timeout:true]  // move on to the next question after a timeout
                 [retype_on_fail:true]  // on a wrong answer, give the solution and re-ask (like a timeout, but no negative score)
+                [announce_on_fail:true]  // on a wrong answer, give the solution and re-ask the same problem until answered correctly (no penalty; it then scores like any correct answer)
             }
             Alternatively, a problem generator can return a <list of problems> := {
                 type: 'problem_list',
@@ -1030,20 +1031,20 @@
                 if((value - 0) == bee.problem.solution) { // Success!
                     end_question('success');
                     manage_level_stats('success');
-                    // An immediate re-question (see end_question) doesn't count towards the puzzle
-                    const no_puzzle_count = bee.problem.is_requestion ? true : false;
+                    // An immediate re-question (see end_question) earns no score and doesn't count towards the puzzle
+                    const is_requestion = bee.problem.is_requestion ? true : false;
                     if(bee.problem.hint && bee.problem.hint.speak_solution) {
                         bee_tts.speak(bee.problem.hint.speak_solution, function() {
-                            if(success_common({'fast_to_next_question':true, 'no_puzzle_count':no_puzzle_count})
+                            if(success_common({'fast_to_next_question':true, 'skip_this_score':is_requestion, 'no_puzzle_count':is_requestion})
                                 == 'level_complete') { manage_level_stats('reset'); }
                         });
                     } else {
-                        if(success_common({'no_puzzle_count':no_puzzle_count}) == 'level_complete') { manage_level_stats('reset'); }
+                        if(success_common({'skip_this_score':is_requestion, 'no_puzzle_count':is_requestion}) == 'level_complete') { manage_level_stats('reset'); }
                     }
                 }
                 else {
                     // Wrong answer
-                    if(bee.problem.use_timeout || bee.problem.retype_on_fail) {
+                    if(bee.problem.use_timeout || bee.problem.retype_on_fail || bee.problem.announce_on_fail) {
                         end_question('failed');
                     } else {
                         // User will retry here until it is correct
@@ -1320,21 +1321,28 @@
             if(reason == 'failed' || reason == 'timeout') {
                 $('.prompt').addClass('failed');
                 bee.$input.html(esc_html(bee.problem.solution));
-                if(!old_question.retype_on_fail) { add_negative_score(2); }
-                // Try to put the question back on the queue (a normal question again, counting towards the puzzle)
-                const repeat_later = Object.assign({}, old_question); // clone
-                if(bee.queued_problems.length) {
-                    bee.queued_problems.splice(2, 0, repeat_later);
+                if(reason == 'failed' && old_question.announce_on_fail) {
+                    // Re-ask the same problem (not an is_requestion copy) until it is answered correctly; that answer
+                    // then scores and counts towards the puzzle like any other
+                    bee.queued_problems.unshift(old_question);
                 }
-                // Add the same question again
-                const repeat_now = Object.assign({}, old_question); // clone
-                // Clearing the flags makes a wrong answer retry in place (penalty_delay), so the child can
-                // only proceed with the right answer; this also prevents adding the same question multiple
-                // times if the app is left alone
-                repeat_now.use_timeout = false;
-                repeat_now.retype_on_fail = false;
-                repeat_now.is_requestion = true; // doesn't count towards the puzzle; persisted with the queue
-                bee.queued_problems.unshift(repeat_now);
+                else {
+                    if(!old_question.retype_on_fail) { add_negative_score(2); }
+                    // Try to put the question back on the queue (a normal question again, counting towards the score and the puzzle)
+                    const repeat_later = Object.assign({}, old_question); // clone
+                    if(bee.queued_problems.length) {
+                        bee.queued_problems.splice(2, 0, repeat_later);
+                    }
+                    // Add the same question again
+                    const repeat_now = Object.assign({}, old_question); // clone
+                    // Clearing the flags makes a wrong answer retry in place (penalty_delay), so the child can
+                    // only proceed with the right answer; this also prevents adding the same question multiple
+                    // times if the app is left alone
+                    repeat_now.use_timeout = false;
+                    repeat_now.retype_on_fail = false;
+                    repeat_now.is_requestion = true; // earns no score and doesn't count towards the puzzle; persisted with the queue
+                    bee.queued_problems.unshift(repeat_now);
+                }
             } else {
                 $('.prompt').addClass('success');
             }
