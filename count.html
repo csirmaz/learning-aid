@@ -9,7 +9,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?519">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?521">
     <style>
         body {
             /* Disables pull-to-refresh but allows overscroll glow effects. */
@@ -27,6 +27,19 @@
         .prompticonfailed { display: none; }
         body .prompt.failed .prompticonfailed { display: inline; }
         body .prompt.failed .prompticon { display: none; }
+
+        /* The wrong-answer penalty animation (see penalty_delay) overlays the prompt icon, so nothing moves */
+        .prompt .inpline { position: relative; }
+        .prompticonpenalty {
+            display: none;
+            position: absolute;
+            left: 0;
+            top: 50%;
+            height: 1em;
+            margin-top: -.5em;
+        }
+        body .prompt.penalty .prompticonpenalty { display: block; }
+        body .prompt.penalty .prompticon { visibility: hidden; }
 
         .prompt .infield {
             background: #fffae4;
@@ -163,11 +176,47 @@
             background: #fcc;
         }
 
+        table.hint .finger {
+            display: inline-block;
+            width: 1.4rem;
+            height: 1.4rem;
+            border: 2px solid #555;
+            border-radius: 50%;
+            margin-right: .3rem;
+        }
+        table.hint .finger-h {
+            background: #0f0;
+        }
+        table.hint .handgap {
+            display: inline-block;
+            width: 1rem;
+        }
+
+        table.hint td.coin {
+            text-align: center;
+        }
+        table.hint .coin10, table.hint .coin1 {
+            display: inline-block;
+            border: 2px solid #a70;
+            border-radius: .5rem;
+            background: #fd5;
+        }
+        table.hint .coin10 {
+            font-size: .9rem;
+            min-width: 1.4rem;
+            line-height: 1.4rem;
+        }
+        table.hint .coin1 {
+            font-size: .7rem;
+            min-width: 1rem;
+            line-height: 1rem;
+        }
+
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?519">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?521">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?519"></script>
+    <script src="assets/local/beelocal.js?521"></script>
 </head>
 <body>
     <div class="container">
@@ -182,7 +231,7 @@
         <div class="game tab-panel tab-panel-game prompt">
             <div class="infield">
                 <div class="problem"></div>
-                <div><span class="prompticon"></span><span class="prompticonsuccess"></span><span class="prompticonfailed"></span> <span class="prompt-ph"><span class="ph">a</span><span class="cmpop">=</span></span><span class="inp"></span></div>
+                <div class="inpline"><span class="prompticon"></span><span class="prompticonsuccess"></span><span class="prompticonfailed"></span><img class="prompticonpenalty" src="assets/images/bricks.gif"> <span class="prompt-ph"><span class="ph">a</span><span class="cmpop">=</span></span><span class="inp"></span></div>
             </div>
             <div class="hintwrap">
                 <div class="hintloader"><img src="assets/images/loader.gif"></div>
@@ -361,11 +410,18 @@
             return speak_repeat(p, ab);
         }
 
+        // Whether a*b is helped with the nine-times finger trick, in both the spoken (multiply_hint, multiply_explain)
+        // and the visual (multiply_visual_help) help. The 10, 0 and 1 rules come first.
+        function is_nine_fingers(a, b) {
+            if(a==10 || b==10 || a<=1 || b<=1) { return false; }
+            return ((a==9 && b<10) || (b==9 && a<10));
+        }
+
         function multiply_hint(a, b) {
             return ((a==10 || b==10)?'To multiply by ten, just write a zero after the other number.':
                 ((a==0 || b==0)?'You are multiplying by zero':
                 ((a==1 || b==1)?'You are multiplying by one':
-                (( (a==9 && b<10) || (b==9 && a<10))?'To multiply by nine, hold your finger and count the ones before and after.':
+                (is_nine_fingers(a, b)?'To multiply by nine, hold your finger and count the ones before and after.':
                 (( (a==11 && b<10) || (b==11 && a<10))?'The two digits will be the same':
                 ((a==2)?('Remember that this is '+b+' plus '+b+'.'):
                 ((b==2)?('Remember that this is '+a+' plus '+a+'.'):
@@ -393,7 +449,7 @@
             const expl = ((a==10 || b==10)?'Remember, to multiply by ten, just write a zero after the other number.':
                 ((a==0 || b==0)?'We are multiplying by zero.':
                 ((a==1 || b==1)?'We are multiplying by one.':
-                (( (a==9 && b<10) || (b==9 && a<10))?'Remember, to multiply by nine, hold your finger and count the ones before and after.':
+                (is_nine_fingers(a, b)?'Remember, to multiply by nine, hold your finger and count the ones before and after.':
                 (( (a==11 && b<10) || (b==11 && a<10))?'Remember that the two digits will be the same.':
                 ((a==2)?('Remember that this is '+b+' plus '+b+'.'):
                 ((b==2)?('Remember that this is '+a+' plus '+a+'.'):
@@ -430,14 +486,25 @@
             return {in_group:(b==5?b:a), groups:(b==5?a:b), row_length:(b==5||a==5?2:1)};
         }
 
+        // The visual help fields of the hint of a*b (see show_help): the nine-times finger trick, 10 and 1 coins for
+        // the 11 and 12 times tables, otherwise the grid of groups. Like multiply_hint(), the 10, 0 and 1 rules come first.
+        function multiply_visual_help(a, b) {
+            const grid = {groups: multipl_group_help(b, a)};
+            if(a==10 || b==10 || a<=1 || b<=1) { return grid; }
+            if(is_nine_fingers(a, b)) { return {nines: (a==9 ? b : a)}; }
+            if((a==5 && b==12) || (a==12 && b==5)) { return grid; }
+            if(a==12 || b==12) { return {coins: {per_row: (a==12 ? b : a), ones_rows: 2}}; }
+            if(a==11 || b==11) { return {coins: {per_row: (a==11 ? b : a), ones_rows: 1}}; }
+            return grid;
+        }
+
         function get_multiplication_problem(a, b, loop_on_fail) {
-            return {problem: a+'*'+b+'=', solution:(a*b), loop_on_fail:!!loop_on_fail, hint:{
+            return {problem: a+'*'+b+'=', solution:(a*b), loop_on_fail:!!loop_on_fail, hint:Object.assign({
                 speak_prompt: ''+a+' times '+b+'',
                 speak_solution: speak_multiplication(a, b, true),
                 speak_failed: speak_multiplication(a, b, false),
-                groups: multipl_group_help(b, a),
                 help_speech: multiply_hint(a, b)
-            }};
+            }, multiply_visual_help(a, b))};
         }
         
         function get_div_problem_from_mult(a, b) {
@@ -457,7 +524,7 @@
                 [placeholder:true]  // add if the question has a variable/placeholder
                 [use_timeout:true]  // move on to the next question after a timeout
                 [retype_on_fail:true]  // on a wrong answer, give the solution and re-ask (like a timeout, but no negative score)
-                [loop_on_fail:true]  // on a wrong answer, give the solution, speak speak_failed, and re-ask the same problem with its hint shown until answered correctly (no penalty; it then scores like any correct answer)
+                [loop_on_fail:true]  // on a wrong answer, give the solution, speak speak_failed, and re-ask the same problem with its hint shown until answered correctly (no score penalty, but a penalty_delay on the re-ask in bee.loop_penalty_problemsets; it then scores like any correct answer)
             }
             Alternatively, a problem generator can return a <list of problems> := {
                 type: 'problem_list',
@@ -473,6 +540,8 @@
                     // hint syntax: {range: [range-min, range-max, highlight-min, highlight-max]}
                     // hint syntax: {range: [range-min, range-max, highlight-min, highlight-max, step]}
                 groups: // show matrix of symbols for multiplication
+                nines: <n> // show two hands of 5 circles with the n'th coloured (the nine-times finger trick)
+                coins: {per_row: <n>, ones_rows: <1|2>} // show a row of n 10 coins over rows of n 1 coins (11 and 12 times tables)
                 help_txt: // shown on screen
                 longform: [a, b]
         */
@@ -709,15 +778,14 @@
                 return {type: 'problem_list', problems: problems};
             },
             multiply_specific_sets: function() {
-                const a = choose_from([2, 5, 10, 3, 4, 8, 6, 7, 9, 11, 12]);
+                const a = choose_from([9, 11]); // 10, 2, 5, 3, 4, 8, 6, 7, 12
                 const getprob = function(a, b) {
-                    return {problem: a+'*'+b+'=', solution:(a*b), loop_on_fail:true, hint:{
+                    return {problem: a+'*'+b+'=', solution:(a*b), loop_on_fail:true, hint:Object.assign({
                         speak_prompt: ''+a+' times '+b+'',
                         speak_solution: speak_multiplication(a, b, true),
                         speak_failed: multiply_explain(a, b),
-                        groups: multipl_group_help(b, a),
                         help_speech: multiply_hint(a, b)
-                    }};
+                    }, multiply_visual_help(a, b))};
                 };
 
                 const problems = [];
@@ -888,6 +956,8 @@
             question_timeout_value: 6, // the timeout (if the problem specifies) in seconds
             puzzle_needs: 4, // how many successes before puzzle is dismissed
             longform_help_shown: true, // whether to automatically show help if it's longform
+            loop_penalty_problemsets: [0], // problemsets where the re-ask of a failed loop_on_fail problem starts with a penalty_delay
+            loop_early_hint_problemsets: [0], // problemsets where a failed loop_on_fail problem shows its hint already while the explanation (speak_failed) is spoken
             // State (common)
             storage: {'players': {}},  // storage data that's saved into local storage
             load_time: Date.now(),
@@ -903,6 +973,7 @@
             problemset: false, // index (int)
             problem: false, // state: output of a problem generator, {problem:HTML, solution:STR, hint:OBJ}
             queued_problems: false,
+            hint_problem: false, // state: the problem whose hint is on screen (see show_help), or false
             $input: $('.prompt .infield .inp'),
             questiontimeout: { // state: used for question timeouts
                 $warn: $('.timeoutwarn'),
@@ -912,12 +983,13 @@
         };
 
     </script>
-    <script src="assets/common.js?519"></script>
+    <script src="assets/common.js?521"></script>
     <script>
 
         
         function clear_hint() {
             $('.hint').html('');
+            bee.hint_problem = false;
             $('body').removeClass('condense');
             $('.hintloader').hide();
         }
@@ -943,7 +1015,8 @@
         // immediately, leave typing enabled and don't voice. Without it, a manual help press keeps
         // the original loader-then-reveal-after-a-pause behaviour.
         function show_help(auto) {
-            const data = bee.problem.hint;
+            const problem = bee.problem;
+            const data = problem.hint;
             if(data === false) {
                 if(!auto) { playme('notavail'); }
                 return;
@@ -987,6 +1060,23 @@
                 else if(data.help_txt) {
                     o = '<td class="nob">'+format_problem(data.help_txt)+'</td>';
                 }
+                else if(data.nines) {
+                    o += '<td class="nob">';
+                    for(let i=1; i<=10; i++) {
+                        o += '<span class="finger'+(i==data.nines?' finger-h':'')+'"></span>';
+                        if(i==5) { o += '<span class="handgap"></span>'; }
+                    }
+                    o += '</td>';
+                }
+                else if(data.coins) {
+                    // One coin per cell, so each column adds up to one 11 or 12
+                    for(let r=0; r<=data.coins.ones_rows; r++) {
+                        if(r>0) { o += '</tr><tr>'; }
+                        for(let i=0; i<data.coins.per_row; i++) {
+                            o += '<td class="nob coin">'+(r==0 ? '<span class="coin10">10</span>' : '<span class="coin1">1</span>')+'</td>';
+                        }
+                    }
+                }
                 else if(data.groups) {
                     const signs = ['🦆', '🧁', '🧶', '🐸', '🎩'];
                     const sign = signs[Math.floor(Math.random() * signs.length)] + "\ufe0f";
@@ -1009,6 +1099,7 @@
                 
                 o += '</tr>';
                 $('.hint').html(o);
+                bee.hint_problem = problem;
                 setTimeout(function() {
                     if(!auto) { $('.hintloader').hide(); } // auto mode: the loader may belong to a concurrent penalty_delay, so leave it alone
                     $('.hint').show();
@@ -1203,19 +1294,24 @@
         }
 
 
-        // Delay answering as a penalty
+        // Delay answering as a penalty. A wrong answer's animation overlays the prompt icon (see .prompticonpenalty),
+        // so a hint on screen doesn't move; other penalties show the loader.
         var penalty_timeout_ongoing = false;
         function penalty_delay(wrong_answer, reason) {
             console.log('penalty_delay reason=', reason, 'wrong_answer=', wrong_answer, 'ongoing=', penalty_timeout_ongoing);
             if(penalty_timeout_ongoing) { return; }
             bee.can_type = false;
             penalty_timeout_ongoing = true;
-            if(!wrong_answer) { add_negative_score(.5); }
-            $('.hintloader img').attr('src', wrong_answer ? 'assets/images/bricks.gif' : 'assets/images/loader.gif');
-            $('.hintloader').show();
+            if(wrong_answer) {
+                $('.prompt').addClass('penalty');
+            }
+            else {
+                add_negative_score(.5);
+                $('.hintloader').show();
+            }
             setTimeout(function() {
+                $('.prompt').removeClass('penalty');
                 $('.hintloader').hide();
-                $('.hintloader img').attr('src', 'assets/images/loader.gif');
                 bee.can_type = true;
                 penalty_timeout_ongoing = false;
             }, wrong_answer ? 6*1000 : 8*1000);
@@ -1269,11 +1365,14 @@
             $('.prompt').removeClass('success');
             $('.prompt').removeClass('failed');
             $('.prompt-ph').toggle(bee.problem.placeholder ? true : false);
-            clear_hint();
             // Some hints are shown automatically at question time (see is_hint_auto_shown): the child sees
-            // them without asking, and the help key then only re-voices them.
-            if(is_hint_auto_shown()) {
-                show_help(true);
+            // them without asking, and the help key then only re-voices them. A hint already on screen for
+            // this problem (see end_question) is kept as it is.
+            if(bee.hint_problem !== bee.problem) {
+                clear_hint();
+                if(is_hint_auto_shown()) {
+                    show_help(true);
+                }
             }
 
             // Another cheat: switching to the calculator app and reload page
@@ -1408,12 +1507,23 @@
             store_question(bee.queued_problems); // This is modified now
 
             if(reason == 'failed' || reason == 'timeout') {
+                // In some problemsets the re-ask of a failed loop_on_fail problem is blocked by a penalty_delay after the
+                // explanation. It runs after new_question, as start_question re-enables typing.
+                const with_penalty = (reason == 'failed' && old_question.loop_on_fail && bee.loop_penalty_problemsets.includes(bee.problemset));
+                // In some problemsets its hint is shown already while the explanation is spoken; start_question
+                // then keeps it for the re-ask
+                const early_hint = (reason == 'failed' && old_question.loop_on_fail && bee.loop_early_hint_problemsets.includes(bee.problemset));
+                if(early_hint && bee.hint_problem !== bee.problem) { show_help(true); }
+                const next = function() {
+                    new_question(reason);
+                    if(with_penalty) { penalty_delay(true, 'wrong answer (loop_on_fail)'); }
+                };
                 if(bee.problem.hint && bee.problem.hint.speak_failed) {
                     bee_tts.speak(bee.problem.hint.speak_failed, function() {
-                        setTimeout(function(){ new_question(reason); }, 600);
+                        setTimeout(next, 600);
                     });
                 } else {
-                    setTimeout(function(){ new_question(reason); }, 2000);
+                    setTimeout(next, 2000);
                 }
             }
             // Going to the next question when reason=='success' is handled outside this function            
@@ -1493,8 +1603,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?519"></script>
-    <script src="assets/aquarium/js/aquarium.js?519"></script>
+    <script src="assets/aquarium/js/config.js?521"></script>
+    <script src="assets/aquarium/js/aquarium.js?521"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
