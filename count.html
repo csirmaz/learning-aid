@@ -9,7 +9,7 @@
     <meta http-equiv="Content-Language" content="en">
     <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, user-scalable=0">
     <title>Count</title>
-    <link rel="stylesheet" type="text/css" href="assets/common.css?521">
+    <link rel="stylesheet" type="text/css" href="assets/common.css?522">
     <style>
         body {
             /* Disables pull-to-refresh but allows overscroll glow effects. */
@@ -195,7 +195,7 @@
         table.hint td.coin {
             text-align: center;
         }
-        table.hint .coin10, table.hint .coin1 {
+        table.hint .coin10, table.hint .coin5, table.hint .coin1 {
             display: inline-block;
             border: 2px solid #a70;
             border-radius: .5rem;
@@ -206,6 +206,16 @@
             min-width: 1.4rem;
             line-height: 1.4rem;
         }
+        table.hint .coin5 {
+            font-size: .8rem;
+            min-width: 1.2rem;
+            line-height: 1.2rem;
+        }
+        table.hint td.coinsum {
+            padding-left: .6rem;
+            font-size: .7rem;
+            color: #333;
+        }
         table.hint .coin1 {
             font-size: .7rem;
             min-width: 1rem;
@@ -213,10 +223,10 @@
         }
 
     </style>
-    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?521">
+    <link rel="stylesheet" type="text/css" href="assets/aquarium/css/aquarium.css?522">
     <script src="assets/confetti/js-confetti.browser.js"></script>
     <script src="assets/jquery/jquery-3.7.1.min.js"></script>
-    <script src="assets/local/beelocal.js?521"></script>
+    <script src="assets/local/beelocal.js?522"></script>
 </head>
 <body>
     <div class="container">
@@ -417,6 +427,8 @@
             return ((a==9 && b<10) || (b==9 && a<10));
         }
 
+        // 5*12 is helped as pairs of fives (matching its 5 coins in multiply_visual_help()), not split like the rest of
+        // the 12 times table; multiply_explain() does the same
         function multiply_hint(a, b) {
             return ((a==10 || b==10)?'To multiply by ten, just write a zero after the other number.':
                 ((a==0 || b==0)?'You are multiplying by zero':
@@ -425,8 +437,8 @@
                 (( (a==11 && b<10) || (b==11 && a<10))?'The two digits will be the same':
                 ((a==2)?('Remember that this is '+b+' plus '+b+'.'):
                 ((b==2)?('Remember that this is '+a+' plus '+a+'.'):
-                ((a==12)?('Split the problem. Take ten times '+b+' and add two times '+b+'.'):
-                ((b==12)?('Split the problem. Take ten times '+a+' and add two times '+a+'.'):
+                ((a==12 && b!=5)?('Split the problem. Take ten times '+b+' and add two times '+b+'.'):
+                ((b==12 && a!=5)?('Split the problem. Take ten times '+a+' and add two times '+a+'.'):
                 ((a==11)?('Split the problem. Take ten times '+b+' and add '+b+'.'):
                 ((b==11)?('Split the problem. Take ten times '+a+' and add '+a+'.'):
                 ((a==5 && (b%2==0))?('Remember that '+b+' times five is '+(b/2)+' pairs of fives.'):
@@ -453,8 +465,8 @@
                 (( (a==11 && b<10) || (b==11 && a<10))?'Remember that the two digits will be the same.':
                 ((a==2)?('Remember that this is '+b+' plus '+b+'.'):
                 ((b==2)?('Remember that this is '+a+' plus '+a+'.'):
-                ((a==12)?('Remember to split the problem. Take ten times '+b+' and add two times '+b+'.'):
-                ((b==12)?('Remember to split the problem. Take ten times '+a+' and add two times '+a+'.'):
+                ((a==12 && b!=5)?('Remember to split the problem. Take ten times '+b+' and add two times '+b+'.'):
+                ((b==12 && a!=5)?('Remember to split the problem. Take ten times '+a+' and add two times '+a+'.'):
                 ((a==11)?('Remember to split the problem. Take ten times '+b+' and add '+b+'.'):
                 ((b==11)?('Remember to split the problem. Take ten times '+a+' and add '+a+'.'):
                 ((a==5 && (b%2==0))?('Remember that '+b+' times five is '+(b/2)+' pairs of fives.'):
@@ -486,13 +498,14 @@
             return {in_group:(b==5?b:a), groups:(b==5?a:b), row_length:(b==5||a==5?2:1)};
         }
 
-        // The visual help fields of the hint of a*b (see show_help): the nine-times finger trick, 10 and 1 coins for
-        // the 11 and 12 times tables, otherwise the grid of groups. Like multiply_hint(), the 10, 0 and 1 rules come first.
+        // The visual help fields of the hint of a*b (see show_help): the nine-times finger trick, 5 coins for the 5 times
+        // table (but 5*11 is shown like the rest of the 11 times table), 10 and 1 coins for the 11 and 12 times tables,
+        // otherwise the grid of groups. Like multiply_hint(), the 10, 0 and 1 rules come first.
         function multiply_visual_help(a, b) {
             const grid = {groups: multipl_group_help(b, a)};
             if(a==10 || b==10 || a<=1 || b<=1) { return grid; }
             if(is_nine_fingers(a, b)) { return {nines: (a==9 ? b : a)}; }
-            if((a==5 && b==12) || (a==12 && b==5)) { return grid; }
+            if((a==5 || b==5) && a!=11 && b!=11) { return {fives: (a==5 ? b : a)}; }
             if(a==12 || b==12) { return {coins: {per_row: (a==12 ? b : a), ones_rows: 2}}; }
             if(a==11 || b==11) { return {coins: {per_row: (a==11 ? b : a), ones_rows: 1}}; }
             return grid;
@@ -541,6 +554,7 @@
                     // hint syntax: {range: [range-min, range-max, highlight-min, highlight-max, step]}
                 groups: // show matrix of symbols for multiplication
                 nines: <n> // show two hands of 5 circles with the n'th coloured (the nine-times finger trick)
+                fives: <n> // show n 5 coins in pairs, each full pair followed by the running total (5 times table)
                 coins: {per_row: <n>, ones_rows: <1|2>} // show a row of n 10 coins over rows of n 1 coins (11 and 12 times tables)
                 help_txt: // shown on screen
                 longform: [a, b]
@@ -778,7 +792,7 @@
                 return {type: 'problem_list', problems: problems};
             },
             multiply_specific_sets: function() {
-                const a = choose_from([9, 11]); // 10, 2, 5, 3, 4, 8, 6, 7, 12
+                const a = choose_from([10, 5, 2, 4, 11]); // 8,   3, 6, 9,   7,   12
                 const getprob = function(a, b) {
                     return {problem: a+'*'+b+'=', solution:(a*b), loop_on_fail:true, hint:Object.assign({
                         speak_prompt: ''+a+' times '+b+'',
@@ -983,7 +997,7 @@
         };
 
     </script>
-    <script src="assets/common.js?521"></script>
+    <script src="assets/common.js?522"></script>
     <script>
 
         
@@ -1075,6 +1089,16 @@
                         for(let i=0; i<data.coins.per_row; i++) {
                             o += '<td class="nob coin">'+(r==0 ? '<span class="coin10">10</span>' : '<span class="coin1">1</span>')+'</td>';
                         }
+                    }
+                }
+                else if(data.fives) {
+                    // Two coins per row, so each full row adds another ten, shown after it
+                    for(let r=0; r*2<data.fives; r++) {
+                        if(r>0) { o += '</tr><tr>'; }
+                        for(let i=0; i<2; i++) {
+                            o += '<td class="nob coin">'+(r*2+i < data.fives ? '<span class="coin5">5</span>' : '')+'</td>';
+                        }
+                        o += '<td class="nob coinsum">'+(r*2+2 <= data.fives ? (r+1)*10 : '')+'</td>';
                     }
                 }
                 else if(data.groups) {
@@ -1393,12 +1417,20 @@
 
         
         // Prevent getting a new question when the page is refreshed (a cheat to get out of difficult questions)
+        // The queue is stored with bee_app_version, and one stored by another version (or with none) is thrown away,
+        // so changes to the problemsets or to problem properties take effect at the next version bump.
         function store_question(problem_data) {
             bee.storage.players[bee.player].current_question = problem_data;
+            bee.storage.players[bee.player].current_question_version = bee_app_version;
             save_storage('store_question');
         }
 
         function get_question_from_store() {
+            const v = bee.storage.players[bee.player].current_question_version;
+            if(v !== bee_app_version) {
+                console.log('Discarding the question queue stored by app version', v);
+                return false;
+            }
             const w = bee.storage.players[bee.player].current_question;
             return w;
         }
@@ -1603,8 +1635,8 @@
         }
 
     </script>
-    <script src="assets/aquarium/js/config.js?521"></script>
-    <script src="assets/aquarium/js/aquarium.js?521"></script>
+    <script src="assets/aquarium/js/config.js?522"></script>
+    <script src="assets/aquarium/js/aquarium.js?522"></script>
     <div class="footercontent"></div>
 
     <script> bootstrap(); </script>
